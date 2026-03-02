@@ -785,7 +785,7 @@ function mk(tag,cls,html){ var e=document.createElement(tag||'div'); if(cls) e.c
 var fab=mk('button','rt7-fab'); fab.type='button';
 fab.innerHTML='<span class="rt7-dot"></span>'
   +'<div style="display:flex;flex-direction:column;line-height:1.1;">'
-  +'<div class="rt7-fname">工具教程</div>'
+  +'<div class="rt7-fname">工具导游</div>'
   +'<div class="rt7-ftip">选择功能逐步讲解</div></div>';
 
 var mask=mk('div','rt7-mask');
