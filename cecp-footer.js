@@ -17,8 +17,6 @@ document.addEventListener('keydown', function(e) {
     const isPortrait = window.matchMedia && window.matchMedia("(orientation: portrait)").matches;
     b.classList.toggle("cecp-portrait", !!isPortrait);
     b.classList.toggle("cecp-landscape", !isPortrait);
-    const isHome = location.pathname === "/" || location.pathname === "";
-    b.classList.toggle("cecp-home", isHome);
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", setOrientationClass);
