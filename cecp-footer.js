@@ -549,7 +549,17 @@ document.addEventListener('keydown', function(e) {
 /* ===== Ring Coach Tour v7.1 ===== */
 (function(){
 'use strict';
-if(!document.getElementById('rt5-enable')) return;
+// 用 MutationObserver 等待引擎渲染完成后插入的 #rt5-enable
+function initTourWhenReady(){
+  if(document.getElementById('rt5-enable')){ initTour(); return; }
+  var obs=new MutationObserver(function(){
+    if(document.getElementById('rt5-enable')){ obs.disconnect(); initTour(); }
+  });
+  var body=document.body;
+  if(body) obs.observe(body,{childList:true,subtree:true});
+  else document.addEventListener('DOMContentLoaded',function(){ obs.observe(document.body,{childList:true,subtree:true}); });
+}
+function initTour(){
 
 var $  = function(s,r){ return (r||document).querySelector(s); };
 var $$ = function(s,r){ return Array.from((r||document).querySelectorAll(s)); };
@@ -600,7 +610,7 @@ function unlockPage(){
   try{ window.scrollTo(0,LOCK.y); }catch(e){}
 }
 
-function ap(){ return $('.aplayer')||$('[class*="aplayer-wrap"]'); }
+function ap(){ return $('.ym-song-panel.active .aplayer')||$('.aplayer')||$('[class*="aplayer-wrap"]'); }
 function api(s){ var r=ap(); return r?$(s,r):null; }
 function apPlayBtn(){
   var r=ap(); if(!r) return null;
@@ -965,4 +975,6 @@ window.addEventListener('keydown',function(e){
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',updateFab);
 else updateFab();
 
+} // end initTour
+initTourWhenReady();
 })();
