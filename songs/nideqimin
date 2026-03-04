@@ -1,0 +1,196 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-03-04 22:21:38",
+  "id": "nideqimin",
+  "title": "你的器皿",
+  "artist": "赞美之泉",
+  "sub": "新的事将要成就【2015】吴介恩词曲(太5:13-14)",
+  "origKey": "F",
+  "timeSign": "4/4",
+  "bpm": 84,
+  "mp3": "/upload/nideqimin.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/nideqiming.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/nideqiming.lrc",
+  "youtube": "https://youtu.be/4j8AZAwBiXo?si=634ztqS0GC09OfIG",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/nideqiminF.jpg",
+  "sections": [
+  {
+    "name": "前奏",
+    "lines": [
+      [
+        {"chord":"F","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C/E","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Dm7","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C/E","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Dm7","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C/E","lyric":""},
+        {"chord":"","lyric":"｜"}
+      ]
+    ]
+  },
+  {
+    "name": "主歌",
+    "lines": [
+      [
+        {"chord":"F","n":"0_ 3_","lyric":"ㅤ 世"},
+        {"chord":"","n":"3·_ 3__ 2_ 3_ 0_","lyric":"界的灰暗"},
+        {"chord":"","n":"1__ 1__","lyric":"需要"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"3_ 3","lyric":"灿烂"},
+        {"chord":"","n":"2__ ( 2__ 2_ ) 1·","lyric":"的色ㅤ 彩，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Dm","n":"0_ 1_","lyric":"ㅤ 冷"},
+        {"chord":"","n":"1_ 2_ 1·","lyric":"漠生命"},
+        {"chord":"","n":"5,_","lyric":"缺"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C/E","n":"7,_ 7,_ 1_ ( 2_ 2 ) -","lyric":"温暖关 怀"},
+        {"chord":"","lyric":"｜"}
+      ],
+      [
+        {"chord":"F","n":"0_ 3_","lyric":"ㅤ 颤"},
+        {"chord":"","n":"3·_ 3__ 2_ 3_ 0_","lyric":"抖的双手"},
+        {"chord":"","n":"5,__ 5,__","lyric":"等待"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"6,_ 1 6,__ ( 2__ 2_ )","lyric":"扶持的力"},
+        {"chord":"","n":"1·","lyric":"量，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Dm","n":"0_ 1_","lyric":"ㅤ迷"},
+        {"chord":"","n":"1_ 2_ 1·","lyric":"失的心"},
+        {"chord":"","n":"5,_","lyric":"在"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C/E","n":"2_ 2_ 1_ ( 2_ 2_ ) -","lyric":"寻找方 向。"},
+        {"chord":"","lyric":"｜"}
+      ],
+      [
+        {"chord":"Bb","n":"0_ 6,_","lyric":"ㅤ人"},
+        {"chord":"","n":"6,_ 1_ 1","lyric":"来人往"},
+        {"chord":"","n":"5,_ 5,_","lyric":"有谁"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F/A","n":"5,_ 3 2__ ( 1__ 1 )","lyric":"能停下来，"},
+        {"chord":"","n":"1_ ([ 5_","lyric":"真心"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"]) 5","lyric":"ㅤ"},
+        {"chord":"","n":"1_ ( 1_ sp 1_ )","lyric":"付出"},
+        {"chord":"","n":"1_","lyric":"舍"},
+        {"chord":"","n":"1_ 2_","lyric":"己的"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C","n":"2 - - -","lyric":"爱"},
+        {"chord":"","lyric":"｜"}
+      ],
+      [
+        {"chord":"Gm","n":"0_ 6,_","lyric":"ㅤ耶"},
+        {"chord":"","n":"1 6,_ 1 ([ 5,_","lyric":"稣请你来"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F/A","n":"]) 5,_","lyric":"ㅤ"},
+        {"chord":"","n":"5,_ 3 3_ 2_ 2_ 3_ ([ 3_","lyric":"安 慰受伤心 灵，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"]) 3_","lyric":"ㅤ"},
+        {"chord":"","n":"6,_ 4_ 3_ 4_ 3__ ( 4__ 4 )","lyric":"使沉睡的 时 代"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C","n":"3_ 4_","lyric":"再次"},
+        {"chord":"","n":"3_ ( 5_ 5 ) -","lyric":"苏醒。"},
+        {"chord":"","lyric":"\\\\"}
+      ]
+    ]
+  },
+  {
+    "name": "副歌",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"F","n":"0_ 3_","lyric":"ㅤ求"},
+        {"chord":"","n":"3","lyric":"你"},
+        {"chord":"","n":"3_ 2_ 3_ ([ 5_","lyric":"软化我心，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C/E","n":"]) 5_","lyric":"ㅤ"},
+        {"chord":"","n":"3_ 3","lyric":"跟随"},
+        {"chord":"","n":"3_ 2_ 2_ ([ 1_","lyric":"你的旨意，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Dm7","n":"]) 1_","lyric":"ㅤ"},
+        {"chord":"","n":"1_","lyric":"安"},
+        {"chord":"","n":"1_ 2_ ( 1_ 1_ )","lyric":"静聆听"},
+        {"chord":"","n":"1_ 2_","lyric":"你的"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"( 3_ 3_ )","lyric":"声"},
+        {"chord":"","n":"5_","lyric":"ㅤ"},
+        {"chord":"","n":"( 5_ 5 ) -","lyric":"音。"},
+        {"chord":"","lyric":"｜"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Bb","n":"0_ 6_","lyric":"ㅤ看"},
+        {"chord":"","n":"6_ 6_","lyric":"见人"},
+        {"chord":"","n":"6·_ ( 5__ 5_ )","lyric":"的需"},
+        {"chord":"","n":"([ 5_","lyric":"要"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F/A","n":"]) 5_","lyric":"ㅤ"},
+        {"chord":"","n":"5_","lyric":"日"},
+        {"chord":"","n":"5_ 3_ 5·_","lyric":"夜守望"},
+        {"chord":"","n":"( 3__ 3_ )","lyric":"祈"},
+        {"chord":"","n":"([ 1_","lyric":"祷，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"]) 1_","lyric":"ㅤ"},
+        {"chord":"","n":"1_ 1_ 2_ 1 1_ 2_","lyric":"带人重 回 你的"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"( 3 2_ )","lyric":"怀"},
+        {"chord":"","n":"( 2_ 2 )","lyric":"抱"},
+        {"chord":"","lyric":"\\\\"}
+      ]}
+    ]
+  },
+  {
+    "name": "副歌二",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"F","n":"0_ 3_","lyric":"ㅤ每"},
+        {"chord":"","n":"3","lyric":"天"},
+        {"chord":"","n":"3_ 2_ 3_ ([ 5_","lyric":"专注于你，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C/E","n":"]) 5_","lyric":"ㅤ"},
+        {"chord":"","n":"3_ 3","lyric":"求开"},
+        {"chord":"","n":"3_ 2_ 2_ ([ 1_","lyric":"启我双眼，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Dm7","n":"]) 1_","lyric":"ㅤ"},
+        {"chord":"","n":"1_","lyric":"靠"},
+        {"chord":"","n":"1_ 2_ ( 1_ 1_ )","lyric":"着生灵述"},
+        {"chord":"","n":"1_ 2_","lyric":"说你"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"( 3_ 3_ )","lyric":"奇妙"},
+        {"chord":"","n":"5_","lyric":"恩"},
+        {"chord":"","n":"( 5_ 5 ) -","lyric":"典。"},
+        {"chord":"","lyric":"｜"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Bb","n":"0_ 6_","lyric":"ㅤ我"},
+        {"chord":"","n":"6_ 6_","lyric":"是"},
+        {"chord":"","n":"6·_ ( 5__ 5_ )","lyric":"你的器"},
+        {"chord":"","n":"([ 5_","lyric":"皿，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F/A","n":"]) 5_","lyric":"ㅤ"},
+        {"chord":"","n":"5_","lyric":"为"},
+        {"chord":"","n":"5_ 3_ 5·_","lyric":"你作光"},
+        {"chord":"","n":"( 3__ 3_ )","lyric":"作"},
+        {"chord":"","n":"([ 1_","lyric":"盐，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"]) 1_","lyric":"ㅤ"},
+        {"chord":"","n":"1_ 1_ 2_ 1 1_","lyric":"使人得 着 你"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"5 -","lyric":"爱"},
+        {"chord":"","n":"2","lyric":"的"},
+        {"chord":"","n":"( 3_ 2_ )","lyric":"拥"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"1 - - -","lyric":"抱"},
+        {"chord":"","lyric":"\\\\"}
+      ]}
+    ]
+  }
+]
+}
