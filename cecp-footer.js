@@ -36,7 +36,6 @@ document.addEventListener('keydown', function(e) {
   const API_BASE=WORKER.replace(/\/$/,"");
   const LS_PREFIX="HBW::";
   const PRIMARY_LOCAL="CUNPSS";
-  const PRIMARY_YV="YV:";
   const DEFAULT_PRIMARY=PRIMARY_LOCAL;
 
   const DESIRED_T2=[
@@ -44,7 +43,6 @@ document.addEventListener('keydown', function(e) {
     {code:"NR06",label:"NR06 · Nuova Riveduta 2006 (Italiano)"},
     {code:"ESV",label:"ESV (English)"},
     {code:"WEB",label:"WEB (English)"},
-    {code:"YV:36",label:"CCB · 当代圣经 (中文)"},
   ];
 
   const BOOKS=[
