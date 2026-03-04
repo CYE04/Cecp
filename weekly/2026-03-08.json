@@ -1,0 +1,17 @@
+{
+  "week": "2026年3月 第2周",
+  "time": "每周日 12:00 – 13:30",
+  "sheetName": "080326",
+  "speaker": "吴超凡",
+  "topic": "讲题",
+  "bibleRef": "？",
+  "pptUrl": null,
+  "replayUrl": null,
+  "gameText": "本周没有游戏活动哦👀",
+  "schedule": [
+    { "time": "12:00 – 12:30", "event": "诗歌敬拜", "emoji": "🎶" },
+    { "time": "12:30 – 13:30", "event": "圣经分享", "emoji": "📖" },
+    { "time": "13:30", "event": "祷告 & 结束", "emoji": "🙏" }
+  ],
+  "songs": ["zmzq-shunfu", "zmzq-endianzhilu"]
+}
