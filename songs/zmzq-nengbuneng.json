@@ -7,10 +7,10 @@
   "timeSign": "4/4",
   "bpm": 65,
   "mp3": "",
-  "cover": "",
-  "lrc": "",
+  "cover": "https://cecpadua.github.io/resouces/covers/nengbuneng.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/nengbuneng.jpg",
   "youtube": "https://youtu.be/rZw6z8hH7Jc?si=ScXErfxg5Fwl7q0h",
-  "scoreImg": "",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/nengbuneng.jpg",
   "sections": [
     {
       "name": "前奏",
