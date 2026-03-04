@@ -7,10 +7,10 @@
   "timeSign": "4/4",
   "bpm": 66,
   "mp3": "/upload/endianzhilu.mp3",
-  "cover": "/upload/endianzhilu.jpg",
-  "lrc": "/upload/endianzhilu.lrc",
+  "cover": "https://cecpadua.github.io/resouces/covers/endianzhilu.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/endianzhilu.lrc",
   "youtube": "https://youtu.be/0Q444bzsehU?si=Cwb2smX0td-M7CrQ",
-  "scoreImg": "/upload/endianzhiluF.jpg",
+  "scoreImg": "https://cecpadua.github.io/resouces/score/endianzhiluF.jpg",
   "sections": [
     {
       "name": "前奏",

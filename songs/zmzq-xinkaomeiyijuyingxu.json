@@ -7,10 +7,10 @@
   "timeSign": "4/4",
   "bpm": 90,
   "mp3": "/upload/xinkaomeiyijuyingxu.mp3",
-  "cover": "/upload/junwangjiuzaizheli-JSLs.jpg",
-  "lrc": "/upload/xinkaomeiyijuyingxu.lrc",
+  "cover": "https://cecpadua.github.io/resouces/covers/junwangjiuzaizheli-JSLs.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/xinkaomeiyijuyingxu.lrc",
   "youtube": "https://youtu.be/hQ6Uz6Uhesw",
-  "scoreImg": "/upload/xinkaomeiyijuyingxuE.jpg",
+  "scoreImg": "https://cecpadua.github.io/resouces/score/xinkaomeiyijuyingxuE.jpg",
   "sections": [
     {
       "name": "前奏",
