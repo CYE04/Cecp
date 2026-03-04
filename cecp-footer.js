@@ -762,13 +762,13 @@ var MODS={
     label:'🎸 移调计算器',
     desc:'展开移调面板 → 选目标调 → 变调夹提示 → 和弦歌词区',
     steps:[
-      { ico:'🎸', t:'"移调"按钮', s:'点击展开/收起移调面板', find:function(){ return $('.sw-tog')||null; }, text:'点击 <b>移调</b> 按钮，展开调性选择面板。<br>点击后可以为吉他手/键盘手选择最顺手的调。' },
+      { ico:'🎸', t:'"移调"按钮', s:'点击展开/收起移调面板', find:function(){ return $$('.sw-tog').find(function(e){return vis(e);})||null; }, text:'点击 <b>移调</b> 按钮，展开调性选择面板。<br>点击后可以为吉他手/键盘手选择最顺手的调。' },
       { ico:'🎵', t:'目标调选择', s:'点击任意调名切换',
-        before:function(){ var panel=$('.sw-panel'); if(panel&&!panel.classList.contains('open')){ var tog=$('.sw-tog'); if(tog) try{ tog.click(); }catch(e){} } },
-        find:function(){ var panel=$('.sw-panel'); if(panel&&!panel.classList.contains('open')){ var tog=$('.sw-tog'); if(tog) try{ tog.click(); }catch(e){} } return $('.sw-kg')||$('.sw-panel-inner')||null; },
+        before:function(){ var tog=$$('.sw-tog').find(function(e){return vis(e);}); if(tog){ var panel=tog.closest('.ym-song-panel')||document; var p=panel.querySelector?panel.querySelector('.sw-panel'):$('.sw-panel'); if(p&&!p.classList.contains('open')) try{ tog.click(); }catch(e){} } },
+        find:function(){ var tog=$$('.sw-tog').find(function(e){return vis(e);}); if(tog){ var panel=tog.closest('.ym-song-panel')||document; var p=panel.querySelector?panel.querySelector('.sw-panel'):$('.sw-panel'); if(p&&!p.classList.contains('open')) try{ tog.click(); }catch(e){} return panel.querySelector?panel.querySelector('.sw-kg')||panel.querySelector('.sw-panel-inner'):$('.sw-kg')||$('.sw-panel-inner')||null; } return $$('.sw-kg').find(function(e){return vis(e);})||$$('.sw-panel-inner').find(function(e){return vis(e);})||null; },
         text:'这里列出了全部 12 个调名。<br>点击任意一个，下方的和弦、变调夹提示会立刻自动更新。' },
-      { ico:'🟠', t:'变调夹提示', s:'显示需要夹第几格', find:function(){ return vis($('.sw-capo'))?$('.sw-capo'):$('.sw-panel-inner')||null; }, text:'这里告诉你：<br>• 是否需要变调夹，以及夹第几格<br>• 实际弹奏时用哪个调的指法<br>选原调时显示"原调演奏，不需要变调夹"。' },
-      { ico:'🎼', t:'和弦 + 歌词', s:'实时更新的和弦谱', find:function(){ return $('.sw-lb,.sw-lsec')||$('.sw-panel-inner')||null; }, text:'移调后这里的所有和弦会<b>自动换算</b>成新的调性。<br>歌词保持不变，和弦名称实时更新。' }
+      { ico:'🟠', t:'变调夹提示', s:'显示需要夹第几格', find:function(){ return $$('.sw-capo').find(function(e){return vis(e);})||$$('.sw-panel-inner').find(function(e){return vis(e);})||null; }, text:'这里告诉你：<br>• 是否需要变调夹，以及夹第几格<br>• 实际弹奏时用哪个调的指法<br>选原调时显示"原调演奏，不需要变调夹"。' },
+      { ico:'🎼', t:'和弦 + 歌词', s:'实时更新的和弦谱', find:function(){ return $$('.sw-lb').find(function(e){return vis(e);})||$$('.sw-lsec').find(function(e){return vis(e);})||$$('.sw-panel-inner').find(function(e){return vis(e);})||null; }, text:'移调后这里的所有和弦会<b>自动换算</b>成新的调性。<br>歌词保持不变，和弦名称实时更新。' }
     ]
   },
   bible:{
