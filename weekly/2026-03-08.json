@@ -12,10 +12,10 @@
   "schedule": [
     { "time": "12:00 – 12:30", "event": "诗歌敬拜", "emoji": "🎶" },
     { "time": "12:30 – 13:30", "event": "圣经分享", "emoji": "📖" },
-    { "time": "13:30",         "event": "祷告 & 结束", "emoji": "🙏" }
+    { "time": "13:30", "event": "祷告 & 结束", "emoji": "🙏" }
   ],
   "songs": [
     "zmzq-xinkaomeiyijuyingxu",
-    "zmzq-endianzhilu"
+    "zmzq-endianzhilu",
+    "zmzq-howawesomeyouare"
   ]
-}
