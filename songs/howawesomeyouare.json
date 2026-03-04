@@ -1,0 +1,606 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-03-04 18:10:47",
+  "id": "howawesomeyouare",
+  "title": "主祢真伟大-How Awesome You Are",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉儿童专辑 High to the Sky 2018 曾祥怡 游智婷 词曲(赛40:15-25)",
+  "origKey": "A",
+  "timeSign": "4/4",
+  "bpm": 70,
+  "mp3": "/upload/HowAwesomeYouAre.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/HowAwesomeYouAre.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/HowAwesomeYouAre.lrc",
+  "youtube": "https://youtu.be/B4FDL1eMI_8?si=q22c1MM0Ut4aEnth",
+  "scoreImg": "https://cecpadua.github.io/resouces/score/How Awesome You Are A.jpg",
+  "sections": [
+    {
+      "name": "前奏",
+      "lines": [
+        [
+          {
+            "chord": "A",
+            "n": "3'_ 2'_ 3'_ ( 3'_ 3' - )",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "E/G#",
+            "n": "3'_ 2'_ 6'_ ( 3'_ 3' - )",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "F#m",
+            "n": "3'_ 2'_ 5'_ 3'_ 1''_ 7'_ 5'_ 1'_",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "D",
+            "n": "6 - - -",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ]
+      ]
+    },
+    {
+      "name": "主歌+副歌",
+      "lines": [
+        [
+          {
+            "chord": "A",
+            "n": "3 1",
+            "lyric": "伟大"
+          },
+          {
+            "chord": "E/G#",
+            "n": "2 5",
+            "lyric": "奇妙"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "F#m",
+            "n": "1 - - -",
+            "lyric": "神"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "A",
+            "n": "3 1",
+            "lyric": ""
+          },
+          {
+            "chord": "E/G#",
+            "n": "2 6",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "C#m",
+            "n": "5 - -",
+            "lyric": "主，"
+          },
+          {
+            "chord": "",
+            "n": "6_ 7_",
+            "lyric": "在你"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "D",
+            "n": "( 1'· 4_ )",
+            "lyric": "眼"
+          },
+          {
+            "chord": "D/E",
+            "n": "4_ 1'_ 7_ 6_",
+            "lyric": "里,万国只"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ],
+        [
+          {
+            "chord": "C#m",
+            "n": "5 5_ 4_",
+            "lyric": "像小水"
+          },
+          {
+            "chord": "F#m",
+            "n": "3· 3_",
+            "lyric": "滴,无"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Bm",
+            "n": "4 5 6 6",
+            "lyric": "人与你相"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "D/E",
+            "n": "([ 5 - - -",
+            "lyric": "比"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "E",
+            "n": "]) 5",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "0_ 5_ 1'_ 1'_ 7_ ([ 1'_",
+            "lyric": "ㅤ主你真伟大"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ],
+        [
+          {
+            "chord": "A",
+            "n": "]) 1'·",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "5_",
+            "lyric": "How"
+          },
+          {
+            "chord": "",
+            "n": "1'_ sp_",
+            "lyric": "awe-"
+          },
+          {
+            "chord": "",
+            "n": "1'_",
+            "lyric": "some"
+          },
+          {
+            "chord": "",
+            "n": "1_ sp_",
+            "lyric": "You"
+          },
+          {
+            "chord": "",
+            "n": "([ 7_",
+            "lyric": "are"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "E/G#",
+            "n": "]) 7·",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "5_ 1'_ 1'_ 7'_ ([ 1'_",
+            "lyric": "主你真伟大,"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "F#m",
+            "n": "]) 1'·",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "sp 1'_",
+            "lyric": "ㅤHow"
+          }
+        ],
+        [
+          {
+            "chord": "",
+            "n": "1'_ sp_",
+            "lyric": "awe-"
+          },
+          {
+            "chord": "",
+            "n": "1'_",
+            "lyric": "some"
+          },
+          {
+            "chord": "",
+            "n": "3_ sp_ ([ 5_",
+            "lyric": "You are"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "C#m",
+            "n": "]) 5",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "0",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "6_ 5_ 4_ ([ 6_",
+            "lyric": "深深爱我，"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "D",
+            "n": "]) 6",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "0",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "6_ 7_ 1'_ ([ 5_",
+            "lyric": "捧我在你"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "",
+            "n": "]) 5 -",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "3 5",
+            "lyric": "手心"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "",
+            "n": "5 - - -",
+            "lyric": "中"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ],
+        [
+          {
+            "chord": "E",
+            "n": "0",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "0_ 5_ 1'_ 1'_ 7_ ([ 1'_",
+            "lyric": "ㅤ主你真伟大"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "A",
+            "n": "]) 1'·",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "5_ sp_",
+            "lyric": "Howㅤ"
+          },
+          {
+            "chord": "",
+            "n": "1'_ sp_",
+            "lyric": "awe-"
+          },
+          {
+            "chord": "",
+            "n": "1'_",
+            "lyric": "some"
+          },
+          {
+            "chord": "",
+            "n": "1_ sp_",
+            "lyric": "You"
+          },
+          {
+            "chord": "",
+            "n": "([ 7_",
+            "lyric": "Are"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "E/G#",
+            "n": "]) 7·",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "5_ 1'_ 1'_ 7'_ ([ 1'_",
+            "lyric": "主你真伟大"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "F#m",
+            "n": "]) 1'·",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "sp 1'_",
+            "lyric": "ㅤHow"
+          }
+        ],
+        [
+          {
+            "chord": "",
+            "n": "1'_ sp_",
+            "lyric": "awe-"
+          },
+          {
+            "chord": "",
+            "n": "1'_",
+            "lyric": "some"
+          },
+          {
+            "chord": "",
+            "n": "3_ sp_ ([ 5_",
+            "lyric": "You are"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "C#m",
+            "n": "]) 5",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "0",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "6_ 5_ 4_ ([ 6_",
+            "lyric": "永恒的主"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "D",
+            "n": "]) 6",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "6_ 7_ 1'_ ([ 1'_",
+            "lyric": "唯一的主"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "D/E",
+            "n": "]) 1'",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "-",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "n": "( 7· sp 1' )",
+            "lyric": "上"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "A",
+            "n": "([ 1' - - -",
+            "lyric": "帝。"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "",
+            "n": "]) 1' - - -",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ]
+      ]
+    },
+    {
+      "name": "Ending",
+      "lines": [
+        [
+          {
+            "chord": "A",
+            "n": "3 1",
+            "lyric": "伟大"
+          },
+          {
+            "chord": "E/G#m",
+            "n": "2 5",
+            "lyric": "奇妙"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "F#m",
+            "n": "1 - - -",
+            "lyric": "神"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "A",
+            "n": "3 1",
+            "lyric": "宇宙"
+          },
+          {
+            "chord": "E/G#",
+            "n": "2 6",
+            "lyric": "创造"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "C#m",
+            "n": "5 - -",
+            "lyric": "主，"
+          },
+          {
+            "chord": "",
+            "n": "6_ 7_",
+            "lyric": "创世"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "D",
+            "n": "( 1'· sp 4_ )",
+            "lyric": "之"
+          },
+          {
+            "chord": "D/E",
+            "n": "4_ sp_ 1'_",
+            "lyric": "前，为"
+          },
+          {
+            "chord": "",
+            "n": "7_ 6_",
+            "lyric": "我定"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "C#m",
+            "n": "5 5_ 4_",
+            "lyric": "完美计"
+          },
+          {
+            "chord": "F#m",
+            "n": "3·",
+            "lyric": "划，"
+          },
+          {
+            "chord": "",
+            "n": "3_",
+            "lyric": "我"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ],
+        [
+          {
+            "chord": "Bm",
+            "n": "4 5",
+            "lyric": "一生"
+          },
+          {
+            "chord": "D/E",
+            "n": "6 7,",
+            "lyric": "敬拜"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "A",
+            "n": "1 - - -",
+            "lyric": "你"
+          }
+        ]
+      ]
+    }
+  ]
+}
