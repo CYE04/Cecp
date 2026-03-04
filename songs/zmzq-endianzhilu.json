@@ -1,0 +1,437 @@
+{
+  "id": "zmzq-endianzhilu",
+  "title": "恩典之路",
+  "artist": "赞美之泉",
+  "sub": "The Path of Grace 曾祥怡 词 曲(诗 23:3;林后 1:20)",
+  "origKey": "F",
+  "timeSign": "4/4",
+  "bpm": 66,
+  "mp3": "/upload/endianzhilu.mp3",
+  "cover": "/upload/endianzhilu.jpg",
+  "lrc": "/upload/endianzhilu.lrc",
+  "youtube": "https://youtu.be/0Q444bzsehU?si=Cwb2smX0td-M7CrQ",
+  "scoreImg": "/upload/endianzhiluF.jpg",
+  "sections": [
+    {
+      "name": "前奏",
+      "lines": [
+        [
+          {
+            "chord": "F",
+            "n": "1'_ 5'_ 1'_ ( 2'_ 2' - )",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "|"
+          },
+          {
+            "chord": "Bbmaj⁷/F",
+            "n": "4'_ 5_ 1'_ ( 3'_ 3' ) -",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "F/A",
+            "n": "5 -",
+            "lyric": ""
+          },
+          {
+            "chord": "Bb",
+            "n": "6· 5_",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "G7/B",
+            "n": "6· 1'_",
+            "lyric": ""
+          },
+          {
+            "chord": "C",
+            "n": "7_ 5,_ 1_ 2_",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "F",
+            "n": "1_ 5_ 5_ 3_",
+            "lyric": ""
+          },
+          {
+            "chord": "C/E",
+            "n": "2 -",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ],
+        [
+          {
+            "chord": "Dm",
+            "n": "1_ 5_ 5_ 2_",
+            "lyric": ""
+          },
+          {
+            "chord": "F/C",
+            "n": "1 -",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Bb",
+            "n": "6 -",
+            "lyric": ""
+          },
+          {
+            "chord": "F/A",
+            "n": "5 -",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Gm",
+            "n": "4",
+            "lyric": ""
+          },
+          {
+            "chord": "F",
+            "n": "3",
+            "lyric": ""
+          },
+          {
+            "chord": "Eb",
+            "n": "([ 2 -",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "",
+            "n": "]) 2",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "n": "5,__ 6,__ 1_",
+            "lyric": ""
+          },
+          {
+            "chord": "C",
+            "n": "([ 5_ -",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "",
+            "n": "]) 5_",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "n": "- - -",
+            "lyric": ""
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ]
+      ]
+    },
+    {
+      "name": "主歌",
+      "lines": [
+        [
+          {
+            "chord": "F",
+            "n": "5,_ 3_ 3_ 5,_",
+            "lyric": "祢是我的"
+          },
+          {
+            "chord": "C",
+            "n": "( 2· sp 2__ )",
+            "lyric": "主"
+          },
+          {
+            "chord": "",
+            "n": "7,__",
+            "lyric": "引"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Dm",
+            "n": "1_ 1_ 7,_ 6,_ 5, -",
+            "lyric": "我走正义路，"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Bb",
+            "n": "6,_ 4_ 4_ 6,_",
+            "lyric": "高山或低"
+          },
+          {
+            "chord": "F/A",
+            "n": "( 3_ 2__ 1__ 1·_ sp_ )",
+            "lyric": "谷"
+          },
+          {
+            "chord": "",
+            "n": "2·__",
+            "lyric": "都"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Gm",
+            "n": "3_ 6,_ 1_ 3_",
+            "lyric": "是祢在保"
+          },
+          {
+            "chord": "C",
+            "n": "2 -",
+            "lyric": "护"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ],
+        [
+          {
+            "chord": "F",
+            "n": "5,_ 3_ 3_ 5,_",
+            "lyric": "万人中唯"
+          },
+          {
+            "chord": "C/E",
+            "n": "( 2· sp sp 2__ )",
+            "lyric": "独"
+          },
+          {
+            "chord": "",
+            "n": "7,__",
+            "lyric": "祢"
+          },
+          {
+            "chord": "Dm",
+            "n": "1_ 1_ 2_ 4_",
+            "lyric": "爱我认识"
+          },
+          {
+            "chord": "F/C",
+            "n": "3 -",
+            "lyric": "我，"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Bb",
+            "n": "6,_ 4_ 4_ 5_",
+            "lyric": "永远不变"
+          },
+          {
+            "chord": "",
+            "n": "3_ 2__ ( 1__ 1·_ ) sp_ 3__",
+            "lyric": "的应许，ㅤㅤ这"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Gm",
+            "n": "( 3_ 2__ ) ( 2__ 2 ) ([ sp",
+            "lyric": "一ㅤ 生"
+          },
+          {
+            "chord": "",
+            "n": "]) 2_",
+            "lyric": "ㅤ"
+          },
+          {
+            "chord": "Gm/F",
+            "n": "1_ 1_ 6_",
+            "lyric": "都是祝"
+          },
+          {
+            "chord": "Bb",
+            "n": "5 - - -",
+            "lyric": "福"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ]
+      ]
+    },
+    {
+      "name": "副歌",
+      "lines": [
+        [
+          {
+            "chord": "F",
+            "n": "1_ 5_ 5_ 4_",
+            "lyric": "一步又一"
+          },
+          {
+            "chord": "C/E",
+            "n": "( 2· sp 2__ ) 1__",
+            "lyric": "步ㅤㅤㅤ这"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Dm",
+            "n": "1_ 5_ 5_ 3_",
+            "lyric": "是恩典之"
+          },
+          {
+            "chord": "F/C",
+            "n": "( 2_ 1 ) 3_",
+            "lyric": "路，ㅤ祢"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Bb",
+            "n": "6,· sp 3_",
+            "lyric": "爱， 祢"
+          },
+          {
+            "chord": "F/A",
+            "n": "( 5,· sp sp 5,__ )",
+            "lyric": "手， "
+          },
+          {
+            "chord": "",
+            "n": "3,__",
+            "lyric": "将"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Gm",
+            "n": "4,_ 5,_ 6,_ 3_",
+            "lyric": "我紧紧抓"
+          },
+          {
+            "chord": "",
+            "n": "2 -",
+            "lyric": "住；"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          }
+        ],
+        [
+          {
+            "chord": "F",
+            "n": "1_ 5_ 5_ 4_",
+            "lyric": "一步又一"
+          },
+          {
+            "chord": "C/E",
+            "n": "( 2· sp 2__ ) 1__",
+            "lyric": "步ㅤㅤㅤ这"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Dm",
+            "n": "1_ 5_ 5_ 3_",
+            "lyric": "是盼望之"
+          },
+          {
+            "chord": "F/C",
+            "n": "( 2_ 1 ) 3_",
+            "lyric": "路，ㅤ祢"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Bb",
+            "n": "6,· sp 3_",
+            "lyric": "爱， 祢"
+          },
+          {
+            "chord": "F/A",
+            "n": "( 5,· sp sp 5,__ )",
+            "lyric": "手，"
+          },
+          {
+            "chord": "",
+            "n": "3,__",
+            "lyric": "牵"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "Gm",
+            "n": "4,_ 5,_ 6,_ 1_ 3 6,",
+            "lyric": "引我走这 人生"
+          },
+          {
+            "chord": "",
+            "lyric": "｜"
+          },
+          {
+            "chord": "",
+            "n": "1 - - -",
+            "lyric": "路"
+          },
+          {
+            "chord": "",
+            "lyric": "｜｜"
+          }
+        ]
+      ]
+    }
+  ]
+}
