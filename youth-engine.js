@@ -337,7 +337,6 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var navItems = [
       {label:'📅 聚会流程', href:'#ym-flow'},
       {label:'🎧 本周诗歌', href:'#ym-songs'},
-      {label:'🎼 歌谱',     href:'#ym-score'},
       {label:'📖 信息分享', href:'#ym-message'},
       {label:'📺 直播回放', href:'#ym-replay'},
       {label:'📑 讲员PPT',  href:'#ym-ppt'},
