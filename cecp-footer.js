@@ -19,8 +19,9 @@ document.addEventListener('keydown', function(e) {
     const isPortrait = window.matchMedia && window.matchMedia("(orientation: portrait)").matches;
     b.classList.toggle("cecp-portrait", !!isPortrait);
     b.classList.toggle("cecp-landscape", !isPortrait);
-    // cecp-home 由首页模板手动注入，这里不覆盖已有的值
-    // 若页面没有手动加 cecp-home，则保持不加（不是首页）
+    // 首页判断：路径为 /
+    const isHome = window.location.pathname === "/";
+    b.classList.toggle("cecp-home", isHome);
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", setOrientationClass);
