@@ -1,3 +1,5 @@
+/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
+
 /* ===== 屏蔽 Ctrl+U / F12 ===== */
 document.addEventListener('keydown', function(e) {
   if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
@@ -17,6 +19,10 @@ document.addEventListener('keydown', function(e) {
     const isPortrait = window.matchMedia && window.matchMedia("(orientation: portrait)").matches;
     b.classList.toggle("cecp-portrait", !!isPortrait);
     b.classList.toggle("cecp-landscape", !isPortrait);
+    // 首页判断：路径为 / 或 /index.html
+    const path = window.location.pathname;
+    const isHome = path === "/" || path === "/index.html" || path === "/index.htm";
+    b.classList.toggle("cecp-home", isHome);
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", setOrientationClass);
@@ -973,4 +979,20 @@ else updateFab();
 
 } // end initTour
 initTourWhenReady();
+})();
+
+/* ===== YuEn 水印 ===== */
+(function(){
+  function addWatermark(){
+    if(document.getElementById('yuen-watermark')) return;
+    var el = document.createElement('div');
+    el.id = 'yuen-watermark';
+    el.textContent = 'YuEn';
+    document.body.appendChild(el);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', addWatermark);
+  } else {
+    addWatermark();
+  }
 })();

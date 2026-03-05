@@ -1,3 +1,5 @@
+/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
+
 /* ===================== 竖屏隐藏侧边栏 + 横屏显示 + 竖屏正文补满 ===================== */
 @media (max-width: 1024px) {
   /* 竖屏：隐藏侧边栏（主页除外） */
@@ -447,4 +449,20 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   .rt7-tip-body{ font-size:12px; padding:9px 11px 10px; }
   .rt7-tip-foot{ padding:8px 11px 10px; }
   .rt7-btn{ padding:8px 11px; font-size:12px; }
+}
+
+/* ===== YuEn 水印 ===== */
+#yuen-watermark {
+  position: fixed;
+  bottom: 10px;
+  right: 13px;
+  z-index: 9999;
+  font-family: 'Georgia', serif;
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  color: rgba(0, 0, 0, 0.13);
+  pointer-events: none;
+  user-select: none;
+  mix-blend-mode: multiply;
 }
