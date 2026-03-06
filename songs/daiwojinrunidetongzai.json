@@ -1,7 +1,7 @@
 {
   "version": "1",
   "created": "YuEn",
-  "createdTime": "2026-03-06 21:27:13",
+  "createdTime": "2026-03-06 22:17:07",
   "id": "daiwojinrunidetongzai",
   "title": "带我进入你的同在",
   "artist": "赞美之泉",
@@ -9,7 +9,7 @@
   "origKey": "F",
   "timeSign": "4/4",
   "bpm": 68,
-  "mp3": "/upload/daiwojinrunidetongzao.mp3",
+  "mp3": "",
   "cover": "https://cecpadua.github.io/resouces/covers/daiwojinrunidetongzai.jpg",
   "lrc": "https://cecpadua.github.io/resouces/lyrics/daiwojinrunidetongzai.lrc",
   "youtube": "https://youtu.be/QFGc0KDqeDE?si=_rA2Ke5xMXIVMjVt",
@@ -33,7 +33,165 @@
         {"chord":"","lyric":"｜"},
         {"chord":"F","n":"]) 3 ([ - - -","lyric":""},
         {"chord":"","lyric":"｜"},
-        {"chord":"","n":"]) 3 - 1_ 2_ 3_ ([ 4_","lyric":""},
+        {"chord":"","n":"]) 3 -","lyric":""},
+        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb/F","n":"]) 4 ([ - - -","lyric":""},
+        {"chord":"","lyric":"｜"}
+      ],
+      [
+        {"chord":"","n":"]) 4","lyric":""},
+        {"chord":"","n":"- - -","lyric":""},
+        {"chord":"","lyric":"\\\\"}
+      ]
+    ]
+  },
+  {
+    "name": "主歌",
+    "lines": [
+      [
+        {"chord":"F","n":"5, 1","lyric":"万军"},
+        {"chord":"C/E","n":"2 7,","lyric":"耶和"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"1 - - -","lyric":"华，"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F","n":"5, 1","lyric":"你的"},
+        {"chord":"C/E","n":"2 3","lyric":"居所"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"4·_ ( 3__ 3_ )","lyric":"何等"},
+        {"chord":"","n":"2_ 1·","lyric":"可爱，"},
+        {"chord":"","n":"3_","lyric":"我"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Gm","n":"4·_ ( 4__ 4 )","lyric":"羡慕"},
+        {"chord":"","n":"4_ 3_ 2_ 1_","lyric":"渴想你的"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F/A","n":"( 5,·_ 3,__ )","lyric":"院"},
+        {"chord":"","n":"( 3 3· )","lyric":"宇，"},
+        {"chord":"","n":"3_","lyric":"我"},
+        {"chord":"","lyric":"｜"}
+      ],
+      [
+        {"chord":"Bb","n":"4·_ ( 4__ 4 )","lyric":"心肠"},
+        {"chord":"","n":"4_ 3_ 2_ 1_","lyric":"肉体向你"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C","n":"( 3·_ 2__ )","lyric":"呼"},
+        {"chord":"","n":"2 - -","lyric":"吁。"},
+        {"chord":"","lyric":"｜"}
+      ]
+    ]
+  },
+  {
+    "name": "Pre-副歌",
+    "lines": [
+      [
+        {"chord":"","n":"0 0","lyric":""},
+        {"chord":"","n":"1_ 2_ 3_ ([ 3_","lyric":"带我进入"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F","n":"]) 3","lyric":"ㅤ"},
+        {"chord":"","n":"-","lyric":"ㅤ"},
+        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":"你的同在"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb/F","n":"]) 4","lyric":"ㅤ"},
+        {"chord":"","n":"-","lyric":"ㅤ"},
+        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":"我不满足"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Gm","n":"]) 4·","lyric":"ㅤ"},
+        {"chord":"","n":"1_","lyric":"只"},
+        {"chord":"","n":"1_ 2_","lyric":"停留"},
+        {"chord":"","n":"3_ ([ 2_","lyric":"现在"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"C","n":"]) 2_","lyric":"ㅤ"},
+        {"chord":"","n":"-","lyric":"ㅤ"},
+        {"chord":"","n":"1_ 2_ 3_ ([ 3_","lyric":"带我进入"},
+        {"chord":"","lyric":"｜"}
+      ],
+      [
+        {"chord":"F","n":"]) 3","lyric":"ㅤ"},
+        {"chord":"","n":"-","lyric":"ㅤ"},
+        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":"你的同在"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb/F","n":"]) 4","lyric":"ㅤ"},
+        {"chord":"","n":"-","lyric":"ㅤ"},
+        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":"我心渴慕"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"1_","lyric":"你"},
+        {"chord":"","n":"1_ 2_","lyric":"永恒"},
+        {"chord":"","n":"3_ ( 2_ sp sp 2 - - )","lyric":"的爱。｜"}
+      ]
+    ]
+  },
+  {
+    "name": "副歌",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"","n":"1_ 1_","lyric":"愿你"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"5 ( 4_ 3_ )","lyric":"的荣"},
+        {"chord":"C/Bb","n":"2 1_ 2_","lyric":"耀从天"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"A","n":"3 2","lyric":"降下"},
+        {"chord":"Dm","n":"1 sp 2_ 3_","lyric":"来，燃烧"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Gm","n":"4 4","lyric":"每颗"},
+        {"chord":"","n":"4_ 3_ 2_ 1_","lyric":"爱慕你的"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F","n":"3 - -","lyric":"心。"},
+        {"chord":"","n":"1_ 1_","lyric":"愿你"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb","n":"5 ( 4_ 3_ )","lyric":"的荣"},
+        {"chord":"C/Bb","n":"2 1_ 2_","lyric":"耀从天"},
+        {"chord":"","lyric":"｜"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"A","n":"3 2","lyric":"降下"},
+        {"chord":"Dm","n":"1","lyric":"来，"},
+        {"chord":"","n":"2_ 3_","lyric":"充满"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Gm","n":"4 4","lyric":"这地"},
+        {"chord":"C","n":"4_ 3_ 2_ 1_","lyric":"与我们相"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F","n":"1 - - -","lyric":"遇。"}
+      ]}
+    ]
+  }
+]
+}{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-03-06 22:17:07",
+  "id": "daiwojinrunidetongzai",
+  "title": "带我进入你的同在",
+  "artist": "赞美之泉",
+  "sub": "【从新合一】(2013)曾祥怡 词曲 (诗84:1-2)",
+  "origKey": "F",
+  "timeSign": "4/4",
+  "bpm": 68,
+  "mp3": "",
+  "cover": "https://cecpadua.github.io/resouces/covers/daiwojinrunidetongzai.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/daiwojinrunidetongzai.lrc",
+  "youtube": "https://youtu.be/QFGc0KDqeDE?si=_rA2Ke5xMXIVMjVt",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/daiwojinrunidetongzai.jpg",
+  "sections": [
+  {
+    "name": "前奏",
+    "lines": [
+      [
+        {"chord":"","n":"1'_ 2'_ 3'_ ([ 3'_","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F","n":"]) 3' ([ - - -","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"]) 3' -","lyric":""},
+        {"chord":"","n":"1'_ 2'_ 3'_ ([ 4'_","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bb/F","n":"]) 4' ([ - - -","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"]) 4' -","lyric":""},
+        {"chord":"","n":"1_ 2_ 3_ ([ 3_","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F","n":"]) 3 ([ - - -","lyric":""},
+        {"chord":"","lyric":"｜"},
+        {"chord":"","n":"]) 3 -","lyric":""},
+        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":""},
         {"chord":"","lyric":"｜"},
         {"chord":"Bb/F","n":"]) 4 ([ - - -","lyric":""},
         {"chord":"","lyric":"｜"}
