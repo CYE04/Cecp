@@ -934,17 +934,18 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     frag.appendChild(buildPPT());
     frag.appendChild(hr());
 
+    // Game
+    frag.appendChild(anchor('ym-game'));
+    frag.appendChild(secTitle('🎮 游戏活动'));
+    frag.appendChild(el('p',{class:'ym-meta',text:C.gameText}));
+    frag.appendChild(hr());
+
     // Replay
     frag.appendChild(anchor('ym-replay'));
     frag.appendChild(secTitle('📺 直播回放'));
     frag.appendChild(buildReplay());
     frag.appendChild(hr());
 
-    // Game
-    frag.appendChild(anchor('ym-game'));
-    frag.appendChild(secTitle('🎮 游戏活动'));
-    frag.appendChild(el('p',{class:'ym-meta',text:C.gameText}));
-    frag.appendChild(hr());
 
     // Action
     var act = div('ym-action');
