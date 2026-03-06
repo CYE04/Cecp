@@ -498,9 +498,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function renderNStr(nStr){
     var d=document.createElement('div');d.className='sw-jianpu';
     if(!nStr||!nStr.trim())return d;
-    // 正规化：( [ → ([  以及  ] ) → ])，兼容含空格的旧数据
-    nStr=nStr.replace(/\(\s*\[/g,'([').replace(/\]\s*\)/g,'])');
-    var toks=nStr.trim().split(/\s+/),i=0;
+    nStr=nStr.replace(/\(\s*\[/g,'([').replace(/\]\s*\)/g,'])');\n    var toks=nStr.trim().split(/\s+/),i=0;
     while(i<toks.length){
       var t=toks[i];
       if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
