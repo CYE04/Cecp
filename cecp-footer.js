@@ -241,6 +241,7 @@ document.addEventListener('keydown', function(e) {
           <div class="hbw-title"><span data-title>经文</span></div>
           <div class="hbw-actions">
             <div class="hbw-shortcut-badge" title="按等号键快速打开">按 <kbd>=</kbd> 快速打开</div>
+            <div class="hbw-act" data-pres title="投屏"><span class="hbw-act-icon">📺</span><span class="txt">投屏</span></div>
             <div class="hbw-act" data-fs title="全屏"><span class="hbw-act-icon">⛶</span><span class="txt">全屏</span></div>
             <div class="hbw-x" data-close="1">✕</div>
           </div>
@@ -302,6 +303,48 @@ document.addEventListener('keydown', function(e) {
       try{if(!document.fullscreenElement){await(modal.querySelector(".hbw-panel").requestFullscreen?.()??modal.requestFullscreen?.());}else{await document.exitFullscreen?.();}}catch(_){}
       setFsLabel();
     });
+
+    // ── 投屏模式 ──
+    const presBtn=modal.querySelector("[data-pres]");
+    const panel=modal.querySelector(".hbw-panel");
+    const result=modal.querySelector(".hbw-result");
+    const controls=modal.querySelector(".hbw-controls");
+
+    function calcPresScale(){
+      const vw=window.innerWidth, vh=window.innerHeight;
+      const baseW=420, baseH=300;
+      return Math.min(vw/baseW, vh/baseH, 3.5);
+    }
+    function enterPres(){
+      modal.classList.add("hbw-pres");
+      applyPresScale();
+      try{ panel.requestFullscreen?.(); }catch(_){}
+      if(presBtn){ const t=presBtn.querySelector(".txt"); if(t)t.textContent="退出投屏"; }
+    }
+    function exitPres(){
+      modal.classList.remove("hbw-pres");
+      result.style.transform="";
+      result.style.transformOrigin="";
+      try{ if(document.fullscreenElement)document.exitFullscreen?.(); }catch(_){}
+      if(presBtn){ const t=presBtn.querySelector(".txt"); if(t)t.textContent="投屏"; }
+    }
+    function applyPresScale(){
+      if(!modal.classList.contains("hbw-pres"))return;
+      const s=calcPresScale();
+      result.style.transform="scale("+s+")";
+      result.style.transformOrigin="top center";
+    }
+    function togglePres(){
+      if(modal.classList.contains("hbw-pres"))exitPres();
+      else enterPres();
+    }
+    if(presBtn)presBtn.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();togglePres();});
+    window.addEventListener("resize",applyPresScale,{passive:true});
+    // F5 触发投屏
+    document.addEventListener("keydown",e=>{
+      if(e.key==="F5"&&modal.classList.contains("is-open")){e.preventDefault();togglePres();}
+    });
+    modal.__exitPres=exitPres;
 
     const mIn=modal.querySelector("[data-input]");
     const mAC=modal.querySelector("[data-ac]");

@@ -466,3 +466,62 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   user-select: none;
   mix-blend-mode: multiply;
 }
+
+/* ===== 投屏模式 ===== */
+.hbw.hbw-pres .hbw-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  transform: none !important;
+  display: flex;
+  flex-direction: column;
+  background: #000 !important;
+}
+/* 搜索栏保留，固定在顶部 */
+.hbw.hbw-pres .hbw-controls {
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.85);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 16px;
+}
+/* 隐藏不必要的 UI */
+.hbw.hbw-pres .hbw-topbar,
+.hbw.hbw-pres .hbw-help,
+.hbw.hbw-pres .hbw-footerhint {
+  display: none !important;
+}
+/* 经文区域占满剩余空间，居中显示 */
+.hbw.hbw-pres .hbw-scroll {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.hbw.hbw-pres .hbw-result {
+  width: 420px;
+  max-width: 100%;
+  transform-origin: top center;
+  transition: transform 0.2s ease;
+}
+/* 投屏时字体颜色强制白色 */
+.hbw.hbw-pres .hbw-line,
+.hbw.hbw-pres .hbw-p-line {
+  color: #fff !important;
+  font-size: 18px;
+  line-height: 1.7;
+}
+.hbw.hbw-pres .hbw-box {
+  background: transparent !important;
+  border: none !important;
+}
+.hbw.hbw-pres .hbw-box h4 {
+  color: rgba(255,255,255,0.5) !important;
+}
+.hbw.hbw-pres .hbw-vn {
+  color: rgba(255,255,255,0.35) !important;
+}
