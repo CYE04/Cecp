@@ -310,30 +310,39 @@ document.addEventListener('keydown', function(e) {
     const result=modal.querySelector(".hbw-result");
     const controls=modal.querySelector(".hbw-controls");
 
-    function calcPresScale(){
-      const vw=window.innerWidth, vh=window.innerHeight;
-      const baseW=420, baseH=300;
-      return Math.min(vw/baseW, vh/baseH, 3.5);
+    function calcPresFontSize(){
+      // 基准字体 18px @ 420px 宽，按屏幕宽度等比缩放，上限 52px
+      const vw=window.innerWidth;
+      return Math.min(Math.round(18 * vw / 420), 52);
+    }
+    function applyPresFontSize(){
+      if(!modal.classList.contains("hbw-pres"))return;
+      const fs=calcPresFontSize();
+      modal.querySelectorAll(".hbw-line,.hbw-p-line").forEach(el=>{
+        el.style.fontSize=fs+"px";
+        el.style.lineHeight="1.65";
+      });
+      modal.querySelectorAll(".hbw-vn").forEach(el=>{
+        el.style.fontSize=Math.round(fs*0.6)+"px";
+      });
     }
     function enterPres(){
       modal.classList.add("hbw-pres");
-      applyPresScale();
+      applyPresFontSize();
       try{ panel.requestFullscreen?.(); }catch(_){}
       if(presBtn){ const t=presBtn.querySelector(".txt"); if(t)t.textContent="退出投屏"; }
     }
     function exitPres(){
       modal.classList.remove("hbw-pres");
-      result.style.transform="";
-      result.style.transformOrigin="";
+      // 还原字体
+      modal.querySelectorAll(".hbw-line,.hbw-p-line").forEach(el=>{
+        el.style.fontSize=""; el.style.lineHeight="";
+      });
+      modal.querySelectorAll(".hbw-vn").forEach(el=>{ el.style.fontSize=""; });
       try{ if(document.fullscreenElement)document.exitFullscreen?.(); }catch(_){}
       if(presBtn){ const t=presBtn.querySelector(".txt"); if(t)t.textContent="投屏"; }
     }
-    function applyPresScale(){
-      if(!modal.classList.contains("hbw-pres"))return;
-      const s=calcPresScale();
-      result.style.transform="scale("+s+")";
-      result.style.transformOrigin="top center";
-    }
+    function applyPresScale(){ applyPresFontSize(); }
     function togglePres(){
       if(modal.classList.contains("hbw-pres"))exitPres();
       else enterPres();
