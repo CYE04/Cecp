@@ -1,30 +1,47 @@
 /**
- * youth-engine.js
+ * youth-engine.js v3.0
  * 橄榄树团契 · 青年聚会渲染引擎
  * 托管于 GitHub Pages，所有帖子共用
- * 读取 window.YouthMeeting 配置并渲染完整页面到 #ym-root
+ *
+ * 使用方式A（新，推荐）：
+ *   YouthEngine.render('2026-03', document.getElementById('ym-root'));
+ *
+ * 使用方式B（旧，向后兼容）：
+ *   window.YouthMeeting = { ... }; // 帖子里定义
+ *   <script src="youth-engine.js"></script>  // 自动读取并渲染
  */
+
+/* ══════════ GitHub Pages 基础路径 ══════════ */
+var YM_BASE = 'https://cye04.github.io/Cecp';
+
+window.YouthEngine = {};
+
 (function () {
   'use strict';
 
-  var C = window.YouthMeeting;
-  var ROOT = document.getElementById('ym-root');
-  if (!C || !ROOT) { console.error('[YM] window.YouthMeeting or #ym-root missing'); return; }
+  // 模块级变量，由 _run() 赋值
+  var C, ROOT;
 
-  /* ══════════════ 默认值 ══════════════ */
-  C.time       = C.time       || '每周日 12:00 – 13:30';
-  C.gameText   = C.gameText   || '本周没有游戏活动哦👀';
-  C.schedule   = C.schedule   || [
-    { time:'12:00 – 12:30', event:'诗歌敬拜',   emoji:'🎶' },
-    { time:'12:30 – 13:30', event:'圣经分享',   emoji:'📖' },
-    { time:'13:30',          event:'祷告 & 结束', emoji:'🙏' },
-  ];
-  C.songs = C.songs || [];
-  C.apiBase = C.apiBase || 'https://script.google.com/macros/s/AKfycbxihf7j08Pkus9rWBqectkmJ7PbJNVdhPTrbNL8v3wm1vTbJ76xE6ksNKytTe4SUii3_Q/exec';
+  function _applyDefaults(C) {
+    C.time       = C.time       || '每周日 12:00 – 13:30';
+    C.gameText   = C.gameText   || '本周没有游戏活动哦👀';
+    C.schedule   = C.schedule   || [
+      { time:'12:00 – 12:30', event:'诗歌敬拜',   emoji:'🎶' },
+      { time:'12:30 – 13:30', event:'圣经分享',   emoji:'📖' },
+      { time:'13:30',          event:'祷告 & 结束', emoji:'🙏' },
+    ];
+    C.songs  = C.songs  || [];
+    C.apiBase = C.apiBase || 'https://script.google.com/macros/s/AKfycbxihf7j08Pkus9rWBqectkmJ7PbJNVdhPTrbNL8v3wm1vTbJ76xE6ksNKytTe4SUii3_Q/exec';
+  }
 
-  /* ══════════════ CSS 注入 ══════════════ */
-  var style = document.createElement('style');
-  style.textContent = `
+  /* ══════════════ CSS 只注入一次 ══════════════ */
+  var _cssInjected = false;
+  function _injectCSS() {
+    if (_cssInjected) return;
+    _cssInjected = true;
+
+    var style = document.createElement('style');
+    style.textContent = `
 /* ── theme vars ── */
 :root{
   --ym-bg:#f8fafc;--ym-card:#fff;--ym-ink:#1a1815;--ym-ink2:#7c746c;--ym-ink3:#b8b0a8;
@@ -46,8 +63,6 @@
   }
 }
 *,*::before,*::after{box-sizing:border-box}
-
-/* ── Welcome Modal ── */
 html.ym-open,html.ym-open body{overflow:hidden!important}
 #ymOverlay{position:fixed;inset:0;background:var(--ybk);backdrop-filter:blur(6px);z-index:2147483646;display:none}
 #ymModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,calc(100vw - 32px));max-height:min(85vh,760px);background:var(--yb);color:var(--yt);border:1px solid var(--ybr);border-radius:22px;box-shadow:0 40px 120px var(--ysh);overflow:hidden;z-index:2147483647;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:clamp(14px,.35vw + 12px,17px)}
@@ -69,8 +84,6 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 #ymModal .yBtns{display:flex;gap:8px}
 #ymModal button{border-radius:999px;padding:8px 16px;font-size:.92em;cursor:pointer;border:1px solid var(--ybr);background:transparent;color:var(--ym)}
 #ymModal button.primary{background:var(--yt);color:var(--yb);border-color:transparent}
-
-/* ── Hero ── */
 .ym-hero{max-width:960px;margin:0 auto 2rem;padding:2.2rem 1.6rem 2.4rem;border-radius:28px;text-align:center;background:var(--ym-card);border:1px solid var(--ym-border);box-shadow:var(--ym-sh-lg)}
 .ym-hero h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;color:var(--ym-ink);margin:0 0 .4rem;letter-spacing:-.01em}
 .ym-hero .sub{font-size:.95rem;color:var(--ym-ink2);margin:0 0 .5rem}
@@ -79,8 +92,6 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .ym-nav-btn{padding:10px 20px;border-radius:999px;border:1px solid var(--ym-border-md);background:var(--ym-soft);font-size:13px;font-weight:500;cursor:pointer;color:var(--ym-ink);box-shadow:var(--ym-sh);transition:all .18s ease}
 .ym-nav-btn:hover{background:var(--ym-border);transform:translateY(-2px);box-shadow:var(--ym-sh-lg)}
 .ym-nav-btn.active{background:var(--ym-ink);color:var(--ym-bg);border-color:transparent;box-shadow:var(--ym-sh-lg)}
-
-/* ── Schedule ── */
 .ym-flow{width:100%;max-width:1100px;margin:1rem auto;font-family:system-ui,-apple-system,"PingFang SC",sans-serif;color:var(--ym-ink)}
 .ym-flow .card{border:1px solid var(--ym-border);border-radius:clamp(16px,2.4vw,22px);background:linear-gradient(180deg,var(--ym-soft),transparent);box-shadow:0 16px 50px rgba(0,0,0,.1);overflow:hidden}
 .ym-flow .head{padding:clamp(14px,2.2vw,20px);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -93,8 +104,6 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .ym-flow .tm{font-weight:900;font-size:clamp(16px,2.2vw,26px)}
 .ym-flow .ev{display:flex;justify-content:flex-end;align-items:center;gap:10px;font-weight:900;font-size:clamp(16px,2.4vw,28px);text-align:right;word-break:break-word}
 @media(max-width:640px){.ym-flow .ev{justify-content:flex-start;text-align:left}}
-
-/* ── Roster ── */
 .wr-root{width:100%;margin:1rem 0;padding:0 2px;box-sizing:border-box;font-family:system-ui,"PingFang SC","Microsoft YaHei";color:var(--ym-ink);overflow:hidden}
 .wr-tabs{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;padding:8px;border-radius:999px;background:var(--ym-soft);border:1px solid var(--ym-border);margin-bottom:12px}
 .wr-tab{padding:6px 14px;border-radius:999px;font-size:12px;cursor:pointer;text-decoration:none;user-select:none;background:var(--ym-card);color:var(--ym-ink);border:1px solid var(--ym-border);transition:.2s ease;white-space:nowrap}
@@ -113,8 +122,6 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .wr-name input::placeholder{color:var(--ym-ink3)}
 .wr-name button{background:#ef4444;border:none;border-radius:6px;color:#fff;cursor:pointer;padding:0 7px;font-size:13px;flex-shrink:0}
 .add-btn{margin-top:5px;font-size:11px;cursor:pointer;color:var(--ym-accent2)}
-
-/* ── Song card ── */
 .sw-wrap{font-family:'Noto Serif SC','PingFang SC',serif;max-width:100%;margin:0 auto 28px;color:var(--ym-ink)}
 .sw-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
 .sw-eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ym-ink3);margin-bottom:4px}
@@ -183,15 +190,11 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-score-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--ym-ink2);background:var(--ym-soft);border:1px solid var(--ym-border);padding:2px 7px;border-radius:5px}
 .sw-score img{width:100%;display:block;cursor:zoom-in}
 .sw-score-ph{padding:40px 20px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--ym-ink3);letter-spacing:1px;line-height:2.2}
-
-/* ── Copy pill ── */
 .ym-copy-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:12px;background:var(--ym-card);border:1px solid var(--ym-border);cursor:pointer;user-select:none;transition:background .15s;box-shadow:var(--ym-sh)}
 .ym-copy-pill:hover{background:var(--ym-soft)}
 .ym-copy-pill .st{font-size:14px;color:var(--ym-ink);white-space:nowrap}
 .ym-copy-pill svg{color:var(--ym-ink2)}
 .ym-song-list{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
-
-/* ── Lightbox ── */
 .sw-lb-overlay{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s,visibility .25s;padding:18px}
 .sw-lb-overlay.open{opacity:1;visibility:visible;pointer-events:auto}
 .sw-lb-box{position:relative;max-width:95vw;max-height:95vh;transform:scale(.92);transition:transform .28s cubic-bezier(.22,1,.36,1)}
@@ -203,8 +206,6 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-lb-nav:hover{background:rgba(0,0,0,.65)}
 .sw-lb-nav.prev{left:-52px}.sw-lb-nav.next{right:-52px}
 @media(max-width:520px){.sw-lb-nav.prev{left:8px}.sw-lb-nav.next{right:8px}.sw-lb-close{top:8px;right:8px}}
-
-/* ── Section dividers & misc ── */
 hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 .ym-section-title{font-size:1.3rem;font-weight:700;color:var(--ym-ink);margin:1.5rem 0 .8rem;display:flex;align-items:center;gap:8px}
 .ym-block{background:var(--ym-card);border:1px solid var(--ym-border);border-radius:16px;padding:16px;margin-bottom:1rem;box-shadow:var(--ym-sh)}
@@ -217,14 +218,11 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 .ym-iframe-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:14px}
 .ym-action{margin:2rem 0;padding:16px;border-left:3px solid var(--ym-accent);background:var(--ym-soft);border-radius:0 12px 12px 0;font-size:14px;line-height:1.8;color:var(--ym-ink)}
 .ym-action strong{color:var(--ym-ink)}
-
-/* ── Song selector tabs ── */
 .ym-songs-wrap{width:100%}
 .ym-song-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;padding:12px;border-radius:18px;background:var(--ym-soft);border:1px solid var(--ym-border)}
 .ym-song-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:12px;border:1px solid var(--ym-border);background:var(--ym-card);color:var(--ym-ink);font-size:14px;cursor:pointer;transition:all .18s ease;text-align:left;max-width:100%}
 .ym-song-tab:hover{background:var(--ym-soft);transform:translateY(-1px);box-shadow:var(--ym-sh)}
 .ym-song-tab.active{background:linear-gradient(160deg,var(--ym-accent2),var(--ym-accent));color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(59,91,253,.35)}
-
 .ym-song-tab-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.25);font-size:11px;font-weight:700;flex-shrink:0}
 .ym-song-tab:not(.active) .ym-song-tab-num{background:var(--ym-soft)}
 .ym-song-tab-title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
@@ -235,7 +233,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 .ym-song-panel{display:none}
 .ym-song-panel.active{display:block}
 `;
-  document.head.appendChild(style);
+    document.head.appendChild(style);
+  }
 
   /* ══════════════ Utility ══════════════ */
   function el(tag, attrs, children) {
@@ -255,10 +254,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function buildModal() {
     var key = 'ym_hide__' + (location.pathname || '');
     try { if (localStorage.getItem(key) === '1') return; } catch(e){}
-
     var overlay = el('div', {id:'ymOverlay'});
     var modal   = el('div', {id:'ymModal'});
-
     modal.innerHTML = `
       <div class="yLayout">
         <div class="yBody">
@@ -266,17 +263,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
             <div class="yCard">
               <h3 class="yTitle">欢迎来到青年聚会页面 👋</h3>
               <p class="ySub">这里是本周聚会安排与预备工具。</p>
-              <p class="yText">🕛 时间：${C.time}
-🎵 内容：敬拜 · 分享 · 活动 · 祷告
-
-🎶 页面功能：
-• ▶️ 诗歌可以直接播放
-• ⏱ 可使用节拍器练习节奏
-• 📋 歌单与流程已整理好
-• 🎸 移调计算器
-
-欢迎邀请朋友一起来参加 ✨
-有建议或发现问题，也欢迎联系 YuEn 🙌</p>
+              <p class="yText">🕛 时间：${C.time}\n🎵 内容：敬拜 · 分享 · 活动 · 祷告\n\n🎶 页面功能：\n• ▶️ 诗歌可以直接播放\n• ⏱ 可使用节拍器练习节奏\n• 📋 歌单与流程已整理好\n• 🎸 移调计算器\n\n欢迎邀请朋友一起来参加 ✨\n有建议或发现问题，也欢迎联系 YuEn 🙌</p>
             </div>
             <div class="yCard">
               <div class="yPanelTitle">本页快速信息</div>
@@ -297,12 +284,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
           </div>
         </div>
       </div>`;
-
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
     overlay.style.display = 'block';
     document.documentElement.classList.add('ym-open');
-
     function close() {
       try { if (document.getElementById('ymDontShow').checked) localStorage.setItem(key,'1'); } catch(e){}
       overlay.style.display = 'none';
@@ -319,7 +304,6 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var navItems = [
       {label:'📅 聚会流程', href:'#ym-flow'},
       {label:'🎧 本周诗歌', href:'#ym-songs'},
-      {label:'🎼 歌谱',     href:'#ym-score'},
       {label:'📖 信息分享', href:'#ym-message'},
       {label:'📺 直播回放', href:'#ym-replay'},
       {label:'📑 讲员PPT',  href:'#ym-ppt'},
@@ -336,13 +320,12 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       });
       navDiv.appendChild(btn);
     });
-    var hero = el('div', {class:'ym-hero'}, [
+    return el('div', {class:'ym-hero'}, [
       el('h1', {text: '青年聚会 · 本周敬拜 & 信息分享'}),
       el('p',  {class:'sub', text:'欢迎一起敬拜、分享，也欢迎敬拜团在这里练习 🎵'}),
       el('div',{class:'tm',  text:'⏰ ' + C.time}),
       navDiv,
     ]);
-    return hero;
   }
 
   /* ══════════════ Schedule ══════════════ */
@@ -353,14 +336,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         el('div',{class:'ev', html: '<span>' + (s.emoji||'') + '</span> ' + (s.event||'')}),
       ]);
     });
-    var list = el('div',{class:'list'}, items);
     return el('div',{class:'ym-flow'},[
       el('div',{class:'card'},[
-        el('div',{class:'head'},[
-          el('div',{class:'icon',text:'🕒'}),
-          el('div',{class:'title',text:'聚会流程'}),
-        ]),
-        list,
+        el('div',{class:'head'},[el('div',{class:'icon',text:'🕒'}),el('div',{class:'title',text:'聚会流程'})]),
+        el('div',{class:'list'}, items),
       ]),
     ]);
   }
@@ -370,89 +349,41 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     if (!C.sheetName) return null;
     var API_URL = C.apiBase + '?sheet=' + encodeURIComponent(C.sheetName);
     var data = {}, isAdmin = false, curView = '所有';
-
-    var root    = div('wr-root');
-    var tabs    = div('wr-tabs');
-    var card    = div('wr-card');
-    var head    = div('wr-head');
-    var titleEl = el('div',{class:'wr-title',text:'所有服侍分工'});
-    var acts    = div('wr-actions');
-    var content = div('');
-    var saveBtn = el('button',{text:'💾 保存',style:'display:none'});
-
-    var lockBtn = el('button',{text:'🔒 管理员'});
-    acts.appendChild(lockBtn);
-    acts.appendChild(saveBtn);
-    head.appendChild(titleEl);
-    head.appendChild(acts);
-    card.appendChild(head);
-    card.appendChild(content);
-
-    var tabDefs = [
-      {label:'📋 所有', view:'所有'},
-      {label:'🎤 人声', view:'🎤'},
-      {label:'🎹 乐器', view:'🎹'},
-      {label:'🎛️ 音控', view:'🎛️'},
-    ];
-    tabDefs.forEach(function(td){
-      var t = el('a',{class:'wr-tab'+(td.view==='所有'?' active':''), text:td.label});
-      t.addEventListener('click', function(){
-        tabs.querySelectorAll('.wr-tab').forEach(function(x){x.classList.remove('active')});
-        t.classList.add('active');
-        curView = td.view;
-        render();
-      });
+    var root=div('wr-root'),tabs=div('wr-tabs'),card=div('wr-card'),head=div('wr-head');
+    var titleEl=el('div',{class:'wr-title',text:'所有服侍分工'}),acts=div('wr-actions'),content=div('');
+    var saveBtn=el('button',{text:'💾 保存',style:'display:none'}),lockBtn=el('button',{text:'🔒 管理员'});
+    acts.appendChild(lockBtn);acts.appendChild(saveBtn);head.appendChild(titleEl);head.appendChild(acts);
+    card.appendChild(head);card.appendChild(content);
+    [{label:'📋 所有',view:'所有'},{label:'🎤 人声',view:'🎤'},{label:'🎹 乐器',view:'🎹'},{label:'🎛️ 音控',view:'🎛️'}].forEach(function(td){
+      var t=el('a',{class:'wr-tab'+(td.view==='所有'?' active':''),text:td.label});
+      t.addEventListener('click',function(){tabs.querySelectorAll('.wr-tab').forEach(function(x){x.classList.remove('active')});t.classList.add('active');curView=td.view;render();});
       tabs.appendChild(t);
     });
-
-    root.appendChild(tabs);
-    root.appendChild(card);
-
+    root.appendChild(tabs);root.appendChild(card);
     function render(){
-      content.innerHTML = '';
-      titleEl.textContent = curView === '所有' ? '所有服侍分工' : '服侍分工';
-      var groups = Object.keys(data).filter(function(k){ return curView==='所有'||k.includes(curView); });
-      groups.forEach(function(g){
-        var grp = el('div',{class:'wr-group'});
-        grp.appendChild(el('h3',{text:g}));
-        var grid = div('wr-grid');
+      content.innerHTML='';titleEl.textContent=curView==='所有'?'所有服侍分工':'服侍分工';
+      Object.keys(data).filter(function(k){return curView==='所有'||k.includes(curView);}).forEach(function(g){
+        var grp=el('div',{class:'wr-group'});grp.appendChild(el('h3',{text:g}));var grid=div('wr-grid');
+        var gc={'🎤':'#3b5bfd','🎹':'#7c3aed','🎛️':'#059669','其他':'#d97706'};
         Object.entries(data[g]).forEach(function(entry){
-          var role = entry[0], arr = entry[1];
-          var sec  = div('wr-section');
-          // Color accent based on group
-          var groupColors = {'🎤':'#3b5bfd','🎹':'#7c3aed','🎛️':'#059669','其他':'#d97706'};
-          var gc = Object.keys(groupColors).find(function(k){return g.includes(k)}) || '其他';
-          sec.style.borderLeft = '3px solid ' + groupColors[gc];
-          sec.appendChild(el('div',{class:'wr-section-title',text:role}));
+          var role=entry[0],arr=entry[1],sec=div('wr-section');
+          var c=Object.keys(gc).find(function(k){return g.includes(k)})||'其他';
+          sec.style.borderLeft='3px solid '+gc[c];sec.appendChild(el('div',{class:'wr-section-title',text:role}));
           arr.forEach(function(name,i){
-            var row = div('wr-name');
-            var inp = el('input',{placeholder:'填写名字'}); inp.value=name; inp.disabled=!isAdmin;
-            inp.addEventListener('input',function(e){arr[i]=e.target.value});
-            row.appendChild(inp);
-            if(isAdmin){ var del=el('button',{text:'×'}); del.onclick=function(){arr.splice(i,1);render();}; row.appendChild(del); }
+            var row=div('wr-name'),inp=el('input',{placeholder:'填写名字'});inp.value=name;inp.disabled=!isAdmin;
+            inp.addEventListener('input',function(e){arr[i]=e.target.value});row.appendChild(inp);
+            if(isAdmin){var del=el('button',{text:'×'});del.onclick=function(){arr.splice(i,1);render();};row.appendChild(del);}
             sec.appendChild(row);
           });
-          if(isAdmin){ var add=el('div',{class:'add-btn',text:'+ 新增'}); add.onclick=function(){arr.push('');render();}; sec.appendChild(add); }
+          if(isAdmin){var add=el('div',{class:'add-btn',text:'+ 新增'});add.onclick=function(){arr.push('');render();};sec.appendChild(add);}
           grid.appendChild(sec);
         });
-        grp.appendChild(grid);
-        content.appendChild(grp);
+        grp.appendChild(grid);content.appendChild(grp);
       });
     }
-
-    lockBtn.onclick = function(){
-      var pwd = prompt('管理员密码'); if(!pwd) return;
-      isAdmin = true; saveBtn.style.display='inline-block'; render();
-    };
-    saveBtn.onclick = function(){
-      var pwd = prompt('再次输入管理员密码'); if(!pwd) return;
-      var url = C.apiBase+'?save=1&sheet='+encodeURIComponent(C.sheetName)+'&password='+encodeURIComponent(pwd)+'&data='+encodeURIComponent(JSON.stringify(data));
-      fetch(url).then(function(r){return r.text()}).then(function(t){
-        if(t==='ok') alert('已保存'); else if(t==='denied') alert('密码错误'); else alert('保存失败');
-      });
-    };
-
-    fetch(API_URL).then(function(r){return r.json()}).then(function(d){ data=d||{}; render(); });
+    lockBtn.onclick=function(){var pwd=prompt('管理员密码');if(!pwd)return;isAdmin=true;saveBtn.style.display='inline-block';render();};
+    saveBtn.onclick=function(){var pwd=prompt('再次输入管理员密码');if(!pwd)return;fetch(C.apiBase+'?save=1&sheet='+encodeURIComponent(C.sheetName)+'&password='+encodeURIComponent(pwd)+'&data='+encodeURIComponent(JSON.stringify(data))).then(function(r){return r.text()}).then(function(t){if(t==='ok')alert('已保存');else if(t==='denied')alert('密码错误');else alert('保存失败');});};
+    fetch(API_URL).then(function(r){return r.json()}).then(function(d){data=d||{};render();});
     return root;
   }
 
@@ -469,7 +400,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     if(tok==='sp'||tok==='sp_'||tok==='sp__'){
       var fake=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
       var el2=parseJpToken(fake);
-      var lw=el2.children[1]; if(lw){var nr=lw.children[0];if(nr){var ns=nr.children[0];if(ns)ns.style.visibility='hidden';}}
+      var lw=el2.children[1];if(lw){var nr=lw.children[0];if(nr){var ns=nr.children[0];if(ns)ns.style.visibility='hidden';}}
       return el2;
     }
     var num=tok,isHigh=0,isLow=0,isDot=false,uline=0;
@@ -498,7 +429,9 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function renderNStr(nStr){
     var d=document.createElement('div');d.className='sw-jianpu';
     if(!nStr||!nStr.trim())return d;
-    nStr=nStr.replace(/\(\s*\[/g,'([').replace(/\]\s*\)/g,'])');\n    var toks=nStr.trim().split(/\s+/),i=0;
+    // 正规化：( [ → ([  以及  ] ) → ])
+    nStr=nStr.replace(/\(\s*\[/g,'([').replace(/\]\s*\)/g,'])');
+    var toks=nStr.trim().split(/\s+/),i=0;
     while(i<toks.length){
       var t=toks[i];
       if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
@@ -527,124 +460,61 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   /* ══════════════ Song card ══════════════ */
   function buildSongCard(song) {
-    var wrap = el('div', {class:'sw-wrap', id:'song-'+song.id});
-    var curKey = song.origKey;
-    var KEYS   = ['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
-
-    /* header */
-    var kPill = el('span',{class:'sw-pill sw-kpill',text:'1 = '+curKey});
-    wrap.innerHTML = '';
-    var hd = div('sw-hd',[
+    var wrap=el('div',{class:'sw-wrap',id:'song-'+song.id});
+    var curKey=song.origKey;
+    var KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+    var kPill=el('span',{class:'sw-pill sw-kpill',text:'1 = '+curKey});
+    wrap.innerHTML='';
+    var hd=div('sw-hd',[
       el('div',{},[
         el('div',{class:'sw-eyebrow',text:'Worship Song'}),
         el('div',{class:'sw-title',text:song.title}),
         el('div',{class:'sw-sub',text:song.sub||''}),
-        el('div',{class:'sw-pills'},[
-          kPill,
-          el('span',{class:'sw-pill',text:song.timeSign||'4/4'}),
-          el('span',{class:'sw-pill',text:'♩ = '+(song.bpm||80)}),
-        ]),
+        el('div',{class:'sw-pills'},[kPill,el('span',{class:'sw-pill',text:song.timeSign||'4/4'}),el('span',{class:'sw-pill',text:'♩ = '+(song.bpm||80)})]),
       ]),
-      el('button',{class:'sw-tog'},[
-        el('svg',{viewBox:'0 0 24 24',html:'<polyline points="6 9 12 15 18 9"></polyline>'}),
-        document.createTextNode(' 移调'),
-      ]),
+      el('button',{class:'sw-tog'},[el('svg',{viewBox:'0 0 24 24',html:'<polyline points="6 9 12 15 18 9"></polyline>'}),document.createTextNode(' 移调')]),
     ]);
     wrap.appendChild(hd);
-
-    /* toggle button */
-    var togBtn = hd.querySelector('.sw-tog');
-    togBtn.addEventListener('click', function(){
-      panel.classList.toggle('open');
-      togBtn.classList.toggle('on', panel.classList.contains('open'));
-    });
-
-    /* transpose panel */
-    var kg     = div('sw-kg');
-    var capoEl = div('sw-capo plain',[
-      el('div',{style:'font-size:15px;flex-shrink:0',text:'🎸'}),
-      el('div',{style:'flex:1'},[
-        el('div',{class:'sw-capo-t'}),
-        el('div',{class:'sw-capo-s'}),
-      ]),
-      el('div',{class:'sw-capo-n'}),
-    ]);
-    var lbDiv  = div('sw-lb');
-    var panelInner = div('sw-panel-inner',[div('sw-ks',[el('div',{class:'sw-slabel',text:'目标调'}),kg]),capoEl,lbDiv]);
-    var panel  = div('sw-panel',[panelInner]);
+    var togBtn=hd.querySelector('.sw-tog');
+    togBtn.addEventListener('click',function(){panel.classList.toggle('open');togBtn.classList.toggle('on',panel.classList.contains('open'));});
+    var kg=div('sw-kg');
+    var capoEl=div('sw-capo plain',[el('div',{style:'font-size:15px;flex-shrink:0',text:'🎸'}),el('div',{style:'flex:1'},[el('div',{class:'sw-capo-t'}),el('div',{class:'sw-capo-s'})]),el('div',{class:'sw-capo-n'})]);
+    var lbDiv=div('sw-lb');
+    var panel=div('sw-panel',[div('sw-panel-inner',[div('sw-ks',[el('div',{class:'sw-slabel',text:'目标调'}),kg]),capoEl,lbDiv])]);
     wrap.appendChild(panel);
-
     KEYS.forEach(function(k){
-      var b = el('button',{class:'sw-kb'+(k===curKey?' on':''),text:k});
-      b.addEventListener('click',function(){
-        curKey=k;
-        kg.querySelectorAll('.sw-kb').forEach(function(x){x.classList.remove('on')});
-        b.classList.add('on'); renderScore();
-      });
+      var b=el('button',{class:'sw-kb'+(k===curKey?' on':''),text:k});
+      b.addEventListener('click',function(){curKey=k;kg.querySelectorAll('.sw-kb').forEach(function(x){x.classList.remove('on')});b.classList.add('on');renderScore();});
       kg.appendChild(b);
     });
-
-    /* tools row */
-    var ytBtn = el('a',{class:'yt-btn',href:song.youtube||'#',target:'_blank',title:'YouTube',
-      html:'<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"></path></svg>'
-    });
-
-    var metroDiv = buildMetro(song.bpm || 80);
-    var toolsRow = div('sw-tools-row',[ytBtn, metroDiv]);
-    wrap.appendChild(div('sw-tools',[toolsRow]));
-
-    /* score image */
-    var scoreKeyBadge = el('span',{class:'sw-score-key sw-score-key-badge',text:'1 = '+curKey});
-    var img = el('img',{src:song.scoreImg||'', alt:'简谱'});
-    img.addEventListener('error', function(){ img.style.display='none'; placeholder.style.display='block'; });
-    var placeholder = el('div',{class:'sw-score-ph',text:'📄 歌谱上传后自动显示',style:'display:none'});
-    var scoreDiv = div('sw-score',[
-      div('sw-score-top',[el('div',{class:'sw-score-lbl',text:'简谱原稿'}), scoreKeyBadge]),
-      img, placeholder,
-    ]);
-    wrap.appendChild(scoreDiv);
-
-    /* jianpu render */
+    var ytBtn=el('a',{class:'yt-btn',href:song.youtube||'#',target:'_blank',title:'YouTube',html:'<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"></path></svg>'});
+    wrap.appendChild(div('sw-tools',[div('sw-tools-row',[ytBtn,buildMetro(song.bpm||80)])]));
+    var scoreKeyBadge=el('span',{class:'sw-score-key sw-score-key-badge',text:'1 = '+curKey});
+    var img=el('img',{src:song.scoreImg||'',alt:'简谱'});
+    var placeholder=el('div',{class:'sw-score-ph',text:'📄 歌谱上传后自动显示',style:'display:none'});
+    img.addEventListener('error',function(){img.style.display='none';placeholder.style.display='block';});
+    wrap.appendChild(div('sw-score',[div('sw-score-top',[el('div',{class:'sw-score-lbl',text:'简谱原稿'}),scoreKeyBadge]),img,placeholder]));
     function renderScore(){
-      var info = calcCapo(curKey, song.origKey), st = info.st;
-      kPill.textContent = '1 = ' + curKey;
-      scoreKeyBadge.textContent = '1 = ' + curKey;
-
-      if(curKey === song.origKey){
-        capoEl.className='sw-capo plain';
-        capoEl.querySelector('.sw-capo-t').textContent='原调演奏';
-        capoEl.querySelector('.sw-capo-s').textContent='不需要变调夹';
-        capoEl.querySelector('.sw-capo-n').textContent='—';
-      } else if(info.capo===0){
-        capoEl.className='sw-capo plain';
-        capoEl.querySelector('.sw-capo-t').textContent='不需要变调夹';
-        capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法演奏';
-        capoEl.querySelector('.sw-capo-n').textContent='开放';
-      } else {
-        capoEl.className='sw-capo';
-        capoEl.querySelector('.sw-capo-t').textContent='变调夹夹第 '+info.capo+' 格';
-        capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法 → 实际 '+curKey;
-        capoEl.querySelector('.sw-capo-n').textContent=info.capo;
-      }
-
-      lbDiv.innerHTML = '';
+      var info=calcCapo(curKey,song.origKey),st=info.st;
+      kPill.textContent='1 = '+curKey;scoreKeyBadge.textContent='1 = '+curKey;
+      if(curKey===song.origKey){capoEl.className='sw-capo plain';capoEl.querySelector('.sw-capo-t').textContent='原调演奏';capoEl.querySelector('.sw-capo-s').textContent='不需要变调夹';capoEl.querySelector('.sw-capo-n').textContent='—';}
+      else if(info.capo===0){capoEl.className='sw-capo plain';capoEl.querySelector('.sw-capo-t').textContent='不需要变调夹';capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法演奏';capoEl.querySelector('.sw-capo-n').textContent='开放';}
+      else{capoEl.className='sw-capo';capoEl.querySelector('.sw-capo-t').textContent='变调夹夹第 '+info.capo+' 格';capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法 → 实际 '+curKey;capoEl.querySelector('.sw-capo-n').textContent=info.capo;}
+      lbDiv.innerHTML='';
       (song.sections||[]).forEach(function(sec){
-        var se=div('sw-lsec');
-        var sn=div('sw-lsec-name');sn.textContent=sec.name;se.appendChild(sn);
+        var se=div('sw-lsec'),sn=div('sw-lsec-name');sn.textContent=sec.name;se.appendChild(sn);
         (sec.lines||[]).forEach(function(line){
-          var le=div('sw-lline');
-          var row=div('sw-lrow');
+          var le=div('sw-lline'),row=div('sw-lrow');
           var segs=Array.isArray(line)?line:line.line;
           segs.forEach(function(seg){
-            var s=div('sw-seg');
-            var c=div('sw-chord'+(seg.chord?'':' empty'));
-            if(seg.chord) c.textContent=trChord(seg.chord,st);
+            var s=div('sw-seg'),c=div('sw-chord'+(seg.chord?'':' empty'));
+            if(seg.chord)c.textContent=trChord(seg.chord,st);
             s.appendChild(c);
-            if(seg.n && seg.n.trim()) s.appendChild(renderNStr(seg.n));
-            var l=div('sw-lyric'); l.textContent=seg.lyric||''; s.appendChild(l);
+            if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
+            var l=div('sw-lyric');l.textContent=seg.lyric||'';s.appendChild(l);
             row.appendChild(s);
           });
-          le.appendChild(row); se.appendChild(le);
+          le.appendChild(row);se.appendChild(le);
         });
         lbDiv.appendChild(se);
       });
@@ -655,35 +525,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   /* ══════════════ Metronome ══════════════ */
   function buildMetro(defBpm) {
-    var metro = div('sw-metro');
-    metro.innerHTML = `
-      <span class="mleaf">🌿</span><span class="mleaf">🌿</span>
-      <div class="mbg">${defBpm}</div>
-      <span class="mleaf">🌿</span><span class="mleaf">🌿</span>
-      <div class="msettings">
-        <div class="mrow">
-          <button class="mminus">−</button>
-          <input class="mbpm" type="number" min="30" max="300" value="${defBpm}">
-          <button class="mplus">＋</button>
-        </div>
-        <div class="mrow">
-          <button class="mreset">重置</button>
-          <button class="mstop-btn">停止</button>
-        </div>
-      </div>`;
-
+    var metro=div('sw-metro');
+    metro.innerHTML=`<span class="mleaf">🌿</span><span class="mleaf">🌿</span><div class="mbg">${defBpm}</div><span class="mleaf">🌿</span><span class="mleaf">🌿</span><div class="msettings"><div class="mrow"><button class="mminus">−</button><input class="mbpm" type="number" min="30" max="300" value="${defBpm}"><button class="mplus">＋</button></div><div class="mrow"><button class="mreset">重置</button><button class="mstop-btn">停止</button></div></div>`;
     var bpm=defBpm,step=0,playing=false,timer=null,audioCtx=null,settingsOpen=false,pressTimer=null;
-    var leaves=metro.querySelectorAll('.mleaf');
-    var mbg=metro.querySelector('.mbg');
-    var msettings=metro.querySelector('.msettings');
-    var minput=metro.querySelector('.mbpm');
-
+    var leaves=metro.querySelectorAll('.mleaf'),mbg=metro.querySelector('.mbg'),msettings=metro.querySelector('.msettings'),minput=metro.querySelector('.mbpm');
     function playClick(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=step===0?900:700;g.gain.value=step===0?.1:.07;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.035);}
     function tick(){leaves.forEach(function(l){l.classList.remove('active')});leaves[step].classList.add('active');playClick();step=(step+1)%4;}
     function mstart(){mstop();step=0;tick();timer=setInterval(tick,60000/bpm);playing=true;}
     function mstop(){if(timer)clearInterval(timer);timer=null;playing=false;leaves.forEach(function(l){l.classList.remove('active')});}
     function setBpm(v){bpm=Math.min(300,Math.max(30,v||defBpm));mbg.textContent=bpm;minput.value=bpm;if(playing)mstart();}
-
     metro.addEventListener('click',function(e){if(e.target.closest('.msettings')||settingsOpen)return;playing?mstop():mstart();});
     function openS(){msettings.style.display='block';settingsOpen=true;}
     function cancelP(){clearTimeout(pressTimer);}
@@ -705,24 +555,16 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   /* ══════════════ Lightbox ══════════════ */
   function initLightbox() {
-    if (document.getElementById('ym-lb-overlay')) return;
-    var ov = div('sw-lb-overlay');
-    ov.id = 'ym-lb-overlay';
-    ov.innerHTML = '<div class="sw-lb-box" role="dialog" aria-modal="true"><button class="sw-lb-close">✕</button><button class="sw-lb-nav prev">‹</button><img class="sw-lb-img" alt="score"><button class="sw-lb-nav next">›</button></div>';
+    if(document.getElementById('ym-lb-overlay'))return;
+    var ov=div('sw-lb-overlay');ov.id='ym-lb-overlay';
+    ov.innerHTML='<div class="sw-lb-box" role="dialog" aria-modal="true"><button class="sw-lb-close">✕</button><button class="sw-lb-nav prev">‹</button><img class="sw-lb-img" alt="score"><button class="sw-lb-nav next">›</button></div>';
     document.body.appendChild(ov);
-
-    var lbImg=ov.querySelector('.sw-lb-img');
-    var btnClose=ov.querySelector('.sw-lb-close');
-    var btnPrev=ov.querySelector('.sw-lb-nav.prev');
-    var btnNext=ov.querySelector('.sw-lb-nav.next');
+    var lbImg=ov.querySelector('.sw-lb-img'),btnClose=ov.querySelector('.sw-lb-close'),btnPrev=ov.querySelector('.sw-lb-nav.prev'),btnNext=ov.querySelector('.sw-lb-nav.next');
     var list=[],idx=0,isOpen=false;
-
     function getImgs(){return Array.from(document.querySelectorAll('.sw-score img')).filter(function(i){return i&&i.src&&i.style.display!=='none';});}
-    function syncNav(){var s=list.length>1;btnPrev.style.display=s?'':'none';btnNext.style.display=s?'':'none';}
     function showImg(i){if(!list.length)return;idx=(i+list.length)%list.length;lbImg.src=list[idx].src;}
-    function lbOpen(img){list=getImgs();idx=Math.max(0,list.indexOf(img));showImg(idx);syncNav();ov.classList.add('open');document.body.style.overflow='hidden';isOpen=true;}
+    function lbOpen(img){list=getImgs();idx=Math.max(0,list.indexOf(img));showImg(idx);var s=list.length>1;btnPrev.style.display=s?'':'none';btnNext.style.display=s?'':'none';ov.classList.add('open');document.body.style.overflow='hidden';isOpen=true;}
     function lbClose(){ov.classList.remove('open');document.body.style.overflow='';isOpen=false;}
-
     btnClose.onclick=function(e){e.stopPropagation();lbClose();};
     btnPrev.onclick=function(e){e.stopPropagation();if(list.length>1)showImg(idx-1);};
     btnNext.onclick=function(e){e.stopPropagation();if(list.length>1)showImg(idx+1);};
@@ -737,212 +579,124 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   /* ══════════════ APlayer ══════════════ */
   function buildAPlayer(song) {
-    var d = div('');
-
-    /* 核心初始化函数：直接调用 new APlayer()
-       Halo 的插件只扫描 DOMContentLoaded 时已存在的元素，
-       动态插入的元素必须我们自己 new APlayer() 来初始化。
-       用 retry 机制等待 APlayer 库加载完成（Halo 用 defer 加载）。 */
-    function initAPlayer(retries) {
-      if (d._aplayer) return;                      // 已初始化，跳过
-
-      if (window.APlayer) {
-        try {
-          d._aplayer = new APlayer({
-            container : d,
-            autoplay  : false,
-            lrcType   : 3,
-            audio     : [{
-              name   : song.title,
-              artist : song.artist  || '',
-              url    : song.mp3     || '',
-              cover  : song.cover   || '',
-              lrc    : song.lrc     || '',
-            }],
-          });
-        } catch(e) {
-          console.warn('[YM] APlayer init error:', e);
-        }
+    var d=div('');
+    function initAPlayer(retries){
+      if(d._aplayer)return;
+      if(window.APlayer){
+        try{d._aplayer=new APlayer({container:d,autoplay:false,lrcType:3,audio:[{name:song.title,artist:song.artist||'',url:song.mp3||'',cover:song.cover||'',lrc:song.lrc||''}]});}catch(e){console.warn('[YM] APlayer init error:',e);}
         return;
       }
-
-      // APlayer 库还没加载好，最多重试 20 次（共等 2 秒）
-      if ((retries || 0) < 20) {
-        setTimeout(function(){ initAPlayer((retries||0)+1); }, 100);
-      } else {
-        console.warn('[YM] APlayer not found after retries, song:', song.title);
-      }
+      if((retries||0)<20)setTimeout(function(){initAPlayer((retries||0)+1);},100);
+      else console.warn('[YM] APlayer not found after retries, song:',song.title);
     }
-
-    // 插入 DOM 后再初始化（requestAnimationFrame 保证已挂载）
-    setTimeout(function(){ initAPlayer(0); }, 0);
-
+    setTimeout(function(){initAPlayer(0);},0);
     return d;
   }
 
-  /* ══════════════ Build all sections ══════════════ */
+  /* ══════════════ Build Songs ══════════════ */
   function buildSongs() {
-    var songs = C.songs || [];
-    if (!songs.length) return el('p',{class:'ym-meta',text:'本周暂无诗歌安排'});
-
-    var wrap   = div('ym-songs-wrap');
-    var tabBar = div('ym-song-tabs');
-    var panels = [];
-
-    songs.forEach(function(song, i){
-
-      /* 复制图标（点击只复制，不切换 tab）*/
-      var copyIcon = el('span',{class:'ym-song-tab-copy',title:'复制歌名',
-        html:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>'
-      });
-      copyIcon.addEventListener('click', function(e){
-        e.stopPropagation();
-        navigator.clipboard.writeText(song.title).then(function(){
-          var old = copyIcon.innerHTML;
-          copyIcon.innerHTML = '&#10003;'; copyIcon.style.color = '#16a34a';
-          setTimeout(function(){ copyIcon.innerHTML = old; copyIcon.style.color = ''; }, 1200);
-        });
-      });
-
-      /* Tab 按钮：序号 + 歌名 + 复制 */
-      var tab = el('button',{class:'ym-song-tab'+(i===0?' active':'')});
+    var songs=C.songs||[];
+    if(!songs.length)return el('p',{class:'ym-meta',text:'本周暂无诗歌安排'});
+    var wrap=div('ym-songs-wrap'),tabBar=div('ym-song-tabs'),panels=[];
+    songs.forEach(function(song,i){
+      var copyIcon=el('span',{class:'ym-song-tab-copy',title:'复制歌名',html:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>'});
+      copyIcon.addEventListener('click',function(e){e.stopPropagation();navigator.clipboard.writeText(song.title).then(function(){var old=copyIcon.innerHTML;copyIcon.innerHTML='&#10003;';copyIcon.style.color='#16a34a';setTimeout(function(){copyIcon.innerHTML=old;copyIcon.style.color='';},1200);});});
+      var tab=el('button',{class:'ym-song-tab'+(i===0?' active':'')});
       tab.appendChild(el('span',{class:'ym-song-tab-num',text:String(i+1)}));
       tab.appendChild(el('span',{class:'ym-song-tab-title',text:song.title}));
       tab.appendChild(copyIcon);
       tabBar.appendChild(tab);
-
-      /* 内容面板：播放器 + 移调卡 */
-      var panel = div('ym-song-panel'+(i===0?' active':''));
+      var panel=div('ym-song-panel'+(i===0?' active':''));
       panel.appendChild(buildAPlayer(song));
       panel.appendChild(buildSongCard(song));
       wrap.appendChild(panel);
-
-      panels.push({tab:tab, panel:panel});
-
-      /* 切换逻辑 */
-      tab.addEventListener('click', function(){
-        panels.forEach(function(p){
-          p.tab.classList.remove('active');
-          p.panel.classList.remove('active');
-        });
-        tab.classList.add('active');
-        panel.classList.add('active');
-      });
+      panels.push({tab:tab,panel:panel});
+      tab.addEventListener('click',function(){panels.forEach(function(p){p.tab.classList.remove('active');p.panel.classList.remove('active');});tab.classList.add('active');panel.classList.add('active');});
     });
-
-    wrap.insertBefore(tabBar, wrap.firstChild);
+    wrap.insertBefore(tabBar,wrap.firstChild);
     return wrap;
   }
 
-  /* ══════════════ Bible widget ══════════════ */
+  /* ══════════════ Bible ══════════════ */
   function buildBible() {
-    var w = div('');
-    var bw = el('div',{class:'hb-bible'});
-    bw.setAttribute('data-id','ym-bible-widget');
-    bw.setAttribute('data-default', C.bibleRef||'？');
-    bw.setAttribute('data-t2','NR06');
-    bw.setAttribute('data-dual','1');
-    w.appendChild(bw);
-    return w;
+    var w=div(''),bw=el('div',{class:'hb-bible'});
+    bw.setAttribute('data-id','ym-bible-widget');bw.setAttribute('data-default',C.bibleRef||'？');bw.setAttribute('data-t2','NR06');bw.setAttribute('data-dual','1');
+    w.appendChild(bw);return w;
   }
 
   /* ══════════════ PPT ══════════════ */
   function buildPPT() {
-    if(C.pptUrl){
-      return el('a',{class:'ppt-download-link',href:C.pptUrl,target:'_blank',rel:'noopener noreferrer',
-        text:(C.pptLabel||'讲员PPT') + ' > 📥 查看 / 下载'});
-    }
+    if(C.pptUrl)return el('a',{class:'ppt-download-link',href:C.pptUrl,target:'_blank',rel:'noopener noreferrer',text:(C.pptLabel||'讲员PPT')+' > 📥 查看 / 下载'});
     return el('p',{class:'ppt-empty',text:'本周暂未提供讲员 PPT 🙏'});
   }
 
   /* ══════════════ Replay ══════════════ */
   function buildReplay() {
-    if(C.replayUrl){
-      var wrap = div('ym-iframe-wrap');
-      var iframe = el('iframe',{src:C.replayUrl,allowfullscreen:'true',allow:'accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture'});
-      wrap.appendChild(iframe);
-      return wrap;
-    }
+    if(C.replayUrl){var wrap=div('ym-iframe-wrap');wrap.appendChild(el('iframe',{src:C.replayUrl,allowfullscreen:'true',allow:'accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture'}));return wrap;}
     return el('p',{class:'replay-tip',text:'本周暂未提供直播回放 🙏🏻'});
   }
 
-  /* ══════════════ Anchor helper ══════════════ */
-  function anchor(id){ var a=el('div',{id:id,style:'scroll-margin-top:80px'}); return a; }
-
-  /* ══════════════ HR ══════════════ */
-  function hr(){ return el('hr',{class:'ym-hr'}); }
-
-  /* ══════════════ Section title ══════════════ */
-  function secTitle(txt){ return el('h2',{class:'ym-section-title',text:txt}); }
+  function anchor(id){return el('div',{id:id,style:'scroll-margin-top:80px'});}
+  function hr(){return el('hr',{class:'ym-hr'});}
+  function secTitle(txt){return el('h2',{class:'ym-section-title',text:txt});}
 
   /* ══════════════ Assemble page ══════════════ */
   function buildPage() {
-    var frag = document.createDocumentFragment();
-
-    frag.appendChild(buildHero());
-    frag.appendChild(hr());
-
-    // Schedule
-    frag.appendChild(anchor('ym-flow'));
-    frag.appendChild(buildSchedule());
-    frag.appendChild(hr());
-
-    // Songs
-    frag.appendChild(anchor('ym-songs'));
-    frag.appendChild(secTitle('🎵 诗歌敬拜'));
-
-    // Roster
-    var roster = buildRoster();
-    if(roster) frag.appendChild(roster);
-
-    frag.appendChild(buildSongs());
-    frag.appendChild(hr());
-
-    // Score (scroll target just before last song card)
-    frag.appendChild(anchor('ym-score'));
-    frag.appendChild(hr());
-
-    // Message
-    frag.appendChild(anchor('ym-message'));
-    frag.appendChild(secTitle('📖 圣经分享'));
-    var metaDiv = div('ym-block');
-    metaDiv.innerHTML = '<div class="ym-meta"><strong>讲员：</strong>'+(C.speaker||'—')+'<br><strong>主题：</strong>'+(C.topic||'—')+'</div>';
-    frag.appendChild(metaDiv);
-    frag.appendChild(buildBible());
-    frag.appendChild(hr());
-
-    // PPT
-    frag.appendChild(anchor('ym-ppt'));
-    frag.appendChild(secTitle('📑 讲员 PPT'));
-    frag.appendChild(buildPPT());
-    frag.appendChild(hr());
-
-    // Replay
-    frag.appendChild(anchor('ym-replay'));
-    frag.appendChild(secTitle('📺 直播回放'));
-    frag.appendChild(buildReplay());
-    frag.appendChild(hr());
-
-    // Game
-    frag.appendChild(anchor('ym-game'));
-    frag.appendChild(secTitle('🎮 游戏活动'));
-    frag.appendChild(el('p',{class:'ym-meta',text:C.gameText}));
-    frag.appendChild(hr());
-
-    // Action
-    var act = div('ym-action');
-    act.innerHTML = '<strong>🙋 行动邀请</strong><br>欢迎邀请你身边的青年朋友一起来参加聚会。<br>如果你对敬拜、乐器或其他服事有感动，我们很欢迎你加入，也可以随时联系同工。<br><strong>一起服事，一起成长，我们等你！</strong>';
+    var frag=document.createDocumentFragment();
+    frag.appendChild(buildHero());frag.appendChild(hr());
+    frag.appendChild(anchor('ym-flow'));frag.appendChild(buildSchedule());frag.appendChild(hr());
+    frag.appendChild(anchor('ym-songs'));frag.appendChild(secTitle('🎵 诗歌敬拜'));
+    var roster=buildRoster();if(roster)frag.appendChild(roster);
+    frag.appendChild(buildSongs());frag.appendChild(hr());
+    frag.appendChild(anchor('ym-score'));frag.appendChild(hr());
+    frag.appendChild(anchor('ym-message'));frag.appendChild(secTitle('📖 圣经分享'));
+    var metaDiv=div('ym-block');metaDiv.innerHTML='<div class="ym-meta"><strong>讲员：</strong>'+(C.speaker||'—')+'<br><strong>主题：</strong>'+(C.topic||'—')+'</div>';
+    frag.appendChild(metaDiv);frag.appendChild(buildBible());frag.appendChild(hr());
+    frag.appendChild(anchor('ym-ppt'));frag.appendChild(secTitle('📑 讲员 PPT'));frag.appendChild(buildPPT());frag.appendChild(hr());
+    frag.appendChild(anchor('ym-replay'));frag.appendChild(secTitle('📺 直播回放'));frag.appendChild(buildReplay());frag.appendChild(hr());
+    frag.appendChild(anchor('ym-game'));frag.appendChild(secTitle('🎮 游戏活动'));frag.appendChild(el('p',{class:'ym-meta',text:C.gameText}));frag.appendChild(hr());
+    var act=div('ym-action');act.innerHTML='<strong>🙋 行动邀请</strong><br>欢迎邀请你身边的青年朋友一起来参加聚会。<br>如果你对敬拜、乐器或其他服事有感动，我们很欢迎你加入，也可以随时联系同工。<br><strong>一起服事，一起成长，我们等你！</strong>';
     frag.appendChild(act);
-
-    // Ring Coach Tour trigger
     frag.appendChild(el('div',{id:'rt5-enable'}));
-
     ROOT.appendChild(frag);
   }
 
-  /* ══════════════ Init ══════════════ */
-  buildModal();
-  buildPage();
-  initLightbox();
+  /* ══════════════ 核心运行函数 ══════════════ */
+  function _run(cfg, root) {
+    C = cfg;
+    ROOT = root;
+    buildModal();
+    buildPage();
+    initLightbox();
+  }
+
+  /* ══════════════ 对外 API ══════════════ */
+  window.YouthEngine.render = function(weekId, root) {
+    if (!root) root = document.getElementById('ym-root');
+    if (!root) { console.error('[YM] root element not found'); return; }
+    root.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--ym-ink2,#888);font-family:system-ui;"><div style="font-size:32px;margin-bottom:12px;">⏳</div><div>正在加载周刊...</div></div>';
+    _injectCSS();
+    fetch(YM_BASE + '/weekly/' + weekId + '.json')
+      .then(function(r){if(!r.ok)throw new Error('周刊不存在: '+weekId);return r.json();})
+      .then(function(weekly){
+        var songIds=weekly.songs||[];
+        return Promise.all(songIds.map(function(id){
+          return fetch(YM_BASE+'/songs/'+id+'.json').then(function(r){if(!r.ok)throw new Error('歌曲不存在: '+id);return r.json();});
+        })).then(function(songs){weekly.songs=songs;return weekly;});
+      })
+      .then(function(cfg){root.innerHTML='';_applyDefaults(cfg);_run(cfg,root);})
+      .catch(function(err){root.innerHTML='<div style="text-align:center;padding:60px 20px;color:#ef4444;font-family:system-ui;"><div style="font-size:32px;margin-bottom:12px;">❌</div><div>'+err.message+'</div></div>';console.error('[YM]',err);});
+  };
+
+  /* ══════════════ 向后兼容：自动运行模式 ══════════════ */
+  if (window.YouthMeeting) {
+    var C0 = window.YouthMeeting;
+    var ROOT0 = document.getElementById('ym-root');
+    if (C0 && ROOT0) {
+      _applyDefaults(C0);
+      _injectCSS();
+      _run(C0, ROOT0);
+    }
+  }
 
 })();
