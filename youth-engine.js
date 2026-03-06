@@ -1,30 +1,47 @@
 /**
- * youth-engine.js
+ * youth-engine.js v3.0
  * 橄榄树团契 · 青年聚会渲染引擎
  * 托管于 GitHub Pages，所有帖子共用
- * 读取 window.YouthMeeting 配置并渲染完整页面到 #ym-root
+ *
+ * 使用方式A（新，推荐）：
+ *   YouthEngine.render('2026-03', document.getElementById('ym-root'));
+ *
+ * 使用方式B（旧，向后兼容）：
+ *   window.YouthMeeting = { ... }; // 帖子里定义
+ *   <script src="youth-engine.js"></script>  // 自动读取并渲染
  */
+
+/* ══════════ GitHub Pages 基础路径 ══════════ */
+var YM_BASE = 'https://cye04.github.io/Cecp';
+
+window.YouthEngine = {};
+
 (function () {
   'use strict';
 
-  var C = window.YouthMeeting;
-  var ROOT = document.getElementById('ym-root');
-  if (!C || !ROOT) { console.error('[YM] window.YouthMeeting or #ym-root missing'); return; }
+  // 模块级变量，由 _run() 赋值
+  var C, ROOT;
 
-  /* ══════════════ 默认值 ══════════════ */
-  C.time       = C.time       || '每周日 12:00 – 13:30';
-  C.gameText   = C.gameText   || '本周没有游戏活动哦👀';
-  C.schedule   = C.schedule   || [
-    { time:'12:00 – 12:30', event:'诗歌敬拜',   emoji:'🎶' },
-    { time:'12:30 – 13:30', event:'圣经分享',   emoji:'📖' },
-    { time:'13:30',          event:'祷告 & 结束', emoji:'🙏' },
-  ];
-  C.songs = C.songs || [];
-  C.apiBase = C.apiBase || 'https://script.google.com/macros/s/AKfycbxihf7j08Pkus9rWBqectkmJ7PbJNVdhPTrbNL8v3wm1vTbJ76xE6ksNKytTe4SUii3_Q/exec';
+  function _applyDefaults(C) {
+    C.time       = C.time       || '每周日 12:00 – 13:30';
+    C.gameText   = C.gameText   || '本周没有游戏活动哦👀';
+    C.schedule   = C.schedule   || [
+      { time:'12:00 – 12:30', event:'诗歌敬拜',   emoji:'🎶' },
+      { time:'12:30 – 13:30', event:'圣经分享',   emoji:'📖' },
+      { time:'13:30',          event:'祷告 & 结束', emoji:'🙏' },
+    ];
+    C.songs  = C.songs  || [];
+    C.apiBase = C.apiBase || 'https://script.google.com/macros/s/AKfycbxihf7j08Pkus9rWBqectkmJ7PbJNVdhPTrbNL8v3wm1vTbJ76xE6ksNKytTe4SUii3_Q/exec';
+  }
 
-  /* ══════════════ CSS 注入 ══════════════ */
-  var style = document.createElement('style');
-  style.textContent = `
+  /* ══════════════ CSS 只注入一次 ══════════════ */
+  var _cssInjected = false;
+  function _injectCSS() {
+    if (_cssInjected) return;
+    _cssInjected = true;
+
+    var style = document.createElement('style');
+    style.textContent = `
 /* ── theme vars ── */
 :root{
   --ym-bg:#f8fafc;--ym-card:#fff;--ym-ink:#1a1815;--ym-ink2:#7c746c;--ym-ink3:#b8b0a8;
@@ -235,7 +252,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 .ym-song-panel{display:none}
 .ym-song-panel.active{display:block}
 `;
-  document.head.appendChild(style);
+    document.head.appendChild(style);
+  } // end _injectCSS
 
   /* ══════════════ Utility ══════════════ */
   function el(tag, attrs, children) {
@@ -319,7 +337,6 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var navItems = [
       {label:'📅 聚会流程', href:'#ym-flow'},
       {label:'🎧 本周诗歌', href:'#ym-songs'},
-      {label:'🎼 歌谱',     href:'#ym-score'},
       {label:'📖 信息分享', href:'#ym-message'},
       {label:'📺 直播回放', href:'#ym-replay'},
       {label:'📑 讲员PPT',  href:'#ym-ppt'},
@@ -498,13 +515,12 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function renderNStr(nStr){
     var d=document.createElement('div');d.className='sw-jianpu';
     if(!nStr||!nStr.trim())return d;
-    nStr=nStr.replace(/\(\s*\[/g,'([').replace(/\]\s*\)/g,'])');
     var toks=nStr.trim().split(/\s+/),i=0;
     while(i<toks.length){
       var t=toks[i];
       if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
       if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')so.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(so);continue;}
-      if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;while(i<toks.length&&toks[i]!=='('&&toks[i]!=='(['&&toks[i]!=='])')sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
+      if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;while(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
       var tm2=t.match(/^\{(3|5)$/);if(tm2){var tn=parseInt(tm2[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));d.appendChild(tp);i++;continue;}
       if(t==='}'){i++;continue;}
       d.appendChild(parseJpToken(t));i++;
@@ -918,17 +934,18 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     frag.appendChild(buildPPT());
     frag.appendChild(hr());
 
+    // Game
+    frag.appendChild(anchor('ym-game'));
+    frag.appendChild(secTitle('🎮 游戏活动'));
+    frag.appendChild(el('p',{class:'ym-meta',text:C.gameText}));
+    frag.appendChild(hr());
+
     // Replay
     frag.appendChild(anchor('ym-replay'));
     frag.appendChild(secTitle('📺 直播回放'));
     frag.appendChild(buildReplay());
     frag.appendChild(hr());
 
-    // Game
-    frag.appendChild(anchor('ym-game'));
-    frag.appendChild(secTitle('🎮 游戏活动'));
-    frag.appendChild(el('p',{class:'ym-meta',text:C.gameText}));
-    frag.appendChild(hr());
 
     // Action
     var act = div('ym-action');
@@ -941,9 +958,62 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     ROOT.appendChild(frag);
   }
 
-  /* ══════════════ Init ══════════════ */
-  buildModal();
-  buildPage();
-  initLightbox();
+  /* ══════════════ 核心运行函数 ══════════════ */
+  function _run(cfg, root) {
+    C = cfg;
+    ROOT = root;
+    buildModal();
+    buildPage();
+    initLightbox();
+  }
+
+  /* ══════════════ 对外 API（在 IIFE 内注册，可访问内部函数）══════════════ */
+  window.YouthEngine.render = function(weekId, root) {
+    if (!root) root = document.getElementById('ym-root');
+    if (!root) { console.error('[YM] root element not found'); return; }
+
+    root.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--ym-ink2,#888);font-family:system-ui;"><div style="font-size:32px;margin-bottom:12px;">⏳</div><div>正在加载周刊...</div></div>';
+    _injectCSS();
+
+    fetch(YM_BASE + '/weekly/' + weekId + '.json')
+      .then(function(r) {
+        if (!r.ok) throw new Error('周刊不存在: ' + weekId);
+        return r.json();
+      })
+      .then(function(weekly) {
+        var songIds = weekly.songs || [];
+        var songPromises = songIds.map(function(id) {
+          return fetch(YM_BASE + '/songs/' + id + '.json')
+            .then(function(r) {
+              if (!r.ok) throw new Error('歌曲不存在: ' + id);
+              return r.json();
+            });
+        });
+        return Promise.all(songPromises).then(function(songs) {
+          weekly.songs = songs;
+          return weekly;
+        });
+      })
+      .then(function(cfg) {
+        root.innerHTML = '';
+        _applyDefaults(cfg);
+        _run(cfg, root);
+      })
+      .catch(function(err) {
+        root.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#ef4444;font-family:system-ui;"><div style="font-size:32px;margin-bottom:12px;">❌</div><div>' + err.message + '</div></div>';
+        console.error('[YM]', err);
+      });
+  };
+
+  /* ══════════════ 向后兼容：自动运行模式 ══════════════ */
+  if (window.YouthMeeting) {
+    var C0 = window.YouthMeeting;
+    var ROOT0 = document.getElementById('ym-root');
+    if (C0 && ROOT0) {
+      _applyDefaults(C0);
+      _injectCSS();
+      _run(C0, ROOT0);
+    }
+  }
 
 })();
