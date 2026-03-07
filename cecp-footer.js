@@ -295,7 +295,11 @@ document.addEventListener('keydown', function(e) {
 
     const fsBtn=modal.querySelector("[data-fs]");
     const setFsLabel=()=>{const on=!!document.fullscreenElement;if(fsBtn){fsBtn.setAttribute("aria-pressed",on?"true":"false");const t=fsBtn.querySelector(".txt");if(t)t.textContent=on?"退出":"全屏";}};
-    const fsCb=()=>setFsLabel();
+    const fsCb=()=>{
+      const on=!!document.fullscreenElement;
+      setFsLabel();
+      if(!on && modal.classList.contains("hbw-pres")) exitPres(true);
+    };
     document.addEventListener("fullscreenchange",fsCb);
     modal.__hbw_fs_cleanup=()=>document.removeEventListener("fullscreenchange",fsCb);
     if(fsBtn)fsBtn.addEventListener("click",async e=>{
@@ -330,23 +334,39 @@ document.addEventListener('keydown', function(e) {
       modal.classList.add("hbw-pres");
       applyPresFontSize();
       // 进入投屏时把经文区域滚回顶部，防止第一节被切掉
-      setTimeout(()=>{ try{ result.scrollTop=0; }catch(_){} }, 80);
+      setTimeout(()=>{
+        try{
+          result.scrollTop=0;
+          const firstBox=result.querySelector(".hbw-box");
+          if(firstBox)firstBox.scrollIntoView({block:"start"});
+        }catch(_){}
+      }, 80);
       try{ panel.requestFullscreen?.(); }catch(_){}
       if(presBtn){ const t=presBtn.querySelector(".txt"); if(t)t.textContent="退出投屏"; }
     }
-    function exitPres(){
+    function exitPres(fromFsEvent){
       modal.classList.remove("hbw-pres");
-      // 还原字体
       modal.querySelectorAll(".hbw-line,.hbw-p-line").forEach(el=>{
-        el.style.fontSize=""; el.style.lineHeight="";
+        el.style.fontSize="";
+        el.style.lineHeight="";
       });
-      modal.querySelectorAll(".hbw-vn").forEach(el=>{ el.style.fontSize=""; });
-      try{ if(document.fullscreenElement)document.exitFullscreen?.(); }catch(_){}
-      if(presBtn){ const t=presBtn.querySelector(".txt"); if(t)t.textContent="投屏"; }
+      modal.querySelectorAll(".hbw-vn").forEach(el=>{
+        el.style.fontSize="";
+      });
+      result.scrollTop=0;
+      if(!fromFsEvent){
+        try{
+          if(document.fullscreenElement) document.exitFullscreen?.();
+        }catch(_){}
+      }
+      if(presBtn){
+        const t=presBtn.querySelector(".txt");
+        if(t) t.textContent="投屏";
+      }
     }
     function applyPresScale(){ applyPresFontSize(); }
     function togglePres(){
-      if(modal.classList.contains("hbw-pres"))exitPres();
+      if(modal.classList.contains("hbw-pres"))exitPres(false);
       else enterPres();
     }
     if(presBtn)presBtn.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();togglePres();});
@@ -371,7 +391,22 @@ document.addEventListener('keydown', function(e) {
     mIn.addEventListener("input",()=>{const raw=san(mIn.value);const tk0=(raw.split(" ")[0]||"");const hasCh=/\s+\d+/.test(raw);if(tk0&&!hasCh)openAC(bestCands(tk0,10));else closeAC();if(hasCh){if(dbT)clearTimeout(dbT);dbT=setTimeout(()=>{if(modal.__triggerOpen)modal.__triggerOpen();},350);}});
     mIn.addEventListener("keydown",e=>{if(e.key==="Escape"){closeAC();return;}const op=mAC.classList.contains("is-open");if(op&&(e.key==="ArrowDown"||e.key==="ArrowUp")){e.preventDefault();const n=acItems.length;if(!n)return;let nx=acIdx;if(e.key==="ArrowDown")nx=(nx+1+n)%n;else nx=(nx-1+n)%n;setAct(nx);return;}if(e.key==="Enter"){e.preventDefault();if(op){if(acIdx<0&&acItems.length)setAct(0);if(acIdx>=0&&acItems[acIdx]){pick(acItems[acIdx].code);return;}}closeAC();if(modal.__triggerOpen)modal.__triggerOpen();return;}if(op&&e.key==="Tab"&&acItems.length){e.preventDefault();if(acIdx<0)setAct(0);if(acIdx>=0&&acItems[acIdx])pick(acItems[acIdx].code);}});
     modal.addEventListener("click",e=>{const t=e.target;if(t===mIn||mAC.contains(t))return;if(t?.getAttribute?.("data-close")==="1")modal.__close();else closeAC();});
-    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("is-open"))modal.__close();});
+    document.addEventListener("keydown",async e=>{
+      if(e.key !== "Escape" || !modal.classList.contains("is-open")) return;
+      if(modal.classList.contains("hbw-pres")){
+        e.preventDefault();
+        e.stopPropagation();
+        exitPres(false);
+        return;
+      }
+      if(document.fullscreenElement){
+        e.preventDefault();
+        e.stopPropagation();
+        try{ await document.exitFullscreen?.(); }catch(_){}
+        return;
+      }
+      modal.__close();
+    });
 
     modal.__open=()=>{
       modal.classList.remove("is-hidden","hbw-stable");

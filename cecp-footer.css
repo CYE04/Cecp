@@ -495,26 +495,30 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 }
 /* 经文区域占满剩余空间 */
 .hbw.hbw-pres .hbw-scroll {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  /* 不在这里 center，否则 controls 会被挤出去 */
 }
 /* controls（搜索栏）固定在上方，不随内容缩放 */
 .hbw.hbw-pres .hbw-controls {
   flex-shrink: 0 !important;
+  padding-bottom: 8px;
 }
-/* 经文内容区：占满剩余高度，垂直居中显示经文 */
+/* 经文内容区：占满剩余高度，从顶部正常开始显示 */
 .hbw.hbw-pres .hbw-result {
   flex: 1;
   width: 100%;
   max-width: 100%;
+  min-height: 0;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 24px 0;
+  overflow-x: hidden;
+  display: block;
+  padding: 24px 16px 32px;
+  scroll-padding-top: 24px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 /* 滚动条隐藏（投屏时不需要滚动条） */
 .hbw.hbw-pres .hbw-result::-webkit-scrollbar { display: none; }
@@ -529,9 +533,20 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 .hbw.hbw-pres .hbw-box {
   background: transparent !important;
   border: none !important;
+  padding: 0 !important;
+  margin: 0 0 22px 0 !important;
 }
 .hbw.hbw-pres .hbw-box h4 {
   color: rgba(255,255,255,0.5) !important;
+  margin-bottom: 14px;
+}
+.hbw.hbw-pres .hbw-par,
+.hbw.hbw-pres [data-solo-v] {
+  display: grid;
+  gap: 18px;
+}
+.hbw.hbw-pres .hbw-p-row {
+  align-items: start;
 }
 .hbw.hbw-pres .hbw-vn {
   color: rgba(255,255,255,0.35) !important;
