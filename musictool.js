@@ -1,4 +1,6 @@
-/* musictool.js — 音乐工具箱*/
+/* musictool.js — 音乐工具箱
+   用法：在 Halo 页面放 <div id="music-toolbox"></div> 然后载入此文件
+*/
 (function(){
 'use strict';
 
@@ -153,18 +155,7 @@ const panels   = { lrc: $('mt-panel-lrc'), jf: $('mt-panel-jf') };
 
 function $(id){ return document.getElementById(id); }
 
-function openTool(id, name){
-  navName.textContent = name;
-  hub.style.display = 'none';
-  toolview.classList.add('on');
-  Object.values(panels).forEach(p => p.classList.remove('on'));
-  panels[id].classList.add('on');
-  if(id === 'lrc' && !localStorage.getItem(TUT_KEY)) setTimeout(tutOpen, 400);
-  if(id === 'jf'  && !localStorage.getItem(TUT_KEY_JF)) setTimeout(tutOpenJF, 400);
-  if(id === 'jf'){
-    const fr = $('mt-jf-iframe');
-    if(!fr.src || fr.src === 'about:blank' || fr.src === ''){
-      const jianpuHTML = `<!DOCTYPE html>
+const jianpuHTML = `<!DOCTYPE html>
 <html lang="zh">
 <head>
 <meta charset="utf-8">
@@ -1293,8 +1284,20 @@ renderEditor();
 </script>
 </body>
 </html>`;
-      const blob = new Blob([jianpuHTML], {type: 'text/html'});
-      fr.src = URL.createObjectURL(blob);
+
+function openTool(id, name){
+  navName.textContent = name;
+  hub.style.display = 'none';
+  toolview.classList.add('on');
+  Object.values(panels).forEach(p => p.classList.remove('on'));
+  panels[id].classList.add('on');
+  if(id === 'lrc' && !localStorage.getItem(TUT_KEY)) setTimeout(tutOpen, 400);
+  if(id === 'jf'  && !localStorage.getItem(TUT_KEY_JF)) setTimeout(tutOpenJF, 400);
+  if(id === 'jf'){
+    const fr = $('mt-jf-iframe');
+    if(!fr.srcdoc && !fr._loaded){
+      fr._loaded = true;
+      fr.srcdoc = jianpuHTML;
     }
   }
 }
