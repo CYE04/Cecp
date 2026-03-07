@@ -230,3 +230,25 @@ body{overflow:hidden!important;}
   font-weight: 700; cursor: pointer; transition: all .15s;
 }
 .mt-tut-next:hover { background: #fff; transform: translateX(2px); }
+
+/* ══ 帮助按钮 ══ */
+.mt-help-btn {
+  margin-left: auto;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1.5px solid var(--border2); background: transparent;
+  color: var(--ink3); font-family: 'Space Mono', monospace;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: all .15s; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.mt-help-btn:hover { border-color: var(--gold); color: var(--gold2); }
+
+/* ══ 以后不再显示按钮 ══ */
+.mt-tut-nevershow {
+  background: none; border: none;
+  color: rgba(255,255,255,0.22);
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  cursor: pointer; letter-spacing: 0.5px; margin-right: 4px;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.mt-tut-nevershow:hover { color: rgba(255,255,255,0.5); }

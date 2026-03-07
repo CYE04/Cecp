@@ -37,6 +37,7 @@ root.innerHTML = `
     <button class="mt-back" id="mt-back">← 返回</button>
     <span class="mt-nav-label">工具箱 /</span>
     <span class="mt-nav-name" id="mt-nav-name"></span>
+    <button class="mt-help-btn" id="mt-help-btn" title="使用教程">?</button>
   </div>
   <div class="mt-body">
 
@@ -139,6 +140,7 @@ root.innerHTML = `
     <div class="mt-tut-footer">
       <div class="mt-tut-dots" id="mt-tut-dots"></div>
       <div class="mt-tut-btns">
+        <button class="mt-tut-nevershow" id="mt-tut-never">以后不再显示</button>
         <button class="mt-tut-skip" id="mt-tut-skip">跳过</button>
         <button class="mt-tut-next" id="mt-tut-next">下一步 →</button>
       </div>
@@ -1311,6 +1313,12 @@ function closeTool(){
 $('mt-card-lrc').onclick = () => openTool('lrc','歌词编辑器');
 $('mt-card-jf').onclick  = () => openTool('jf','简谱编辑器');
 $('mt-back').onclick     = closeTool;
+$('mt-help-btn').onclick = () => {
+  const isJF = $('mt-panel-jf').classList.contains('on');
+  if(isJF){ tutIdxJF=0; tutRenderJF(); $('mt-tut-next').onclick = () => { if(tutIdxJF < tutStepsJF.length-1){ tutIdxJF++; tutRenderJF(); } else tutCloseJF(); }; $('mt-tut-close').onclick=tutCloseJF; $('mt-tut-skip').onclick=tutCloseJF; $('mt-tut-never').onclick=()=>{ localStorage.setItem(TUT_KEY_JF,'1'); tutCloseJF(); }; }
+  else { tutIdx=0; tutRender(); $('mt-tut-next').onclick = () => { if(tutIdx < tutSteps.length-1){ tutIdx++; tutRender(); } else tutClose(); }; $('mt-tut-close').onclick=tutClose; $('mt-tut-skip').onclick=tutClose; $('mt-tut-never').onclick=()=>{ localStorage.setItem(TUT_KEY,'1'); tutClose(); }; }
+  $('mt-tut').classList.add('open');
+};
 
 /* ── LRC 播放器 ── */
 const audio = $('mt-audio');
@@ -1582,6 +1590,7 @@ function tutClose(){
 
 $('mt-tut-close').onclick = tutClose;
 $('mt-tut-skip').onclick  = tutClose;
+$('mt-tut-never').onclick = () => { localStorage.setItem(TUT_KEY,'1'); tutClose(); };
 $('mt-tut-next').onclick  = () => {
   if(tutIdx < tutSteps.length - 1){ tutIdx++; tutRender(); }
   else tutClose();
