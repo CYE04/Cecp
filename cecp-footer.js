@@ -47,6 +47,7 @@ document.addEventListener('keydown', function(e) {
   const DESIRED_T2=[
     {code:"",label:"无第二译本"},
     {code:"YV:36",label:"CCB · 当代圣经 (简体)"},
+    {code:"YV:140",label:"RCUVSS · 和合本修订版 (简体)"},
     {code:"NR06",label:"NR06 · Nuova Riveduta 2006 (Italiano)"},
     {code:"ESV",label:"ESV · English Standard Version"},
   ];
