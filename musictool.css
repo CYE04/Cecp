@@ -145,3 +145,19 @@ body{overflow:hidden!important;}
   .mt-ly-actions{right:6px;}
   .mt-vol-range{width:80px;}
 }
+
+/* ══ 水印 ══ */
+#music-toolbox::after {
+  content: 'YuEn';
+  position: fixed;
+  bottom: 18px;
+  right: 22px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.12);
+  pointer-events: none;
+  z-index: 10001;
+  user-select: none;
+}
