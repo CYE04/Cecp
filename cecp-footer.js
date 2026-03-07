@@ -47,7 +47,6 @@ document.addEventListener('keydown', function(e) {
   const DESIRED_T2=[
     {code:"",label:"无第二译本"},
     {code:"YV:36",label:"CCB · 当代圣经 (简体)"},
-    {code:"YV:140",label:"RCUVSS · 和合本修订版 (简体)"},
     {code:"NR06",label:"NR06 · Nuova Riveduta 2006 (Italiano)"},
     {code:"ESV",label:"ESV · English Standard Version"},
   ];
@@ -148,7 +147,26 @@ document.addEventListener('keydown', function(e) {
   function yvPID(ref){const u=USFM[ref.book.id];if(!u)throw new Error("USFM缺失");if(ref.vStart==null)return `${u}.${ref.chapter}`;if(ref.vStart===ref.vEnd)return `${u}.${ref.chapter}.${ref.vStart}`;const parts=[];for(let v=ref.vStart;v<=ref.vEnd;v++)parts.push(`${u}.${ref.chapter}.${v}`);return parts.join("+");}
   async function yvPassage(bId,pId){return yvFetch(`/v1/bibles/${encodeURIComponent(bId)}/passages/${encodeURIComponent(pId)}?format=text`);}
   function yvNorm(j,ref){const p=j?.data||j;const st=p?.verses||p?.verse_objects||null;if(Array.isArray(st)&&st.length)return sliceRange(st.map(v=>({verse:String(v.verse||v.number||v.verse_number||""),text:String(v.text||v.content||"").trim()})).filter(x=>x.text),ref);let raw=typeof p?.content==="string"?p.content:typeof p?.text==="string"?p.text:Array.isArray(p?.passages)&&p.passages[0]?p.passages[0].content||p.passages[0].text||"":"";raw=String(raw||"").trim();if(!raw)return [];const raw2=raw.replace(/\r/g,"\n").replace(/\n{2,}/g,"\n").trim();const parsed=[];for(const l of raw2.split(/\n+/).map(s=>s.trim()).filter(Boolean)){const m=l.match(/^(\d{1,3})[\s\u00A0]+(.+)$/);if(m)parsed.push({verse:String(+m[1]),text:String(m[2]).trim()});}return parsed.length>=2?sliceRange(parsed,ref):[{verse:"",text:raw2}];}
-  async function yvGet(bId,ref){if(ref.vStart==null)return yvNorm(await yvPassage(bId,yvPID(ref)),ref);try{const v=yvNorm(await yvPassage(bId,yvPID(ref)),ref);if(v?.length)return v;throw new Error("空");}catch(e){if(e.__status===404||e.__status===400){const u=USFM[ref.book.id];const all=yvNorm(await yvPassage(bId,`${u}.${ref.chapter}`),{...ref,vStart:null,vEnd:null});const s=sliceRange(all,ref);if(s?.length)return s;}throw e;}}
+  async function yvGet(bId,ref){
+    // Fetch whole chapter (no verse range)
+    if(ref.vStart==null)return yvNorm(await yvPassage(bId,yvPID(ref)),ref);
+    // Fetch each verse individually and combine - avoids merged content without verse numbers
+    if(ref.vStart!=null&&ref.vEnd!=null&&ref.vStart!==ref.vEnd){
+      const u=USFM[ref.book.id];
+      const results=[];
+      for(let v=ref.vStart;v<=ref.vEnd;v++){
+        try{
+          const j=await yvPassage(bId,`${u}.${ref.chapter}.${v}`);
+          const text=typeof j?.content==="string"?j.content.trim():typeof j?.text==="string"?j.text.trim():"";
+          if(text)results.push({verse:String(v),text});
+        }catch(_){}
+      }
+      if(results.length)return results;
+    }
+    // Single verse
+    try{const v=yvNorm(await yvPassage(bId,yvPID(ref)),ref);if(v?.length)return v;throw new Error("空");}
+    catch(e){if(e.__status===404||e.__status===400){const u=USFM[ref.book.id];const all=yvNorm(await yvPassage(bId,`${u}.${ref.chapter}`),{...ref,vStart:null,vEnd:null});const s=sliceRange(all,ref);if(s?.length)return s;}throw e;}
+  }
 
   async function p1Fetch(primary,ref){if(!primary||primary===PRIMARY_LOCAL){const j=await cfGet(["CUNPSS"],ref.book.id,ref.chapter,ref);return sliceRange(j?.data?.CUNPSS||[],ref).map(x=>({verse:String(x.verse),text:String(x.text||"")}));}if(String(primary).startsWith(PRIMARY_YV))return yvGet(String(primary).slice(3),ref);const j=await cfGet(["CUNPSS"],ref.book.id,ref.chapter,ref);return sliceRange(j?.data?.CUNPSS||[],ref).map(x=>({verse:String(x.verse),text:String(x.text||"")}));}
   async function p2Fetch(t2,ref){if(!t2)return [];if(String(t2).toUpperCase()==="NR06"){const j=await cfGet(["NR06"],ref.book.id,ref.chapter,ref);return sliceRange(j?.data?.NR06||[],ref).map(x=>({verse:String(x.verse),text:String(x.text||"")}));}if(String(t2).startsWith("YV:"))return yvGet(String(t2).slice(3),ref);if(ref.vStart!=null&&ref.vEnd!=null){const r=await BOLLS.par([t2],ref.book.id,ref.chapter,mkRange(ref.vStart,ref.vEnd));return (r?.[0]||[]).map(x=>({verse:String(x.verse||""),text:String(x.text||"")}));}const r=await BOLLS.txt(t2,ref.book.id,ref.chapter);return (r||[]).map(x=>({verse:String(x.verse||""),text:String(x.text||"")}));}
