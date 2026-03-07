@@ -1,4 +1,5 @@
 /* musictool.js — 音乐工具箱
+   用法：在 Halo 页面放 <div id="music-toolbox"></div> 然后载入此文件
 */
 (function(){
 'use strict';
@@ -144,7 +145,7 @@ function openTool(id, name){
   if(id === 'jf'){
     const fr = $('mt-jf-iframe');
     if(!fr.src || !fr.src.includes('jianpu.html')){
-      fr.src = window.location.href.replace(/[^/]*$/, '') + 'jianpu.html';
+      fr.src = 'https://cye04.github.io/Cecp/jianpu.html';
     }
   }
 }
