@@ -1,5 +1,6 @@
-/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
-/* musictool.js — 音乐工具箱*/
+/* musictool.js — 音乐工具箱
+   用法：在 Halo 页面放 <div id="music-toolbox"></div> 然后载入此文件
+*/
 (function(){
 'use strict';
 
@@ -125,6 +126,25 @@ root.innerHTML = `
     </div>
   </div>
 </div>
+
+<!-- 教程弹窗 -->
+<div class="mt-tut-overlay" id="mt-tut">
+  <div class="mt-tut-box">
+    <button class="mt-tut-close" id="mt-tut-close">✕</button>
+    <div class="mt-tut-icon" id="mt-tut-icon">🎵</div>
+    <div class="mt-tut-step-label" id="mt-tut-step-label">步骤 1 / 4</div>
+    <div class="mt-tut-title" id="mt-tut-title"></div>
+    <div class="mt-tut-desc" id="mt-tut-desc"></div>
+    <div class="mt-tut-items" id="mt-tut-items"></div>
+    <div class="mt-tut-footer">
+      <div class="mt-tut-dots" id="mt-tut-dots"></div>
+      <div class="mt-tut-btns">
+        <button class="mt-tut-skip" id="mt-tut-skip">跳过</button>
+        <button class="mt-tut-next" id="mt-tut-next">下一步 →</button>
+      </div>
+    </div>
+  </div>
+</div>
 `;
 
 /* ── 路由 ── */
@@ -141,6 +161,7 @@ function openTool(id, name){
   toolview.classList.add('on');
   Object.values(panels).forEach(p => p.classList.remove('on'));
   panels[id].classList.add('on');
+  if(id === 'lrc' && !localStorage.getItem(TUT_KEY)) setTimeout(tutOpen, 400);
   if(id === 'jf'){
     const fr = $('mt-jf-iframe');
     if(!fr.src || !fr.src.includes('jianpu.html')){
@@ -346,6 +367,93 @@ document.addEventListener('keydown', e => {
 ['mt-modal-info','mt-modal-create'].forEach(id => {
   $(id).addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 });
+
+
+/* ── 教程系统 ── */
+const TUT_KEY = 'mt_lrc_tut_done';
+
+const tutSteps = [
+  {
+    icon: '🎵',
+    title: '欢迎使用歌词编辑器',
+    desc: '几步教你快速上手 LRC 时间轴打轴',
+    items: [
+      '支持导入 .lrc 歌词文件，或从零创建',
+      '上传音频后可边播放边打时间轴',
+      '导出标准 LRC 格式，可直接用于播放器'
+    ]
+  },
+  {
+    icon: '⬆',
+    title: '步骤 1：准备音乐与歌词',
+    desc: '从左侧栏开始操作',
+    items: [
+      '点「上传音乐」选择 MP3/M4A 等音频文件',
+      '点「上传歌词」导入已有 .lrc 文件',
+      '或点「创建歌词」输入纯文字歌词，每行一句'
+    ]
+  },
+  {
+    icon: '○',
+    title: '步骤 2：打时间轴',
+    desc: '播放音乐，对准每句歌词点击打轴',
+    items: [
+      '点顶部 ▶ 播放音乐',
+      '点每行左边的圆圈 ○ 给该行打上当前时间',
+      '快捷键：Tab 打轴并跳下一行，Space 播放/暂停，← → 快退快进 3 秒'
+    ]
+  },
+  {
+    icon: '⬇',
+    title: '步骤 3：导出歌词',
+    desc: '打好时间轴后下载 LRC 文件',
+    items: [
+      '点「add info」可填写歌手、歌名等信息',
+      '右侧「偏移」可整体调整所有时间轴',
+      '点左侧「下载歌词」导出 .lrc 文件'
+    ]
+  }
+];
+
+let tutIdx = 0;
+
+function tutRender(){
+  const step = tutSteps[tutIdx];
+  $('mt-tut-icon').textContent = step.icon;
+  $('mt-tut-step-label').textContent = '步骤 ' + (tutIdx+1) + ' / ' + tutSteps.length;
+  $('mt-tut-title').textContent = step.title;
+  $('mt-tut-desc').textContent = step.desc;
+
+  const itemsEl = $('mt-tut-items');
+  itemsEl.innerHTML = step.items.map(t =>
+    `<div class="mt-tut-item"><div class="mt-tut-item-dot"></div><span>${t}</span></div>`
+  ).join('');
+
+  const dotsEl = $('mt-tut-dots');
+  dotsEl.innerHTML = tutSteps.map((_,i) =>
+    `<div class="mt-tut-dot${i===tutIdx?' active':''}"></div>`
+  ).join('');
+
+  const isLast = tutIdx === tutSteps.length - 1;
+  $('mt-tut-next').textContent = isLast ? '开始使用 ✓' : '下一步 →';
+}
+
+function tutOpen(){
+  tutIdx = 0;
+  tutRender();
+  $('mt-tut').classList.add('open');
+}
+function tutClose(){
+  $('mt-tut').classList.remove('open');
+  localStorage.setItem(TUT_KEY, '1');
+}
+
+$('mt-tut-close').onclick = tutClose;
+$('mt-tut-skip').onclick  = tutClose;
+$('mt-tut-next').onclick  = () => {
+  if(tutIdx < tutSteps.length - 1){ tutIdx++; tutRender(); }
+  else tutClose();
+};
 
 renderLines();
 })();
