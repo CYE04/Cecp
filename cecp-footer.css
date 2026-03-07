@@ -493,19 +493,32 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 .hbw.hbw-pres .hbw-footerhint {
   display: none !important;
 }
-/* 经文区域占满剩余空间，居中显示 */
+/* 经文区域占满剩余空间 */
 .hbw.hbw-pres .hbw-scroll {
   flex: 1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  /* 不在这里 center，否则 controls 会被挤出去 */
 }
+/* controls（搜索栏）固定在上方，不随内容缩放 */
+.hbw.hbw-pres .hbw-controls {
+  flex-shrink: 0 !important;
+}
+/* 经文内容区：占满剩余高度，垂直居中显示经文 */
 .hbw.hbw-pres .hbw-result {
+  flex: 1;
   width: 100%;
   max-width: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 0;
 }
+/* 滚动条隐藏（投屏时不需要滚动条） */
+.hbw.hbw-pres .hbw-result::-webkit-scrollbar { display: none; }
+.hbw.hbw-pres .hbw-result { scrollbar-width: none; }
 /* 投屏时字体颜色强制白色 */
 .hbw.hbw-pres .hbw-line,
 .hbw.hbw-pres .hbw-p-line {

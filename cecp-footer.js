@@ -329,6 +329,8 @@ document.addEventListener('keydown', function(e) {
     function enterPres(){
       modal.classList.add("hbw-pres");
       applyPresFontSize();
+      // 进入投屏时把经文区域滚回顶部，防止第一节被切掉
+      setTimeout(()=>{ try{ result.scrollTop=0; }catch(_){} }, 80);
       try{ panel.requestFullscreen?.(); }catch(_){}
       if(presBtn){ const t=presBtn.querySelector(".txt"); if(t)t.textContent="退出投屏"; }
     }
@@ -515,6 +517,10 @@ document.addEventListener('keydown', function(e) {
             mParBox.style.display="none";mSoloBox.style.display="";
             mSoloH.textContent="中文版本："+(pri===PRIMARY_LOCAL?"CUNPSS":pri);
             renderLines(mSoloV,v1,false,null);
+          }
+          // 投屏模式下渲染完毕后滚回顶部，防止第一节被切掉
+          if(modal.classList.contains("hbw-pres")){
+            setTimeout(()=>{ try{ result.scrollTop=0; }catch(_){} }, 50);
           }
           renderCard();
         }catch(e){if(t!==tok)return;mSt.textContent="加载失败："+(e?.message||e);mSt.className="hbw-help hbw-error";}
