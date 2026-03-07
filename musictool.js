@@ -1,5 +1,4 @@
 /* musictool.js — 音乐工具箱
-   用法：在 Halo 页面放 <div id="music-toolbox"></div> 然后载入此文件
 */
 (function(){
 'use strict';
