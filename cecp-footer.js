@@ -41,6 +41,7 @@ document.addEventListener('keydown', function(e) {
   const API_BASE=WORKER.replace(/\/$/,"");
   const LS_PREFIX="HBW::";
   const PRIMARY_LOCAL="CUNPSS";
+  const PRIMARY_YV="YV:";
   const DEFAULT_PRIMARY=PRIMARY_LOCAL;
 
   const DESIRED_T2=[
