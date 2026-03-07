@@ -149,7 +149,7 @@ body{overflow:hidden!important;}
 
 /* ══ 水印 ══ */
 #music-toolbox::after {
-  content: 'YuEn';
+  content: 'By YuEn';
   position: fixed;
   bottom: 18px;
   right: 22px;
