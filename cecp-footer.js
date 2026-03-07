@@ -46,10 +46,10 @@ document.addEventListener('keydown', function(e) {
 
   const DESIRED_T2=[
     {code:"",label:"无第二译本"},
+    {code:"YV:36",label:"CCB · 当代圣经 (简体)"},
+    {code:"YV:140",label:"RCUVSS · 和合本修订版 (简体)"},
     {code:"NR06",label:"NR06 · Nuova Riveduta 2006 (Italiano)"},
-    {code:"KJV",label:"KJV · King James Version (English)"},
     {code:"ESV",label:"ESV · English Standard Version"},
-    {code:"WEB",label:"WEB · World English Bible"},
   ];
 
   const BOOKS=[
@@ -261,7 +261,6 @@ document.addEventListener('keydown', function(e) {
                 <div class="hbw-field"><span>中文版本</span>
                   <select class="hbw-select" data-primary>
                     <option value="CUNPSS">CUNPSS · 和合本（默认）</option>
-                    <option value="YV:36">YouVersion · 36</option>
                   </select>
                 </div>
                 <div class="hbw-field"><span>第二译本</span>
