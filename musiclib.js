@@ -1,5 +1,4 @@
-/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
-/* CECP Music Library v3.0 */
+/* CECP Music Library v3.2 Halo Sync + Swipe Back + Metronome */
 (function(){
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
@@ -15,6 +14,9 @@
   if(!root)return;
 
   let songs=[],query='';
+  let _apLoaded=false,_ap=null;
+  let _audioCtx=null,_metroTimer=null,_metroNext=0,_metroRunning=false,_metroBpm=72;
+  let _themeObserver=null;
 
   root.innerHTML=`
     <div id="ml-header">
@@ -36,6 +38,8 @@
       <button id="ml-contact">💬 复制微信号 YuEn</button>
     </div>
     <div id="ml-detail">
+      <div id="ml-detail-overlay"></div>
+      <div id="ml-detail-swipe-hint"></div>
       <div id="ml-detail-header">
         <button id="ml-back">‹ 返回</button>
         <div id="ml-detail-title"></div>
@@ -49,9 +53,13 @@
   `;
 
   const $=id=>document.getElementById(id);
+  const detail=$('ml-detail');
+
+  syncHaloTheme();
+  observeThemeChanges();
 
   $('ml-search').addEventListener('input',e=>{query=e.target.value.trim();render();});
-  $('ml-back').addEventListener('click',()=>{destroyAP();$('ml-detail').classList.remove('open');});
+  $('ml-back').addEventListener('click',closeDetail);
   $('ml-contact').addEventListener('click',function(){
     navigator.clipboard&&navigator.clipboard.writeText(WECHAT).then(()=>{
       this.textContent='✓ 已复制微信号';
@@ -59,13 +67,85 @@
     });
   });
   $('ml-lightbox').addEventListener('click',e=>{
-    if(e.target===e.currentTarget||e.target.id==='ml-lightbox-close')
-      $('ml-lightbox').classList.remove('open');
+    if(e.target===e.currentTarget||e.target.id==='ml-lightbox-close') $('ml-lightbox').classList.remove('open');
   });
   $('ml-lightbox-img').addEventListener('click',e=>e.stopPropagation());
+
   function openLightbox(src){$('ml-lightbox-img').src=src;$('ml-lightbox').classList.add('open');}
 
-  /* ── Load songs ── */
+  function closeDetail(){
+    destroyAP();
+    stopMetronome();
+    detail.classList.remove('open');
+    detail.style.transform='';
+    detail.classList.remove('swiping');
+    $('ml-detail-overlay').style.opacity='0';
+  }
+
+  function tryColor(el, prop){
+    if(!el)return '';
+    const v=getComputedStyle(el).getPropertyValue(prop).trim();
+    return v && v!=='transparent' && v!=='rgba(0, 0, 0, 0)' ? v : '';
+  }
+
+  function getThemeGuess(){
+    const cs=getComputedStyle(document.body);
+    const bg=cs.backgroundColor || 'rgb(255,255,255)';
+    const m=bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+    if(!m)return 'light';
+    const avg=(+m[1] + +m[2] + +m[3]) / 3;
+    return avg < 120 ? 'dark' : 'light';
+  }
+
+  function syncHaloTheme(){
+    const rb=root.style;
+    const body=document.body, html=document.documentElement;
+    const mode=getThemeGuess();
+
+    const bg = tryColor(body,'--theme-bg') || tryColor(html,'--theme-bg') || tryColor(body,'background-color') || (mode==='dark'?'#0b0b0d':'#f5f5f7');
+    const bg2 = tryColor(body,'--card-bg') || tryColor(html,'--card-bg') || tryColor(body,'--halo-card-bg') || (mode==='dark'?'#17171a':'#ffffff');
+    const bg3 = tryColor(body,'--muted-bg') || tryColor(html,'--muted-bg') || (mode==='dark'?'#222227':'#ececf1');
+    const text = tryColor(body,'--theme-text') || tryColor(html,'--theme-text') || tryColor(body,'color') || (mode==='dark'?'#f5f7fb':'#1d1d1f');
+    const text2 = tryColor(body,'--theme-text-secondary') || tryColor(html,'--theme-text-secondary') || (mode==='dark'?'rgba(245,247,251,.68)':'#6e6e73');
+    const text3 = tryColor(body,'--theme-text-tertiary') || tryColor(html,'--theme-text-tertiary') || (mode==='dark'?'rgba(245,247,251,.36)':'#aeaeb2');
+    const accent = tryColor(body,'--theme-primary') || tryColor(html,'--theme-primary') || tryColor(body,'--halo-accent') || (mode==='dark'?'#7c9cff':'#007aff');
+    const border = tryColor(body,'--theme-border') || tryColor(html,'--theme-border') || (mode==='dark'?'rgba(255,255,255,.08)':'rgba(0,0,0,.08)');
+    const borderMd = tryColor(body,'--theme-border-strong') || tryColor(html,'--theme-border-strong') || (mode==='dark'?'rgba(255,255,255,.13)':'rgba(0,0,0,.13)');
+
+    rb.setProperty('--halo-bg', bg);
+    rb.setProperty('--halo-bg2', bg2);
+    rb.setProperty('--halo-bg3', bg3);
+    rb.setProperty('--halo-text', text);
+    rb.setProperty('--halo-text2', text2);
+    rb.setProperty('--halo-text3', text3);
+    rb.setProperty('--halo-accent', accent);
+    rb.setProperty('--halo-border', border);
+    rb.setProperty('--halo-border-md', borderMd);
+    rb.setProperty('--halo-accent-light', colorMix(accent, 0.16));
+  }
+
+  function colorMix(color, alpha){
+    if(color.startsWith('rgb')){
+      const m=color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+      if(m)return `rgba(${m[1]},${m[2]},${m[3]},${alpha})`;
+    }
+    if(color.startsWith('#')){
+      const hex=color.slice(1);
+      const full=hex.length===3?hex.split('').map(x=>x+x).join(''):hex;
+      const r=parseInt(full.slice(0,2),16),g=parseInt(full.slice(2,4),16),b=parseInt(full.slice(4,6),16);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+    return `rgba(0,122,255,${alpha})`;
+  }
+
+  function observeThemeChanges(){
+    if(_themeObserver)_themeObserver.disconnect();
+    _themeObserver=new MutationObserver(()=>syncHaloTheme());
+    _themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
+    _themeObserver.observe(document.body,{attributes:true,attributeFilter:['class','style','data-theme']});
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',syncHaloTheme);
+  }
+
   async function loadSongs(){
     try{
       const res=await fetch(GITHUB_API);if(!res.ok)throw 0;
@@ -123,7 +203,6 @@
     </div>`;
   }
 
-  /* ══ Jianpu helpers (from youth-engine) ══ */
   function _div(cls){const d=document.createElement('div');d.className=cls;return d;}
 
   function parseJpToken(tok){
@@ -142,8 +221,7 @@
       return e2;
     }
     let num=tok,isHigh=0,isLow=0,isDot=false,uline=0;
-    if(num.slice(-2)==='__'){uline=2;num=num.slice(0,-2);}
-    else if(num.slice(-1)==='_'){uline=1;num=num.slice(0,-1);}
+    if(num.slice(-2)==='__'){uline=2;num=num.slice(0,-2);} else if(num.slice(-1)==='_'){uline=1;num=num.slice(0,-1);}
     if(num.indexOf('\u00b7')>-1){isDot=true;num=num.replace(/\u00b7/g,'');}
     const hm=num.match(/^(.+?)('+)$/);if(hm){isHigh=hm[2].length;num=hm[1];}
     const lm=num.match(/^(.+?)(,+)$/);if(lm){isLow=lm[2].length;num=lm[1];}
@@ -163,6 +241,7 @@
     w.appendChild(botDot);
     return w;
   }
+
   function makeTuplet(n){const w=document.createElement('span');w.className='jp-tuplet';const br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);const nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);return w;}
   function renderNStr(nStr){
     const d=document.createElement('div');d.className='sw-jianpu';
@@ -180,8 +259,6 @@
     return d;
   }
 
-  /* ══ APlayer ══ */
-  let _apLoaded=false,_ap=null;
   function loadAPlayer(cb){
     if(_apLoaded){cb();return;}
     if(window.APlayer){_apLoaded=true;cb();return;}
@@ -195,41 +272,171 @@
   }
   function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){}_ap=null;}}
 
-  /* ══ Transpose helpers ══ */
   const CHR=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
   const ENH={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
   const FLT={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb'};
-  function nIdx(n){return CHR.indexOf(ENH[n]||n);}
+  function nIdx(n){return CHR.indexOf(ENH[n]||n);} 
   function trNote(n,st){const i=nIdx(n);if(i<0)return n;const r=CHR[(i+st+12)%12];return FLT[r]||r;}
   function trS(c,st){const m=c.match(/^([A-G][b#]?)(.*)$/);if(!m)return c;return trNote(m[1],st)+m[2];}
-  function trChord(c,st){if(!st)return c;const s=c.indexOf('/');if(s>-1)return trS(c.slice(0,s),st)+'/'+trS(c.slice(s+1),st);return trS(c,st);}
+  function trChord(c,st){if(!st)return c;const s=c.indexOf('/');if(s>-1)return trS(c.slice(0,s),st)+'/'+trS(c.slice(s+1),st);return trS(c,st);} 
   function calcCapo(t,o){
     const st=(nIdx(t)-nIdx(o)+12)%12;let best=null;
     ['C','D','E','F','G','A','B'].forEach(pk=>{const c=(nIdx(t)-nIdx(pk)+12)%12;if(c<=7&&(!best||c<best.capo))best={playKey:pk,capo:c};});
     return{st,capo:best?best.capo:0,playKey:best?best.playKey:t};
   }
 
-  /* ══ Detail page ══ */
+  function ensureAudioCtx(){
+    if(_audioCtx)return _audioCtx;
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return null;
+    _audioCtx=new AC();
+    return _audioCtx;
+  }
+
+  function clickAt(time, accent=false){
+    const ctx=ensureAudioCtx();
+    if(!ctx)return;
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.type='triangle';
+    osc.frequency.setValueAtTime(accent?1480:1080,time);
+    gain.gain.setValueAtTime(0.0001,time);
+    gain.gain.exponentialRampToValueAtTime(accent?0.18:0.11,time+0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001,time+0.06);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(time); osc.stop(time+0.07);
+  }
+
+  function scheduler(){
+    const ctx=ensureAudioCtx();
+    if(!_metroRunning||!ctx)return;
+    while(_metroNext < ctx.currentTime + 0.12){
+      clickAt(_metroNext, true);
+      _metroNext += 60 / _metroBpm;
+    }
+  }
+
+  function startMetronome(){
+    const ctx=ensureAudioCtx();
+    if(!ctx)return;
+    ctx.resume?.();
+    _metroRunning=true;
+    _metroNext=ctx.currentTime + 0.04;
+    scheduler();
+    clearInterval(_metroTimer);
+    _metroTimer=setInterval(scheduler, 25);
+    syncMetUI();
+  }
+
+  function stopMetronome(){
+    _metroRunning=false;
+    if(_metroTimer){clearInterval(_metroTimer);_metroTimer=null;}
+    syncMetUI();
+  }
+
+  function syncMetUI(){
+    const btn=document.getElementById('ml-met-toggle');
+    const bpm=document.getElementById('ml-met-bpm');
+    const range=document.getElementById('ml-met-range');
+    if(btn){btn.textContent=_metroRunning?'停止':'开始';btn.classList.toggle('off',!_metroRunning);}
+    if(bpm)bpm.innerHTML=`${_metroBpm}<small>BPM</small>`;
+    if(range && +range.value!==_metroBpm)range.value=_metroBpm;
+  }
+
+  function createMetronome(initialBpm){
+    _metroBpm=Math.max(40, Math.min(240, initialBpm||72));
+    const box=document.createElement('div');box.className='ml-met';
+    box.innerHTML=`
+      <div class="ml-met-top">
+        <div>
+          <div class="ml-met-title">节拍器</div>
+          <div class="ml-met-sub">跟随这首歌的 BPM，也可以手动调整</div>
+        </div>
+        <button id="ml-met-toggle" class="ml-met-toggle off" type="button">开始</button>
+      </div>
+      <div class="ml-met-body">
+        <div id="ml-met-bpm" class="ml-met-bpm"></div>
+        <button id="ml-met-minus" class="ml-met-btn" type="button">−</button>
+        <button id="ml-met-plus" class="ml-met-btn" type="button">+</button>
+        <button id="ml-met-reset" class="ml-met-btn" type="button" title="恢复歌曲 BPM">↺</button>
+        <input id="ml-met-range" class="ml-met-range" type="range" min="40" max="240" step="1" value="${_metroBpm}">
+        <div class="ml-met-hint">点开始即可打拍。滑杆可细调，± 可快速调节。</div>
+      </div>`;
+    queueMicrotask(()=>{
+      const toggle=$('ml-met-toggle'), minus=$('ml-met-minus'), plus=$('ml-met-plus'), reset=$('ml-met-reset'), range=$('ml-met-range');
+      toggle?.addEventListener('click',()=>_metroRunning?stopMetronome():startMetronome());
+      minus?.addEventListener('click',()=>{_metroBpm=Math.max(40,_metroBpm-1);syncMetUI();});
+      plus?.addEventListener('click',()=>{_metroBpm=Math.min(240,_metroBpm+1);syncMetUI();});
+      reset?.addEventListener('click',()=>{_metroBpm=Math.max(40, Math.min(240, initialBpm||72));syncMetUI();});
+      range?.addEventListener('input',e=>{_metroBpm=+e.target.value;syncMetUI();});
+      syncMetUI();
+    });
+    return box;
+  }
+
+  function attachSwipeBack(){
+    let startX=0,startY=0,dragging=false,active=false;
+    const overlay=$('ml-detail-overlay');
+    const maxShift=Math.min(window.innerWidth*0.32, 120);
+
+    function begin(x,y){
+      if(detail.scrollTop>6 || !detail.classList.contains('open')) return;
+      startX=x; startY=y; dragging=true; active=false; detail.classList.add('swiping');
+    }
+    function move(x,y){
+      if(!dragging) return;
+      const dx=x-startX, dy=y-startY;
+      if(!active){
+        if(Math.abs(dx)<10 && Math.abs(dy)<10) return;
+        if(dx>10 && Math.abs(dx)>Math.abs(dy) && startX<42) active=true;
+        else if(Math.abs(dy)>Math.abs(dx)){ cancel(); return; }
+      }
+      if(!active) return;
+      const shift=Math.max(0, Math.min(dx, maxShift));
+      detail.style.transform=`translateX(${shift}px)`;
+      overlay.style.opacity=String(Math.min(shift / maxShift, .95));
+    }
+    function end(x){
+      if(!dragging) return;
+      const dx=x-startX;
+      const shouldClose=active && dx>Math.max(70, window.innerWidth*0.18);
+      detail.classList.remove('swiping');
+      detail.style.transition='transform .2s ease';
+      detail.style.transform=shouldClose?`translateX(${window.innerWidth}px)`:'';
+      overlay.style.opacity=shouldClose?'1':'0';
+      setTimeout(()=>{detail.style.transition=''; if(shouldClose) closeDetail(); else detail.style.transform='';}, shouldClose?160:200);
+      dragging=false; active=false;
+    }
+    function cancel(){dragging=false;active=false;detail.classList.remove('swiping');detail.style.transform='';overlay.style.opacity='0';}
+
+    detail.addEventListener('touchstart',e=>{if(e.touches[0])begin(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+    detail.addEventListener('touchmove',e=>{if(e.touches[0])move(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+    detail.addEventListener('touchend',e=>{const t=e.changedTouches&&e.changedTouches[0];end(t?t.clientX:startX);},{passive:true});
+
+    detail.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse' && e.clientX>24)return; begin(e.clientX,e.clientY);});
+    detail.addEventListener('pointermove',e=>move(e.clientX,e.clientY));
+    detail.addEventListener('pointerup',e=>end(e.clientX));
+    detail.addEventListener('pointercancel',cancel);
+  }
+
   function openDetail(s){
     destroyAP();
+    stopMetronome();
+    syncHaloTheme();
     $('ml-detail-title').textContent=s.title||'';
     const body=$('ml-detail-body');
     body.innerHTML='';
 
-    /* 1. APlayer — full width at top */
     if(s.mp3){
       const apWrap=document.createElement('div');apWrap.id='ml-aplayer-top';
       const apMount=document.createElement('div');apMount.id='ml-aplayer';
       apWrap.appendChild(apMount);body.appendChild(apWrap);
     }
 
-    /* 2. Song info + 移调 toggle (youth-engine sw-hd layout) */
     const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
     let curKey=s.origKey||'C';
 
     const wrap=document.createElement('div');wrap.className='sw-wrap';
-
-    // header row: info + toggle button
     const kPill=document.createElement('span');kPill.className='sw-pill sw-kpill';kPill.textContent='1 = '+curKey;
     const infoDiv=document.createElement('div');
     infoDiv.innerHTML=`<div class="sw-eyebrow">Worship Song</div>
@@ -243,12 +450,9 @@
 
     const togBtn=document.createElement('button');togBtn.className='sw-tog';
     togBtn.innerHTML='<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg> 移调';
-
     const hd=document.createElement('div');hd.className='sw-hd';
-    hd.appendChild(infoDiv);hd.appendChild(togBtn);
-    wrap.appendChild(hd);
+    hd.appendChild(infoDiv);hd.appendChild(togBtn);wrap.appendChild(hd);
 
-    // transpose panel
     const kg=document.createElement('div');kg.className='sw-kg';
     const capoEl=document.createElement('div');
     capoEl.className='sw-capo plain';
@@ -260,13 +464,9 @@
     const ksDiv=document.createElement('div');ksDiv.className='sw-ks';
     const slabel=document.createElement('div');slabel.className='sw-slabel';slabel.textContent='目标调';
     ksDiv.appendChild(slabel);ksDiv.appendChild(kg);
-
     const panelInner=document.createElement('div');panelInner.className='sw-panel-inner';
     panelInner.appendChild(ksDiv);panelInner.appendChild(capoEl);panelInner.appendChild(lbDiv);
-
-    const panel=document.createElement('div');panel.className='sw-panel';
-    panel.appendChild(panelInner);
-    wrap.appendChild(panel);
+    const panel=document.createElement('div');panel.className='sw-panel';panel.appendChild(panelInner);wrap.appendChild(panel);
     body.appendChild(wrap);
 
     togBtn.addEventListener('click',()=>{
@@ -285,7 +485,6 @@
       kg.appendChild(b);
     });
 
-    /* 3. Tools row — YT + LRC */
     const tools=document.createElement('div');tools.className='sw-tools';
     const toolsRow=document.createElement('div');toolsRow.className='sw-tools-row';
     if(s.youtube){
@@ -301,7 +500,8 @@
     }
     if(toolsRow.children.length){tools.appendChild(toolsRow);body.appendChild(tools);}
 
-    /* 4. Score image */
+    body.appendChild(createMetronome(s.bpm || 72));
+
     let scoreKeyBadge=null;
     if(s.scoreImg){
       const scoreDiv=document.createElement('div');scoreDiv.className='sw-score';
@@ -315,12 +515,10 @@
       body.appendChild(scoreDiv);
     }
 
-    /* renderScore — chord transposition + jianpu rebuild */
     function renderScore(){
       const info=calcCapo(curKey,s.origKey||'C'),st=info.st;
       kPill.textContent='1 = '+curKey;
       if(scoreKeyBadge)scoreKeyBadge.textContent='1 = '+curKey;
-      // capo display
       if(curKey===(s.origKey||'C')){
         capoEl.className='sw-capo plain';
         capoEl.querySelector('.sw-capo-t').textContent='原调演奏';
@@ -337,7 +535,6 @@
         capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法 → 实际 '+curKey;
         capoEl.querySelector('.sw-capo-n').textContent=info.capo;
       }
-      // rebuild jianpu + chords
       lbDiv.innerHTML='';
       for(const sec of s.sections||[]){
         const se=_div('sw-lsec');
@@ -362,7 +559,6 @@
     }
     renderScore();
 
-    /* Init APlayer */
     if(s.mp3){
       loadAPlayer(()=>{
         const mount=document.getElementById('ml-aplayer');if(!mount)return;
@@ -370,14 +566,15 @@
         _ap=new window.APlayer({
           container:mount,
           audio:[{name:s.title||'',artist:s.artist||'',url:mp3,cover:s.cover||'',lrc:s.lrc||undefined}],
-          autoplay:false,theme:'#0a84ff',lrcType:s.lrc?3:0,
+          autoplay:false,theme:getComputedStyle(root).getPropertyValue('--halo-accent').trim()||'#0a84ff',lrcType:s.lrc?3:0,
         });
       });
     }
 
-    $('ml-detail').classList.add('open');
-    $('ml-detail').scrollTop=0;
+    detail.classList.add('open');
+    detail.scrollTop=0;
   }
 
+  attachSwipeBack();
   loadSongs();
 })();
