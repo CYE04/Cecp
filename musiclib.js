@@ -1,3 +1,4 @@
+/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v2.1 — Theme Adaptive + Lightbox */
 (function(){
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
@@ -164,9 +165,10 @@
 
     let chordsHTML='';
     if(s.sections&&s.sections.length){
-      chordsHTML=`<div id="ml-chords-section"><div class="ml-section-label">歌词 / 和弦</div>`;
+      chordsHTML=`<div id="ml-chords-section"><span class="ml-section-label">歌词 / 简谱 / 和弦</span>`;
       for(const sec of s.sections){
-        chordsHTML+=`<div class="ml-section-name">${sec.name||''}</div>`;
+        chordsHTML+=`<div class="ml-section-block">`;
+        if(sec.name) chordsHTML+=`<span class="ml-section-name">${sec.name}</span>`;
         for(const line of sec.lines||[]){
           const cells=Array.isArray(line)?line:(line.line||[]);
           chordsHTML+=`<div class="ml-line">`;
@@ -177,6 +179,7 @@
           }
           chordsHTML+=`</div>`;
         }
+        chordsHTML+=`</div>`;
       }
       chordsHTML+=`</div>`;
     }
