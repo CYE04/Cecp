@@ -51,7 +51,7 @@
   const $=id=>document.getElementById(id);
 
   $('ml-search').addEventListener('input',e=>{query=e.target.value.trim();render();});
-  $('ml-back').addEventListener('click',()=>$('ml-detail').classList.remove('open'));
+  $('ml-back').addEventListener('click',()=>{destroyAP();$('ml-detail').classList.remove('open');});
 
   /* lightbox */
   $('ml-lightbox').addEventListener('click',e=>{
@@ -134,7 +134,24 @@
     </div>`;
   }
 
+  /* ── APlayer loader ── */
+  let _apLoaded=false;
+  function loadAPlayer(cb){
+    if(_apLoaded){cb();return;}
+    if(window.APlayer){_apLoaded=true;cb();return;}
+    const css=document.createElement('link');css.rel='stylesheet';
+    css.href='https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css';
+    document.head.appendChild(css);
+    const js=document.createElement('script');
+    js.src='https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js';
+    js.onload=()=>{_apLoaded=true;cb();};
+    document.head.appendChild(js);
+  }
+  let _ap=null;
+  function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){}  _ap=null;}}
+
   function openDetail(s){
+    destroyAP();
     $('ml-detail-title').textContent=s.title||'';
     const cover=s.cover
       ?`<img id="ml-detail-cover" src="${s.cover}" onerror="this.outerHTML='<div id=\\'ml-detail-cover-placeholder\\'>♪</div>'">`
@@ -156,7 +173,7 @@
           for(const c of cells){
             if(c.lyric==='｜')chordsHTML+=`<span class="ml-bar">|</span>`;
             else if(c.lyric==='\\\\')chordsHTML+=`</div><div class="ml-line">`;
-            else chordsHTML+=`<span class="ml-cell"><span class="ml-chord">${c.chord||''}</span><span class="ml-lyric">${c.lyric||' '}</span></span>`;
+            else chordsHTML+=`<span class="ml-cell"><span class="ml-chord">${c.chord||''}</span>${c.n?`<span class="ml-jianpu">${c.n}</span>`:''}<span class="ml-lyric">${c.lyric||' '}</span></span>`;
           }
           chordsHTML+=`</div>`;
         }
@@ -173,6 +190,9 @@
       </div>`;
     }
 
+    /* APlayer mount point */
+    const playerHTML=s.mp3?`<div id="ml-player-section"><div id="ml-aplayer"></div></div>`:'';
+
     $('ml-detail-body').innerHTML=`
       <div id="ml-detail-hero">
         ${cover}
@@ -188,6 +208,7 @@
         </div>
       </div>
       ${btns?`<div id="ml-actions">${btns}</div>`:''}
+      ${playerHTML}
       ${chordsHTML}
       ${scoreHTML}
     `;
@@ -196,6 +217,31 @@
     const scoreEl=document.getElementById('ml-score-img');
     if(scoreEl){
       scoreEl.addEventListener('click',()=>openLightbox(scoreEl.dataset.src));
+    }
+
+    /* init APlayer */
+    if(s.mp3){
+      loadAPlayer(()=>{
+        const mount=document.getElementById('ml-aplayer');
+        if(!mount)return;
+        // resolve relative mp3 path
+        const mp3=s.mp3.startsWith('http')?s.mp3:('https://cecp.it'+s.mp3);
+        const lrcUrl=s.lrc||(s.lrc?s.lrc:undefined);
+        const apOpts={
+          container:mount,
+          audio:[{
+            name:s.title||'',
+            artist:s.artist||'',
+            url:mp3,
+            cover:s.cover||'',
+            lrc:lrcUrl,
+          }],
+          autoplay:false,
+          theme:'var(--accent,#007aff)',
+          lrcType:lrcUrl?3:0,
+        };
+        _ap=new window.APlayer(apOpts);
+      });
     }
 
     $('ml-detail').classList.add('open');
