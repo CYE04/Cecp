@@ -1,8 +1,8 @@
-/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
+/* 鉁� Designed & Built by YuEn 漏 2025鈥�2026 鉁� */
 
-/* ===================== 竖屏隐藏侧边栏 + 横屏显示 + 竖屏正文补满 ===================== */
+/* ===================== 绔栧睆闅愯棌渚ц竟鏍� + 妯睆鏄剧ず + 绔栧睆姝ｆ枃琛ユ弧 ===================== */
 @media (max-width: 1024px) {
-  /* 竖屏：隐藏侧边栏（主页除外） */
+  /* 绔栧睆锛氶殣钘忎晶杈规爮锛堜富椤甸櫎澶栵級 */
   body.cecp-portrait:not(.cecp-home) .cecp-side-col,
   body.cecp-portrait:not(.cecp-home) .cecp-sidebar,
   body.cecp-portrait:not(.cecp-home) aside.sidebar,
@@ -14,7 +14,7 @@
   body.cecp-portrait:not(.cecp-home) [id*="aside"] {
     display: none !important;
   }
-  /* 主页竖屏：强制恢复侧边栏 */
+  /* 涓婚〉绔栧睆锛氬己鍒舵仮澶嶄晶杈规爮 */
   body.cecp-portrait.cecp-home .cecp-side-col,
   body.cecp-portrait.cecp-home .cecp-sidebar,
   body.cecp-portrait.cecp-home aside.sidebar,
@@ -26,7 +26,7 @@
   body.cecp-portrait.cecp-home [id*="aside"] {
     display: block !important;
   }
-  /* 竖屏：解除主内容外层宽度限制（主页除外） */
+  /* 绔栧睆锛氳В闄や富鍐呭澶栧眰瀹藉害闄愬埗锛堜富椤甸櫎澶栵級 */
   body.cecp-portrait:not(.cecp-home) .container,
   body.cecp-portrait:not(.cecp-home) .container-fluid,
   body.cecp-portrait:not(.cecp-home) .wrap,
@@ -41,7 +41,7 @@
     max-width: 100% !important;
     min-width: 0 !important;
   }
-  /* Bootstrap 栅格 */
+  /* Bootstrap 鏍呮牸 */
   body.cecp-portrait:not(.cecp-home) .row {
     flex-wrap: wrap !important;
   }
@@ -53,12 +53,12 @@
     width: 100% !important;
     min-width: 0 !important;
   }
-  /* Tailwind / Grid 单列（主页除外） */
+  /* Tailwind / Grid 鍗曞垪锛堜富椤甸櫎澶栵級 */
   body.cecp-portrait:not(.cecp-home) .grid,
   body.cecp-portrait:not(.cecp-home) [class*="grid-cols-"] {
     grid-template-columns: 1fr !important;
   }
-  /* 竖屏：正文内容补满（主页除外） */
+  /* 绔栧睆锛氭鏂囧唴瀹硅ˉ婊★紙涓婚〉闄ゅ锛� */
   body.cecp-portrait:not(.cecp-home) .cecp-main-col,
   body.cecp-portrait:not(.cecp-home) .cecp-content,
   body.cecp-portrait:not(.cecp-home) .post,
@@ -73,7 +73,7 @@
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-  /* 横屏：恢复侧边栏显示 */
+  /* 妯睆锛氭仮澶嶄晶杈规爮鏄剧ず */
   body.cecp-landscape .cecp-side-col,
   body.cecp-landscape .cecp-sidebar,
   body.cecp-landscape aside.sidebar,
@@ -87,7 +87,7 @@
   }
 }
 
-/* ===== 圣经 HBW v15.3 ===== */
+/* ===== 鍦ｇ粡 HBW v15.3 ===== */
 .hb-bible{ margin:18px 0; }
 .hbw{
   --r:18px;
@@ -451,7 +451,7 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   .rt7-btn{ padding:8px 11px; font-size:12px; }
 }
 
-/* ===== YuEn 水印 ===== */
+/* ===== YuEn 姘村嵃 ===== */
 #yuen-watermark {
   position: fixed;
   bottom: 10px;
@@ -467,7 +467,7 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   mix-blend-mode: multiply;
 }
 
-/* ===== 投屏模式 ===== */
+/* ===== 鎶曞睆妯″紡 ===== */
 .hbw.hbw-pres .hbw-panel {
   position: fixed !important;
   inset: 0 !important;
@@ -480,33 +480,50 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   flex-direction: column;
   background: #000 !important;
 }
-/* 搜索栏保留，固定在顶部 */
+/* 鎼滅储鏍忎繚鐣欙紝鍥哄畾鍦ㄩ《閮� */
 .hbw.hbw-pres .hbw-controls {
   flex-shrink: 0;
   background: rgba(0,0,0,0.85);
   border-bottom: 1px solid rgba(255,255,255,0.1);
   padding: 10px 16px;
 }
-/* 隐藏不必要的 UI */
+/* 闅愯棌涓嶅繀瑕佺殑 UI */
 .hbw.hbw-pres .hbw-topbar,
 .hbw.hbw-pres .hbw-help,
 .hbw.hbw-pres .hbw-footerhint {
   display: none !important;
 }
-/* 经文区域占满剩余空间，居中显示 */
+/* 缁忔枃鍖哄煙鍗犳弧鍓╀綑绌洪棿 */
 .hbw.hbw-pres .hbw-scroll {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
+/* controls锛堟悳绱㈡爮锛夊浐瀹氬湪涓婃柟锛屼笉闅忓唴瀹圭缉鏀� */
+.hbw.hbw-pres .hbw-controls {
+  flex-shrink: 0 !important;
+  padding-bottom: 8px;
+}
+/* 缁忔枃鍐呭鍖猴細鍗犳弧鍓╀綑楂樺害锛屼粠椤堕儴姝ｅ父寮€濮嬫樉绀� */
 .hbw.hbw-pres .hbw-result {
+  flex: 1;
   width: 100%;
   max-width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: block;
+  padding: 24px 16px 32px;
+  scroll-padding-top: 24px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
-/* 投屏时字体颜色强制白色 */
+/* 婊氬姩鏉￠殣钘忥紙鎶曞睆鏃朵笉闇€瑕佹粴鍔ㄦ潯锛� */
+.hbw.hbw-pres .hbw-result::-webkit-scrollbar { display: none; }
+.hbw.hbw-pres .hbw-result { scrollbar-width: none; }
+/* 鎶曞睆鏃跺瓧浣撻鑹插己鍒剁櫧鑹� */
 .hbw.hbw-pres .hbw-line,
 .hbw.hbw-pres .hbw-p-line {
   color: #fff !important;
@@ -516,9 +533,20 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 .hbw.hbw-pres .hbw-box {
   background: transparent !important;
   border: none !important;
+  padding: 0 !important;
+  margin: 0 0 22px 0 !important;
 }
 .hbw.hbw-pres .hbw-box h4 {
   color: rgba(255,255,255,0.5) !important;
+  margin-bottom: 14px;
+}
+.hbw.hbw-pres .hbw-par,
+.hbw.hbw-pres [data-solo-v] {
+  display: grid;
+  gap: 18px;
+}
+.hbw.hbw-pres .hbw-p-row {
+  align-items: start;
 }
 .hbw.hbw-pres .hbw-vn {
   color: rgba(255,255,255,0.35) !important;
