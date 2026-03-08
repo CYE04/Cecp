@@ -135,6 +135,70 @@
     </div>`;
   }
 
+  /* ══════════════ Jianpu helpers (ported from youth-engine) ══════════════ */
+  function _div(cls){ const d=document.createElement('div'); d.className=cls; return d; }
+
+  function parseJpToken(tok){
+    if(!tok||tok==='|'||tok==='||'||tok===' '){
+      const pl=document.createElement('span');
+      pl.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;';
+      const _t=document.createElement('span');_t.style.height='12px';pl.appendChild(_t);
+      const _s=document.createElement('span');_s.style.cssText='font-size:15px;line-height:1;text-align:center;';_s.textContent=tok||'';pl.appendChild(_s);
+      const _b=document.createElement('span');_b.style.height='16px';pl.appendChild(_b);
+      return pl;
+    }
+    if(tok==='sp'||tok==='sp_'||tok==='sp__'){
+      const fake=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
+      const el2=parseJpToken(fake);
+      const lw=el2.children[1];if(lw){const nr=lw.children[0];if(nr){const ns=nr.children[0];if(ns)ns.style.visibility='hidden';}}
+      return el2;
+    }
+    let num=tok,isHigh=0,isLow=0,isDot=false,uline=0;
+    if(num.slice(-2)==='__'){uline=2;num=num.slice(0,-2);}
+    else if(num.slice(-1)==='_'){uline=1;num=num.slice(0,-1);}
+    if(num.indexOf('\u00b7')>-1){isDot=true;num=num.replace(/\u00b7/g,'');}
+    const hm=num.match(/^(.+?)('+)$/);if(hm){isHigh=hm[2].length;num=hm[1];}
+    const lm=num.match(/^(.+?)(,+)$/);if(lm){isLow=lm[2].length;num=lm[1];}
+    const w=document.createElement('span');w.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;';
+    const topDot=document.createElement('span');topDot.style.cssText='font-size:7px;line-height:1;height:12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;';
+    if(isHigh>=2)topDot.innerHTML='\u00b7<br>\u00b7';else if(isHigh===1)topDot.textContent='\u00b7';
+    w.appendChild(topDot);
+    const lw2=document.createElement('span');lw2.style.cssText='display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;';
+    const numRow=document.createElement('span');numRow.style.cssText='display:inline-flex;align-items:center;justify-content:center;position:relative;'+(uline>=1?'border-bottom:1.5px solid currentColor;':'');
+    const ns2=document.createElement('span');ns2.style.cssText='font-size:22px;line-height:1;display:inline-block;text-align:center;min-width:1em;';ns2.textContent=num;numRow.appendChild(ns2);
+    if(isDot){const dt=document.createElement('span');dt.style.cssText='font-size:10px;position:absolute;right:-0.42em;top:0.1em;line-height:1;';dt.textContent='\u00b7';numRow.appendChild(dt);}
+    lw2.appendChild(numRow);
+    if(uline===2){const u2=document.createElement('span');u2.style.cssText='position:absolute;bottom:0;left:0;right:0;height:1.5px;background:currentColor;';lw2.appendChild(u2);}
+    w.appendChild(lw2);
+    const botDot=document.createElement('span');botDot.style.cssText='font-size:7px;line-height:1;height:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;';
+    if(isLow>=2)botDot.innerHTML='\u00b7<br>\u00b7';else if(isLow===1)botDot.textContent='\u00b7';
+    w.appendChild(botDot);
+    return w;
+  }
+
+  function makeTuplet(n){
+    const w=document.createElement('span');w.className='jp-tuplet';
+    const br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);
+    const nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);
+    return w;
+  }
+
+  function renderNStr(nStr){
+    const d=document.createElement('div');d.className='sw-jianpu';
+    if(!nStr||!nStr.trim())return d;
+    const toks=nStr.trim().split(/\s+/);let i=0;
+    while(i<toks.length){
+      const t=toks[i];
+      if(t==='('){const sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
+      if(t==='(['){const so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')so.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(so);continue;}
+      if(t==='])'){const sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
+      const tm2=t.match(/^\{(3|5)$/);if(tm2){const tn=parseInt(tm2[1],10);const tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));d.appendChild(tp);i++;continue;}
+      if(t==='}'){i++;continue;}
+      d.appendChild(parseJpToken(t));i++;
+    }
+    return d;
+  }
+
   /* ── APlayer loader ── */
   let _apLoaded=false;
   function loadAPlayer(cb){
@@ -149,53 +213,23 @@
     document.head.appendChild(js);
   }
   let _ap=null;
-  function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){}  _ap=null;}}
+  function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){} _ap=null;}}
 
   function openDetail(s){
     destroyAP();
     $('ml-detail-title').textContent=s.title||'';
+
     const cover=s.cover
       ?`<img id="ml-detail-cover" src="${s.cover}" onerror="this.outerHTML='<div id=\\'ml-detail-cover-placeholder\\'>♪</div>'">`
       :`<div id="ml-detail-cover-placeholder">♪</div>`;
 
     let btns='';
     if(s.youtube)btns+=`<a class="ml-btn ml-btn-primary" href="${s.youtube}" target="_blank">▶&nbsp;YouTube</a>`;
-    if(s.scoreImg)btns+=`<a class="ml-btn ml-btn-secondary" href="${s.scoreImg}" target="_blank">📄&nbsp;简谱</a>`;
     if(s.lrc)btns+=`<a class="ml-btn ml-btn-secondary" href="${s.lrc}" target="_blank">📝&nbsp;LRC</a>`;
 
-    let chordsHTML='';
-    if(s.sections&&s.sections.length){
-      chordsHTML=`<div id="ml-chords-section"><span class="ml-section-label">歌词 / 简谱 / 和弦</span>`;
-      for(const sec of s.sections){
-        chordsHTML+=`<div class="ml-section-block">`;
-        if(sec.name) chordsHTML+=`<span class="ml-section-name">${sec.name}</span>`;
-        for(const line of sec.lines||[]){
-          const cells=Array.isArray(line)?line:(line.line||[]);
-          chordsHTML+=`<div class="ml-line">`;
-          for(const c of cells){
-            if(c.lyric==='｜')chordsHTML+=`<span class="ml-bar">|</span>`;
-            else if(c.lyric==='\\\\')chordsHTML+=`</div><div class="ml-line">`;
-            else chordsHTML+=`<span class="ml-cell"><span class="ml-chord">${c.chord||''}</span>${c.n?`<span class="ml-jianpu">${c.n}</span>`:''}<span class="ml-lyric">${c.lyric||' '}</span></span>`;
-          }
-          chordsHTML+=`</div>`;
-        }
-        chordsHTML+=`</div>`;
-      }
-      chordsHTML+=`</div>`;
-    }
-
-    /* score image — clickable for lightbox */
-    let scoreHTML='';
-    if(s.scoreImg){
-      scoreHTML=`<div id="ml-score-section">
-        <div class="ml-section-label">简谱（点击放大）</div>
-        <img id="ml-score-img" src="${s.scoreImg}" loading="lazy" data-src="${s.scoreImg}">
-      </div>`;
-    }
-
-    /* APlayer mount point */
     const playerHTML=s.mp3?`<div id="ml-player-section"><div id="ml-aplayer"></div></div>`:'';
 
+    /* static HTML for hero + actions + player */
     $('ml-detail-body').innerHTML=`
       <div id="ml-detail-hero">
         ${cover}
@@ -212,38 +246,71 @@
       </div>
       ${btns?`<div id="ml-actions">${btns}</div>`:''}
       ${playerHTML}
-      ${chordsHTML}
-      ${scoreHTML}
     `;
 
-    /* bind score image click → lightbox */
-    const scoreEl=document.getElementById('ml-score-img');
-    if(scoreEl){
-      scoreEl.addEventListener('click',()=>openLightbox(scoreEl.dataset.src));
+    /* ── Chords + Jianpu section (DOM, youth-engine style) ── */
+    if(s.sections&&s.sections.length){
+      const sec_wrap=document.createElement('div');
+      sec_wrap.id='ml-chords-section';
+      const lbDiv=_div('sw-lb');
+      for(const sec of s.sections){
+        const se=_div('sw-lsec');
+        const sn=_div('sw-lsec-name');sn.textContent=sec.name||'';se.appendChild(sn);
+        for(const line of sec.lines||[]){
+          const le=_div('sw-lline');
+          const row=_div('sw-lrow');
+          const segs=Array.isArray(line)?line:(line.line||[]);
+          for(const seg of segs){
+            const segEl=_div('sw-seg');
+            const chord=document.createElement('span');
+            chord.className='sw-chord'+(seg.chord?'':' empty');
+            chord.textContent=seg.chord||'';
+            segEl.appendChild(chord);
+            if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
+            const lyric=document.createElement('span');
+            lyric.className='sw-lyric';
+            lyric.textContent=seg.lyric||'';
+            segEl.appendChild(lyric);
+            row.appendChild(segEl);
+          }
+          le.appendChild(row);se.appendChild(le);
+        }
+        lbDiv.appendChild(se);
+      }
+      sec_wrap.appendChild(lbDiv);
+      $('ml-detail-body').appendChild(sec_wrap);
     }
 
-    /* init APlayer */
+    /* ── Score image (youth-engine sw-score style) ── */
+    if(s.scoreImg){
+      const scoreDiv=document.createElement('div');
+      scoreDiv.className='sw-score';
+      scoreDiv.style.margin='14px 16px';
+      scoreDiv.innerHTML=`
+        <div class="sw-score-top">
+          <span class="sw-score-lbl">简谱原稿</span>
+          <span class="sw-score-key">1 = ${s.origKey||'?'}</span>
+        </div>
+      `;
+      const img=document.createElement('img');
+      img.src=s.scoreImg;img.loading='lazy';
+      img.style.cssText='width:100%;display:block;cursor:zoom-in;';
+      img.addEventListener('click',()=>openLightbox(s.scoreImg));
+      scoreDiv.appendChild(img);
+      $('ml-detail-body').appendChild(scoreDiv);
+    }
+
+    /* ── APlayer ── */
     if(s.mp3){
       loadAPlayer(()=>{
         const mount=document.getElementById('ml-aplayer');
         if(!mount)return;
-        // resolve relative mp3 path
         const mp3=s.mp3.startsWith('http')?s.mp3:('https://cecp.it'+s.mp3);
-        const lrcUrl=s.lrc||(s.lrc?s.lrc:undefined);
-        const apOpts={
+        _ap=new window.APlayer({
           container:mount,
-          audio:[{
-            name:s.title||'',
-            artist:s.artist||'',
-            url:mp3,
-            cover:s.cover||'',
-            lrc:lrcUrl,
-          }],
-          autoplay:false,
-          theme:'var(--accent,#007aff)',
-          lrcType:lrcUrl?3:0,
-        };
-        _ap=new window.APlayer(apOpts);
+          audio:[{name:s.title||'',artist:s.artist||'',url:mp3,cover:s.cover||'',lrc:s.lrc||undefined}],
+          autoplay:false,theme:'var(--accent,#007aff)',lrcType:s.lrc?3:0,
+        });
       });
     }
 
