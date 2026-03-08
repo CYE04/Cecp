@@ -1,13 +1,12 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
-/* CECP Music Library v2.1 — Theme Adaptive + Lightbox */
+/* CECP Music Library v3.0 */
 (function(){
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
-  const CONTACT='mailto:yuen@cecp.it?subject=诗歌申请';
+  const WECHAT='YuEn_CECP';
 
   if(!document.getElementById('ml-style')){
-    const s=document.createElement('link');
-    s.id='ml-style';s.rel='stylesheet';
+    const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
     s.href='https://cye04.github.io/Cecp/musiclib.css';
     document.head.appendChild(s);
   }
@@ -31,10 +30,10 @@
     <div id="ml-loading"><div id="ml-spinner"></div>正在载入诗歌…</div>
     <div id="ml-list"></div>
     <div id="ml-empty">
-      <div id="ml-empty-icon">🎶</div>
+      <div id="ml-empty-icon">🎵</div>
       <div id="ml-empty-msg">找不到「<span id="ml-query-text"></span>」</div>
-      <div id="ml-empty-sub">还没有这首歌，可以联系 YuEn 添加</div>
-      <a id="ml-contact" href="${CONTACT}">📩 联系 YuEn 申请添加</a>
+      <div id="ml-empty-sub">还没有这首歌，可以微信联系 YuEn 申请添加</div>
+      <button id="ml-contact">💬 复制微信号 YuEn</button>
     </div>
     <div id="ml-detail">
       <div id="ml-detail-header">
@@ -45,7 +44,7 @@
     </div>
     <div id="ml-lightbox">
       <button id="ml-lightbox-close">✕</button>
-      <img id="ml-lightbox-img" src="" alt="简谱">
+      <img id="ml-lightbox-img" src="" alt="">
     </div>
   `;
 
@@ -53,24 +52,23 @@
 
   $('ml-search').addEventListener('input',e=>{query=e.target.value.trim();render();});
   $('ml-back').addEventListener('click',()=>{destroyAP();$('ml-detail').classList.remove('open');});
-
-  /* lightbox */
+  $('ml-contact').addEventListener('click',function(){
+    navigator.clipboard&&navigator.clipboard.writeText(WECHAT).then(()=>{
+      this.textContent='✓ 已复制微信号';
+      setTimeout(()=>{this.textContent='💬 复制微信号 YuEn';},2000);
+    });
+  });
   $('ml-lightbox').addEventListener('click',e=>{
     if(e.target===e.currentTarget||e.target.id==='ml-lightbox-close')
       $('ml-lightbox').classList.remove('open');
   });
   $('ml-lightbox-img').addEventListener('click',e=>e.stopPropagation());
+  function openLightbox(src){$('ml-lightbox-img').src=src;$('ml-lightbox').classList.add('open');}
 
-  function openLightbox(src){
-    $('ml-lightbox-img').src=src;
-    $('ml-lightbox').classList.add('open');
-  }
-
-  /* load */
+  /* ── Load songs ── */
   async function loadSongs(){
     try{
-      const res=await fetch(GITHUB_API);
-      if(!res.ok)throw new Error();
+      const res=await fetch(GITHUB_API);if(!res.ok)throw 0;
       const files=await res.json();
       const jsons=files.filter(f=>f.name.endsWith('.json')&&f.name!=='test.json');
       const all=await Promise.all(jsons.map(f=>fetch(RAW_BASE+f.name).then(r=>r.json()).catch(()=>null)));
@@ -84,14 +82,11 @@
   }
 
   function hasLyricMatch(s,q){
-    for(const sec of s.sections||[])
-      for(const line of sec.lines||[]){
-        const arr=Array.isArray(line)?line:(line.line||[]);
-        for(const c of arr)if((c.lyric||'').toLowerCase().includes(q))return true;
-      }
-    return false;
+    for(const sec of s.sections||[])for(const line of sec.lines||[]){
+      const arr=Array.isArray(line)?line:(line.line||[]);
+      for(const c of arr)if((c.lyric||'').toLowerCase().includes(q))return true;
+    }return false;
   }
-
   function hi(t,q){
     if(!q||!t)return t||'';
     return t.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'),'<mark class="ml-highlight">$1</mark>');
@@ -99,23 +94,16 @@
 
   function render(){
     const list=$('ml-list'),empty=$('ml-empty'),q=query.toLowerCase();
-    let filtered=q
+    const filtered=q
       ?songs.filter(s=>(s.title||'').toLowerCase().includes(q)||(s.artist||'').toLowerCase().includes(q)||hasLyricMatch(s,q))
       :[...songs];
-    filtered.sort((a,b)=>((a.title||'').toLowerCase().startsWith(q)?0:1)-((b.title||'').toLowerCase().startsWith(q)?0:1));
-
     if(!filtered.length){
-      list.innerHTML='';
-      $('ml-query-text').textContent=query;
-      empty.style.display='block';
+      list.innerHTML='';$('ml-query-text').textContent=query;empty.style.display='block';
     }else{
       empty.style.display='none';
       list.innerHTML=filtered.map(s=>cardHTML(s,q)).join('')+'<div id="ml-list-end"></div>';
       list.querySelectorAll('.ml-song-card').forEach(el=>{
-        el.addEventListener('click',()=>{
-          const s=songs.find(x=>x.id===el.dataset.id);
-          if(s)openDetail(s);
-        });
+        el.addEventListener('click',()=>{const s=songs.find(x=>x.id===el.dataset.id);if(s)openDetail(s);});
       });
     }
   }
@@ -130,13 +118,13 @@
         <div class="ml-song-title">${hi(s.title,q)}</div>
         <div class="ml-song-meta">${hi([s.artist,s.sub].filter(Boolean).join(' · '),q)}</div>
       </div>
-      ${s.origKey?`<div class="ml-song-key">${s.origKey}</div>`:''}
+      ${s.origKey?`<span class="ml-song-key">${s.origKey}</span>`:''}
       <span class="ml-chevron">›</span>
     </div>`;
   }
 
-  /* ══════════════ Jianpu helpers (ported from youth-engine) ══════════════ */
-  function _div(cls){ const d=document.createElement('div'); d.className=cls; return d; }
+  /* ══ Jianpu helpers (from youth-engine) ══ */
+  function _div(cls){const d=document.createElement('div');d.className=cls;return d;}
 
   function parseJpToken(tok){
     if(!tok||tok==='|'||tok==='||'||tok===' '){
@@ -149,9 +137,9 @@
     }
     if(tok==='sp'||tok==='sp_'||tok==='sp__'){
       const fake=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
-      const el2=parseJpToken(fake);
-      const lw=el2.children[1];if(lw){const nr=lw.children[0];if(nr){const ns=nr.children[0];if(ns)ns.style.visibility='hidden';}}
-      return el2;
+      const e2=parseJpToken(fake);const lw=e2.children[1];
+      if(lw){const nr=lw.children[0];if(nr){const ns=nr.children[0];if(ns)ns.style.visibility='hidden';}}
+      return e2;
     }
     let num=tok,isHigh=0,isLow=0,isDot=false,uline=0;
     if(num.slice(-2)==='__'){uline=2;num=num.slice(0,-2);}
@@ -175,14 +163,7 @@
     w.appendChild(botDot);
     return w;
   }
-
-  function makeTuplet(n){
-    const w=document.createElement('span');w.className='jp-tuplet';
-    const br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);
-    const nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);
-    return w;
-  }
-
+  function makeTuplet(n){const w=document.createElement('span');w.className='jp-tuplet';const br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);const nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);return w;}
   function renderNStr(nStr){
     const d=document.createElement('div');d.className='sw-jianpu';
     if(!nStr||!nStr.trim())return d;
@@ -199,8 +180,8 @@
     return d;
   }
 
-  /* ── APlayer loader ── */
-  let _apLoaded=false;
+  /* ══ APlayer ══ */
+  let _apLoaded=false,_ap=null;
   function loadAPlayer(cb){
     if(_apLoaded){cb();return;}
     if(window.APlayer){_apLoaded=true;cb();return;}
@@ -212,46 +193,59 @@
     js.onload=()=>{_apLoaded=true;cb();};
     document.head.appendChild(js);
   }
-  let _ap=null;
-  function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){} _ap=null;}}
+  function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){}_ap=null;}}
 
+  /* ══ Detail page ══ */
   function openDetail(s){
     destroyAP();
     $('ml-detail-title').textContent=s.title||'';
 
-    const cover=s.cover
-      ?`<img id="ml-detail-cover" src="${s.cover}" onerror="this.outerHTML='<div id=\\'ml-detail-cover-placeholder\\'>♪</div>'">`
-      :`<div id="ml-detail-cover-placeholder">♪</div>`;
+    const body=$('ml-detail-body');
+    body.innerHTML='';
 
-    let btns='';
-    if(s.youtube)btns+=`<a class="ml-btn-yt" href="${s.youtube}" target="_blank" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg></a>`;
-    if(s.lrc)btns+=`<a class="ml-btn ml-btn-secondary" href="${s.lrc}" target="_blank">📝&nbsp;LRC</a>`;
-
-    const playerHTML=s.mp3?`<div id="ml-player-section"><div id="ml-aplayer"></div></div>`:'';
-
-    /* static HTML for hero + actions + player */
-    $('ml-detail-body').innerHTML=`
-      <div id="ml-detail-hero">
-        ${cover}
-        <div id="ml-detail-meta">
-          <div id="ml-detail-name">${s.title||''}</div>
-          <div id="ml-detail-artist">${s.artist||''}</div>
-          <div id="ml-detail-sub">${s.sub||''}</div>
-          <div class="ml-tags">
-            ${s.origKey?`<span class="ml-tag">原调 ${s.origKey}</span>`:''}
-            ${s.timeSign?`<span class="ml-tag">${s.timeSign}</span>`:''}
-            ${s.bpm?`<span class="ml-tag">♩=${s.bpm}</span>`:''}
-          </div>
-        </div>
+    /* ── Hero ── */
+    const hero=document.createElement('div');hero.id='ml-detail-hero';
+    const coverEl=document.createElement(s.cover?'img':'div');
+    if(s.cover){coverEl.id='ml-detail-cover';coverEl.src=s.cover;coverEl.onerror=()=>{coverEl.outerHTML='<div id="ml-detail-cover-placeholder">♪</div>';};}
+    else{coverEl.id='ml-detail-cover-placeholder';coverEl.textContent='♪';}
+    const meta=document.createElement('div');meta.id='ml-detail-meta';
+    meta.innerHTML=`
+      <div id="ml-detail-name">${s.title||''}</div>
+      <div id="ml-detail-artist">${s.artist||''}</div>
+      <div id="ml-detail-sub">${s.sub||''}</div>
+      <div class="ml-tags">
+        ${s.origKey?`<span class="ml-tag">1 = ${s.origKey}</span>`:''}
+        ${s.timeSign?`<span class="ml-tag">${s.timeSign}</span>`:''}
+        ${s.bpm?`<span class="ml-tag">♩ = ${s.bpm}</span>`:''}
       </div>
-      ${btns?`<div id="ml-actions">${btns}</div>`:''}
-      ${playerHTML}
     `;
+    hero.appendChild(coverEl);hero.appendChild(meta);
+    body.appendChild(hero);
 
-    /* ── Chords + Jianpu section (DOM, youth-engine style) ── */
+    /* ── Tools row: YT icon + LRC + APlayer ── */
+    const toolsRow=document.createElement('div');toolsRow.id='ml-tools-row';
+    if(s.youtube){
+      const yt=document.createElement('a');
+      yt.className='ml-yt-btn';yt.href=s.youtube;yt.target='_blank';yt.title='YouTube';
+      yt.innerHTML='<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>';
+      toolsRow.appendChild(yt);
+    }
+    if(s.lrc){
+      const lrc=document.createElement('a');
+      lrc.className='ml-lrc-btn';lrc.href=s.lrc;lrc.target='_blank';
+      lrc.textContent='📝 LRC';
+      toolsRow.appendChild(lrc);
+    }
+    if(s.mp3){
+      const wrap=document.createElement('div');wrap.id='ml-player-wrap';
+      const ap=document.createElement('div');ap.id='ml-aplayer';
+      wrap.appendChild(ap);toolsRow.appendChild(wrap);
+    }
+    if(toolsRow.children.length)body.appendChild(toolsRow);
+
+    /* ── Chords + Jianpu (youth-engine DOM) ── */
     if(s.sections&&s.sections.length){
-      const sec_wrap=document.createElement('div');
-      sec_wrap.id='ml-chords-section';
+      const secWrap=document.createElement('div');secWrap.id='ml-chords-section';
       const lbDiv=_div('sw-lb');
       for(const sec of s.sections){
         const se=_div('sw-lsec');
@@ -268,8 +262,7 @@
             segEl.appendChild(chord);
             if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
             const lyric=document.createElement('span');
-            lyric.className='sw-lyric';
-            lyric.textContent=seg.lyric||'';
+            lyric.className='sw-lyric';lyric.textContent=seg.lyric||'';
             segEl.appendChild(lyric);
             row.appendChild(segEl);
           }
@@ -277,39 +270,31 @@
         }
         lbDiv.appendChild(se);
       }
-      sec_wrap.appendChild(lbDiv);
-      $('ml-detail-body').appendChild(sec_wrap);
+      secWrap.appendChild(lbDiv);
+      body.appendChild(secWrap);
     }
 
-    /* ── Score image (youth-engine sw-score style) ── */
+    /* ── Score image ── */
     if(s.scoreImg){
-      const scoreDiv=document.createElement('div');
-      scoreDiv.className='sw-score';
-      scoreDiv.style.margin='14px 16px';
-      scoreDiv.innerHTML=`
-        <div class="sw-score-top">
-          <span class="sw-score-lbl">简谱原稿</span>
-          <span class="sw-score-key">1 = ${s.origKey||'?'}</span>
-        </div>
-      `;
+      const scoreDiv=document.createElement('div');scoreDiv.className='sw-score';
+      const top=document.createElement('div');top.className='sw-score-top';
+      top.innerHTML=`<span class="sw-score-lbl">简谱原稿</span><span class="sw-score-key">1 = ${s.origKey||'?'}</span>`;
       const img=document.createElement('img');
-      img.src=s.scoreImg;img.loading='lazy';
-      img.style.cssText='width:100%;display:block;cursor:zoom-in;';
+      img.src=s.scoreImg;img.loading='lazy';img.alt='简谱';
       img.addEventListener('click',()=>openLightbox(s.scoreImg));
-      scoreDiv.appendChild(img);
-      $('ml-detail-body').appendChild(scoreDiv);
+      scoreDiv.appendChild(top);scoreDiv.appendChild(img);
+      body.appendChild(scoreDiv);
     }
 
-    /* ── APlayer ── */
+    /* ── Init APlayer ── */
     if(s.mp3){
       loadAPlayer(()=>{
-        const mount=document.getElementById('ml-aplayer');
-        if(!mount)return;
-        const mp3=s.mp3.startsWith('http')?s.mp3:('https://cecp.it'+s.mp3);
+        const mount=document.getElementById('ml-aplayer');if(!mount)return;
+        const mp3=s.mp3.startsWith('http')?s.mp3:'https://cecp.it'+s.mp3;
         _ap=new window.APlayer({
           container:mount,
           audio:[{name:s.title||'',artist:s.artist||'',url:mp3,cover:s.cover||'',lrc:s.lrc||undefined}],
-          autoplay:false,theme:'var(--accent,#007aff)',lrcType:s.lrc?3:0,
+          autoplay:false,theme:'#0a84ff',lrcType:s.lrc?3:0,
         });
       });
     }
