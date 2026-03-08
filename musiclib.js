@@ -3,7 +3,7 @@
 (function(){
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
-  const WECHAT='YuEn_CECP';
+  const WECHAT='CYuen_290104';
 
   if(!document.getElementById('ml-style')){
     const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
@@ -195,98 +195,174 @@
   }
   function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){}_ap=null;}}
 
+  /* ══ Transpose helpers ══ */
+  const CHR=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const ENH={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
+  const FLT={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb'};
+  function nIdx(n){return CHR.indexOf(ENH[n]||n);}
+  function trNote(n,st){const i=nIdx(n);if(i<0)return n;const r=CHR[(i+st+12)%12];return FLT[r]||r;}
+  function trS(c,st){const m=c.match(/^([A-G][b#]?)(.*)$/);if(!m)return c;return trNote(m[1],st)+m[2];}
+  function trChord(c,st){if(!st)return c;const s=c.indexOf('/');if(s>-1)return trS(c.slice(0,s),st)+'/'+trS(c.slice(s+1),st);return trS(c,st);}
+  function calcCapo(t,o){
+    const st=(nIdx(t)-nIdx(o)+12)%12;let best=null;
+    ['C','D','E','F','G','A','B'].forEach(pk=>{const c=(nIdx(t)-nIdx(pk)+12)%12;if(c<=7&&(!best||c<best.capo))best={playKey:pk,capo:c};});
+    return{st,capo:best?best.capo:0,playKey:best?best.playKey:t};
+  }
+
   /* ══ Detail page ══ */
   function openDetail(s){
     destroyAP();
     $('ml-detail-title').textContent=s.title||'';
-
     const body=$('ml-detail-body');
     body.innerHTML='';
 
-    /* ── Hero ── */
-    const hero=document.createElement('div');hero.id='ml-detail-hero';
-    const coverEl=document.createElement(s.cover?'img':'div');
-    if(s.cover){coverEl.id='ml-detail-cover';coverEl.src=s.cover;coverEl.onerror=()=>{coverEl.outerHTML='<div id="ml-detail-cover-placeholder">♪</div>';};}
-    else{coverEl.id='ml-detail-cover-placeholder';coverEl.textContent='♪';}
-    const meta=document.createElement('div');meta.id='ml-detail-meta';
-    meta.innerHTML=`
-      <div id="ml-detail-name">${s.title||''}</div>
-      <div id="ml-detail-artist">${s.artist||''}</div>
-      <div id="ml-detail-sub">${s.sub||''}</div>
-      <div class="ml-tags">
-        ${s.origKey?`<span class="ml-tag">1 = ${s.origKey}</span>`:''}
-        ${s.timeSign?`<span class="ml-tag">${s.timeSign}</span>`:''}
-        ${s.bpm?`<span class="ml-tag">♩ = ${s.bpm}</span>`:''}
-      </div>
-    `;
-    hero.appendChild(coverEl);hero.appendChild(meta);
-    body.appendChild(hero);
+    /* 1. APlayer — full width at top */
+    if(s.mp3){
+      const apWrap=document.createElement('div');apWrap.id='ml-aplayer-top';
+      const apMount=document.createElement('div');apMount.id='ml-aplayer';
+      apWrap.appendChild(apMount);body.appendChild(apWrap);
+    }
 
-    /* ── Tools row: YT icon + LRC + APlayer ── */
-    const toolsRow=document.createElement('div');toolsRow.id='ml-tools-row';
+    /* 2. Song info + 移调 toggle (youth-engine sw-hd layout) */
+    const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+    let curKey=s.origKey||'C';
+
+    const wrap=document.createElement('div');wrap.className='sw-wrap';
+
+    // header row: info + toggle button
+    const kPill=document.createElement('span');kPill.className='sw-pill sw-kpill';kPill.textContent='1 = '+curKey;
+    const infoDiv=document.createElement('div');
+    infoDiv.innerHTML=`<div class="sw-eyebrow">Worship Song</div>
+      <div class="sw-title">${s.title||''}</div>
+      <div class="sw-sub">${s.sub||''}</div>`;
+    const pillsDiv=document.createElement('div');pillsDiv.className='sw-pills';
+    pillsDiv.appendChild(kPill);
+    if(s.timeSign){const p=document.createElement('span');p.className='sw-pill';p.textContent=s.timeSign;pillsDiv.appendChild(p);}
+    if(s.bpm){const p=document.createElement('span');p.className='sw-pill';p.textContent='♩ = '+s.bpm;pillsDiv.appendChild(p);}
+    infoDiv.appendChild(pillsDiv);
+
+    const togBtn=document.createElement('button');togBtn.className='sw-tog';
+    togBtn.innerHTML='<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg> 移调';
+
+    const hd=document.createElement('div');hd.className='sw-hd';
+    hd.appendChild(infoDiv);hd.appendChild(togBtn);
+    wrap.appendChild(hd);
+
+    // transpose panel
+    const kg=document.createElement('div');kg.className='sw-kg';
+    const capoEl=document.createElement('div');
+    capoEl.className='sw-capo plain';
+    capoEl.innerHTML=`<div style="font-size:15px;flex-shrink:0">🎸</div>
+      <div style="flex:1"><div class="sw-capo-t"></div><div class="sw-capo-s"></div></div>
+      <div class="sw-capo-n"></div>`;
+    const lbDiv=document.createElement('div');lbDiv.className='sw-lb';
+
+    const ksDiv=document.createElement('div');ksDiv.className='sw-ks';
+    const slabel=document.createElement('div');slabel.className='sw-slabel';slabel.textContent='目标调';
+    ksDiv.appendChild(slabel);ksDiv.appendChild(kg);
+
+    const panelInner=document.createElement('div');panelInner.className='sw-panel-inner';
+    panelInner.appendChild(ksDiv);panelInner.appendChild(capoEl);panelInner.appendChild(lbDiv);
+
+    const panel=document.createElement('div');panel.className='sw-panel';
+    panel.appendChild(panelInner);
+    wrap.appendChild(panel);
+    body.appendChild(wrap);
+
+    togBtn.addEventListener('click',()=>{
+      panel.classList.toggle('open');
+      togBtn.classList.toggle('on',panel.classList.contains('open'));
+    });
+
+    KEYS.forEach(k=>{
+      const b=document.createElement('button');
+      b.className='sw-kb'+(k===curKey?' on':'');b.textContent=k;
+      b.addEventListener('click',()=>{
+        curKey=k;
+        kg.querySelectorAll('.sw-kb').forEach(x=>x.classList.remove('on'));
+        b.classList.add('on');renderScore();
+      });
+      kg.appendChild(b);
+    });
+
+    /* 3. Tools row — YT + LRC */
+    const tools=document.createElement('div');tools.className='sw-tools';
+    const toolsRow=document.createElement('div');toolsRow.className='sw-tools-row';
     if(s.youtube){
-      const yt=document.createElement('a');
-      yt.className='ml-yt-btn';yt.href=s.youtube;yt.target='_blank';yt.title='YouTube';
+      const yt=document.createElement('a');yt.className='yt-btn';yt.href=s.youtube;yt.target='_blank';yt.title='YouTube';
       yt.innerHTML='<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>';
       toolsRow.appendChild(yt);
     }
     if(s.lrc){
-      const lrc=document.createElement('a');
-      lrc.className='ml-lrc-btn';lrc.href=s.lrc;lrc.target='_blank';
-      lrc.textContent='📝 LRC';
-      toolsRow.appendChild(lrc);
+      const lrc=document.createElement('a');lrc.className='sw-pill';
+      lrc.href=s.lrc;lrc.target='_blank';
+      lrc.style.cssText='font-size:12px;padding:5px 12px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;';
+      lrc.textContent='📝 LRC';toolsRow.appendChild(lrc);
     }
-    if(s.mp3){
-      const wrap=document.createElement('div');wrap.id='ml-player-wrap';
-      const ap=document.createElement('div');ap.id='ml-aplayer';
-      wrap.appendChild(ap);toolsRow.appendChild(wrap);
-    }
-    if(toolsRow.children.length)body.appendChild(toolsRow);
+    if(toolsRow.children.length){tools.appendChild(toolsRow);body.appendChild(tools);}
 
-    /* ── Chords + Jianpu (youth-engine DOM) ── */
-    if(s.sections&&s.sections.length){
-      const secWrap=document.createElement('div');secWrap.id='ml-chords-section';
-      const lbDiv=_div('sw-lb');
-      for(const sec of s.sections){
+    /* 4. Score image */
+    let scoreKeyBadge=null;
+    if(s.scoreImg){
+      const scoreDiv=document.createElement('div');scoreDiv.className='sw-score';
+      const scoreTop=document.createElement('div');scoreTop.className='sw-score-top';
+      scoreKeyBadge=document.createElement('span');scoreKeyBadge.className='sw-score-key';scoreKeyBadge.textContent='1 = '+curKey;
+      const lbl=document.createElement('span');lbl.className='sw-score-lbl';lbl.textContent='简谱原稿';
+      scoreTop.appendChild(lbl);scoreTop.appendChild(scoreKeyBadge);
+      const img=document.createElement('img');img.src=s.scoreImg;img.loading='lazy';img.alt='简谱';
+      img.addEventListener('click',()=>openLightbox(s.scoreImg));
+      scoreDiv.appendChild(scoreTop);scoreDiv.appendChild(img);
+      body.appendChild(scoreDiv);
+    }
+
+    /* renderScore — chord transposition + jianpu rebuild */
+    function renderScore(){
+      const info=calcCapo(curKey,s.origKey||'C'),st=info.st;
+      kPill.textContent='1 = '+curKey;
+      if(scoreKeyBadge)scoreKeyBadge.textContent='1 = '+curKey;
+      // capo display
+      if(curKey===(s.origKey||'C')){
+        capoEl.className='sw-capo plain';
+        capoEl.querySelector('.sw-capo-t').textContent='原调演奏';
+        capoEl.querySelector('.sw-capo-s').textContent='不需要变调夹';
+        capoEl.querySelector('.sw-capo-n').textContent='—';
+      }else if(info.capo===0){
+        capoEl.className='sw-capo plain';
+        capoEl.querySelector('.sw-capo-t').textContent='不需要变调夹';
+        capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法演奏';
+        capoEl.querySelector('.sw-capo-n').textContent='开放';
+      }else{
+        capoEl.className='sw-capo';
+        capoEl.querySelector('.sw-capo-t').textContent='变调夹夹第 '+info.capo+' 格';
+        capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法 → 实际 '+curKey;
+        capoEl.querySelector('.sw-capo-n').textContent=info.capo;
+      }
+      // rebuild jianpu + chords
+      lbDiv.innerHTML='';
+      for(const sec of s.sections||[]){
         const se=_div('sw-lsec');
         const sn=_div('sw-lsec-name');sn.textContent=sec.name||'';se.appendChild(sn);
         for(const line of sec.lines||[]){
-          const le=_div('sw-lline');
-          const row=_div('sw-lrow');
+          const le=_div('sw-lline');const row=_div('sw-lrow');
           const segs=Array.isArray(line)?line:(line.line||[]);
           for(const seg of segs){
             const segEl=_div('sw-seg');
             const chord=document.createElement('span');
             chord.className='sw-chord'+(seg.chord?'':' empty');
-            chord.textContent=seg.chord||'';
+            if(seg.chord)chord.textContent=trChord(seg.chord,st);
             segEl.appendChild(chord);
             if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
-            const lyric=document.createElement('span');
-            lyric.className='sw-lyric';lyric.textContent=seg.lyric||'';
-            segEl.appendChild(lyric);
-            row.appendChild(segEl);
+            const lyric=document.createElement('span');lyric.className='sw-lyric';lyric.textContent=seg.lyric||'';
+            segEl.appendChild(lyric);row.appendChild(segEl);
           }
           le.appendChild(row);se.appendChild(le);
         }
         lbDiv.appendChild(se);
       }
-      secWrap.appendChild(lbDiv);
-      body.appendChild(secWrap);
     }
+    renderScore();
 
-    /* ── Score image ── */
-    if(s.scoreImg){
-      const scoreDiv=document.createElement('div');scoreDiv.className='sw-score';
-      const top=document.createElement('div');top.className='sw-score-top';
-      top.innerHTML=`<span class="sw-score-lbl">简谱原稿</span><span class="sw-score-key">1 = ${s.origKey||'?'}</span>`;
-      const img=document.createElement('img');
-      img.src=s.scoreImg;img.loading='lazy';img.alt='简谱';
-      img.addEventListener('click',()=>openLightbox(s.scoreImg));
-      scoreDiv.appendChild(top);scoreDiv.appendChild(img);
-      body.appendChild(scoreDiv);
-    }
-
-    /* ── Init APlayer ── */
+    /* Init APlayer */
     if(s.mp3){
       loadAPlayer(()=>{
         const mount=document.getElementById('ml-aplayer');if(!mount)return;
