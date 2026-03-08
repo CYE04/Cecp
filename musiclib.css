@@ -1,3 +1,4 @@
+/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library CSS v2.1 — Theme Adaptive + Lightbox */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
 
@@ -132,20 +133,106 @@ body{overflow-x:hidden;}
 .ml-btn-secondary{background:var(--bg3);color:var(--text);}
 .ml-btn-secondary:hover{opacity:.75;}
 
-/* ── CHORDS ── */
-#ml-chords-section{padding:20px 20px 0;}
-.ml-section-label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-.ml-section-name{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.4px;text-transform:uppercase;margin:14px 0 8px;}
-.ml-line{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 1px;margin-bottom:10px;}
-.ml-cell{display:inline-flex;flex-direction:column;align-items:flex-start;}
-.ml-chord{font-size:11px;font-weight:600;color:var(--accent);min-height:16px;line-height:16px;white-space:nowrap;font-family:-apple-system,BlinkMacSystemFont,monospace;}
-.ml-jianpu{
-  font-size:13px;font-weight:600;color:var(--text);
-  line-height:18px;white-space:pre;letter-spacing:.5px;
-  font-family:-apple-system,BlinkMacSystemFont,monospace;
+/* ── CHORDS / JIANPU — Apple Music style ── */
+#ml-chords-section{
+  padding:0 0 16px;
 }
-.ml-lyric{font-size:16px;color:var(--text);white-space:pre;line-height:24px;}
-.ml-bar{color:var(--text3);font-size:18px;padding:0 3px;line-height:24px;align-self:flex-end;}
+
+/* top label "歌词 / 和弦" */
+.ml-section-label{
+  font-size:11px;font-weight:700;color:var(--text3);
+  letter-spacing:1px;text-transform:uppercase;
+  margin:0 20px 20px;
+  padding-top:20px;
+  display:block;
+}
+
+/* section block e.g. 主歌 / 副歌 */
+.ml-section-block{
+  margin:0 0 6px;
+}
+
+/* pill badge for section name */
+.ml-section-name{
+  display:inline-block;
+  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--accent);
+  background:var(--accent-light);
+  border-radius:20px;padding:5px 14px;
+  margin:0 20px 12px;
+}
+
+/* one phrase / bar row */
+.ml-line{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  padding:6px 20px 6px;
+  gap:0;
+  border-radius:0;
+  transition:background .15s;
+}
+.ml-line:hover{
+  background:var(--bg2);
+}
+
+/* individual syllable column */
+.ml-cell{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 4px;
+  min-width:20px;
+}
+
+/* chord — small pill above jianpu */
+.ml-chord{
+  font-size:10px;font-weight:700;
+  color:var(--accent);
+  background:var(--accent-light);
+  border-radius:4px;
+  padding:1px 5px;
+  line-height:16px;min-height:18px;
+  white-space:nowrap;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Mono',monospace;
+  margin-bottom:3px;
+  letter-spacing:.2px;
+}
+/* empty chord placeholder keeps height */
+.ml-chord:empty{
+  background:transparent;
+  padding:0 5px;
+}
+
+/* jianpu — the big hero number */
+.ml-jianpu{
+  font-size:22px;font-weight:700;
+  color:var(--text);
+  line-height:28px;
+  white-space:pre;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Mono',monospace;
+  letter-spacing:1px;
+}
+
+/* lyric — below jianpu, subtler */
+.ml-lyric{
+  font-size:13px;font-weight:400;
+  color:var(--text2);
+  white-space:pre;
+  line-height:20px;
+  margin-top:2px;
+  letter-spacing:.3px;
+}
+
+/* bar separator */
+.ml-bar{
+  font-size:26px;font-weight:100;
+  color:var(--border);
+  line-height:28px;
+  padding:0 3px;
+  align-self:center;
+  margin-bottom:22px;/* align with jianpu baseline */
+}
 
 /* ── APLAYER ── */
 #ml-player-section{
