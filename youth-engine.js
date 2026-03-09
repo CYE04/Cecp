@@ -171,6 +171,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-chord.empty{visibility:hidden}
 .sw-jianpu{font-family:'DM Mono',monospace;color:var(--ym-ink);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1}
 .sw-lyric{font-size:22px;color:var(--ym-ink2);white-space:pre;letter-spacing:.5px}
+.sw-lyric2{font-size:14px;opacity:0.65;margin-top:2px;letter-spacing:.3px;}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
 .jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
@@ -660,6 +661,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
             s.appendChild(c);
             if(seg.n && seg.n.trim()) s.appendChild(renderNStr(seg.n));
             var l=div('sw-lyric'); l.textContent=seg.lyric||''; s.appendChild(l);
+            if(seg.lyric2){var l2=div('sw-lyric sw-lyric2');l2.textContent=seg.lyric2;s.appendChild(l2);}
             row.appendChild(s);
           });
           le.appendChild(row); se.appendChild(le);
