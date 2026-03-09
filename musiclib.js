@@ -388,7 +388,8 @@
       const dx=x-startX, dy=y-startY;
       if(!active){
         if(Math.abs(dx)<10 && Math.abs(dy)<10) return;
-        if(dx>10 && Math.abs(dx)>Math.abs(dy) && startX<42) active=true;
+        const isTouch=startX<42 || (detail.dataset.pointerType==='touch');
+        if(dx>10 && Math.abs(dx)>Math.abs(dy) && (isTouch || dx>10)) active=true;
         else if(Math.abs(dy)>Math.abs(dx)){ cancel(); return; }
       }
       if(!active) return;
@@ -413,9 +414,10 @@
     detail.addEventListener('touchmove',e=>{if(e.touches[0])move(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
     detail.addEventListener('touchend',e=>{const t=e.changedTouches&&e.changedTouches[0];end(t?t.clientX:startX);},{passive:true});
 
-    detail.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse' && e.clientX>24)return; begin(e.clientX,e.clientY);});
-    detail.addEventListener('pointermove',e=>move(e.clientX,e.clientY));
-    detail.addEventListener('pointerup',e=>end(e.clientX));
+    // Desktop: allow swipe from anywhere (not just left edge)
+    detail.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse') begin(e.clientX,e.clientY);});
+    detail.addEventListener('pointermove',e=>{if(e.pointerType==='mouse') move(e.clientX,e.clientY);});
+    detail.addEventListener('pointerup',e=>{if(e.pointerType==='mouse') end(e.clientX);});
     detail.addEventListener('pointercancel',cancel);
   }
 
