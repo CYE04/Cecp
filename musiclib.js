@@ -1,4 +1,4 @@
-/* CECP Music Library v3.2 Halo Sync + Swipe Back + Metronome */
+/* CECP Music Library v3.2 */
 (function(){
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
@@ -17,6 +17,7 @@
   let _apLoaded=false,_ap=null;
   let _audioCtx=null,_metroTimer=null,_metroNext=0,_metroRunning=false,_metroBpm=72;
   let _themeObserver=null;
+  let _detailStatePushed=false;
 
   root.innerHTML=`
     <div id="ml-header">
@@ -73,13 +74,18 @@
 
   function openLightbox(src){$('ml-lightbox-img').src=src;$('ml-lightbox').classList.add('open');}
 
-  function closeDetail(){
+  function closeDetail(fromPop){
+    if(!fromPop && _detailStatePushed){
+      history.back();
+      return;
+    }
     destroyAP();
     stopMetronome();
     detail.classList.remove('open');
     detail.style.transform='';
     detail.classList.remove('swiping');
     $('ml-detail-overlay').style.opacity='0';
+    _detailStatePushed=false;
   }
 
   function tryColor(el, prop){
@@ -374,6 +380,10 @@
     return box;
   }
 
+  window.addEventListener('popstate',()=>{
+    if(detail.classList.contains('open')) closeDetail(true);
+  });
+
   function attachSwipeBack(){
     let startX=0,startY=0,dragging=false,active=false;
     const overlay=$('ml-detail-overlay');
@@ -423,6 +433,12 @@
     destroyAP();
     stopMetronome();
     syncHaloTheme();
+    if(!detail.classList.contains('open') && !(_detailStatePushed && history.state && history.state.__mlDetail)){
+      try{
+        history.pushState(Object.assign({}, history.state||{}, {__mlDetail:true}), '');
+        _detailStatePushed=true;
+      }catch(err){}
+    }
     $('ml-detail-title').textContent=s.title||'';
     const body=$('ml-detail-body');
     body.innerHTML='';
