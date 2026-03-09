@@ -105,7 +105,6 @@ body{overflow-x:hidden;}
 
 /* ══════════ DETAIL PANEL ══════════ */
 #ml-detail{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y;}
-#ml-detail.swiping{user-select:none;cursor:grabbing;}
 #ml-detail.open{display:block;animation:ml-detail-in .24s ease;}
 @keyframes ml-detail-in{from{opacity:.01;transform:translateX(18px)}to{opacity:1;transform:none}}
 #ml-detail.swiping{transition:none!important;}

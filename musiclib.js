@@ -375,50 +375,64 @@
   });
 
   function attachSwipeBack(){
-    let startX=0,startY=0,dragging=false,active=false;
+    let startX=0,startY=0,dragging=false,active=false,isMouse=false;
     const overlay=$('ml-detail-overlay');
-    const maxShift=Math.min(window.innerWidth*0.32, 120);
+    const maxShift=Math.min(window.innerWidth*0.38, 150);
 
-    function begin(x,y){
-      if(detail.scrollTop>6 || !detail.classList.contains('open')) return;
-      startX=x; startY=y; dragging=true; active=false; detail.classList.add('swiping');
+    function begin(x,y,mouse){
+      if(!detail.classList.contains('open')) return;
+      // Touch: only trigger from left edge. Mouse: anywhere.
+      if(!mouse && x>56) return;
+      startX=x; startY=y; dragging=true; active=false; isMouse=mouse||false;
+      detail.classList.add('swiping');
     }
     function move(x,y){
       if(!dragging) return;
       const dx=x-startX, dy=y-startY;
       if(!active){
-        if(Math.abs(dx)<10 && Math.abs(dy)<10) return;
-        const isTouch=startX<42 || (detail.dataset.pointerType==='touch');
-        if(dx>10 && Math.abs(dx)>Math.abs(dy) && (isTouch || dx>10)) active=true;
-        else if(Math.abs(dy)>Math.abs(dx)){ cancel(); return; }
+        if(Math.abs(dx)<8 && Math.abs(dy)<8) return;
+        if(dx>8 && Math.abs(dx)>Math.abs(dy)*1.1) active=true;
+        else{ cancel(); return; }
       }
       if(!active) return;
       const shift=Math.max(0, Math.min(dx, maxShift));
       detail.style.transform=`translateX(${shift}px)`;
-      overlay.style.opacity=String(Math.min(shift / maxShift, .95));
+      overlay.style.opacity=String(Math.min(shift/maxShift, .9));
     }
     function end(x){
       if(!dragging) return;
       const dx=x-startX;
-      const shouldClose=active && dx>Math.max(70, window.innerWidth*0.18);
+      const threshold=isMouse ? Math.max(50, window.innerWidth*0.1) : Math.max(70, window.innerWidth*0.18);
+      const shouldClose=active && dx>threshold;
       detail.classList.remove('swiping');
-      detail.style.transition='transform .2s ease';
+      detail.style.transition='transform .22s ease';
       detail.style.transform=shouldClose?`translateX(${window.innerWidth}px)`:'';
       overlay.style.opacity=shouldClose?'1':'0';
-      setTimeout(()=>{detail.style.transition=''; if(shouldClose) closeDetail(); else detail.style.transform='';}, shouldClose?160:200);
-      dragging=false; active=false;
+      setTimeout(()=>{detail.style.transition=''; if(shouldClose) closeDetail(); else detail.style.transform='';}, shouldClose?180:220);
+      dragging=false; active=false; isMouse=false;
     }
-    function cancel(){dragging=false;active=false;detail.classList.remove('swiping');detail.style.transform='';overlay.style.opacity='0';}
+    function cancel(){dragging=false;active=false;isMouse=false;detail.classList.remove('swiping');detail.style.transform='';overlay.style.opacity='0';}
 
-    detail.addEventListener('touchstart',e=>{if(e.touches[0])begin(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+    // Touch events
+    detail.addEventListener('touchstart',e=>{if(e.touches[0])begin(e.touches[0].clientX,e.touches[0].clientY,false);},{passive:true});
     detail.addEventListener('touchmove',e=>{if(e.touches[0])move(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
     detail.addEventListener('touchend',e=>{const t=e.changedTouches&&e.changedTouches[0];end(t?t.clientX:startX);},{passive:true});
 
-    // Desktop: allow swipe from anywhere (not just left edge)
-    detail.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse') begin(e.clientX,e.clientY);});
+    // Mouse — setPointerCapture so pointerup fires even outside element
+    detail.addEventListener('pointerdown',e=>{
+      if(e.pointerType!=='mouse') return;
+      try{detail.setPointerCapture(e.pointerId);}catch(_){}
+      begin(e.clientX,e.clientY,true);
+    });
     detail.addEventListener('pointermove',e=>{if(e.pointerType==='mouse') move(e.clientX,e.clientY);});
     detail.addEventListener('pointerup',e=>{if(e.pointerType==='mouse') end(e.clientX);});
     detail.addEventListener('pointercancel',cancel);
+
+    // Keyboard: Escape closes detail
+    document.addEventListener('keydown',e=>{
+      if(!detail.classList.contains('open')) return;
+      if(e.key==='Escape') closeDetail();
+    });
   }
 
   function openDetail(s){
