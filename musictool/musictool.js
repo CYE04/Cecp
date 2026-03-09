@@ -294,7 +294,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
 .p-lyric{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink2);}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
-.p-lyric2{font-size:12px;opacity:0.65;margin-top:1px;}
+.p-lyric2{font-size:15px;opacity:0.55;margin-top:0;}
 
 /* 音符结构 */
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
@@ -954,7 +954,7 @@ function renderEditor(){
         inpL.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric=this.value;renderPreview();};})(si,li,gi);
         tdL.appendChild(inpL);
         var inpL2=document.createElement('input');inpL2.className='inp-lyric';inpL2.value=seg.lyric2||'';
-        inpL2.placeholder='下行…';inpL2.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
+        inpL2.placeholder='下行…';inpL2.style.cssText='display:block;margin-top:2px;opacity:0.6;';
         inpL2.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric2=this.value;renderPreview();};})(si,li,gi);
         tdL.appendChild(inpL2);tr.appendChild(tdL);
 
