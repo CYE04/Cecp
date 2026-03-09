@@ -266,18 +266,7 @@
     return d;
   }
 
-  function loadAPlayer(cb){
-    if(_apLoaded){cb();return;}
-    if(window.APlayer){_apLoaded=true;cb();return;}
-    const css=document.createElement('link');css.rel='stylesheet';
-    css.href='https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css';
-    document.head.appendChild(css);
-    const js=document.createElement('script');
-    js.src='https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js';
-    js.onload=()=>{_apLoaded=true;cb();};
-    document.head.appendChild(js);
-  }
-  function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){}_ap=null;}}
+  function destroyAP(){}
 
   const CHR=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
   const ENH={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
@@ -444,10 +433,14 @@
     const body=$('ml-detail-body');
     body.innerHTML='';
 
-    if(s.mp3){
-      const apWrap=document.createElement('div');apWrap.id='ml-aplayer-top';
-      const apMount=document.createElement('div');apMount.id='ml-aplayer';
-      apWrap.appendChild(apMount);body.appendChild(apWrap);
+    /* Cover hero — rounded, padded, not stuck to edge */
+    if(s.cover){
+      const heroWrap=document.createElement('div');heroWrap.id='ml-cover-hero';
+      const img=document.createElement('img');img.id='ml-cover-hero-img';
+      img.src=s.cover;img.alt=s.title||'';
+      img.onerror=()=>{heroWrap.style.display='none';};
+      heroWrap.appendChild(img);
+      body.appendChild(heroWrap);
     }
 
     const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
@@ -575,18 +568,6 @@
       }
     }
     renderScore();
-
-    if(s.mp3){
-      loadAPlayer(()=>{
-        const mount=document.getElementById('ml-aplayer');if(!mount)return;
-        const mp3=s.mp3.startsWith('http')?s.mp3:'https://cecp.it'+s.mp3;
-        _ap=new window.APlayer({
-          container:mount,
-          audio:[{name:s.title||'',artist:s.artist||'',url:mp3,cover:s.cover||'',lrc:s.lrc||undefined}],
-          autoplay:false,theme:getComputedStyle(root).getPropertyValue('--halo-accent').trim()||'#0a84ff',lrcType:s.lrc?3:0,
-        });
-      });
-    }
 
     detail.classList.add('open');
     detail.scrollTop=0;
