@@ -1299,6 +1299,8 @@ function openTool(id, name){
   navName.textContent = name;
   hub.style.display = 'none';
   toolview.classList.add('on');
+  // Push state so browser back returns to hub
+  history.pushState({__mtTool: id}, '');
   Object.values(panels).forEach(p => p.classList.remove('on'));
   panels[id].classList.add('on');
   if(id === 'lrc' && !localStorage.getItem(TUT_KEY)) setTimeout(tutOpen, 400);
@@ -1311,12 +1313,20 @@ function openTool(id, name){
     }
   }
 }
-function closeTool(){
+function closeTool(fromPop){
   toolview.classList.remove('on');
   hub.style.display = '';
   audio.pause();
   updatePlayBtn();
+  if(!fromPop && history.state && history.state.__mtTool){
+    try{ history.back(); }catch(_){}
+  }
 }
+
+// Browser back → close tool (not leave page)
+window.addEventListener('popstate', () => {
+  if(toolview.classList.contains('on')) closeTool(true);
+});
 
 $('mt-card-lrc').onclick = () => openTool('lrc','歌词编辑器');
 $('mt-card-jf').onclick  = () => openTool('jf','简谱编辑器');
