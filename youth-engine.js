@@ -171,7 +171,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-chord.empty{visibility:hidden}
 .sw-jianpu{font-family:'DM Mono',monospace;color:var(--ym-ink);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1}
 .sw-lyric{font-size:22px;color:var(--ym-ink2);white-space:pre;letter-spacing:.5px}
-.sw-lyric2{font-size:14px;opacity:0.65;margin-top:2px;letter-spacing:.3px;}
+.sw-lyric2{display:block;opacity:0.55;margin-top:2px;}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
 .jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
@@ -337,7 +337,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function buildHero() {
     var navItems = [
       {label:'📅 聚会流程', href:'#ym-flow'},
-      {label:'🎧 诗歌敬拜', href:'#ym-songs'},
+      {label:'🎧 本周诗歌', href:'#ym-songs'},
       {label:'📖 信息分享', href:'#ym-message'},
       {label:'📺 直播回放', href:'#ym-replay'},
       {label:'📑 讲员PPT',  href:'#ym-ppt'},
