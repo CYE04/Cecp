@@ -172,7 +172,7 @@ const jianpuHTML = `<!DOCTYPE html>
   --accent:#7c6af7;--accent2:#a89af9;--red:#f27c6a;--green:#6af2a8;--sel:#f0c040;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden;display:flex;flex-direction:column;overscroll-behavior:none;touch-action:pan-y;}
 
 .topbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
@@ -1136,6 +1136,7 @@ function renderCode(){
   });
   lines.push(']');
   document.getElementById('codeBox').textContent=lines.join('\\n');
+  try{localStorage.setItem('jianpu_autosave',JSON.stringify(data));}catch(_){}
 }
 function copyCode(){
   navigator.clipboard.writeText(document.getElementById('codeBox').textContent).then(function(){
@@ -1288,7 +1289,13 @@ function doImport(){
 }
 document.getElementById('importOverlay').addEventListener('click',function(e){if(e.target===this)closeImport();});
 
-/* 初始化 */
+/* 初始化：从自动保存恢复 */
+(function(){
+  try{
+    var saved=localStorage.getItem('jianpu_autosave');
+    if(saved){ var d=JSON.parse(saved); if(Array.isArray(d)&&d.length>0) data=d; }
+  }catch(_){}
+})();
 refreshTupletBtns();
 renderEditor();
 </script>
@@ -1299,7 +1306,6 @@ function openTool(id, name){
   navName.textContent = name;
   hub.style.display = 'none';
   toolview.classList.add('on');
-  // Push state so browser back returns to hub
   history.pushState({__mtTool: id}, '');
   Object.values(panels).forEach(p => p.classList.remove('on'));
   panels[id].classList.add('on');
@@ -1323,7 +1329,6 @@ function closeTool(fromPop){
   }
 }
 
-// Browser back → close tool (not leave page)
 window.addEventListener('popstate', () => {
   if(toolview.classList.contains('on')) closeTool(true);
 });
