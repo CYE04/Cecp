@@ -226,4 +226,4 @@ body{overflow-x:hidden;}
 }
 
 /* 双行歌词 */
-.sw-lyric2{display:block;font-size:13px;opacity:0.6;margin-top:2px;letter-spacing:.3px;}
+.sw-lyric2{display:block;opacity:0.55;margin-top:2px;}
