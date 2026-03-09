@@ -374,13 +374,12 @@
   });
 
   function attachSwipeBack(){
-    let startX=0,startY=0,dragging=false,active=false,isMouse=false;
+    let startX=0,startY=0,dragging=false,active=false,isMouse=false,pointerId=null;
     const overlay=$('ml-detail-overlay');
-    const maxShift=Math.min(window.innerWidth*0.38, 150);
+    const maxShift=Math.min(window.innerWidth*0.38,150);
 
     function begin(x,y,mouse){
       if(!detail.classList.contains('open')) return;
-      // Touch: only from left edge. Mouse: anywhere on panel
       if(!mouse && x>56) return;
       startX=x; startY=y; dragging=true; active=false; isMouse=!!mouse;
       detail.classList.add('swiping');
@@ -393,43 +392,52 @@
         if(dx>8 && Math.abs(dx)>Math.abs(dy)*1.2) active=true;
         else{ cancel(); return; }
       }
-      if(!active) return;
-      const shift=Math.max(0, Math.min(dx, maxShift));
+      const shift=Math.max(0,Math.min(dx,maxShift));
       detail.style.transform=`translateX(${shift}px)`;
-      overlay.style.opacity=String(Math.min(shift/maxShift, .9));
+      overlay.style.opacity=String(Math.min(shift/maxShift,.9));
     }
     function end(x){
       if(!dragging) return;
       const dx=x-startX;
-      const threshold=isMouse ? Math.max(50,window.innerWidth*0.1) : Math.max(70,window.innerWidth*0.18);
-      const shouldClose=active && dx>threshold;
+      const threshold=isMouse?Math.max(50,window.innerWidth*0.1):Math.max(70,window.innerWidth*0.18);
+      const shouldClose=active&&dx>threshold;
       detail.classList.remove('swiping');
       detail.style.transition='transform .22s ease';
       detail.style.transform=shouldClose?`translateX(${window.innerWidth}px)`:'';
       overlay.style.opacity=shouldClose?'1':'0';
       setTimeout(()=>{detail.style.transition=''; if(shouldClose) closeDetail(); else detail.style.transform='';},shouldClose?180:220);
-      dragging=false; active=false; isMouse=false;
+      dragging=false; active=false; isMouse=false; pointerId=null;
     }
-    function cancel(){dragging=false;active=false;isMouse=false;detail.classList.remove('swiping');detail.style.transform='';overlay.style.opacity='0';}
+    function cancel(){
+      dragging=false;active=false;isMouse=false;pointerId=null;
+      detail.classList.remove('swiping');detail.style.transform='';overlay.style.opacity='0';
+    }
 
     // Touch
     detail.addEventListener('touchstart',e=>{if(e.touches[0])begin(e.touches[0].clientX,e.touches[0].clientY,false);},{passive:true});
     detail.addEventListener('touchmove',e=>{if(e.touches[0])move(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
     detail.addEventListener('touchend',e=>{const t=e.changedTouches&&e.changedTouches[0];end(t?t.clientX:startX);},{passive:true});
 
-    // Mouse — setPointerCapture so drag outside element still works
+    // Mouse — don't capture immediately (breaks button clicks!)
+    // Instead track on document so pointerup outside still fires
     detail.addEventListener('pointerdown',e=>{
       if(e.pointerType!=='mouse') return;
-      try{detail.setPointerCapture(e.pointerId);}catch(_){}
+      // Don't intercept clicks on buttons, inputs, links
+      if(e.target.closest('button,input,a,select')) return;
+      pointerId=e.pointerId;
       begin(e.clientX,e.clientY,true);
     });
-    detail.addEventListener('pointermove',e=>{if(e.pointerType==='mouse') move(e.clientX,e.clientY);});
-    detail.addEventListener('pointerup',e=>{if(e.pointerType==='mouse') end(e.clientX);});
+    document.addEventListener('pointermove',e=>{
+      if(e.pointerType==='mouse'&&dragging&&isMouse) move(e.clientX,e.clientY);
+    });
+    document.addEventListener('pointerup',e=>{
+      if(e.pointerType==='mouse'&&dragging&&isMouse) end(e.clientX);
+    });
     detail.addEventListener('pointercancel',cancel);
 
     // Escape key
     document.addEventListener('keydown',e=>{
-      if(detail.classList.contains('open') && e.key==='Escape') closeDetail();
+      if(detail.classList.contains('open')&&e.key==='Escape') closeDetail();
     });
   }
 
