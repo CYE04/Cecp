@@ -1,3 +1,4 @@
+/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.2 */
 (function(){
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';

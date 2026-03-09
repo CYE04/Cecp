@@ -1,4 +1,5 @@
-/* CECP Music Library CSS v3.2 Halo Sync */
+/* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
+/* CECP Music Library CSS */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 #music-library *{box-sizing:border-box;margin:0;padding:0;}
@@ -26,6 +27,7 @@
   background:var(--bg);color:var(--text);min-height:100vh;
   -webkit-font-smoothing:antialiased;
   transition:background .25s ease,color .25s ease;
+  border-radius:20px;overflow:hidden;
 }
 
 @media(prefers-color-scheme:dark){
@@ -77,6 +79,7 @@ body{overflow-x:hidden;}
   padding:10px 10px;cursor:pointer;
   border-bottom:1px solid var(--border);
   border-radius:12px;
+  margin-bottom:2px;
   transition:transform .18s ease,background .18s ease,box-shadow .18s ease,opacity .12s ease;
   transform:translateY(0) scale(1);
 }
