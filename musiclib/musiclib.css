@@ -25,7 +25,6 @@
   --radius:14px;--radius-sm:10px;
   font-family:'Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-serif;
   background:var(--bg);color:var(--text);min-height:100vh;
-  border-radius:20px;overflow:hidden;
   -webkit-font-smoothing:antialiased;
   transition:background .25s ease,color .25s ease;
 }
@@ -225,3 +224,6 @@ body{overflow-x:hidden;}
   #music-library .sw-lyric{font-size:20px;}
   #music-library .ml-met{margin:0 12px 12px;}
 }
+
+/* 双行歌词 */
+.sw-lyric2{display:block;font-size:13px;opacity:0.6;margin-top:2px;letter-spacing:.3px;}

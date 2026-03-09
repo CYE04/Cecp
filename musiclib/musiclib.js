@@ -76,17 +76,16 @@
   function openLightbox(src){$('ml-lightbox-img').src=src;$('ml-lightbox').classList.add('open');}
 
   function closeDetail(fromPop){
-    // Always close the panel immediately
+    if(!fromPop && _detailStatePushed){
+      history.back();
+      return;
+    }
     destroyAP();
     stopMetronome();
     detail.classList.remove('open');
     detail.style.transform='';
     detail.classList.remove('swiping');
     $('ml-detail-overlay').style.opacity='0';
-    // Clean up history state if we pushed one
-    if(!fromPop && _detailStatePushed){
-      try{ history.back(); }catch(_){}
-    }
     _detailStatePushed=false;
   }
 
@@ -562,7 +561,9 @@
             segEl.appendChild(chord);
             if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
             const lyric=document.createElement('span');lyric.className='sw-lyric';lyric.textContent=seg.lyric||'';
-            segEl.appendChild(lyric);row.appendChild(segEl);
+            segEl.appendChild(lyric);
+            if(seg.lyric2){const ly2=document.createElement('span');ly2.className='sw-lyric sw-lyric2';ly2.textContent=seg.lyric2;segEl.appendChild(ly2);}
+            row.appendChild(segEl);
           }
           le.appendChild(row);se.appendChild(le);
         }
