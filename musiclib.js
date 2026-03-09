@@ -266,7 +266,18 @@
     return d;
   }
 
-  function destroyAP(){}
+  function loadAPlayer(cb){
+    if(_apLoaded){cb();return;}
+    if(window.APlayer){_apLoaded=true;cb();return;}
+    const css=document.createElement('link');css.rel='stylesheet';
+    css.href='https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css';
+    document.head.appendChild(css);
+    const js=document.createElement('script');
+    js.src='https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js';
+    js.onload=()=>{_apLoaded=true;cb();};
+    document.head.appendChild(js);
+  }
+  function destroyAP(){if(_ap){try{_ap.destroy();}catch(_){}_ap=null;}}
 
   const CHR=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
   const ENH={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
@@ -433,14 +444,10 @@
     const body=$('ml-detail-body');
     body.innerHTML='';
 
-    /* Cover hero — rounded, padded, not stuck to edge */
-    if(s.cover){
-      const heroWrap=document.createElement('div');heroWrap.id='ml-cover-hero';
-      const img=document.createElement('img');img.id='ml-cover-hero-img';
-      img.src=s.cover;img.alt=s.title||'';
-      img.onerror=()=>{heroWrap.style.display='none';};
-      heroWrap.appendChild(img);
-      body.appendChild(heroWrap);
+    if(s.mp3){
+      const apWrap=document.createElement('div');apWrap.id='ml-aplayer-top';
+      const apMount=document.createElement('div');apMount.id='ml-aplayer';
+      apWrap.appendChild(apMount);body.appendChild(apWrap);
     }
 
     const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
@@ -448,7 +455,14 @@
 
     const wrap=document.createElement('div');wrap.className='sw-wrap';
     const kPill=document.createElement('span');kPill.className='sw-pill sw-kpill';kPill.textContent='1 = '+curKey;
-    const infoDiv=document.createElement('div');
+
+    // Small cover thumbnail
+    const coverThumb=document.createElement(s.cover?'img':'div');
+    coverThumb.className='sw-cover-thumb';
+    if(s.cover){coverThumb.src=s.cover;coverThumb.alt=s.title||'';}
+    else{coverThumb.textContent='♪';}
+
+    const infoDiv=document.createElement('div');infoDiv.className='sw-info';
     infoDiv.innerHTML=`<div class="sw-eyebrow">Worship Song</div>
       <div class="sw-title">${s.title||''}</div>
       <div class="sw-sub">${s.sub||''}</div>`;
@@ -458,10 +472,13 @@
     if(s.bpm){const p=document.createElement('span');p.className='sw-pill';p.textContent='♩ = '+s.bpm;pillsDiv.appendChild(p);}
     infoDiv.appendChild(pillsDiv);
 
+    const titleRow=document.createElement('div');titleRow.className='sw-title-row';
+    titleRow.appendChild(coverThumb);titleRow.appendChild(infoDiv);
+
     const togBtn=document.createElement('button');togBtn.className='sw-tog';
     togBtn.innerHTML='<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg> 移调';
     const hd=document.createElement('div');hd.className='sw-hd';
-    hd.appendChild(infoDiv);hd.appendChild(togBtn);wrap.appendChild(hd);
+    hd.appendChild(titleRow);hd.appendChild(togBtn);wrap.appendChild(hd);
 
     const kg=document.createElement('div');kg.className='sw-kg';
     const capoEl=document.createElement('div');
@@ -568,6 +585,18 @@
       }
     }
     renderScore();
+
+    if(s.mp3){
+      loadAPlayer(()=>{
+        const mount=document.getElementById('ml-aplayer');if(!mount)return;
+        const mp3=s.mp3.startsWith('http')?s.mp3:'https://cecp.it'+s.mp3;
+        _ap=new window.APlayer({
+          container:mount,
+          audio:[{name:s.title||'',artist:s.artist||'',url:mp3,cover:s.cover||'',lrc:s.lrc||undefined}],
+          autoplay:false,theme:getComputedStyle(root).getPropertyValue('--halo-accent').trim()||'#0a84ff',lrcType:s.lrc?3:0,
+        });
+      });
+    }
 
     detail.classList.add('open');
     detail.scrollTop=0;
