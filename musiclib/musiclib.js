@@ -36,7 +36,7 @@
     <div id="ml-empty">
       <div id="ml-empty-icon">🎵</div>
       <div id="ml-empty-msg">找不到「<span id="ml-query-text"></span>」</div>
-      <div id="ml-empty-sub">还没有这首歌，可以微信联系 YuEn 申请添加</div>
+      <div id="ml-empty-sub">还没有这首歌，可以微信联系 YuEn 申请添加 (一首歌的耗时约在1~2小时)</div>
       <button id="ml-contact">💬 复制微信号 YuEn</button>
     </div>
     <div id="ml-detail">
