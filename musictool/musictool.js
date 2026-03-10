@@ -1099,6 +1099,7 @@ function renderNStr(nStr){
   }
   return div;
 }
+function renderPreview(){
   var wrap=document.getElementById('previewWrap');wrap.innerHTML='';
   data.forEach(function(sec){
     var ps=document.createElement('div');ps.className='prev-sec';
