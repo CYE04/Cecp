@@ -165,7 +165,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-lsec-name{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--ym-ink3);margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .sw-lsec-name::after{content:'';flex:1;height:1px;background:var(--ym-border)}
 .sw-lline{margin-bottom:12px}.sw-lline:last-child{margin-bottom:0}
-.sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow:visible}
 .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:1px;margin-bottom:5px}
 .sw-chord{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--ym-capo);margin-bottom:3px;min-height:15px;white-space:nowrap}
 .sw-chord.empty{visibility:hidden}
@@ -194,7 +194,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-metro input.mbpm{width:58px;font-size:15px;text-align:center;border-radius:9px;border:1px solid var(--ym-border);padding:3px 5px;background:var(--ym-soft);color:var(--ym-ink)}
 .sw-metro button{font-size:14px;padding:4px 10px;border-radius:9px;border:none;background:var(--ym-soft);cursor:pointer;color:var(--ym-ink)}
 .sw-metro .mstop-btn{background:var(--ym-ink);color:var(--ym-bg)}
-.sw-score{border-radius:16px;border:1px solid var(--ym-border);background:var(--ym-card);box-shadow:var(--ym-sh);overflow:hidden;overflow-x:auto;margin-top:4px}
+.sw-score{border-radius:16px;border:1px solid var(--ym-border);background:var(--ym-card);box-shadow:var(--ym-sh);overflow:visible;margin-top:4px}
 .sw-score-top{padding:10px 14px;border-bottom:1px solid var(--ym-border);display:flex;align-items:center;justify-content:space-between}
 .sw-score-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ym-ink3)}
 .sw-score-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--ym-ink2);background:var(--ym-soft);border:1px solid var(--ym-border);padding:2px 7px;border-radius:5px}
@@ -667,7 +667,23 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         lbDiv.appendChild(se);
       });
     }
+    function fitRows(){
+      requestAnimationFrame(function(){
+        lbDiv.querySelectorAll('.sw-lrow').forEach(function(row){
+          row.style.fontSize='';
+          var avail=row.parentElement.clientWidth;
+          var natural=row.scrollWidth;
+          if(natural>avail&&avail>0){
+            var base=parseFloat(getComputedStyle(row).fontSize)||22;
+            row.style.fontSize=(base*(avail/natural))+'px';
+          }
+        });
+      });
+    }
     renderScore();
+    fitRows();
+    var fitObs=new ResizeObserver(fitRows);
+    fitObs.observe(lbDiv);
     return wrap;
   }
 
