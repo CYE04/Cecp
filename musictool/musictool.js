@@ -285,17 +285,32 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
 
 
-/* 编辑器 A4 纸张背景 */
-#previewWrap{
-  background:rgba(255,255,255,0.03);
-  border-radius:6px;
-  border:1px solid rgba(255,255,255,0.08);
-  padding:12px 14px;
-  min-height:200px;
+/* 编辑器 A4 纸张背景 - 匹配帖子显示宽度 */
+#top-preview{
+  /* 稿纸横线背景 */
   background-image:repeating-linear-gradient(
-    transparent,transparent 31px,
-    rgba(255,255,255,0.04) 31px,rgba(255,255,255,0.04) 32px
+    to bottom,
+    transparent 0px, transparent 35px,
+    rgba(255,255,255,0.05) 35px, rgba(255,255,255,0.05) 36px
   );
+}
+#previewWrap{
+  /* 16px = sw-wrap padding, 16px = sw-lb padding → 总共32px per side，模拟帖子内容宽度 */
+  margin:0 32px;
+  padding:12px 0;
+  min-height:200px;
+  border-left:1px solid rgba(255,255,255,0.12);
+  border-right:1px solid rgba(255,255,255,0.12);
+  position:relative;
+}
+/* 左右边距标记 */
+#previewWrap::before{
+  content:'帖子内容区';
+  position:absolute;top:4px;right:4px;
+  font-size:8px;letter-spacing:1px;
+  color:rgba(255,255,255,0.2);
+  pointer-events:none;
+  font-family:monospace;
 }
 
 /* 预览 */
