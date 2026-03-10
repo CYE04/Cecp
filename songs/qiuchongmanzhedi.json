@@ -14,48 +14,48 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/qiuchongmanzhedi.lrc",
   "youtube": "https://youtu.be/xj7daezGohs?si=kJWTOELHorar5gou",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/qiuchongmanzhediF.jpg",
-  "sections": [
+ "sections": [
   {
     "name": "主歌",
     "lines": [
       [
-        {"chord":"","n":"0_","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"","n":"5_ 2'_ 1'_","lyric":"哦主感","lyric2":"ㅤ"},
-        {"chord":"","lyric":"||","lyric2":"||"},
-        {"chord":"Fadd2","n":"2'·_ ( 1'__ 1' )","lyric":"谢你，","lyric2":"谢你"},
-        {"chord":"","n":"2'_ 1'__ ( 1'__ 1'_ )","lyric":"创造这","lyric2":"创造这"},
-        {"chord":"","n":"3'_","lyric":"土｜","lyric2":"土｜"},
-        {"chord":"Am","n":"5 - 0_","lyric":"地，","lyric2":"地，"},
-        {"chord":"","n":"5_ 2'_ 1'_","lyric":"以永恒｜","lyric2":"以慈爱｜"},
-        {"chord":"Dm7","n":"7·_ ( 1'__ 1'·_ ) 1'__ 2'__ 1'__ ( 2'__ 2'_ ) ([ 3'_","lyric":"话 语ㅤ赐 下 无 限ㅤ生｜","lyric2":"浇灌,ㅤㅤ 以 喜 乐ㅤ耕｜"},
-        {"chord":"Am7","n":"]) 3'_ ( 5_ 5 )","lyric":"ㅤ 命，","lyric2":"ㅤ 耘，"}
+        {"chord":"","n":"0_","lyric":"ㅤ"},
+        {"chord":"","n":"5_ 2'_ 1'_","lyric":"哦主感"},
+        {"chord":"","lyric":"||"},
+        {"chord":"Fadd2","n":"2'·_ ( 1'__ 1' )","lyric":"谢你，"},
+        {"chord":"","n":"2'_ 1'__ ( 1'__ 1'_ )","lyric":"创造这"},
+        {"chord":"","n":"3'_","lyric":"土｜"},
+        {"chord":"Am","n":"5 - 0_","lyric":"地，"},
+        {"chord":"","n":"5_ 2'_ 1'_","lyric":"以永恒｜"},
+        {"chord":"Dm7","n":"7·_ ( 1'__ 1'·_ ) 1'__ 2'__ 1'__ ( 2'__ 2'_ ) ([ 3'_","lyric":"话 语ㅤ赐 下 无 限ㅤ生｜"},
+        {"chord":"Am7","n":"]) 3'_ ( 5_ 5 )","lyric":"ㅤ 命，"}
       ],
       [
-        {"chord":"","n":"0_","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"","n":"5_ 1'_ 5_","lyric":"用恩典｜","lyric2":"用无数｜"},
-        {"chord":"Bb","n":"5_ 6__ ( 6__ 6_ ) 7__","lyric":"的馨香ㅤ 气","lyric2":"的白昼ㅤ 黑"},
-        {"chord":"ㅤㅤC/Bb","n":"( 1'__ 1'_ )","lyric":"息","lyric2":"夜"},
-        {"chord":"","n":"7__ ( 6__ 6_ ) ( 5__ 6__ ) ([ sp","lyric":"祝福 ㅤ这ㅤ","lyric2":"孕育ㅤ 这"},
-        {"chord":"","lyric":"｜","lyric2":"｜"},
-        {"chord":"Am7","n":"]) 5_","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"ㅤㅤㅤㅤDm7","n":"( 5· sp 5 ) 0_","lyric":"地，","lyric2":"地，"},
-        {"chord":"","n":"3__ 4__","lyric":"让我｜","lyric2":"顺服｜"},
-        {"chord":"1","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"Gm7","n":"5_ 4__ ( 4__ 4 )","lyric":"们全心","lyric2":"ㅤ"},
-        {"chord":"Bb/F","n":"5_ 4__ ( 4__ 4_ )","lyric":"跟随你","lyric2":"ㅤ"},
-        {"chord":"","n":"3_","lyric":"带｜","lyric2":"ㅤ ｜"}
+        {"chord":"","n":"0_","lyric":"ㅤ"},
+        {"chord":"","n":"5_ 1'_ 5_","lyric":"用恩典｜"},
+        {"chord":"Bb","n":"5_ 6__ ( 6__ 6_ ) 7__","lyric":"的馨香ㅤ 气"},
+        {"chord":"ㅤㅤC/Bb","n":"( 1'__ 1'_ )","lyric":"息"},
+        {"chord":"","n":"7__ ( 6__ 6_ ) ( 5__ 6__ ) ([ sp","lyric":"祝福 ㅤ这ㅤ"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Am7","n":"]) 5_","lyric":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤDm7","n":"( 5· sp 5 ) 0_","lyric":"地，"},
+        {"chord":"","n":"3__ 4__","lyric":"让我｜"},
+        {"chord":"1","lyric":"ㅤ"},
+        {"chord":"Gm7","n":"5_ 4__ ( 4__ 4 )","lyric":"们全心"},
+        {"chord":"Bb/F","n":"5_ 4__ ( 4__ 4_ )","lyric":"跟随你"},
+        {"chord":"","n":"3_","lyric":"带｜"}
       ],
       [
         {"chord":"Eb","n":"2 -","lyric":"领。"},
         {"chord":"Bb/C","n":"0_","lyric":"ㅤ"},
         {"chord":"","n":"5_ 2'_ 1'_","lyric":"哦主感"},
-        {"chord":"1","lyric":"|","lyric2":"|"},
-        {"chord":"2","lyric":"|","lyric2":"|"},
+        {"chord":"1","lyric":"|"},
+        {"chord":"2","lyric":"|"},
         {"chord":"Gm7","n":"5_ 4__ ( 4__ 4·_ )","lyric":"的人情、"},
         {"chord":"","n":"5__","lyric":"感"},
         {"chord":"F/A","n":"6_ 5__ ( 6__ 6_ )","lyric":"恩的心"},
         {"chord":"","n":"5_","lyric":"情,"},
-        {"chord":"2","lyric":"|","lyric2":"|"},
+        {"chord":"2","lyric":"|"},
         {"chord":"Bb","n":"6_ 1'__ ( 1'__ 1'__ )","lyric":"现 在都"},
         {"chord":"ㅤㅤㅤ G/B","n":"6_ ( 1'__ sp 1'_ )","lyric":"只 愿"},
         {"chord":"","n":"6__ 6__ 3'_ 2'__ 1'__","lyric":"以 基督的 心｜"},
@@ -69,18 +69,18 @@
     "name": "副歌",
     "lines": [
       { "b": true, "line": [
-        {"chord":"","n":"]) 2' - 0_","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"【Chorus】","n":"5'_ 2''_ 1''_","lyric":"主,求你","lyric2":"ㅤ"},
-        {"chord":"","lyric":"｜","lyric2":"｜"},
-        {"chord":"F","n":"2'_ 1'__ ( 2'__ 2'_ )","lyric":"充满我","lyric2":"充满我"},
-        {"chord":"","n":"1'_","lyric":"们，","lyric2":"们，"},
-        {"chord":"","n":"2'_ 1'__ ( 2'__ 2'_ )","lyric":"来医治","lyric2":"来医治"},
-        {"chord":"","n":"([ 3'_","lyric":"这｜","lyric2":"这｜"},
-        {"chord":"Am7","n":"]) 3'_ 5· sp 0_","lyric":"地，","lyric2":"地，"},
-        {"chord":"","n":"5__ 5__ 2'_ 1'_","lyric":"痛苦疾病｜","lyric2":"全地看见｜"},
-        {"chord":"Dm7","n":"7_ 1'__ ( 1'__ 1' )","lyric":"要过去，","lyric2":"你荣耀、"},
-        {"chord":"","n":"2'_ 1'__ ( 2'__ 2'_ )","lyric":"神迹在","lyric2":"你复兴"},
-        {"chord":"","n":"([ 3'_","lyric":"运｜","lyric2":"降｜"}
+        {"chord":"","n":"]) 2' - 0_","lyric":"ㅤ"},
+        {"chord":"【Chorus】","n":"5'_ 2''_ 1''_","lyric":"主,求你"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"F","n":"2'_ 1'__ ( 2'__ 2'_ )","lyric":"充满我"},
+        {"chord":"","n":"1'_","lyric":"们，"},
+        {"chord":"","n":"2'_ 1'__ ( 2'__ 2'_ )","lyric":"来医治"},
+        {"chord":"","n":"([ 3'_","lyric":"这｜"},
+        {"chord":"Am7","n":"]) 3'_ 5· sp 0_","lyric":"地，"},
+        {"chord":"","n":"5__ 5__ 2'_ 1'_","lyric":"痛苦疾病｜"},
+        {"chord":"Dm7","n":"7_ 1'__ ( 1'__ 1' )","lyric":"要过去，"},
+        {"chord":"","n":"2'_ 1'__ ( 2'__ 2'_ )","lyric":"神迹在"},
+        {"chord":"","n":"([ 3'_","lyric":"运｜"}
       ]},
       { "b": true, "line": [
         {"chord":"1","lyric":"ㅤ"},
@@ -125,22 +125,17 @@
         {"chord":"C","n":"]) 2'","lyric":"ㅤ"},
         {"chord":"","n":"1' 1'_ 7_ 7_ ([ 1'_ ])","lyric":"为你而站立。｜"},
         {"chord":"F(Bb)","n":"]) 1' - -","lyric":"ㅤ"},
-        {"chord":"Fine","lyric":"ㅤㅤ｜"}
-      ]
-    ]
-  },
-  {
-    "name": "桥段",
-    "lines": [
-      [
+        {"chord":"Fine","lyric":"ㅤㅤ"},
         {"chord":"【Bridge】","n":"3'_ ([ 2'_","lyric":"一生｜"},
         {"chord":"1","lyric":"ㅤ"},
-        {"chord":"C/Bb","n":"]) 2' - -","lyric":"ㅤ"},
+        {"chord":"C/Bb","n":"]) 2' -","lyric":"ㅤ"},
         {"chord":"","n":"6_ ([ 5_","lyric":"祝福｜"},
         {"chord":"Am7","n":"]) 5·","lyric":"ㅤ"},
         {"chord":"","n":"( 5_ 5_ )","lyric":"永"},
         {"chord":"(跳到Coda处)","n":"3_ 2'_ ( 1'_ )","lyric":"不停息"},
-        {"chord":"1","lyric":"|"},
+        {"chord":"1","lyric":"|"}
+      ],
+      { "b": true, "line": [
         {"chord":"2","lyric":"|"},
         {"chord":"Bb","n":"( 1' ) ( - 1'_ )","lyric":"ㅤ"},
         {"chord":"","n":"3' ([ 2'_","lyric":"祝福｜"},
@@ -148,20 +143,20 @@
         {"chord":"Am7","n":"2'·","lyric":"ㅤ"},
         {"chord":"","n":"( 3'_ 3'_ ) 2'_","lyric":"永ㅤ 不"},
         {"chord":"","n":"2'_ ([ 1'_","lyric":"停息｜"},
-        {"chord":"Dm7","n":"]) 1' - -","lyric":"ㅤ"}
-      ],
-      [
+        {"chord":"Dm7","n":"]) 1' - -","lyric":"ㅤ"},
         {"chord":"","n":"6'_ ([ 1'_","lyric":"世代｜"},
         {"chord":"Gm7","n":"]) 1'·","lyric":"ㅤ"},
         {"chord":"","n":"1'_ 1'_ 6_ 3'_ ([ 2'_","lyric":"因你爱延续｜"},
         {"chord":"Csus4","n":"]) 2' -","lyric":"ㅤ"},
         {"chord":"","n":"1' 2'","lyric":"呼求｜"},
         {"chord":"F","n":"([ 3' - - -","lyric":"你。"},
-        {"chord":"","lyric":"｜"},
+        {"chord":"","lyric":"｜"}
+      ]},
+      { "b": true, "line": [
         {"chord":"","n":"]) 3' - - 1'_ ( 1'_","lyric":"ㅤ"},
         {"chord":"To Chorus","lyric":""},
         {"chord":"","lyric":"｜"}
-      ]
+      ]}
     ]
   }
 ]
