@@ -283,25 +283,22 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .copy-btn{margin-top:8px;width:100%;padding:8px;border-radius:6px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;}
 .copy-btn:hover{background:var(--accent);border-color:var(--accent);}
 
-/* 手机框预览 */
-#phone-frame{
-  display:inline-block;position:relative;
-  border:3px solid var(--border);border-radius:32px;
-  background:var(--panel2);
-  padding:44px 14px 28px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.25);
-  min-width:200px;max-width:100%;box-sizing:border-box;
+
+
+/* 编辑器背景参考线 */
+#previewWrap{position:relative;}
+#preview-bound{
+  position:absolute;top:0;bottom:0;right:0;
+  border-left:1px dashed rgba(255,180,0,0.35);
+  pointer-events:none;z-index:1;width:0;
 }
-#phone-frame::before{
-  content:'';position:absolute;top:16px;left:50%;transform:translateX(-50%);
-  width:48px;height:6px;border-radius:3px;background:var(--border);
+#preview-bound-label{
+  position:absolute;top:0;right:0;
+  font-size:8px;color:rgba(255,180,0,0.55);
+  white-space:nowrap;padding:2px 4px;
+  background:rgba(0,0,0,0.3);border-radius:0 0 0 4px;
+  pointer-events:none;z-index:2;
 }
-#phone-screen{
-  width:330px;max-width:100%;
-  background:var(--bg);border-radius:8px;overflow:hidden;
-  box-sizing:border-box;
-}
-#phone-wrap{padding:10px 12px;}
 
 /* 预览 */
 .prev-sec{margin-bottom:20px;}
@@ -362,7 +359,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 </div>
 
 <div class="top-area">
-  <div class="top-panel on" id="top-preview"><div id="phone-frame"><div id="phone-screen"><div id="phone-wrap"><div id="previewWrap"></div></div></div></div></div>
+  <div class="top-panel on" id="top-preview"><div id="previewWrap"></div></div>
   <div class="top-panel" id="top-code">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
       <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">ID（文件名）
@@ -1118,20 +1115,6 @@ function renderNStr(nStr){
       ps.appendChild(row);
     });
     wrap.appendChild(ps);
-  });
-  // fit preview rows to phone-screen width
-  requestAnimationFrame(function(){
-    var phoneScreen=document.getElementById('phone-screen');
-    if(!phoneScreen)return;
-    var avail=phoneScreen.clientWidth - 24; // minus phone-wrap padding
-    document.getElementById('previewWrap').querySelectorAll('.prev-row').forEach(function(row){
-      row.style.fontSize='';
-      var natural=row.scrollWidth;
-      if(natural>avail&&avail>0){
-        var base=parseFloat(getComputedStyle(row).fontSize)||15;
-        row.style.fontSize=(base*(avail/natural))+'px';
-      }
-    });
   });
   renderCode();
 }
