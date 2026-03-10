@@ -172,7 +172,7 @@ const jianpuHTML = `<!DOCTYPE html>
   --accent:#7c6af7;--accent2:#a89af9;--red:#f27c6a;--green:#6af2a8;--sel:#f0c040;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden;display:flex;flex-direction:column;overscroll-behavior:none;touch-action:pan-y;}
+body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
 .topbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
@@ -183,7 +183,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .top-tab.on{background:var(--accent);color:#fff;border-color:var(--accent);}
 
 .top-area{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
-.top-panel{flex:1;overflow-y:auto;padding:14px 16px;display:none;}
+.top-panel{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 16px;display:none;position:relative;}
 .top-panel.on{display:block;}
 
 .bottom-area{height:52vh;display:flex;flex-shrink:0;border-top:1px solid var(--border2);}
@@ -283,6 +283,26 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .copy-btn{margin-top:8px;width:100%;padding:8px;border-radius:6px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;}
 .copy-btn:hover{background:var(--accent);border-color:var(--accent);}
 
+/* 手机框预览 */
+#phone-frame{
+  display:inline-block;position:relative;
+  border:3px solid var(--border);border-radius:32px;
+  background:var(--panel2);
+  padding:44px 14px 28px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.25);
+  min-width:200px;max-width:100%;box-sizing:border-box;
+}
+#phone-frame::before{
+  content:'';position:absolute;top:16px;left:50%;transform:translateX(-50%);
+  width:48px;height:6px;border-radius:3px;background:var(--border);
+}
+#phone-screen{
+  width:330px;max-width:100%;
+  background:var(--bg);border-radius:8px;overflow:hidden;
+  box-sizing:border-box;
+}
+#phone-wrap{padding:10px 12px;}
+
 /* 预览 */
 .prev-sec{margin-bottom:20px;}
 .prev-sec-name{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
@@ -294,7 +314,6 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
 .p-lyric{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink2);}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
-.p-lyric2{font-size:15px;opacity:0.55;margin-top:0;}
 
 /* 音符结构 */
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
@@ -343,7 +362,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 </div>
 
 <div class="top-area">
-  <div class="top-panel on" id="top-preview"><div id="previewWrap"></div></div>
+  <div class="top-panel on" id="top-preview"><div id="phone-frame"><div id="phone-screen"><div id="phone-wrap"><div id="previewWrap"></div></div></div></div></div>
   <div class="top-panel" id="top-code">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
       <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">ID（文件名）
@@ -947,16 +966,11 @@ function renderEditor(){
         tf.appendChild(endSpan);
         tdN.appendChild(tf);tr.appendChild(tdN);
 
-        // 歌词（上行 + 可选下行）
-        var tdL=document.createElement('td');tdL.style.cssText='vertical-align:middle;';
+        // 歌词
+        var tdL=document.createElement('td');
         var inpL=document.createElement('input');inpL.className='inp-lyric';inpL.value=seg.lyric||'';
-        inpL.style.display='block';
         inpL.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric=this.value;renderPreview();};})(si,li,gi);
-        tdL.appendChild(inpL);
-        var inpL2=document.createElement('input');inpL2.className='inp-lyric';inpL2.value=seg.lyric2||'';
-        inpL2.placeholder='下行…';inpL2.style.cssText='display:block;margin-top:2px;opacity:0.6;';
-        inpL2.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric2=this.value;renderPreview();};})(si,li,gi);
-        tdL.appendChild(inpL2);tr.appendChild(tdL);
+        tdL.appendChild(inpL);tr.appendChild(tdL);
 
         // 删除
         var tdD=document.createElement('td');
@@ -1088,7 +1102,6 @@ function renderNStr(nStr){
   }
   return div;
 }
-function renderPreview(){
   var wrap=document.getElementById('previewWrap');wrap.innerHTML='';
   data.forEach(function(sec){
     var ps=document.createElement('div');ps.className='prev-sec';
@@ -1100,12 +1113,25 @@ function renderPreview(){
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\\u00a0';s.appendChild(c);
         if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
-        if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
         row.appendChild(s);
       });
       ps.appendChild(row);
     });
     wrap.appendChild(ps);
+  });
+  // fit preview rows to phone-screen width
+  requestAnimationFrame(function(){
+    var phoneScreen=document.getElementById('phone-screen');
+    if(!phoneScreen)return;
+    var avail=phoneScreen.clientWidth - 24; // minus phone-wrap padding
+    document.getElementById('previewWrap').querySelectorAll('.prev-row').forEach(function(row){
+      row.style.fontSize='';
+      var natural=row.scrollWidth;
+      if(natural>avail&&avail>0){
+        var base=parseFloat(getComputedStyle(row).fontSize)||15;
+        row.style.fontSize=(base*(avail/natural))+'px';
+      }
+    });
   });
   renderCode();
 }
@@ -1126,7 +1152,6 @@ function renderCode(){
         var obj={chord:seg.chord||''};
         if(seg.n&&seg.n.trim())obj.n=seg.n;
         obj.lyric=seg.lyric||'';
-        if(seg.lyric2)obj.lyric2=seg.lyric2;
         lines.push('        '+JSON.stringify(obj)+(lastSeg?'':','));
       });
       lines.push(line.bold?'      ]}'+(!lastLine?',':''):'      ]'+(!lastLine?',':''));
@@ -1136,7 +1161,6 @@ function renderCode(){
   });
   lines.push(']');
   document.getElementById('codeBox').textContent=lines.join('\\n');
-  try{localStorage.setItem('jianpu_autosave',JSON.stringify(data));}catch(_){}
 }
 function copyCode(){
   navigator.clipboard.writeText(document.getElementById('codeBox').textContent).then(function(){
@@ -1289,13 +1313,7 @@ function doImport(){
 }
 document.getElementById('importOverlay').addEventListener('click',function(e){if(e.target===this)closeImport();});
 
-/* 初始化：从自动保存恢复 */
-(function(){
-  try{
-    var saved=localStorage.getItem('jianpu_autosave');
-    if(saved){ var d=JSON.parse(saved); if(Array.isArray(d)&&d.length>0) data=d; }
-  }catch(_){}
-})();
+/* 初始化 */
 refreshTupletBtns();
 renderEditor();
 </script>
@@ -1306,7 +1324,6 @@ function openTool(id, name){
   navName.textContent = name;
   hub.style.display = 'none';
   toolview.classList.add('on');
-  history.pushState({__mtTool: id}, '');
   Object.values(panels).forEach(p => p.classList.remove('on'));
   panels[id].classList.add('on');
   if(id === 'lrc' && !localStorage.getItem(TUT_KEY)) setTimeout(tutOpen, 400);
@@ -1319,19 +1336,12 @@ function openTool(id, name){
     }
   }
 }
-function closeTool(fromPop){
+function closeTool(){
   toolview.classList.remove('on');
   hub.style.display = '';
   audio.pause();
   updatePlayBtn();
-  if(!fromPop && history.state && history.state.__mtTool){
-    try{ history.back(); }catch(_){}
-  }
 }
-
-window.addEventListener('popstate', () => {
-  if(toolview.classList.contains('on')) closeTool(true);
-});
 
 $('mt-card-lrc').onclick = () => openTool('lrc','歌词编辑器');
 $('mt-card-jf').onclick  = () => openTool('jf','简谱编辑器');
