@@ -286,8 +286,10 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
 
 /* 编辑器 A4 纸张背景 - 匹配帖子显示宽度 */
+/* 帖子 sw-wrap+sw-lb = 各16px padding，共32px per side
+   top-panel 已有 16px padding per side
+   所以 previewWrap margin = 32-16 = 16px per side */
 #top-preview{
-  /* 稿纸横线背景 */
   background-image:repeating-linear-gradient(
     to bottom,
     transparent 0px, transparent 35px,
@@ -295,15 +297,13 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
   );
 }
 #previewWrap{
-  /* 16px = sw-wrap padding, 16px = sw-lb padding → 总共32px per side，模拟帖子内容宽度 */
-  margin:0 32px;
+  margin:0 16px;
   padding:12px 0;
   min-height:200px;
-  border-left:1px solid rgba(255,255,255,0.12);
-  border-right:1px solid rgba(255,255,255,0.12);
+  border-left:1px solid rgba(255,255,255,0.15);
+  border-right:1px solid rgba(255,255,255,0.15);
   position:relative;
 }
-/* 左右边距标记 */
 #previewWrap::before{
   content:'帖子内容区';
   position:absolute;top:4px;right:4px;
