@@ -670,12 +670,21 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     function fitRows(){
       requestAnimationFrame(function(){
         lbDiv.querySelectorAll('.sw-lrow').forEach(function(row){
-          row.style.fontSize='';
+          row.style.transform='';row.style.transformOrigin='';
           var avail=row.parentElement.clientWidth;
+          if(!avail)return;
+          row.style.display='inline-flex';
           var natural=row.scrollWidth;
-          if(natural>avail&&avail>0){
-            var base=parseFloat(getComputedStyle(row).fontSize)||22;
-            row.style.fontSize=(base*(avail/natural))+'px';
+          row.style.display='';
+          if(natural>avail){
+            var scale=avail/natural;
+            row.style.transform='scaleX('+scale+')';
+            row.style.transformOrigin='left center';
+            row.style.width=natural+'px';
+            row.parentElement.style.overflow='hidden';
+          } else {
+            row.style.width='';
+            row.parentElement.style.overflow='';
           }
         });
       });
