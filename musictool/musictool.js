@@ -297,17 +297,13 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
   );
 }
 #previewWrap{
-  margin:0 16px; /* 桌面: sw-wrap(16)+sw-lb(16)-panel(16)=16px */
+  width:426px; /* 手机竖屏实测 sw-lb 宽度 */
+  max-width:calc(100% - 28px); /* 小于426px时贴边 */
   padding:12px 0;
   min-height:200px;
   border-left:1px solid rgba(255,255,255,0.15);
   border-right:1px solid rgba(255,255,255,0.15);
   position:relative;
-}
-@media(max-width:768px){
-  #previewWrap{
-    margin:0 12px; /* 手机: sw-wrap(12)+sw-lb(16)-panel(16)=12px */
-  }
 }
 #previewWrap::before{
   content:'帖子内容区';
