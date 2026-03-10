@@ -104,8 +104,6 @@ body{overflow-x:hidden;}
 
 /* ══════════ DETAIL PANEL ══════════ */
 #ml-detail{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y;}
-#ml-detail .sw-score{overflow-x:auto;}
-#ml-detail .sw-score-body{overflow-x:auto;}
 #ml-detail.open{display:block;animation:ml-detail-in .24s ease;}
 @keyframes ml-detail-in{from{opacity:.01;transform:translateX(18px)}to{opacity:1;transform:none}}
 #ml-detail.swiping{transition:none!important;}
@@ -179,7 +177,7 @@ body{overflow-x:hidden;}
 #music-library .yt-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:#ff0000;text-decoration:none;box-shadow:0 2px 8px rgba(255,0,0,.3);transition:transform .15s,box-shadow .15s;}
 #music-library .yt-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,0,0,.4);}
 #music-library .yt-btn svg{width:16px;height:16px;fill:#fff;}
-#music-library .sw-score{margin:16px 0 20px;border-radius:14px;border:1px solid var(--border);background:var(--bg2);overflow:hidden;overflow-x:auto;box-shadow:var(--shadow);}
+#music-library .sw-score{margin:16px 0 20px;border-radius:14px;border:1px solid var(--border);background:var(--bg2);overflow:hidden;box-shadow:var(--shadow);}
 #music-library .sw-score-top{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 #music-library .sw-score-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);}
 #music-library .sw-score-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);padding:2px 7px;border-radius:5px;}
@@ -191,7 +189,7 @@ body{overflow-x:hidden;}
 #music-library .sw-lsec-name::after{content:'';flex:1;height:1px;background:var(--border);}
 #music-library .sw-lline{margin-bottom:12px;}
 #music-library .sw-lline:last-child{margin-bottom:0;}
-#music-library .sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow-x:auto;}
+#music-library .sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow:visible;}
 #music-library .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:1px;margin-bottom:5px;}
 #music-library .sw-chord{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);margin-bottom:3px;min-height:15px;white-space:nowrap;}
 #music-library .sw-chord.empty{visibility:hidden;}
