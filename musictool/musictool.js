@@ -285,19 +285,17 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
 
 
-/* 编辑器背景参考线 */
-#previewWrap{position:relative;}
-#preview-bound{
-  position:absolute;top:0;bottom:0;right:0;
-  border-left:1px dashed rgba(255,180,0,0.35);
-  pointer-events:none;z-index:1;width:0;
-}
-#preview-bound-label{
-  position:absolute;top:0;right:0;
-  font-size:8px;color:rgba(255,180,0,0.55);
-  white-space:nowrap;padding:2px 4px;
-  background:rgba(0,0,0,0.3);border-radius:0 0 0 4px;
-  pointer-events:none;z-index:2;
+/* 编辑器 A4 纸张背景 */
+#previewWrap{
+  background:rgba(255,255,255,0.03);
+  border-radius:6px;
+  border:1px solid rgba(255,255,255,0.08);
+  padding:12px 14px;
+  min-height:200px;
+  background-image:repeating-linear-gradient(
+    transparent,transparent 31px,
+    rgba(255,255,255,0.04) 31px,rgba(255,255,255,0.04) 32px
+  );
 }
 
 /* 预览 */
