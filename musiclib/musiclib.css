@@ -5,6 +5,7 @@
 #music-library *{box-sizing:border-box;margin:0;padding:0;}
 
 #music-library{
+  border-radius:20px;overflow:hidden;
   --halo-bg:#f5f5f7;
   --halo-bg2:#ffffff;
   --halo-bg3:#e8e8ed;
@@ -225,5 +226,7 @@ body{overflow-x:hidden;}
   #music-library .ml-met{margin:0 12px 12px;}
 }
 
+/* 鼠标拖拽 */
+#ml-detail.swiping{user-select:none;cursor:grabbing;}
 /* 双行歌词 */
 .sw-lyric2{display:block;opacity:0.55;margin-top:2px;}
