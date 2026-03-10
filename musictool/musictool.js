@@ -297,8 +297,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
   );
 }
 #previewWrap{
-  width:426px; /* 手机竖屏实测 sw-lb 宽度 */
-  max-width:calc(100% - 28px); /* 小于426px时贴边 */
+  width:694px; /* 平板竖屏(768px)实测 sw-lb 宽度 */
+  max-width:calc(100% - 2px);
   padding:12px 0;
   min-height:200px;
   border-left:1px solid rgba(255,255,255,0.15);
