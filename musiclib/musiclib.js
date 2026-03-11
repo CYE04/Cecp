@@ -439,6 +439,7 @@
   function destroyAP(){ _mpAudio.pause(); }
 
   /* ── Compact Minibar (list page) ── */
+  let _mbCoverSrc = '';
   function _mbUpdate(){
     const bar = document.getElementById('ml-minibar');
     if(!bar) return;
@@ -453,9 +454,16 @@
     if(song){
       if(title) title.textContent = song.title||'';
       if(artist) artist.textContent = song.artist||'';
-      if(cover){
-        if(song.cover){ cover.style.backgroundImage='url('+song.cover+')'; cover.textContent=''; }
-        else { cover.style.backgroundImage=''; cover.textContent='♪'; }
+      if(cover && song.cover !== _mbCoverSrc){
+        _mbCoverSrc = song.cover||'';
+        if(song.cover){
+          cover.innerHTML='';
+          const img=document.createElement('img');
+          img.src=song.cover; img.alt='';
+          cover.appendChild(img);
+        } else {
+          cover.innerHTML='♪';
+        }
       }
       bar.classList.add('active');
     }
