@@ -36,7 +36,7 @@
     <div id="ml-empty">
       <div id="ml-empty-icon">🎵</div>
       <div id="ml-empty-msg">找不到「<span id="ml-query-text"></span>」</div>
-      <div id="ml-empty-sub">还没有这首歌，可以微信联系 YuEn 申请添加 (一首歌的耗时约在1~2小时)</div>
+      <div id="ml-empty-sub">还没有这首歌，可以微信联系 YuEn 申请添加</div>
       <button id="ml-contact">💬 复制微信号 YuEn</button>
     </div>
     <div id="ml-detail">
@@ -571,21 +571,25 @@
     function fitRows(){
       requestAnimationFrame(function(){
         lbDiv.querySelectorAll('.sw-lrow').forEach(function(row){
-          row.style.transform='';row.style.transformOrigin='';
+          row.style.transform='';row.style.transformOrigin='';row.style.marginBottom='';
           var avail=row.parentElement.clientWidth;
           if(!avail)return;
-          row.style.display='inline-flex'; // measure natural width
+          row.style.display='inline-flex';
           var natural=row.scrollWidth;
           row.style.display='';
           if(natural>avail){
             var scale=avail/natural;
-            row.style.transform='scaleX('+scale+')';
-            row.style.transformOrigin='left center';
-            // prevent row from taking up natural height space
+            // 等比缩放，像图片一样
+            row.style.transform='scale('+scale+')';
+            row.style.transformOrigin='left top';
             row.style.width=natural+'px';
+            // 补偿高度（scale后元素实际占用高度减少，需要负margin）
+            var naturalH=row.offsetHeight;
+            row.style.marginBottom=(naturalH*(scale-1))+'px';
             row.parentElement.style.overflow='hidden';
           } else {
             row.style.width='';
+            row.style.marginBottom='';
             row.parentElement.style.overflow='';
           }
         });
