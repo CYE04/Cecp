@@ -21,30 +21,22 @@
   let _detailStatePushed=false;
 
   root.innerHTML=`
-    <div id="ml-miniplayer">
-      <div id="ml-mp-cover-wrap">
-        <div id="ml-mp-cover">♪</div>
-        <div id="ml-mp-lrc-scroll">
-          <div id="ml-mp-lrc-inner"></div>
-        </div>
+    <div id="ml-minibar">
+      <div id="ml-mb-cover"></div>
+      <div id="ml-mb-info">
+        <div id="ml-mb-title">未播放</div>
+        <div id="ml-mb-artist"></div>
       </div>
-      <div id="ml-mp-info">
-        <div id="ml-mp-title">未播放</div>
-        <div id="ml-mp-artist"></div>
+      <div id="ml-mb-controls">
+        <button id="ml-mb-prev">⏮</button>
+        <button id="ml-mb-playpause">▶</button>
+        <button id="ml-mb-next">⏭</button>
       </div>
-      <div id="ml-mp-controls">
-        <button id="ml-mp-prev" title="上一首">⏮</button>
-        <button id="ml-mp-playpause" title="播放/暂停">▶</button>
-        <button id="ml-mp-next" title="下一首">⏭</button>
+      <div id="ml-mb-right">
+        <div id="ml-mb-progress-bar"><div id="ml-mb-progress-fill"></div></div>
+        <div id="ml-mb-times"><span id="ml-mb-cur">0:00</span><span id="ml-mb-dur">0:00</span></div>
+        <input id="ml-mb-vol" type="range" min="0" max="1" step="0.02" value="1">
       </div>
-      <div id="ml-mp-right">
-        <div id="ml-mp-progress-wrap">
-          <div id="ml-mp-progress-bar"><div id="ml-mp-progress-fill"></div></div>
-          <div id="ml-mp-times"><span id="ml-mp-cur">0:00</span><span id="ml-mp-dur">0:00</span></div>
-        </div>
-        <input id="ml-mp-vol" type="range" min="0" max="1" step="0.02" value="1" title="音量">
-      </div>
-      <audio id="ml-mp-audio"></audio>
     </div>
     <div id="ml-header">
       <div id="ml-header-top">
@@ -70,6 +62,33 @@
       <div id="ml-detail-header">
         <button id="ml-back">‹ 返回</button>
         <div id="ml-detail-title"></div>
+      </div>
+      <div id="ml-miniplayer">
+        <audio id="ml-mp-audio"></audio>
+        <div id="ml-mp-stage">
+          <div id="ml-mp-cover-wrap">
+            <div id="ml-mp-cover"><span>♪</span></div>
+          </div>
+          <div id="ml-mp-lrc-panel">
+            <div id="ml-mp-lrc-inner"></div>
+          </div>
+        </div>
+        <div id="ml-mp-bottom">
+          <div id="ml-mp-info">
+            <div id="ml-mp-title"></div>
+            <div id="ml-mp-artist"></div>
+          </div>
+          <div id="ml-mp-controls">
+            <button id="ml-mp-prev">⏮</button>
+            <button id="ml-mp-playpause">▶</button>
+            <button id="ml-mp-next">⏭</button>
+          </div>
+          <div id="ml-mp-right">
+            <div id="ml-mp-progress-bar"><div id="ml-mp-progress-fill"></div></div>
+            <div id="ml-mp-times"><span id="ml-mp-cur">0:00</span><span id="ml-mp-dur">0:00</span></div>
+            <input id="ml-mp-vol" type="range" min="0" max="1" step="0.02" value="1">
+          </div>
+        </div>
       </div>
       <div id="ml-detail-body"></div>
     </div>
@@ -308,14 +327,10 @@
 
   /* ── Mini Player ── */
   const _mpAudio = document.getElementById('ml-mp-audio');
-  let _mpSongs = [];       // current playlist order
-  let _mpIdx = -1;         // current song index in _mpSongs
-  let _mpLrc = [];         // [{time, text}]
-  let _mpLrcIdx = -1;
-  let _mpActive = false;
+  let _mpSongs = [], _mpIdx = -1, _mpLrc = [], _mpLrcIdx = -1;
 
   function _mpFmt(s){
-    const m=Math.floor(s/60), ss=Math.floor(s%60);
+    const m=Math.floor(s/60),ss=Math.floor(s%60);
     return m+':'+(ss<10?'0':'')+ss;
   }
   function _mpParseLrc(text){
@@ -324,8 +339,7 @@
       const m=l.match(/^\[(\d+):(\d+\.\d+)\](.*)/);
       if(m) lines.push({time:parseInt(m[1])*60+parseFloat(m[2]),text:m[3].trim()});
     });
-    lines.sort((a,b)=>a.time-b.time);
-    return lines;
+    return lines.sort((a,b)=>a.time-b.time);
   }
   function _mpHighlightLrc(){
     if(!_mpLrc.length) return;
@@ -334,11 +348,26 @@
     _mpLrc.forEach((l,i)=>{ if(l.time<=t) idx=i; });
     if(idx===_mpLrcIdx) return;
     _mpLrcIdx=idx;
-    const inner=document.getElementById('ml-mp-lrc-inner');
-    if(!inner) return;
-    const rows=inner.querySelectorAll('.ml-mp-lrc-line');
-    rows.forEach((r,i)=>r.classList.toggle('active',i===idx));
-    if(idx>=0 && rows[idx]) rows[idx].scrollIntoView({block:'center',behavior:'smooth'});
+    document.querySelectorAll('.ml-mp-lrc-line').forEach((r,i)=>r.classList.toggle('active',i===idx));
+    if(idx>=0){
+      const el=document.querySelectorAll('.ml-mp-lrc-line')[idx];
+      if(el) el.scrollIntoView({block:'center',behavior:'smooth'});
+    }
+  }
+  function _mpSetState(playing){
+    // playing=true: cover slides left, lyrics appear
+    // playing=false (initial/paused first time): cover center
+    // once played, always stay in played layout
+    const stage=document.getElementById('ml-mp-stage');
+    if(!stage) return;
+    if(playing) stage.classList.add('playing');
+    // never remove 'playing' class after first play
+  }
+  function _mpSetCover(src){
+    const c=document.getElementById('ml-mp-cover');
+    if(!c) return;
+    if(src){ const img=new Image(); img.src=src; img.alt=''; c.innerHTML=''; c.appendChild(img); }
+    else { c.innerHTML='<span>♪</span>'; }
   }
   function _mpRenderLrc(){
     const inner=document.getElementById('ml-mp-lrc-inner');
@@ -352,55 +381,39 @@
       inner.appendChild(d);
     });
   }
-  function _mpSetCover(src){
-    const cover=document.getElementById('ml-mp-cover');
-    if(!cover) return;
-    if(src){
-      cover.innerHTML='';
-      const img=document.createElement('img');
-      img.src=src; img.alt='cover';
-      cover.appendChild(img);
-    } else {
-      cover.innerHTML='♪';
-    }
-  }
-  function _mpShowLrc(show){
-    const wrap=document.getElementById('ml-mp-cover-wrap');
-    if(wrap) wrap.classList.toggle('lrc-mode', show);
-  }
   function _mpLoadSong(song){
-    _mpActive=true;
     _mpLrc=[]; _mpLrcIdx=-1;
-    document.getElementById('ml-mp-title').textContent=song.title||'';
-    document.getElementById('ml-mp-artist').textContent=song.artist||'';
+    const titleEl=document.getElementById('ml-mp-title');
+    const artistEl=document.getElementById('ml-mp-artist');
+    if(titleEl) titleEl.textContent=song.title||'';
+    if(artistEl) artistEl.textContent=song.artist||'';
     _mpSetCover(song.cover||null);
-    _mpShowLrc(false);
-    _mpAudio.src=song.mp3||'';
+    // reset stage: cover back to center for new song
+    const stage=document.getElementById('ml-mp-stage');
+    if(stage) stage.classList.remove('playing');
     const inner=document.getElementById('ml-mp-lrc-inner');
     if(inner) inner.innerHTML='';
-    // load LRC
+    // show/hide detail player based on mp3
+    const detailPlayer=document.getElementById('ml-miniplayer');
+    if(detailPlayer) detailPlayer.classList.toggle('has-mp3', !!song.mp3);
+    _mpAudio.src=song.mp3||'';
     if(song.lrc){
       fetch(song.lrc).then(r=>r.text()).then(text=>{
         _mpLrc=_mpParseLrc(text);
         _mpRenderLrc();
-        // show lrc only after a short delay when audio starts playing
-        const showLrcOnPlay = ()=>{ _mpShowLrc(true); _mpAudio.removeEventListener('timeupdate',showLrcOnPlay); };
-        _mpAudio.addEventListener('timeupdate', showLrcOnPlay);
       }).catch(()=>{});
     }
-    document.getElementById('ml-miniplayer').classList.add('active');
-    _mpAudio.play().catch(()=>{});
+    if(song.mp3) _mpAudio.play().catch(()=>{});
   }
   function _mpPlayIdx(idx){
     if(idx<0||idx>=_mpSongs.length) return;
-    _mpIdx=idx;
-    _mpLoadSong(_mpSongs[idx]);
+    _mpIdx=idx; _mpLoadSong(_mpSongs[idx]);
   }
   function _mpUpdateProgress(){
-    const dur=_mpAudio.duration||0;
-    const cur=_mpAudio.currentTime||0;
-    document.getElementById('ml-mp-cur').textContent=_mpFmt(cur);
-    document.getElementById('ml-mp-dur').textContent=_mpFmt(dur);
+    const dur=_mpAudio.duration||0, cur=_mpAudio.currentTime||0;
+    const c=document.getElementById('ml-mp-cur'),d=document.getElementById('ml-mp-dur');
+    if(c) c.textContent=_mpFmt(cur);
+    if(d) d.textContent=_mpFmt(dur);
     const fill=document.getElementById('ml-mp-progress-fill');
     if(fill) fill.style.width=(dur?cur/dur*100:0)+'%';
     _mpHighlightLrc();
@@ -410,24 +423,13 @@
     if(btn) btn.textContent=_mpAudio.paused?'▶':'⏸';
   }
   _mpAudio.addEventListener('timeupdate',_mpUpdateProgress);
-  _mpAudio.addEventListener('play',_mpUpdateBtn);
+  _mpAudio.addEventListener('play',()=>{ _mpSetState(true); _mpUpdateBtn(); });
   _mpAudio.addEventListener('pause',_mpUpdateBtn);
-  _mpAudio.addEventListener('ended',()=>{
-    if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1);
-    else _mpUpdateBtn();
-  });
-  document.getElementById('ml-mp-playpause').onclick=()=>{
-    _mpAudio.paused?_mpAudio.play():_mpAudio.pause();
-  };
-  document.getElementById('ml-mp-prev').onclick=()=>{
-    if(_mpIdx>0) _mpPlayIdx(_mpIdx-1);
-  };
-  document.getElementById('ml-mp-next').onclick=()=>{
-    if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1);
-  };
-  document.getElementById('ml-mp-vol').oninput=e=>{
-    _mpAudio.volume=parseFloat(e.target.value);
-  };
+  _mpAudio.addEventListener('ended',()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); else _mpUpdateBtn(); });
+  document.getElementById('ml-mp-playpause').onclick=()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
+  document.getElementById('ml-mp-prev').onclick=()=>{ if(_mpIdx>0)_mpPlayIdx(_mpIdx-1); };
+  document.getElementById('ml-mp-next').onclick=()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); };
+  document.getElementById('ml-mp-vol').oninput=e=>{ _mpAudio.volume=parseFloat(e.target.value); };
   document.getElementById('ml-mp-progress-bar').onclick=e=>{
     if(!_mpAudio.duration) return;
     const r=e.currentTarget.getBoundingClientRect();
@@ -435,6 +437,46 @@
   };
 
   function destroyAP(){ _mpAudio.pause(); }
+
+  /* ── Compact Minibar (list page) ── */
+  function _mbUpdate(){
+    const bar = document.getElementById('ml-minibar');
+    if(!bar) return;
+    const title = document.getElementById('ml-mb-title');
+    const artist = document.getElementById('ml-mb-artist');
+    const cover = document.getElementById('ml-mb-cover');
+    const btn = document.getElementById('ml-mb-playpause');
+    const fill = document.getElementById('ml-mb-progress-fill');
+    const cur = document.getElementById('ml-mb-cur');
+    const dur = document.getElementById('ml-mb-dur');
+    const song = _mpSongs[_mpIdx];
+    if(song){
+      if(title) title.textContent = song.title||'';
+      if(artist) artist.textContent = song.artist||'';
+      if(cover){
+        if(song.cover){ cover.style.backgroundImage='url('+song.cover+')'; cover.textContent=''; }
+        else { cover.style.backgroundImage=''; cover.textContent='♪'; }
+      }
+      bar.classList.add('active');
+    }
+    if(btn) btn.textContent = _mpAudio.paused ? '▶' : '⏸';
+    const d = _mpAudio.duration||0, t = _mpAudio.currentTime||0;
+    if(fill) fill.style.width = (d ? t/d*100 : 0)+'%';
+    if(cur) cur.textContent = _mpFmt(t);
+    if(dur) dur.textContent = _mpFmt(d);
+  }
+  _mpAudio.addEventListener('play', _mbUpdate);
+  _mpAudio.addEventListener('pause', _mbUpdate);
+  _mpAudio.addEventListener('timeupdate', _mbUpdate);
+  document.getElementById('ml-mb-playpause').onclick = ()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
+  document.getElementById('ml-mb-prev').onclick = ()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1); };
+  document.getElementById('ml-mb-next').onclick = ()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1); };
+  document.getElementById('ml-mb-vol').oninput = e=>{ _mpAudio.volume=parseFloat(e.target.value); };
+  document.getElementById('ml-mb-progress-bar').onclick = e=>{
+    if(!_mpAudio.duration) return;
+    const r=e.currentTarget.getBoundingClientRect();
+    _mpAudio.currentTime=((e.clientX-r.left)/r.width)*_mpAudio.duration;
+  };
 
   const CHR=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
   const ENH={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
@@ -591,6 +633,12 @@
     destroyAP();
     stopMetronome();
     syncHaloTheme();
+    // load song into mini player if it has mp3
+    if(s.mp3){
+      const idx=_mpSongs.findIndex(x=>x.id===s.id);
+      if(idx>=0 && idx!==_mpIdx){ _mpIdx=idx; _mpLoadSong(s); }
+      else if(idx<0){ _mpSongs=[s]; _mpIdx=0; _mpLoadSong(s); }
+    }
     if(!detail.classList.contains('open') && !(_detailStatePushed && history.state && history.state.__mlDetail)){
       try{
         history.pushState(Object.assign({}, history.state||{}, {__mlDetail:true}), '');
