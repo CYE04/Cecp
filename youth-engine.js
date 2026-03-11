@@ -652,8 +652,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         var sn=div('sw-lsec-name');sn.textContent=sec.name;se.appendChild(sn);
         (sec.lines||[]).forEach(function(line){
           var le=div('sw-lline');
-          var row=div('sw-lrow');
-          var segs=Array.isArray(line)?line:line.line;
+          var row=div('sw-lrow'+((!Array.isArray(line)&&line.b)?' bold':''));
+          var segs=Array.isArray(line)?line:(line.line||[]);
           segs.forEach(function(seg){
             var s=div('sw-seg');
             var c=div('sw-chord'+(seg.chord?'':' empty'));
