@@ -275,12 +275,21 @@ body{overflow-x:hidden;}
 }
 #ml-mb-controls { display:flex; align-items:center; gap:2px; flex-shrink:0; }
 #ml-mb-controls button {
-  background:none; border:none; color:rgba(255,255,255,0.75);
-  cursor:pointer; font-size:14px; padding:5px 8px; border-radius:6px;
-  line-height:1; transition:color .15s, background .15s;
+  background: rgba(255,255,255,0.1);
+  border: none; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-size: 13px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1; transition: background .15s, transform .1s;
+  flex-shrink: 0;
 }
-#ml-mb-playpause { font-size:18px !important; color:#fff !important; }
-#ml-mb-controls button:hover { background:rgba(255,255,255,0.12); color:#fff; }
+#ml-mb-playpause {
+  font-size: 16px !important; color: #fff !important;
+  background: rgba(255,255,255,0.18) !important;
+  width: 36px !important; height: 36px !important;
+}
+#ml-mb-controls button:hover { background: rgba(255,255,255,0.22); transform: scale(1.05); }
 #ml-mb-right {
   display:flex; flex-direction:column; gap:5px;
   flex-shrink:0; width:110px;
@@ -326,10 +335,13 @@ body{overflow-x:hidden;}
   background: rgba(16,16,18,0.94);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.09);
+  margin: 12px 0 8px;
   padding: 18px 16px 14px;
   gap: 12px;
   color: #fff;
+  overflow: hidden;
 }
 #ml-miniplayer.has-mp3 { display: flex; }
 
@@ -337,27 +349,22 @@ body{overflow-x:hidden;}
 #ml-mp-stage {
   position: relative;
   height: 80px;
-  display: flex;
-  align-items: center;
   overflow: hidden;
+  width: 100%;
 }
 
 /* Cover — starts centered, slides to left edge on play */
 #ml-mp-cover-wrap {
   position: absolute;
-  /* center: left = 50% - half cover width */
   left: 50%;
   transform: translateX(-50%);
   width: 80px; height: 80px;
   border-radius: 12px;
   overflow: hidden;
-  flex-shrink: 0;
-  transition:
-    left .6s cubic-bezier(.4,0,.2,1),
-    transform .6s cubic-bezier(.4,0,.2,1),
-    width .6s cubic-bezier(.4,0,.2,1),
-    height .6s cubic-bezier(.4,0,.2,1),
-    border-radius .6s;
+  transition: left .55s cubic-bezier(.4,0,.2,1),
+              transform .55s cubic-bezier(.4,0,.2,1),
+              width .55s cubic-bezier(.4,0,.2,1),
+              height .55s cubic-bezier(.4,0,.2,1);
   z-index: 1;
 }
 #ml-mp-stage.playing #ml-mp-cover-wrap {
@@ -381,7 +388,7 @@ body{overflow-x:hidden;}
   top: 0; bottom: 0;
   overflow: hidden;
   opacity: 0;
-  transform: translateX(14px);
+  transform: translateX(12px);
   transition: opacity .5s .2s, transform .5s .2s;
   pointer-events: none;
 }
@@ -425,12 +432,21 @@ body{overflow-x:hidden;}
 }
 #ml-mp-controls { display:flex; align-items:center; gap:2px; flex-shrink:0; }
 #ml-mp-controls button {
-  background:none; border:none; color:rgba(255,255,255,0.75);
-  cursor:pointer; font-size:15px; padding:5px 8px; border-radius:7px;
-  line-height:1; transition:color .15s, background .15s;
+  background: rgba(255,255,255,0.1);
+  border: none; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-size: 15px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1; transition: background .15s, transform .1s;
+  flex-shrink: 0;
 }
-#ml-mp-playpause { font-size:20px !important; color:#fff !important; }
-#ml-mp-controls button:hover { background:rgba(255,255,255,0.12); color:#fff; }
+#ml-mp-playpause {
+  font-size: 18px !important; color: #fff !important;
+  background: rgba(255,255,255,0.18) !important;
+  width: 38px !important; height: 38px !important;
+}
+#ml-mp-controls button:hover { background: rgba(255,255,255,0.22); transform: scale(1.05); }
 #ml-mp-right { display:flex; flex-direction:column; gap:5px; flex-shrink:0; width:120px; }
 #ml-mp-progress-bar {
   height:3px; background:rgba(255,255,255,0.18); border-radius:2px; cursor:pointer;

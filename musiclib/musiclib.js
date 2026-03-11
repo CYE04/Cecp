@@ -403,7 +403,7 @@
         _mpRenderLrc();
       }).catch(()=>{});
     }
-    if(song.mp3) _mpAudio.play().catch(()=>{});
+    // no auto-play — user must press play
   }
   function _mpPlayIdx(idx){
     if(idx<0||idx>=_mpSongs.length) return;
@@ -644,8 +644,40 @@
     // load song into mini player if it has mp3
     if(s.mp3){
       const idx=_mpSongs.findIndex(x=>x.id===s.id);
-      if(idx>=0 && idx!==_mpIdx){ _mpIdx=idx; _mpLoadSong(s); }
-      else if(idx<0){ _mpSongs=[s]; _mpIdx=0; _mpLoadSong(s); }
+      if(idx>=0 && idx!==_mpIdx){
+        _mpIdx=idx;
+        // update info/cover without playing
+        _mpLrc=[]; _mpLrcIdx=-1;
+        const titleEl=document.getElementById('ml-mp-title');
+        const artistEl=document.getElementById('ml-mp-artist');
+        if(titleEl) titleEl.textContent=s.title||'';
+        if(artistEl) artistEl.textContent=s.artist||'';
+        _mpSetCover(s.cover||null);
+        const stage=document.getElementById('ml-mp-stage');
+        if(stage) stage.classList.remove('playing');
+        const inner=document.getElementById('ml-mp-lrc-inner');
+        if(inner) inner.innerHTML='';
+        const detailPlayer=document.getElementById('ml-miniplayer');
+        if(detailPlayer) detailPlayer.classList.toggle('has-mp3',!!s.mp3);
+        _mpAudio.src=s.mp3||'';
+        if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});
+      } else if(idx<0){
+        _mpSongs=[s]; _mpIdx=0;
+        _mpLrc=[]; _mpLrcIdx=-1;
+        const titleEl=document.getElementById('ml-mp-title');
+        const artistEl=document.getElementById('ml-mp-artist');
+        if(titleEl) titleEl.textContent=s.title||'';
+        if(artistEl) artistEl.textContent=s.artist||'';
+        _mpSetCover(s.cover||null);
+        const stage=document.getElementById('ml-mp-stage');
+        if(stage) stage.classList.remove('playing');
+        const inner=document.getElementById('ml-mp-lrc-inner');
+        if(inner) inner.innerHTML='';
+        const detailPlayer=document.getElementById('ml-miniplayer');
+        if(detailPlayer) detailPlayer.classList.toggle('has-mp3',!!s.mp3);
+        _mpAudio.src=s.mp3||'';
+        if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});
+      }
     }
     if(!detail.classList.contains('open') && !(_detailStatePushed && history.state && history.state.__mlDetail)){
       try{
