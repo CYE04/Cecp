@@ -551,7 +551,7 @@
         const se=_div('sw-lsec');
         const sn=_div('sw-lsec-name');sn.textContent=sec.name||'';se.appendChild(sn);
         for(const line of sec.lines||[]){
-          const le=_div('sw-lline');const row=_div('sw-lrow');
+          const le=_div('sw-lline');const row=_div('sw-lrow'+((!Array.isArray(line)&&line.b)?' bold':''));
           const segs=Array.isArray(line)?line:(line.line||[]);
           for(const seg of segs){
             const segEl=_div('sw-seg');
@@ -561,7 +561,9 @@
             segEl.appendChild(chord);
             if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
             const lyric=document.createElement('span');lyric.className='sw-lyric';lyric.textContent=seg.lyric||'';
-            segEl.appendChild(lyric);row.appendChild(segEl);
+            segEl.appendChild(lyric);
+            if(seg.lyric2){const ly2=document.createElement('span');ly2.className='sw-lyric sw-lyric2';ly2.textContent=seg.lyric2;segEl.appendChild(ly2);}
+            row.appendChild(segEl);
           }
           le.appendChild(row);se.appendChild(le);
         }
