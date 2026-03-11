@@ -1,0 +1,123 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-03-11 22:04:57",
+  "id": "zhaodaowo",
+  "title": "找到我",
+  "artist": "约书亚乐团",
+  "sub": "约书亚乐团【父的筵席】(2018) 褚治轩、陈州邦、洪德耀、玺恩 词曲",
+  "origKey": "F",
+  "timeSign": "4/4",
+  "bpm": 68,
+  "mp3": "upload/zhaodaowo.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/zhaodaowo.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/zhaodaowo.lrc",
+  "youtube": "https://youtu.be/5hkbct1UPK8?si=Hr8buBtevs0hcDsz",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/zhaodaowoF.jpg",
+  "sections": [
+  {
+    "name": "主歌",
+    "lines": [
+      [
+        {"chord":"Bbmaj7","n":"3,_ 2,_","lyric":"看着","lyric2":"你每"},
+        {"chord":"","n":"3,_ 5,__ ( 5,__ 5, )","lyric":"我自己","lyric2":"字每句"},
+        {"chord":"","n":"sp 0 sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","lyric":"｜","lyric2":"｜"},
+        {"chord":"F/A","n":"3,_ 2,_","lyric":"如此","lyric2":"炼净"},
+        {"chord":"","n":"3,_ 5,__ ( 5,__ 5, )","lyric":"的渺小，","lyric2":"我生命，"},
+        {"chord":"","n":"sp 0 sp","lyric":"ㅤㅤ","lyric2":"ㅤㅤ"},
+        {"chord":"","lyric":"｜","lyric2":"｜"},
+        {"chord":"Bbmaj7","n":"3,_ 2,__ 3,__","lyric":"拿把尺","lyric2":"你气息、"},
+        {"chord":"","n":"0_ 2,_","lyric":"ㅤ 在","lyric2":"ㅤ 你"},
+        {"chord":"","n":"3,_ 5,__ 5,__","lyric":"生命中","lyric2":"的声音"},
+        {"chord":"","n":"sp 0 sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","lyric":"｜","lyric2":"｜"}
+      ],
+      [
+        {"chord":"Dm7","n":"7,_ 1__ ( 7,__ 7,·_ )","lyric":"不断地","lyric2":"牵引着"},
+        {"chord":"ㅤ ㅤCsus4","n":"( 5,__ 5,__ ) 3·_","lyric":"测ㅤ 量。","lyric2":"我ㅤ 心。"},
+        {"chord":"","n":"sp 0 sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","lyric":"｜","lyric2":"｜"},
+        {"chord":"Bbmaj7","n":"3,_ 2,_","lyric":"但你","lyric2":"我已"},
+        {"chord":"","n":"3,_ 5,__ ( 5,__ 5,· )","lyric":"对我说,","lyric2":"经决定"},
+        {"chord":"","n":"sp sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"2,_ sp","lyric":"你","lyric2":"ㅤ "},
+        {"chord":"","lyric":"｜","lyric2":"｜"},
+        {"chord":"F/A","n":"3,_ 2,_","lyric":"爱我","lyric2":"一生"},
+        {"chord":"","n":"3,_ 7,__ ( 1__ 1 )","lyric":"已足够，","lyric2":"跟随你，"},
+        {"chord":"","n":"sp 0 sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","lyric":"｜","lyric2":"｜"}
+      ],
+      [
+        {"chord":"Ab","n":"1_ 1__ ( 1__ 1_ )","lyric":"放下一","lyric2":"失去你、"},
+        {"chord":"","n":"2_","lyric":"切","lyric2":"活"},
+        {"chord":"","n":"2_ 1__ ( 1__ 1_ )","lyric":"我愿跟","lyric2":"着没有"},
+        {"chord":"","n":"5,_","lyric":"你ㅤ","lyric2":"意ㅤ"},
+        {"chord":"","n":"sp","lyric":"｜","lyric2":"｜"},
+        {"chord":"ㅤC","n":"2 -","lyric":"走。","lyric2":"义。"},
+        {"chord":"【Chorus】","n":"0_ ( 1_ 2__ 1__ )","lyric":"ㅤ 耶","lyric2":"ㅤ"},
+        {"chord":"","n":"([ 5__","lyric":"稣,||","lyric2":"ㅤ"},
+        {"chord":"Bbmaj7","n":"]) 5 sp sp 0","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"sp 0_ 3__ 3__","lyric":"ㅤ ㅤ 因你","lyric2":"ㅤ"},
+        {"chord":"","lyric":""},
+        {"chord":"","n":"3_ 2__ 1__","lyric":"的宝血","lyric2":"ㅤ"},
+        {"chord":"","n":"sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","lyric":"｜","lyric2":"｜"}
+      ],
+      [
+        {"chord":"F/A","n":"0_ 2__ 1__","lyric":"ㅤ 使我"},
+        {"chord":"","n":"2_ 3__ ( 3__ sp 3 )","lyric":"的自由。"},
+        {"chord":"","n":"( 1_ 2__ 1__ )","lyric":"耶"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Bbmaj7","n":"5 -","lyric":"稣，"},
+        {"chord":"","n":"0_ 3__ 3__","lyric":"ㅤ 因 你"},
+        {"chord":"","n":"3_ 2__ 1__","lyric":"钉痕的｜"},
+        {"chord":"Dm7","n":"2_ 1__ ( 2__ 2_ ) 5_","lyric":"双手拯ㅤㅤ救"},
+        {"chord":"C","n":"3","lyric":"我。"},
+        {"chord":"","n":"( 1_ 2__ 1__ )","lyric":"耶"},
+        {"chord":"","n":"sp","lyric":"ㅤ"},
+        {"chord":"","lyric":"｜"}
+      ],
+      [
+        {"chord":"Bbmaj7","n":"5 sp - sp - sp -","lyric":"稣"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Dm7","n":"7_","lyric":"跨"},
+        {"chord":"","n":"6__ ( 6__ 6_ )","lyric":"越了"},
+        {"chord":"C","n":"3_","lyric":"时"},
+        {"chord":"","n":"( 2_ 1_ )","lyric":"空，"},
+        {"chord":"","n":"6,_ 1__ ([ 5__","lyric":"找到我"},
+        {"chord":"","lyric":"｜"},
+        {"chord":"Gm7","n":"]) 5","lyric":"ㅤ"},
+        {"chord":"ㅤㅤㅤ ㅤCsus4","n":"6,_ 1__ ( 5__ 5_ )","lyric":"找到我"},
+        {"chord":"","n":"3_ 2_ 1__ ([ 1__","lyric":"在你怀中｜"},
+        {"chord":"F","n":"]) 1 - - -","lyric":"ㅤ"},
+        {"chord":"Fine","lyric":"||"}
+      ],
+      [
+        {"chord":"Dm7","n":"0_ sp_ ( 5__ 5__ )","lyric":"ㅤ ㅤ过","lyric2":"ㅤ ㅤ如 今"},
+        {"chord":"【Bridge】","n":"5_ sp_ 5__ ( 5__ 5_ ) sp_","lyric":"去ㅤ 不再","lyric2":"活ㅤ 着不"},
+        {"chord":"","n":"3_ sp_","lyric":"束","lyric2":"再"},
+        {"chord":"","n":"2_ sp_ 1_","lyric":"缚ㅤ 我，｜","lyric2":"是ㅤ 我，｜"},
+        {"chord":"Bb","n":"0_ sp_ 5_","lyric":"ㅤ ㅤ你","lyric2":"ㅤ ㅤ基"},
+        {"chord":"","n":"5_ sp_ 5__ ( 6__ 6_ )","lyric":"的ㅤ 盼望","lyric2":"督ㅤ 在我"},
+        {"chord":"","n":"sp_ 3_ sp 2_ sp_ 1_","lyric":"ㅤ 赋ㅤ 予ㅤ 我，","lyric2":"ㅤ 里ㅤ 面ㅤ 活，"},
+        {"chord":"","lyric":"｜","lyric2":"｜"}
+      ],
+      [
+        {"chord":"F","n":"( 1__ sp__ 2__ 3__ 5__ )","lyric":"Oh","lyric2":"Oh"},
+        {"chord":"","n":"0_ 1__ 2__","lyric":"ㅤ 生命","lyric2":"ㅤ 你是"},
+        {"chord":"","n":"2__ 5·_","lyric":"能力","lyric2":"我的"},
+        {"chord":"","lyric":""},
+        {"chord":"","n":"3_ ( 3__ 2__ ) ([ sp","lyric":"涌流。｜","lyric2":"所有。｜"},
+        {"chord":"1","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"]) 2 - - -","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","lyric":"||","lyric2":"||"},
+        {"chord":"2","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"C","n":"( 2 ) sp - sp 0_","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"( 1_ sp 2__ 1__ )","lyric":"耶","lyric2":"ㅤ"},
+        {"chord":"","n":"( 5_ sp )","lyric":"稣 ||","lyric2":"ㅤ"}
+      ]
+    ]
+  }
+]
+}
