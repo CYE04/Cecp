@@ -644,40 +644,32 @@
     // load song into mini player if it has mp3
     if(s.mp3){
       const idx=_mpSongs.findIndex(x=>x.id===s.id);
-      if(idx>=0 && idx!==_mpIdx){
-        _mpIdx=idx;
-        // update info/cover without playing
+      const isSameSong = (idx>=0 && idx===_mpIdx);
+      if(!isSameSong){
+        // different song: load fresh
+        if(idx>=0) _mpIdx=idx; else { _mpSongs=[s]; _mpIdx=0; }
         _mpLrc=[]; _mpLrcIdx=-1;
-        const titleEl=document.getElementById('ml-mp-title');
-        const artistEl=document.getElementById('ml-mp-artist');
-        if(titleEl) titleEl.textContent=s.title||'';
-        if(artistEl) artistEl.textContent=s.artist||'';
-        _mpSetCover(s.cover||null);
-        const stage=document.getElementById('ml-mp-stage');
-        if(stage) stage.classList.remove('playing');
-        const inner=document.getElementById('ml-mp-lrc-inner');
-        if(inner) inner.innerHTML='';
-        const detailPlayer=document.getElementById('ml-miniplayer');
-        if(detailPlayer) detailPlayer.classList.toggle('has-mp3',!!s.mp3);
-        _mpAudio.src=s.mp3||'';
-        if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});
-      } else if(idx<0){
-        _mpSongs=[s]; _mpIdx=0;
-        _mpLrc=[]; _mpLrcIdx=-1;
-        const titleEl=document.getElementById('ml-mp-title');
-        const artistEl=document.getElementById('ml-mp-artist');
-        if(titleEl) titleEl.textContent=s.title||'';
-        if(artistEl) artistEl.textContent=s.artist||'';
-        _mpSetCover(s.cover||null);
-        const stage=document.getElementById('ml-mp-stage');
-        if(stage) stage.classList.remove('playing');
-        const inner=document.getElementById('ml-mp-lrc-inner');
-        if(inner) inner.innerHTML='';
-        const detailPlayer=document.getElementById('ml-miniplayer');
-        if(detailPlayer) detailPlayer.classList.toggle('has-mp3',!!s.mp3);
         _mpAudio.src=s.mp3||'';
         if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});
       }
+      // always update UI text & cover
+      const titleEl=document.getElementById('ml-mp-title');
+      const artistEl=document.getElementById('ml-mp-artist');
+      if(titleEl) titleEl.textContent=s.title||'';
+      if(artistEl) artistEl.textContent=s.artist||'';
+      _mpSetCover(s.cover||null);
+      // stage: show playing layout only if audio is actually playing
+      const stage=document.getElementById('ml-mp-stage');
+      if(stage) stage.classList.toggle('playing', !_mpAudio.paused);
+      // restore lrc inner if same song
+      if(isSameSong && _mpLrc.length && !document.getElementById('ml-mp-lrc-inner')?.children.length){
+        _mpRenderLrc();
+      }
+      const detailPlayer=document.getElementById('ml-miniplayer');
+      if(detailPlayer) detailPlayer.classList.add('has-mp3');
+    } else {
+      const detailPlayer=document.getElementById('ml-miniplayer');
+      if(detailPlayer) detailPlayer.classList.remove('has-mp3');
     }
     if(!detail.classList.contains('open') && !(_detailStatePushed && history.state && history.state.__mlDetail)){
       try{

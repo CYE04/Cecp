@@ -345,21 +345,24 @@ body{overflow-x:hidden;}
 }
 #ml-miniplayer.has-mp3 { display: flex; }
 
-/* Stage: fixed height, cover+lyrics sit inside */
+/* Stage: uses vw-based sizing so it scales on all devices */
 #ml-mp-stage {
   position: relative;
-  height: 80px;
+  /* cover is 80px on desktop, clamp to device width */
+  --cover-size: clamp(56px, 12vw, 80px);
+  height: var(--cover-size);
   overflow: hidden;
   width: 100%;
 }
 
-/* Cover — starts centered, slides to left edge on play */
+/* Cover — centered when paused, slides left on play */
 #ml-mp-cover-wrap {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: 80px; height: 80px;
-  border-radius: 12px;
+  width: var(--cover-size);
+  height: var(--cover-size);
+  border-radius: clamp(8px, 2vw, 12px);
   overflow: hidden;
   transition: left .55s cubic-bezier(.4,0,.2,1),
               transform .55s cubic-bezier(.4,0,.2,1),
@@ -370,21 +373,22 @@ body{overflow-x:hidden;}
 #ml-mp-stage.playing #ml-mp-cover-wrap {
   left: 0;
   transform: translateX(0);
-  width: 68px; height: 68px;
-  border-radius: 10px;
+  width: calc(var(--cover-size) * 0.85);
+  height: calc(var(--cover-size) * 0.85);
 }
 #ml-mp-cover {
   width: 100%; height: 100%;
   background: rgba(255,255,255,0.08);
   display: flex; align-items: center; justify-content: center;
-  font-size: 28px; color: rgba(255,255,255,0.35);
+  font-size: clamp(18px, 4vw, 28px); color: rgba(255,255,255,0.35);
 }
 #ml-mp-cover img { width:100%; height:100%; object-fit:cover; display:block; }
 
-/* Lyrics panel — hidden right, slides in on play */
+/* Lyrics panel — slides in from right on play */
 #ml-mp-lrc-panel {
   position: absolute;
-  left: 82px; right: 0;
+  left: calc(var(--cover-size) * 0.9);
+  right: 0;
   top: 0; bottom: 0;
   overflow: hidden;
   opacity: 0;
@@ -406,7 +410,7 @@ body{overflow-x:hidden;}
 }
 #ml-mp-lrc-inner::-webkit-scrollbar { display:none; }
 .ml-mp-lrc-line {
-  font-size: 12px; line-height: 1.65;
+  font-size: clamp(10px, 2.2vw, 13px); line-height: 1.65;
   color: rgba(255,255,255,0.28);
   cursor: pointer; padding: 0;
   transition: color .3s, font-size .25s, font-weight .25s;
@@ -414,40 +418,41 @@ body{overflow-x:hidden;}
   flex-shrink: 0;
 }
 .ml-mp-lrc-line.active {
-  color: #fff; font-size: 14px; font-weight: 600;
+  color: #fff; font-size: clamp(11px, 2.6vw, 14px); font-weight: 600;
 }
 
-/* Bottom bar: info + controls + progress */
+/* Bottom bar: info + controls + progress — wraps on tiny screens */
 #ml-mp-bottom {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: clamp(4px, 1.5vw, 10px);
+  flex-wrap: nowrap;
 }
 #ml-mp-info { flex:1; min-width:0; }
 #ml-mp-title {
-  font-size:14px; font-weight:600; color:#fff;
+  font-size: clamp(12px, 3vw, 14px); font-weight:600; color:#fff;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 #ml-mp-artist {
-  font-size:12px; color:rgba(255,255,255,0.5);
+  font-size: clamp(10px, 2.5vw, 12px); color:rgba(255,255,255,0.5);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 #ml-mp-controls { display:flex; align-items:center; gap:2px; flex-shrink:0; }
 #ml-mp-controls button {
   background: rgba(255,255,255,0.1);
   border: none; color: rgba(255,255,255,0.85);
-  cursor: pointer; font-size: 15px;
-  width: 32px; height: 32px;
+  cursor: pointer; font-size: clamp(12px, 2.8vw, 15px);
+  width: clamp(28px, 6vw, 34px); height: clamp(28px, 6vw, 34px);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   line-height: 1; transition: background .15s, transform .1s;
   flex-shrink: 0;
 }
 #ml-mp-playpause {
-  font-size: 18px !important; color: #fff !important;
+  font-size: clamp(15px, 3.5vw, 19px) !important; color: #fff !important;
   background: rgba(255,255,255,0.18) !important;
-  width: 38px !important; height: 38px !important;
+  width: clamp(32px, 7vw, 40px) !important; height: clamp(32px, 7vw, 40px) !important;
 }
 #ml-mp-controls button:hover { background: rgba(255,255,255,0.22); transform: scale(1.05); }
-#ml-mp-right { display:flex; flex-direction:column; gap:5px; flex-shrink:0; width:120px; }
+#ml-mp-right { display:flex; flex-direction:column; gap:5px; flex-shrink:0; width:clamp(80px, 22vw, 130px); }
 #ml-mp-progress-bar {
   height:3px; background:rgba(255,255,255,0.18); border-radius:2px; cursor:pointer;
 }
@@ -466,9 +471,4 @@ body{overflow-x:hidden;}
   border-radius:50%; background:#fff; cursor:pointer;
 }
 
-/* ── Responsive ── */
-@media (max-width: 480px) {
-  #ml-mb-right { width: 80px; }
-  #ml-mp-right { width: 90px; }
-  #ml-mp-lrc-panel { left: 76px; }
-}
+
