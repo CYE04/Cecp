@@ -61,10 +61,22 @@ root.innerHTML = `
         <div class="mt-lrc-left">
           <button class="mt-side-btn" id="mt-btn-music">⬆ 上传音乐</button>
           <input type="file" id="mt-music-file" accept="audio/*" style="display:none">
-          <button class="mt-side-btn" id="mt-btn-lyric">⬆ 上传歌词</button>
-          <input type="file" id="mt-lyric-file" accept=".lrc,.txt" style="display:none">
+          <div class="mt-hover-group" id="mt-hg-lyric">
+            <button class="mt-side-btn" id="mt-btn-lyric">⬆ 上传歌词</button>
+            <input type="file" id="mt-lyric-file" accept=".lrc" style="display:none">
+            <div class="mt-sub-btns">
+              <button class="mt-side-btn mt-sub-btn" id="mt-btn-txt">📄 上传文本</button>
+              <input type="file" id="mt-txt-file" accept=".txt" style="display:none">
+              <button class="mt-side-btn mt-sub-btn" id="mt-btn-find">🔍 查找歌词</button>
+            </div>
+          </div>
           <button class="mt-side-btn" id="mt-btn-create">📄 创建歌词</button>
-          <button class="mt-side-btn" id="mt-btn-dl">⬇ 下载歌词</button>
+          <div class="mt-hover-group" id="mt-hg-dl">
+            <button class="mt-side-btn" id="mt-btn-dl">⬇ 下载歌词</button>
+            <div class="mt-sub-btns">
+              <button class="mt-side-btn mt-sub-btn" id="mt-btn-dl-twin">⬇ 下载双语LRC</button>
+            </div>
+          </div>
         </div>
         <div class="mt-lrc-center" id="mt-lrc-center">
           <div class="mt-info-row">
@@ -120,10 +132,22 @@ root.innerHTML = `
 <div class="mt-modal-overlay" id="mt-modal-create">
   <div class="mt-modal-box">
     <div class="mt-modal-title">创建歌词 · 每行一句</div>
+    <div class="mt-modal-warn">⚠️ 这会删除当前所有歌词，确认继续吗？</div>
     <textarea class="mt-modal-ta" id="mt-create-ta" placeholder="第一行歌词&#10;第二行歌词&#10;第三行歌词"></textarea>
     <div class="mt-modal-footer">
       <button class="mt-modal-ok" id="mt-create-ok">创建</button>
       <button class="mt-modal-cancel" id="mt-create-cancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="mt-modal-overlay" id="mt-modal-txt">
+  <div class="mt-modal-box">
+    <div class="mt-modal-title">上传文本 · 粘贴歌词</div>
+    <textarea class="mt-modal-ta" id="mt-txt-ta" placeholder="粘贴纯文本歌词，每行一句&#10;（不需要时间戳）"></textarea>
+    <div class="mt-modal-footer">
+      <button class="mt-modal-ok" id="mt-txt-ok">导入</button>
+      <button class="mt-modal-cancel" id="mt-txt-cancel">取消</button>
     </div>
   </div>
 </div>
@@ -1433,16 +1457,52 @@ $('mt-lyric-file').onchange = function(){
   const reader = new FileReader();
   reader.onload = e => {
     const parsed = [];
+    const timeMap = {}; // 相同时间戳合并为双语（用 | 连接）
     e.target.result.split('\n').forEach(l => {
       const mm = l.match(/^\[(ar|ti|al|by):([^\]]*)\]/i);
-      if(mm){ const k=mm[1].toLowerCase(),v=mm[2].trim(); $('mt-meta-'+k) && ($('mt-meta-'+k).value=v); }
+      if(mm){ const k=mm[1].toLowerCase(),v=mm[2].trim(); $('mt-meta-'+k) && ($('mt-meta-'+k).value=v); return; }
       const m = l.match(/^\[(\d+):(\d+\.\d+)\](.*)/);
-      if(m) parsed.push({time:parseInt(m[1])*60+parseFloat(m[2]), text:m[3].trim()});
+      if(m){
+        const t = parseInt(m[1])*60+parseFloat(m[2]);
+        const txt = m[3].trim();
+        const key = t.toFixed(2);
+        if(timeMap[key] !== undefined){
+          // 双语LRC：相同时间戳 → 合并用 | 连接
+          parsed[timeMap[key]].text += ' | ' + txt;
+        } else {
+          timeMap[key] = parsed.length;
+          parsed.push({time:t, text:txt});
+        }
+      }
     });
     if(parsed.length){ lrcData=parsed; renderLines(); }
   };
   reader.readAsText(this.files[0]);
 };
+
+/* 上传文本 */
+$('mt-btn-txt').onclick = () => $('mt-modal-txt').classList.add('open');
+$('mt-txt-file').onchange = function(){
+  if(!this.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    lrcData = e.target.result.split('\n').map(t => ({time:null, text:t.trim()})).filter(l=>l.text);
+    renderLines();
+  };
+  reader.readAsText(this.files[0]);
+};
+$('mt-txt-ok').onclick = () => {
+  const raw = $('mt-txt-ta').value;
+  if(!raw.trim()) return;
+  lrcData = raw.split('\n').map(t => ({time:null, text:t.trim()})).filter(l=>l.text);
+  $('mt-modal-txt').classList.remove('open');
+  $('mt-txt-ta').value = '';
+  renderLines();
+};
+$('mt-txt-cancel').onclick = () => { $('mt-modal-txt').classList.remove('open'); };
+
+/* 查找歌词 */
+$('mt-btn-find').onclick = () => window.open('https://music.liuzhijin.cn/', '_blank');
 
 /* 创建歌词 */
 $('mt-btn-create').onclick  = () => $('mt-modal-create').classList.add('open');
@@ -1456,7 +1516,7 @@ $('mt-create-ok').onclick = () => {
 };
 
 /* 下载歌词 */
-$('mt-btn-dl').onclick = () => {
+function buildLRCmeta(){
   const ar=$('mt-meta-ar').value, ti=$('mt-meta-ti').value,
         al=$('mt-meta-al').value, by=$('mt-meta-by').value;
   const lines=[];
@@ -1464,12 +1524,31 @@ $('mt-btn-dl').onclick = () => {
   if(ti) lines.push('[ti:'+ti+']');
   if(al) lines.push('[al:'+al+']');
   if(by) lines.push('[by:'+by+']');
-  lrcData.forEach(l => { if(l.time!==null) lines.push(fmtLRC(l.time)+l.text); });
+  return {lines, ti};
+}
+function doDownloadLRC(twin){
+  const {lines, ti} = buildLRCmeta();
+  if(!twin){
+    lrcData.forEach(l => { if(l.time!==null) lines.push(fmtLRC(l.time)+l.text); });
+  } else {
+    // 双语LRC：同一时间戳出现两次，分别为 | 左边和右边
+    const left=[], right=[];
+    lrcData.forEach(l => {
+      if(l.time===null) return;
+      const parts = l.text.split(/(?<!\\)\|/); // 按未转义 | 分割
+      left.push({time:l.time, text:(parts[0]||'').trim()});
+      right.push({time:l.time, text:(parts[1]||'').trim()});
+    });
+    left.forEach(l => lines.push(fmtLRC(l.time)+l.text));
+    right.forEach(l => lines.push(fmtLRC(l.time)+l.text));
+  }
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain'}));
   a.download=(ti||'lyrics')+'.lrc';
   a.click();
-};
+}
+$('mt-btn-dl').onclick = () => doDownloadLRC(false);
+$('mt-btn-dl-twin').onclick = () => doDownloadLRC(true);
 
 /* Info modal */
 $('mt-btn-info').onclick   = () => $('mt-modal-info').classList.add('open');

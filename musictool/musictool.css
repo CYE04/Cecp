@@ -253,3 +253,15 @@ body{overflow:hidden!important;}
   text-decoration: underline; text-underline-offset: 3px;
 }
 .mt-tut-nevershow:hover { color: rgba(255,255,255,0.5); }
+
+/* LRC 悬停展开子按钮 */
+.mt-hover-group { position:relative; }
+.mt-sub-btns {
+  display:none;
+  flex-direction:column;
+  gap:4px;
+  margin-top:4px;
+}
+.mt-hover-group:hover .mt-sub-btns { display:flex; }
+.mt-sub-btn { font-size:11px !important; padding:4px 8px !important; opacity:0.85; }
+.mt-modal-warn { font-size:12px; color:#f59e0b; margin-bottom:8px; }
