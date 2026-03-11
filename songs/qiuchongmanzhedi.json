@@ -1,4 +1,20 @@
-"sections": [
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-03-11 19:28:19",
+  "id": "qiuchongamnzhedi",
+  "title": "求充满这地",
+  "artist": "约书亚乐团",
+  "sub": "约书亚乐团【为这你的荣耀】(2012)  杨家宁词/李宗唐曲",
+  "origKey": "F",
+  "timeSign": "4/4",
+  "bpm": 70,
+  "mp3": "upload/qiuchongmanzhedi.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/qiuchongmanzhedi.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/qiuchongmanzhedi.lrc",
+  "youtube": "https://youtu.be/xj7daezGohs?si=pOhIUcgvQIxf1qWa",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/qiuchongmanzhediF.jpg",
+  "sections": [
   {
     "name": "主歌",
     "lines": [
