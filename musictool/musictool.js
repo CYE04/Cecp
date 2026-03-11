@@ -325,7 +325,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
 .p-lyric{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink2);}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
-.p-lyric2{font-size:12px;opacity:0.65;margin-top:1px;}
+.p-lyric2{opacity:0.65;margin-top:1px;}
 
 /* 音符结构 */
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
