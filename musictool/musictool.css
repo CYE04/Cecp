@@ -265,3 +265,11 @@ body{overflow:hidden!important;}
 .mt-hover-group:hover .mt-sub-btns { display:flex; }
 .mt-sub-btn { font-size:11px !important; padding:4px 8px !important; opacity:0.85; }
 .mt-modal-warn { font-size:12px; color:#f59e0b; margin-bottom:8px; }
+
+/* 时间戳手动编辑 */
+.mt-ly-ts-wrap { display:inline-flex; align-items:center; }
+.mt-ly-time-edit {
+  width:80px; font-size:12px; font-family:monospace;
+  background:#1a2a3a; color:#7dd3fc; border:1px solid #3b82f6;
+  border-radius:4px; padding:1px 4px; text-align:center;
+}

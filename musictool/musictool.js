@@ -1587,12 +1587,32 @@ function renderLines(){
     const row = document.createElement('div');
     row.className = 'mt-ly-row' + (i===curIdx?' playing':'');
 
-    // 时间戳
+    // 时间戳（双击编辑）
+    const tsWrap = document.createElement('div');
+    tsWrap.className = 'mt-ly-ts-wrap';
     const ts = document.createElement('span');
     ts.className = 'mt-ly-time' + (l.time===null?' unstamped':'');
     ts.textContent = l.time!==null ? fmtLRC(l.time) : '[--:--.--]';
     if(l.time!==null) ts.onclick = () => { audio.currentTime=l.time; };
-    row.appendChild(ts);
+    // 双击进入编辑模式
+    ts.ondblclick = (e) => {
+      e.stopPropagation();
+      const inp = document.createElement('input');
+      inp.type='text'; inp.className='mt-ly-time-edit';
+      inp.value = l.time!==null ? fmtLRC(l.time) : '[00:00.00]';
+      inp.select();
+      const commit = () => {
+        const m = inp.value.match(/\[?(\d+):(\d+\.\d+)\]?/);
+        if(m){ lrcData[i].time = parseInt(m[1])*60+parseFloat(m[2]); }
+        renderLines();
+      };
+      inp.onblur = commit;
+      inp.onkeydown = e2 => { if(e2.key==='Enter') inp.blur(); if(e2.key==='Escape'){ inp.onblur=null; tsWrap.replaceChild(ts,inp); } };
+      tsWrap.replaceChild(inp, ts);
+      inp.focus(); inp.select();
+    };
+    tsWrap.appendChild(ts);
+    row.appendChild(tsWrap);
 
     // 打轴圆圈
     const sb = document.createElement('button');
