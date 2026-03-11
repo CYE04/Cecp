@@ -337,6 +337,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var navItems = [
       {label:'📅 聚会流程', href:'#ym-flow'},
       {label:'🎧 本周诗歌', href:'#ym-songs'},
+      {label:'🎼 歌谱',     href:'#ym-score'},
       {label:'📖 信息分享', href:'#ym-message'},
       {label:'📺 直播回放', href:'#ym-replay'},
       {label:'📑 讲员PPT',  href:'#ym-ppt'},
@@ -669,7 +670,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     function fitRows(){
       requestAnimationFrame(function(){
         lbDiv.querySelectorAll('.sw-lrow').forEach(function(row){
-          row.style.transform='';row.style.transformOrigin='';
+          row.style.transform='';row.style.transformOrigin='';row.style.marginBottom='';
           var avail=row.parentElement.clientWidth;
           if(!avail)return;
           row.style.display='inline-flex';
@@ -677,12 +678,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
           row.style.display='';
           if(natural>avail){
             var scale=avail/natural;
-            row.style.transform='scaleX('+scale+')';
-            row.style.transformOrigin='left center';
+            row.style.transform='scale('+scale+')';
+            row.style.transformOrigin='left top';
             row.style.width=natural+'px';
+            var naturalH=row.offsetHeight;
+            row.style.marginBottom=(naturalH*(scale-1))+'px';
             row.parentElement.style.overflow='hidden';
           } else {
             row.style.width='';
+            row.style.marginBottom='';
             row.parentElement.style.overflow='';
           }
         });
