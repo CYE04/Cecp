@@ -570,29 +570,30 @@
     }
     function fitRows(){
       requestAnimationFrame(function(){
+        // 重置
+        lbDiv.style.transform='';lbDiv.style.transformOrigin='';
+        lbDiv.style.width='';lbDiv.style.marginBottom='';
+        var avail=lbDiv.parentElement.clientWidth;
+        if(!avail)return;
+        // 找最宽的行
+        var maxW=0;
         lbDiv.querySelectorAll('.sw-lrow').forEach(function(row){
-          row.style.transform='';row.style.transformOrigin='';row.style.marginBottom='';
-          var avail=row.parentElement.clientWidth;
-          if(!avail)return;
           row.style.display='inline-flex';
-          var natural=row.scrollWidth;
+          if(row.scrollWidth>maxW)maxW=row.scrollWidth;
           row.style.display='';
-          if(natural>avail){
-            var scale=avail/natural;
-            // 等比缩放，像图片一样
-            row.style.transform='scale('+scale+')';
-            row.style.transformOrigin='left top';
-            row.style.width=natural+'px';
-            // 补偿高度（scale后元素实际占用高度减少，需要负margin）
-            var naturalH=row.offsetHeight;
-            row.style.marginBottom=(naturalH*(scale-1))+'px';
-            row.parentElement.style.overflow='hidden';
-          } else {
-            row.style.width='';
-            row.style.marginBottom='';
-            row.parentElement.style.overflow='';
-          }
         });
+        if(maxW>avail){
+          var scale=avail/maxW;
+          // 整个 lbDiv 等比缩放，像图片一样
+          lbDiv.style.transform='scale('+scale+')';
+          lbDiv.style.transformOrigin='left top';
+          lbDiv.style.width=maxW+'px';
+          var naturalH=lbDiv.offsetHeight;
+          lbDiv.style.marginBottom=(naturalH*(scale-1))+'px';
+          lbDiv.parentElement.style.overflow='hidden';
+        } else {
+          lbDiv.parentElement.style.overflow='';
+        }
       });
     }
     renderScore();
