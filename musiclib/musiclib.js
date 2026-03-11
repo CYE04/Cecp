@@ -383,7 +383,9 @@
       fetch(song.lrc).then(r=>r.text()).then(text=>{
         _mpLrc=_mpParseLrc(text);
         _mpRenderLrc();
-        _mpShowLrc(true);
+        // show lrc only after a short delay when audio starts playing
+        const showLrcOnPlay = ()=>{ _mpShowLrc(true); _mpAudio.removeEventListener('timeupdate',showLrcOnPlay); };
+        _mpAudio.addEventListener('timeupdate', showLrcOnPlay);
       }).catch(()=>{});
     }
     document.getElementById('ml-miniplayer').classList.add('active');

@@ -294,12 +294,8 @@ body{overflow-x:hidden;}
 #ml-mp-cover-wrap.lrc-mode #ml-mp-cover {
   opacity: 0;
 }
-/* Expand lrc area when in lrc-mode on the whole player */
-#ml-miniplayer.active #ml-mp-cover-wrap.lrc-mode {
-  width: 180px;
-  transition: width .5s;
-}
-#ml-mp-cover-wrap { transition: width .5s; }
+#ml-mp-cover-wrap { width: 44px; transition: width .5s; }
+#ml-mp-cover-wrap.lrc-mode { width: 140px; }
 
 #ml-mp-lrc-inner {
   display: flex;
