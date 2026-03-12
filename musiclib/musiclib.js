@@ -377,7 +377,11 @@
     _mpSetMiniLyric(_mpCurrentLyricText());
     if(idx>=0){
       const el=lyricNodes[idx];
-      if(el) el.scrollIntoView({block:'center',behavior:'smooth'});
+      const inner=document.getElementById('ml-mp-lrc-inner');
+      if(el && inner && inner.scrollHeight > inner.clientHeight + 8){
+        const top=Math.max(0, el.offsetTop - inner.clientHeight/2 + el.offsetHeight/2);
+        inner.scrollTo({top,behavior:'smooth'});
+      }
     }
   }
   function _mpSetState(playing){
