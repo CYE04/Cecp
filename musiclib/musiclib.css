@@ -384,21 +384,23 @@ body{overflow-x:hidden;}
 }
 #ml-mp-cover img { width:100%; height:100%; object-fit:cover; display:block; }
 
-/* Lyrics panel — slides in from right on play */
+/* Lyrics panel — full stage, text centered */
 #ml-mp-lrc-panel {
   position: absolute;
-  left: calc(var(--cover-size) * 0.9);
-  right: 0;
+  left: 0; right: 0;
   top: 0; bottom: 0;
   overflow: hidden;
   opacity: 0;
-  transform: translateX(12px);
+  transform: translateY(6px);
   transition: opacity .5s .2s, transform .5s .2s;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 #ml-mp-stage.playing #ml-mp-lrc-panel {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(0);
   pointer-events: auto;
 }
 #ml-mp-lrc-inner {
@@ -407,6 +409,8 @@ body{overflow-x:hidden;}
   scroll-behavior: smooth; gap: 0;
   -ms-overflow-style: none; scrollbar-width: none;
   padding: 4px 0;
+  width: 100%;
+  align-items: center;
 }
 #ml-mp-lrc-inner::-webkit-scrollbar { display:none; }
 .ml-mp-lrc-line {
@@ -416,6 +420,8 @@ body{overflow-x:hidden;}
   transition: color .3s, font-size .25s, font-weight .25s;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   flex-shrink: 0;
+  text-align: center;
+  width: 100%;
 }
 .ml-mp-lrc-line.active {
   color: #fff; font-size: clamp(11px, 2.6vw, 14px); font-weight: 600;
