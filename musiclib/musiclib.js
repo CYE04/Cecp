@@ -28,33 +28,7 @@
   let _detailStatePushed=false;
 
   root.innerHTML=`
-    <div id="ml-minibar">
-      <div class="pl-song-row">
-        <div id="ml-mb-cover" class="pl-cover"></div>
-        <div class="pl-info">
-          <div id="ml-mb-title" class="pl-title">未播放</div>
-          <div id="ml-mb-artist" class="pl-artist"></div>
-        </div>
-      </div>
-      <div class="pl-progress-wrap">
-        <div class="pl-progress-bar"><div class="pl-progress-fill" id="ml-mb-fill"></div></div>
-        <div class="pl-times"><span id="ml-mb-cur">0:00</span><span id="ml-mb-dur">0:00</span></div>
-      </div>
-      <div class="pl-controls">
-        <button class="pl-btn" id="ml-mb-seek-back" aria-label="后退15秒"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15.5" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="system-ui,sans-serif" font-weight="600">15</text></svg></button>
-        <button class="pl-btn" id="ml-mb-prev" aria-label="上一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1zm3.2 5.65 7.1-4.8A.43.43 0 0 1 17 7.2v9.6a.43.43 0 0 1-.7.35L9.2 12.35a.43.43 0 0 1 0-.7z"/></svg></button>
-        <button class="pl-btn pl-playpause" id="ml-mb-playpause" aria-label="播放"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg></button>
-        <button class="pl-btn" id="ml-mb-next" aria-label="下一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6a1 1 0 0 0-1 1v10a1 1 0 1 0 2 0V7a1 1 0 0 0-1-1zm-3.2 5.65-7.1-4.8A.43.43 0 0 0 7 7.2v9.6a.43.43 0 0 0 .7.35l7.1-4.8a.43.43 0 0 0 0-.7z"/></svg></button>
-        <button class="pl-btn" id="ml-mb-seek-fwd" aria-label="前进15秒"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="15.5" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="system-ui,sans-serif" font-weight="600">15</text></svg></button>
-        <button class="pl-btn pl-repeat" id="ml-mb-repeat" aria-label="循环"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
-      </div>
-      <div class="pl-vol-wrap">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-        <input class="pl-vol" id="ml-mb-vol" type="range" min="0" max="1" step="0.02" value="1">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM18.5 12c0-2.77-1.5-5.15-3.75-6.45v12.9C16.99 17.14 18.5 14.77 18.5 12z"/></svg>
-      </div>
-    </div>
-div>
+
     <div id="ml-header">
       <div id="ml-header-top">
         <div id="ml-title">🎵 诗歌库</div>
@@ -464,27 +438,7 @@ div>
     });
     return lines.sort((a,b)=>a.time-b.time);
   }
-  function _mbUpdateLyric(forceIdx){
-    const el=$('ml-mb-lyric');
-    if(!el) return;
-    if(!_mpLrc.length){
-      el.textContent='';
-      el.classList.remove('show');
-      return;
-    }
-    let idx=typeof forceIdx==='number' ? forceIdx : _mpLrcIdx;
-    if(idx < 0){
-      idx=_mpLrc.findIndex(l=>(l.text||'').trim());
-    }
-    const text=(idx>=0 && _mpLrc[idx] ? (_mpLrc[idx].text||'').trim() : '');
-    if(!text){
-      el.textContent='';
-      el.classList.remove('show');
-      return;
-    }
-    el.textContent=text;
-    el.classList.add('show');
-  }
+  function _mbUpdateLyric(){ /* minibar removed */ }
 
   function _mpHighlightLrc(){
     if(!_mpLrc.length){ _mbUpdateLyric(-1); return; }
@@ -604,8 +558,7 @@ div>
   document.getElementById('ml-mp-seek-fwd').onclick=()=>{ _mpAudio.currentTime=Math.min(_mpAudio.duration||0,_mpAudio.currentTime+15); };
   document.getElementById('ml-mp-repeat').onclick=()=>{
     _mpRepeat=(_mpRepeat+1)%3;
-    const rBtns=[document.getElementById('ml-mp-repeat'),document.getElementById('ml-mb-repeat')];
-    rBtns.forEach(b=>{ if(b){ b.classList.toggle('active',_mpRepeat>0); b.dataset.mode=_mpRepeat; } });
+    const rBtn=document.getElementById('ml-mp-repeat'); if(rBtn){ rBtn.classList.toggle('active',_mpRepeat>0); rBtn.dataset.mode=_mpRepeat; }
   };
   document.querySelector('#ml-miniplayer .pl-progress-bar').onclick=e=>{
     if(!_mpAudio.duration) return;
@@ -617,64 +570,8 @@ div>
 
   /* ── Compact Minibar (list page) ── */
   let _mbCoverSrc = '';
-  function _mbUpdate(){
-    const bar = document.getElementById('ml-minibar');
-    if(!bar) return;
-    const title = document.getElementById('ml-mb-title');
-    const artist = document.getElementById('ml-mb-artist');
-    const cover = document.getElementById('ml-mb-cover');
-    const btn = document.getElementById('ml-mb-playpause');
-    const fill = document.getElementById('ml-mb-fill');
-    const cur = document.getElementById('ml-mb-cur');
-    const dur = document.getElementById('ml-mb-dur');
-    const song = _mpSongs[_mpIdx];
-    if(song){
-      if(title) title.textContent = song.title||'';
-      if(artist) artist.textContent = song.artist||'';
-      if(cover && song.cover !== _mbCoverSrc){
-        _mbCoverSrc = song.cover||'';
-        if(song.cover){
-          cover.innerHTML='';
-          const img=document.createElement('img');
-          img.src=song.cover; img.alt='';
-          cover.appendChild(img);
-        } else {
-          cover.innerHTML='♪';
-        }
-      }
-      bar.classList.add('active');
-    }
-    if(btn) btn.innerHTML = _mpAudio.paused ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>` : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h3v14H6V5zm9 0h3v14h-3V5z"/></svg>`;
-    _mbUpdateLyric();
-    const d = _mpAudio.duration||0, t = _mpAudio.currentTime||0;
-    if(fill) fill.style.width = (d ? t/d*100 : 0)+'%';
-    if(cur) cur.textContent = _mpFmt(t);
-    if(dur) dur.textContent = _mpFmt(d);
-  }
-  _mpAudio.addEventListener('play', _mbUpdate);
-  _mpAudio.addEventListener('pause', _mbUpdate);
-  _mpAudio.addEventListener('timeupdate', _mbUpdate);
-  document.getElementById('ml-mb-playpause').onclick = ()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
-  document.getElementById('ml-mb-prev').onclick = ()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1,!_mpAudio.paused); };
-  document.getElementById('ml-mb-next').onclick = ()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1,!_mpAudio.paused); };
-  document.getElementById('ml-mb-seek-back').onclick = ()=>{ _mpAudio.currentTime=Math.max(0,_mpAudio.currentTime-15); };
-  document.getElementById('ml-mb-seek-fwd').onclick = ()=>{ _mpAudio.currentTime=Math.min(_mpAudio.duration||0,_mpAudio.currentTime+15); };
-  document.getElementById('ml-mb-repeat').onclick = ()=>{
-    _mpRepeat=(_mpRepeat+1)%3;
-    const rBtns=[document.getElementById('ml-mp-repeat'),document.getElementById('ml-mb-repeat')];
-    rBtns.forEach(b=>{ if(b){ b.classList.toggle('active',_mpRepeat>0); b.dataset.mode=_mpRepeat; } });
-  };
-  document.getElementById('ml-mb-vol').oninput = e=>{ _mpAudio.volume=parseFloat(e.target.value); };
-  document.querySelector('#ml-minibar .pl-progress-bar').onclick = e=>{
-    if(!_mpAudio.duration) return;
-    const r=e.currentTarget.getBoundingClientRect();
-    _mpAudio.currentTime=((e.clientX-r.left)/r.width)*_mpAudio.duration;
-  };
-  document.querySelector('#ml-minibar .pl-progress-bar').onclick = e=>{
-    if(!_mpAudio.duration) return;
-    const r=e.currentTarget.getBoundingClientRect();
-    _mpAudio.currentTime=((e.clientX-r.left)/r.width)*_mpAudio.duration;
-  };
+  function _mbUpdate(){ /* minibar removed */ }
+  // minibar removed
 
   const CHR=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
   const ENH={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
