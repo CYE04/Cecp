@@ -451,14 +451,12 @@
     _mbUpdateLyric(idx);
     if(idx>=0){
       const lines=document.querySelectorAll('.ml-mp-lrc-line');
-      const inner=document.getElementById('ml-mp-lrc-inner');
-      const stage=document.getElementById('ml-mp-stage');
-      if(inner && stage && lines[idx]){
-        const panelCenter = stage.offsetHeight / 2;
+      const panel=document.getElementById('ml-mp-lrc-panel');
+      if(panel && lines[idx]){
+        const panelCenter = panel.offsetHeight / 2;
         const lineTop = lines[idx].offsetTop;
         const lineCenter = lines[idx].offsetHeight / 2;
-        inner.style.transition='transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)';
-        inner.style.transform=`translateY(${panelCenter - lineTop - lineCenter}px)`;
+        panel.scrollTo({ top: lineTop - panelCenter + lineCenter, behavior:'smooth' });
       }
     }
   }
@@ -480,6 +478,7 @@
   function _mpRenderLrc(){
     const inner=document.getElementById('ml-mp-lrc-inner');
     if(!inner) return;
+    inner.style.transform='';
     inner.innerHTML='';
     _mpLrc.forEach(l=>{
       const d=document.createElement('div');
@@ -560,11 +559,24 @@
     _mpRepeat=(_mpRepeat+1)%3;
     const rBtn=document.getElementById('ml-mp-repeat'); if(rBtn){ rBtn.classList.toggle('active',_mpRepeat>0); rBtn.dataset.mode=_mpRepeat; }
   };
-  document.querySelector('#ml-miniplayer .pl-progress-bar').onclick=e=>{
-    if(!_mpAudio.duration) return;
-    const r=e.currentTarget.getBoundingClientRect();
-    _mpAudio.currentTime=((e.clientX-r.left)/r.width)*_mpAudio.duration;
-  };
+  (()=>{
+    const wrap=document.querySelector('#ml-miniplayer .pl-progress-wrap');
+    const bar=document.querySelector('#ml-miniplayer .pl-progress-bar');
+    if(!wrap||!bar) return;
+    function seek(clientX){
+      if(!_mpAudio.duration) return;
+      const r=bar.getBoundingClientRect();
+      const ratio=Math.min(1,Math.max(0,(clientX-r.left)/r.width));
+      _mpAudio.currentTime=ratio*_mpAudio.duration;
+    }
+    let dragging=false;
+    wrap.addEventListener('mousedown',e=>{ dragging=true; seek(e.clientX); });
+    window.addEventListener('mousemove',e=>{ if(dragging) seek(e.clientX); });
+    window.addEventListener('mouseup',()=>{ dragging=false; });
+    wrap.addEventListener('touchstart',e=>{ dragging=true; seek(e.touches[0].clientX); },{passive:true});
+    window.addEventListener('touchmove',e=>{ if(dragging) seek(e.touches[0].clientX); },{passive:true});
+    window.addEventListener('touchend',()=>{ dragging=false; });
+  })();
 
   function destroyAP(){ _mpAudio.pause(); }
 
