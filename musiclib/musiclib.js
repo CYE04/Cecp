@@ -375,13 +375,9 @@
     }
   }
   function _mpSetState(playing){
-    // playing=true: cover slides left, lyrics appear
-    // playing=false (initial/paused first time): cover center
-    // once played, always stay in played layout
     const stage=document.getElementById('ml-mp-stage');
     if(!stage) return;
-    if(playing) stage.classList.add('playing');
-    // never remove 'playing' class after first play
+    stage.classList.toggle('playing', !!playing);
   }
   function _mpSetCover(src){
     const c=document.getElementById('ml-mp-cover');
@@ -459,7 +455,7 @@
   }
   _mpAudio.addEventListener('timeupdate',_mpUpdateProgress);
   _mpAudio.addEventListener('play',()=>{ _mpSetState(true); _mpUpdateBtn(); });
-  _mpAudio.addEventListener('pause',_mpUpdateBtn);
+  _mpAudio.addEventListener('pause',()=>{ _mpSetState(false); _mpUpdateBtn(); });
   _mpAudio.addEventListener('ended',()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); else _mpUpdateBtn(); });
   document.getElementById('ml-mp-playpause').onclick=()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
   document.getElementById('ml-mp-prev').onclick=()=>{ if(_mpIdx>0)_mpPlayIdx(_mpIdx-1); };

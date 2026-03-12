@@ -446,10 +446,10 @@ body{overflow-x:hidden;}
   right: 0;
   top: 0; bottom: 0;
   overflow: hidden;
-  opacity: .92;
-  transform: translateX(0);
+  opacity: 0;
+  transform: translateX(18px);
   transition: opacity .35s ease, transform .35s ease;
-  pointer-events: auto;
+  pointer-events: none;
 }
 #ml-mp-stage.playing #ml-mp-lrc-panel {
   opacity: 1;
