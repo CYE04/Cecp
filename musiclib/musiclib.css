@@ -360,7 +360,8 @@ body{overflow-x:hidden;}
 #ml-mb-progress-bar { height:3px; border-radius:99px; background:rgba(255,255,255,0.15); cursor:pointer; }
 #ml-mb-progress-fill { height:100%; background:#fff; border-radius:99px; width:0%; transition:width .4s linear; }
 #ml-mb-times { display:flex; justify-content:space-between; margin-top:5px; font-size:10px; color:rgba(255,255,255,0.35); font-variant-numeric:tabular-nums; }
-#ml-mb-controls { display:flex; align-items:center; justify-content:center; gap:6px; }
+#ml-mb-bottom { display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
+#ml-mb-controls { display:flex; align-items:center; justify-content:center; gap:6px; flex:1; }
 #ml-mb-controls button {
   background:none; border:none; color:rgba(255,255,255,0.55);
   width:34px; height:34px; border-radius:50%;
@@ -370,15 +371,12 @@ body{overflow-x:hidden;}
 }
 #ml-mb-controls button:hover { color:#fff; background:rgba(255,255,255,0.09); }
 #ml-mb-controls button:active { transform:scale(0.88); }
-#ml-mb-playpause {
-  color:#fff !important; background:rgba(255,255,255,0.15) !important;
-  width:42px !important; height:42px !important;
-}
+#ml-mb-playpause { color:#fff !important; background:rgba(255,255,255,0.15) !important; width:42px !important; height:42px !important; }
 #ml-mb-playpause:hover { background:rgba(255,255,255,0.24) !important; }
 #ml-mb-repeat.active { color:#fff !important; }
 #ml-mb-repeat { position:relative; }
 #ml-mb-repeat[data-mode="2"]::after { content:'1'; position:absolute; font-size:7px; bottom:3px; right:3px; font-weight:700; color:#fff; line-height:1; }
-#ml-mb-vol-wrap { display:flex; align-items:center; gap:8px; padding:0 2px; color:rgba(255,255,255,0.35); }
+#ml-mb-vol-wrap { display:flex; align-items:center; gap:8px; flex-shrink:0; width:clamp(70px,16vw,110px); color:rgba(255,255,255,0.35); }
 #ml-mb-vol { -webkit-appearance:none; appearance:none; flex:1; height:3px; background:rgba(255,255,255,0.15); border-radius:99px; outline:none; cursor:pointer; }
 #ml-mb-vol::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#fff; cursor:pointer; }
 
@@ -633,31 +631,22 @@ body{overflow-x:hidden;}
 }
 #ml-notice-actions{
   display:flex; flex-direction:column;
-  gap:0; margin-top:16px;
-  border-radius:14px; overflow:hidden;
-  background:#242428;
+  gap:9px; margin-top:18px;
 }
 .ml-notice-action{
-  display:flex; align-items:center;
-  gap:14px; padding:15px 16px;
-  border:none; border-bottom:1px solid rgba(255,255,255,.06);
-  background:transparent;
-  color:#fff; cursor:pointer; width:100%;
-  transition:background .15s ease;
-  text-align:left;
-}
-.ml-notice-action:last-child{ border-bottom:none; }
-.ml-notice-action:hover{ background:rgba(255,255,255,.05); }
-.ml-notice-action:active{ background:rgba(255,255,255,.09); }
-.ml-notice-action-ico{
-  width:34px; height:34px; border-radius:9px; flex:0 0 34px;
   display:flex; align-items:center; justify-content:center;
-  background:rgba(255,255,255,.1); color:#fff;
+  gap:10px; padding:16px 22px;
+  border-radius:999px; border:none;
+  background:#242428;
+  color:#fff; cursor:pointer; width:100%;
+  font-size:15px; font-weight:500;
+  transition:background .15s ease, transform .1s ease;
+  text-align:center;
 }
-.ml-notice-action-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
-.ml-notice-action-label{ font-size:11px; color:rgba(255,255,255,.38); letter-spacing:.02em; }
-.ml-notice-action-title{ font-size:15px; font-weight:500; color:#fff; }
-.ml-notice-action-arrow{ color:rgba(255,255,255,.25); flex-shrink:0; display:flex; align-items:center; }
+.ml-notice-action:hover{ background:#2e2e34; transform:translateY(-1px); }
+.ml-notice-action:active{ transform:scale(.98); background:#2a2a30; }
+.ml-notice-action svg{ flex-shrink:0; opacity:.7; }
+.ml-notice-action-title{ font-size:15px; font-weight:500; }
 #ml-toast{
   position:fixed; left:50%; bottom:28px; z-index:1300;
   transform:translate(-50%,10px); opacity:0; pointer-events:none;
@@ -667,50 +656,14 @@ body{overflow-x:hidden;}
 }
 #ml-toast.show{ opacity:1; transform:translate(-50%,0); }
 
-/* better minibar lyrics */
-#ml-minibar{
-  display:none;
-  flex-direction:column;
-  align-items:stretch;
-  gap:10px;
-  margin:14px 16px 0;
-  padding:14px 16px;
-  min-height:auto;
-  border-radius:22px;
-  background:linear-gradient(180deg, rgba(24,24,30,.94), rgba(14,14,18,.96));
-}
-#ml-minibar.active{ display:flex; }
-#ml-mb-head,
-#ml-mb-progress-row,
-#ml-mb-bottom{ display:flex; align-items:center; }
-#ml-mb-head{ justify-content:space-between; gap:12px; }
-#ml-mb-title{ font-size:clamp(20px,2.2vw,28px); font-weight:700; }
-#ml-mb-artist{ margin-top:4px; font-size:clamp(12px,1.2vw,14px); color:rgba(255,255,255,.56); }
-#ml-mb-lyric{
-  display:none; min-height:1.5em;
-  font-size:clamp(14px,1.6vw,18px); line-height:1.5; text-align:center;
-  color:rgba(255,255,255,.86); padding:2px 10px;
-  white-space:normal; word-break:break-word;
-}
-#ml-mb-lyric.show{ display:-webkit-box; }
-#ml-mb-progress-row{ gap:12px; }
-#ml-mb-progress-row #ml-mb-cur,
-#ml-mb-progress-row #ml-mb-dur{ font-size:11px; color:rgba(255,255,255,.48); font-variant-numeric:tabular-nums; }
-#ml-mb-progress-row #ml-mb-progress-bar{ flex:1; height:4px; border-radius:999px; }
-#ml-mb-bottom{ justify-content:center; gap:16px; }
-#ml-mb-bottom button{
-  width:42px; height:42px; border-radius:50%; border:none; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  color:#fff; background:rgba(255,255,255,.08); font-size:18px;
-}
-#ml-mb-bottom #ml-mb-playpause{ width:52px; height:52px; background:rgba(255,255,255,.16)!important; font-size:24px!important; }
+
 
 @media (max-width:768px){
   #ml-notice,
   #ml-detail-notice{ width:calc(100% - 12px); margin:14px 6px 0; border-radius:999px; }
   #ml-detail-notice{ margin-bottom:10px; }
   .ml-notice-item{ padding:20px 32px; font-size:17px; }
-  #ml-minibar{ margin:12px 12px 0; }
+  #ml-minibar{ margin:12px 10px 0; padding:12px 14px 10px; border-radius:16px; }
   #ml-mb-title{ font-size:18px; }
   #ml-mb-lyric{ font-size:14px; }
   #ml-notice-modal{ padding:12px; }
@@ -719,61 +672,9 @@ body{overflow-x:hidden;}
   #ml-notice-modal-title{ font-size:20px; margin-right:42px; }
   #ml-notice-copy{ font-size:13px; padding:14px 16px; }
   #ml-notice-sub{ font-size:12px; }
-  .ml-notice-action{ padding:13px 14px; gap:12px; }
+  .ml-notice-action{ padding:14px 18px; gap:9px; }
   .ml-notice-action-title{ font-size:14px; }
-  .ml-notice-action-ico{ width:30px; height:30px; border-radius:8px; }
 }
 
 
-/* minibar lyric final override */
-#ml-minibar{
-  display:none;
-  align-items:center;
-  gap:12px;
-  margin:14px 16px 0;
-  padding:14px 16px;
-  min-height:78px;
-  border-radius:22px;
-}
-#ml-minibar.active{ display:flex; }
-#ml-mb-info{
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:2px;
-}
-#ml-mb-title{ font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-#ml-mb-artist{ font-size:12px; color:rgba(255,255,255,.58); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-#ml-mb-lyric{
-  display:none;
-  margin-top:4px;
-  font-size:12px;
-  line-height:1.4;
-  color:rgba(255,255,255,.86);
-  white-space:normal;
-  overflow:hidden;
-  display:-webkit-box;
-  -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;
-}
-#ml-mb-lyric.show{ display:-webkit-box; }
-#ml-mb-controls{ display:flex; align-items:center; gap:2px; flex-shrink:0; }
-#ml-mb-right{ display:flex; flex-direction:column; gap:5px; width:118px; flex-shrink:0; }
-#ml-mb-progress-bar{ height:4px; border-radius:999px; overflow:hidden; }
-#ml-mb-progress-fill{ transition:width .25s linear; }
-#ml-mb-times{ display:flex; justify-content:space-between; font-size:10px; color:rgba(255,255,255,.44); font-variant-numeric:tabular-nums; }
-@media (max-width:768px){
-  #ml-minibar{ margin:12px 12px 0; padding:12px 14px; border-radius:18px; gap:10px; min-height:72px; }
-  #ml-mb-cover{ width:46px; height:46px; border-radius:10px; }
-  #ml-mb-title{ font-size:15px; }
-  #ml-mb-artist{ font-size:11px; }
-  #ml-mb-lyric{ font-size:11px; }
-  #ml-mb-controls button{ width:28px; height:28px; font-size:13px; }
-  #ml-mb-playpause{ width:34px!important; height:34px!important; font-size:16px!important; }
-  #ml-mb-right{ width:92px; }
-}
-@media (max-width:560px){
-  #ml-mb-right{ display:none; }
-}
+
