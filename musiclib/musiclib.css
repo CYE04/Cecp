@@ -349,6 +349,7 @@ body{overflow-x:hidden;}
   color:#fff; overflow:hidden;
 }
 #ml-miniplayer.active { display:flex; }
+#ml-miniplayer.has-mp3 { display:flex; }
 
 /* Song row */
 .pl-song-row { display:flex; align-items:center; gap:12px; }
@@ -561,6 +562,3 @@ body{overflow-x:hidden;}
   .ml-notice-action{ padding:14px 18px; gap:9px; }
   .ml-notice-action-title{ font-size:14px; }
 }
-
-
-
