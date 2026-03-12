@@ -7,7 +7,8 @@
 
   if(!document.getElementById('ml-style')){
     const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
-    s.href='https://cye04.github.io/Cecp/musiclib.css';
+    const currentScript=(document.currentScript&&document.currentScript.src)||([...document.scripts].map(x=>x.src).find(src=>/musiclib\.js(?:[?#].*)?$/.test(src||'')))||'';
+    s.href=currentScript?currentScript.replace(/musiclib\.js(?:[?#].*)?$/,'musiclib.css'):'https://cye04.github.io/Cecp/musiclib.css';
     document.head.appendChild(s);
   }
 
@@ -22,20 +23,20 @@
 
   root.innerHTML=`
     <div id="ml-minibar">
-      <div id="ml-mb-cover"></div>
-      <div id="ml-mb-info">
+      <div id="ml-mb-head">
         <div id="ml-mb-title">未播放</div>
         <div id="ml-mb-artist"></div>
       </div>
-      <div id="ml-mb-controls">
-        <button id="ml-mb-prev">⏮</button>
-        <button id="ml-mb-playpause">▶</button>
-        <button id="ml-mb-next">⏭</button>
-      </div>
-      <div id="ml-mb-right">
+      <div id="ml-mb-lyric">歌词会显示在这里</div>
+      <div id="ml-mb-progress-row">
+        <span id="ml-mb-cur">0:00</span>
         <div id="ml-mb-progress-bar"><div id="ml-mb-progress-fill"></div></div>
-        <div id="ml-mb-times"><span id="ml-mb-cur">0:00</span><span id="ml-mb-dur">0:00</span></div>
-        <input id="ml-mb-vol" type="range" min="0" max="1" step="0.02" value="1">
+        <span id="ml-mb-dur">0:00</span>
+      </div>
+      <div id="ml-mb-bottom">
+        <button id="ml-mb-prev" type="button" aria-label="上一首">⏮</button>
+        <button id="ml-mb-playpause" type="button" aria-label="播放或暂停">▶</button>
+        <button id="ml-mb-next" type="button" aria-label="下一首">⏭</button>
       </div>
     </div>
     <div id="ml-header">
@@ -247,7 +248,7 @@
           const s=songs.find(x=>x.id===el.dataset.id);
           if(!s||!s.mp3) return;
           const idx=_mpSongs.findIndex(x=>x.id===s.id);
-          if(idx>=0) _mpPlayIdx(idx);
+          if(idx>=0) _mpPlayIdx(idx, true);
         };
         el.appendChild(playBtn);
       });
@@ -330,56 +331,96 @@
   let _mpSongs = [], _mpIdx = -1, _mpLrc = [], _mpLrcIdx = -1;
 
   function _mpFmt(s){
-    const m=Math.floor(s/60),ss=Math.floor(s%60);
+    const safe=Math.max(0, Number.isFinite(s)?s:0);
+    const m=Math.floor(safe/60),ss=Math.floor(safe%60);
     return m+':'+(ss<10?'0':'')+ss;
+  }
+  function _mpSetMiniLyric(text){
+    const el=document.getElementById('ml-mb-lyric');
+    if(el) el.textContent=text||'暂无歌词';
+  }
+  function _mpCurrentLyricText(){
+    if(!_mpLrc.length) return '暂无歌词';
+    if(_mpLrcIdx>=0 && _mpLrc[_mpLrcIdx] && _mpLrc[_mpLrcIdx].text) return _mpLrc[_mpLrcIdx].text;
+    const first=_mpLrc.find(x=>x.text);
+    return first?first.text:'暂无歌词';
   }
   function _mpParseLrc(text){
     const lines=[];
-    text.split('\n').forEach(l=>{
-      const m=l.match(/^\[(\d+):(\d+\.\d+)\](.*)/);
-      if(m) lines.push({time:parseInt(m[1])*60+parseFloat(m[2]),text:m[3].trim()});
+    text.split(/\r?\n/).forEach(raw=>{
+      const row=raw.trim();
+      if(!row) return;
+      const tags=[...row.matchAll(/\[(\d+):(\d+(?:\.\d+)?)\]/g)];
+      if(!tags.length) return;
+      const lyric=row.replace(/\[(\d+):(\d+(?:\.\d+)?)\]/g,'').trim();
+      tags.forEach(tag=>{
+        lines.push({time:parseInt(tag[1],10)*60+parseFloat(tag[2]),text:lyric||'…'});
+      });
     });
     return lines.sort((a,b)=>a.time-b.time);
   }
   function _mpHighlightLrc(){
-    if(!_mpLrc.length) return;
+    const lyricNodes=document.querySelectorAll('.ml-mp-lrc-line');
+    if(!_mpLrc.length){
+      _mpSetMiniLyric('暂无歌词');
+      return;
+    }
     const t=_mpAudio.currentTime;
     let idx=-1;
     _mpLrc.forEach((l,i)=>{ if(l.time<=t) idx=i; });
-    if(idx===_mpLrcIdx) return;
+    if(idx===_mpLrcIdx){
+      _mpSetMiniLyric(_mpCurrentLyricText());
+      return;
+    }
     _mpLrcIdx=idx;
-    document.querySelectorAll('.ml-mp-lrc-line').forEach((r,i)=>r.classList.toggle('active',i===idx));
+    lyricNodes.forEach((r,i)=>r.classList.toggle('active',i===idx));
+    _mpSetMiniLyric(_mpCurrentLyricText());
     if(idx>=0){
-      const el=document.querySelectorAll('.ml-mp-lrc-line')[idx];
+      const el=lyricNodes[idx];
       if(el) el.scrollIntoView({block:'center',behavior:'smooth'});
     }
   }
   function _mpSetState(playing){
-    // playing=true: cover slides left, lyrics appear
-    // playing=false (initial/paused first time): cover center
-    // once played, always stay in played layout
     const stage=document.getElementById('ml-mp-stage');
     if(!stage) return;
-    if(playing) stage.classList.add('playing');
-    // never remove 'playing' class after first play
+    stage.classList.toggle('playing', !!playing);
   }
   function _mpSetCover(src){
     const c=document.getElementById('ml-mp-cover');
     if(!c) return;
-    if(src){ const img=new Image(); img.src=src; img.alt=''; c.innerHTML=''; c.appendChild(img); }
-    else { c.innerHTML='<span>♪</span>'; }
+    if(src){
+      const img=new Image(); img.src=src; img.alt='';
+      c.innerHTML=''; c.appendChild(img);
+    } else {
+      c.innerHTML='<span>♪</span>';
+    }
   }
   function _mpRenderLrc(){
     const inner=document.getElementById('ml-mp-lrc-inner');
     if(!inner) return;
     inner.innerHTML='';
+    if(!_mpLrc.length){
+      const d=document.createElement('div');
+      d.className='ml-mp-lrc-line active';
+      d.textContent='暂无歌词';
+      inner.appendChild(d);
+      _mpSetMiniLyric('暂无歌词');
+      return;
+    }
     _mpLrc.forEach(l=>{
       const d=document.createElement('div');
       d.className='ml-mp-lrc-line';
-      d.textContent=l.text;
+      d.textContent=l.text || '…';
       d.onclick=()=>{ _mpAudio.currentTime=l.time; };
       inner.appendChild(d);
     });
+    _mpSetMiniLyric(_mpCurrentLyricText());
+  }
+  function _mpSyncBarArtwork(song){
+    const bar=document.getElementById('ml-minibar');
+    if(!bar) return;
+    const cover=song&&song.cover?`url("${String(song.cover).replace(/"/g,'\\"')}")`:'none';
+    bar.style.setProperty('--ml-mb-cover', cover);
   }
   function _mpLoadSong(song){
     _mpLrc=[]; _mpLrcIdx=-1;
@@ -388,12 +429,12 @@
     if(titleEl) titleEl.textContent=song.title||'';
     if(artistEl) artistEl.textContent=song.artist||'';
     _mpSetCover(song.cover||null);
-    // reset stage: cover back to center for new song
+    _mpSyncBarArtwork(song);
+    _mpSetMiniLyric('歌词载入中…');
     const stage=document.getElementById('ml-mp-stage');
     if(stage) stage.classList.remove('playing');
     const inner=document.getElementById('ml-mp-lrc-inner');
     if(inner) inner.innerHTML='';
-    // show/hide detail player based on mp3
     const detailPlayer=document.getElementById('ml-miniplayer');
     if(detailPlayer) detailPlayer.classList.toggle('has-mp3', !!song.mp3);
     _mpAudio.src=song.mp3||'';
@@ -401,13 +442,25 @@
       fetch(song.lrc).then(r=>r.text()).then(text=>{
         _mpLrc=_mpParseLrc(text);
         _mpRenderLrc();
-      }).catch(()=>{});
+        _mpHighlightLrc();
+      }).catch(()=>{
+        _mpLrc=[];
+        _mpRenderLrc();
+      });
+    }else{
+      _mpLrc=[];
+      _mpRenderLrc();
     }
-    // no auto-play — user must press play
   }
-  function _mpPlayIdx(idx){
+  function _mpPlayIdx(idx, shouldPlay=false){
     if(idx<0||idx>=_mpSongs.length) return;
-    _mpIdx=idx; _mpLoadSong(_mpSongs[idx]);
+    _mpIdx=idx;
+    _mpLoadSong(_mpSongs[idx]);
+    if(shouldPlay){
+      const doPlay=()=>_mpAudio.play().catch(()=>{});
+      if(_mpAudio.readyState>=1) doPlay();
+      else _mpAudio.addEventListener('loadedmetadata', doPlay, {once:true});
+    }
   }
   function _mpUpdateProgress(){
     const dur=_mpAudio.duration||0, cur=_mpAudio.currentTime||0;
@@ -423,12 +476,16 @@
     if(btn) btn.textContent=_mpAudio.paused?'▶':'⏸';
   }
   _mpAudio.addEventListener('timeupdate',_mpUpdateProgress);
-  _mpAudio.addEventListener('play',()=>{ _mpSetState(true); _mpUpdateBtn(); });
-  _mpAudio.addEventListener('pause',_mpUpdateBtn);
-  _mpAudio.addEventListener('ended',()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); else _mpUpdateBtn(); });
+  _mpAudio.addEventListener('loadedmetadata',_mpUpdateProgress);
+  _mpAudio.addEventListener('play',()=>{ _mpSetState(true); _mpUpdateBtn(); _mbUpdate(); });
+  _mpAudio.addEventListener('pause',()=>{ _mpSetState(false); _mpUpdateBtn(); _mbUpdate(); });
+  _mpAudio.addEventListener('ended',()=>{
+    if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1, true);
+    else { _mpSetState(false); _mpUpdateBtn(); _mbUpdate(); }
+  });
   document.getElementById('ml-mp-playpause').onclick=()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
-  document.getElementById('ml-mp-prev').onclick=()=>{ if(_mpIdx>0)_mpPlayIdx(_mpIdx-1); };
-  document.getElementById('ml-mp-next').onclick=()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); };
+  document.getElementById('ml-mp-prev').onclick=()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1, !_mpAudio.paused); };
+  document.getElementById('ml-mp-next').onclick=()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1, !_mpAudio.paused); };
   document.getElementById('ml-mp-vol').oninput=e=>{ _mpAudio.volume=parseFloat(e.target.value); };
   document.getElementById('ml-mp-progress-bar').onclick=e=>{
     if(!_mpAudio.duration) return;
@@ -438,49 +495,44 @@
 
   function destroyAP(){ _mpAudio.pause(); }
 
-  /* ── Compact Minibar (list page) ── */
-  let _mbCoverSrc = '';
+  /* ── Home Now Playing Bar ── */
   function _mbUpdate(){
-    const bar = document.getElementById('ml-minibar');
+    const bar=document.getElementById('ml-minibar');
     if(!bar) return;
-    const title = document.getElementById('ml-mb-title');
-    const artist = document.getElementById('ml-mb-artist');
-    const cover = document.getElementById('ml-mb-cover');
-    const btn = document.getElementById('ml-mb-playpause');
-    const fill = document.getElementById('ml-mb-progress-fill');
-    const cur = document.getElementById('ml-mb-cur');
-    const dur = document.getElementById('ml-mb-dur');
-    const song = _mpSongs[_mpIdx];
+    const title=document.getElementById('ml-mb-title');
+    const artist=document.getElementById('ml-mb-artist');
+    const btn=document.getElementById('ml-mb-playpause');
+    const fill=document.getElementById('ml-mb-progress-fill');
+    const cur=document.getElementById('ml-mb-cur');
+    const dur=document.getElementById('ml-mb-dur');
+    const song=_mpSongs[_mpIdx];
     if(song){
-      if(title) title.textContent = song.title||'';
-      if(artist) artist.textContent = song.artist||'';
-      if(cover && song.cover !== _mbCoverSrc){
-        _mbCoverSrc = song.cover||'';
-        if(song.cover){
-          cover.innerHTML='';
-          const img=document.createElement('img');
-          img.src=song.cover; img.alt='';
-          cover.appendChild(img);
-        } else {
-          cover.innerHTML='♪';
-        }
-      }
+      if(title) title.textContent=song.title||'';
+      if(artist) artist.textContent=song.artist||'';
+      _mpSyncBarArtwork(song);
+      _mpSetMiniLyric(_mpCurrentLyricText());
       bar.classList.add('active');
+    }else{
+      if(title) title.textContent='未播放';
+      if(artist) artist.textContent='';
+      _mpSetMiniLyric('歌词会显示在这里');
+      bar.classList.remove('active');
+      bar.style.setProperty('--ml-mb-cover','none');
     }
-    if(btn) btn.textContent = _mpAudio.paused ? '▶' : '⏸';
-    const d = _mpAudio.duration||0, t = _mpAudio.currentTime||0;
-    if(fill) fill.style.width = (d ? t/d*100 : 0)+'%';
-    if(cur) cur.textContent = _mpFmt(t);
-    if(dur) dur.textContent = _mpFmt(d);
+    if(btn) btn.textContent=_mpAudio.paused?'▶':'⏸';
+    const d=_mpAudio.duration||0, t=_mpAudio.currentTime||0;
+    if(fill) fill.style.width=(d ? t/d*100 : 0)+'%';
+    if(cur) cur.textContent=_mpFmt(t);
+    if(dur) dur.textContent=_mpFmt(d);
   }
   _mpAudio.addEventListener('play', _mbUpdate);
   _mpAudio.addEventListener('pause', _mbUpdate);
   _mpAudio.addEventListener('timeupdate', _mbUpdate);
-  document.getElementById('ml-mb-playpause').onclick = ()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
-  document.getElementById('ml-mb-prev').onclick = ()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1); };
-  document.getElementById('ml-mb-next').onclick = ()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1); };
-  document.getElementById('ml-mb-vol').oninput = e=>{ _mpAudio.volume=parseFloat(e.target.value); };
-  document.getElementById('ml-mb-progress-bar').onclick = e=>{
+  _mpAudio.addEventListener('loadedmetadata', _mbUpdate);
+  document.getElementById('ml-mb-playpause').onclick=()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
+  document.getElementById('ml-mb-prev').onclick=()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1, !_mpAudio.paused); };
+  document.getElementById('ml-mb-next').onclick=()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1, !_mpAudio.paused); };
+  document.getElementById('ml-mb-progress-bar').onclick=e=>{
     if(!_mpAudio.duration) return;
     const r=e.currentTarget.getBoundingClientRect();
     _mpAudio.currentTime=((e.clientX-r.left)/r.width)*_mpAudio.duration;
@@ -834,14 +886,15 @@
         });
         if(maxW>avail){
           var scale=avail/maxW;
-          // 整个 lbDiv 等比缩放，像图片一样
-          lbDiv.style.transform='scale('+scale+')';
-          lbDiv.style.transformOrigin='left top';
           lbDiv.style.width=maxW+'px';
+          lbDiv.style.marginLeft='50%';
+          lbDiv.style.transform='translateX(-50%) scale('+scale+')';
+          lbDiv.style.transformOrigin='top center';
           var naturalH=lbDiv.offsetHeight;
           lbDiv.style.marginBottom=(naturalH*(scale-1))+'px';
           lbDiv.parentElement.style.overflow='hidden';
         } else {
+          lbDiv.style.marginLeft='';
           lbDiv.parentElement.style.overflow='';
         }
       });
