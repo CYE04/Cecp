@@ -29,21 +29,29 @@
 
   root.innerHTML=`
     <div id="ml-minibar">
-      <div id="ml-mb-cover"></div>
-      <div id="ml-mb-info">
-        <div id="ml-mb-title">未播放</div>
-        <div id="ml-mb-artist"></div>
-        <div id="ml-mb-lyric"></div>
+      <div id="ml-mb-song-row">
+        <div id="ml-mb-cover"></div>
+        <div id="ml-mb-info">
+          <div id="ml-mb-title">未播放</div>
+          <div id="ml-mb-artist"></div>
+        </div>
       </div>
-      <div id="ml-mb-controls">
-        <button id="ml-mb-prev">⏮</button>
-        <button id="ml-mb-playpause">▶</button>
-        <button id="ml-mb-next">⏭</button>
-      </div>
-      <div id="ml-mb-right">
+      <div id="ml-mb-progress-wrap">
         <div id="ml-mb-progress-bar"><div id="ml-mb-progress-fill"></div></div>
         <div id="ml-mb-times"><span id="ml-mb-cur">0:00</span><span id="ml-mb-dur">0:00</span></div>
+      </div>
+      <div id="ml-mb-controls">
+        <button id="ml-mb-seek-back" aria-label="后退15秒"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15.5" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="system-ui,sans-serif" font-weight="600">15</text></svg></button>
+        <button id="ml-mb-prev" aria-label="上一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1zm3.2 5.65 7.1-4.8A.43.43 0 0 1 17 7.2v9.6a.43.43 0 0 1-.7.35L9.2 12.35a.43.43 0 0 1 0-.7z"/></svg></button>
+        <button id="ml-mb-playpause" aria-label="播放"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg></button>
+        <button id="ml-mb-next" aria-label="下一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6a1 1 0 0 0-1 1v10a1 1 0 1 0 2 0V7a1 1 0 0 0-1-1zm-3.2 5.65-7.1-4.8A.43.43 0 0 0 7 7.2v9.6a.43.43 0 0 0 .7.35l7.1-4.8a.43.43 0 0 0 0-.7z"/></svg></button>
+        <button id="ml-mb-seek-fwd" aria-label="前进15秒"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="15.5" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="system-ui,sans-serif" font-weight="600">15</text></svg></button>
+        <button id="ml-mb-repeat" aria-label="循环"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+      </div>
+      <div id="ml-mb-vol-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
         <input id="ml-mb-vol" type="range" min="0" max="1" step="0.02" value="1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM18.5 12c0-2.77-1.5-5.15-3.75-6.45v12.9C16.99 17.14 18.5 14.77 18.5 12z"/></svg>
       </div>
     </div>
     <div id="ml-header">
@@ -91,18 +99,17 @@
             <div id="ml-mp-artist"></div>
           </div>
           <div id="ml-mp-controls">
-            <button id="ml-mp-shuffle" aria-label="随机播放" title="随机播放"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg></button>
+            <button id="ml-mp-seek-back" aria-label="后退15秒"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15.5" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="system-ui,sans-serif" font-weight="600">15</text></svg></button>
             <button id="ml-mp-prev" aria-label="上一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1zm3.2 5.65 7.1-4.8A.43.43 0 0 1 17 7.2v9.6a.43.43 0 0 1-.7.35L9.2 12.35a.43.43 0 0 1 0-.7z"/></svg></button>
-            <button id="ml-mp-seek-back" aria-label="后退15秒" title="后退15秒"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="sans-serif">15</text></svg></button>
             <button id="ml-mp-playpause" aria-label="播放"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg></button>
-            <button id="ml-mp-seek-fwd" aria-label="前进15秒" title="前进15秒"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="15" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="sans-serif">15</text></svg></button>
             <button id="ml-mp-next" aria-label="下一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6a1 1 0 0 0-1 1v10a1 1 0 1 0 2 0V7a1 1 0 0 0-1-1zm-3.2 5.65-7.1-4.8A.43.43 0 0 0 7 7.2v9.6a.43.43 0 0 0 .7.35l7.1-4.8a.43.43 0 0 0 0-.7z"/></svg></button>
-            <button id="ml-mp-repeat" aria-label="循环" title="循环"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+            <button id="ml-mp-seek-fwd" aria-label="前进15秒"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="15.5" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="system-ui,sans-serif" font-weight="600">15</text></svg></button>
+            <button id="ml-mp-repeat" aria-label="循环"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
           </div>
           <div id="ml-mp-vol-wrap">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" opacity=".5"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
             <input id="ml-mp-vol" type="range" min="0" max="1" step="0.02" value="1">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" opacity=".5"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM18.5 12c0-2.77-1.5-5.15-3.75-6.45v12.9C16.99 17.14 18.5 14.77 18.5 12z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM18.5 12c0-2.77-1.5-5.15-3.75-6.45v12.9C16.99 17.14 18.5 14.77 18.5 12z"/></svg>
           </div>
         </div>
       </div>
@@ -149,16 +156,34 @@
         <div id="ml-notice-sub">需要申请新歌练习可联系 <strong>YuEn</strong>。制作一首歌通常需要约 <strong>1–2 小时</strong>，请尽量提前说明。</div>
         <div id="ml-notice-actions">
           <button class="ml-notice-action is-copy" id="ml-copy-wechat" type="button">
-            <span class="ml-notice-action-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 4C5.36 4 2 6.92 2 10.5c0 2.04 1.06 3.86 2.72 5.08L4 18l2.5-1.25A8.6 8.6 0 0 0 9.5 17c.17 0 .34 0 .5-.01A5.7 5.7 0 0 1 9.5 15c0-3.04 2.69-5.5 6-5.5.17 0 .34 0 .5.01C15.41 6.67 12.73 4 9.5 4zm8 7c-2.76 0-5 1.79-5 4s2.24 4 5 4c.72 0 1.4-.14 2-.38L22 20l-.62-1.86A3.93 3.93 0 0 0 22.5 15c0-2.21-2.24-4-5-4z"/></svg></span>
-            <span class="ml-notice-action-title">复制微信号 YuEn</span>
+            <span class="ml-notice-action-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 4C5.36 4 2 6.92 2 10.5c0 2.04 1.06 3.86 2.72 5.08L4 18l2.5-1.25A8.6 8.6 0 0 0 9.5 17c.17 0 .34 0 .5-.01A5.7 5.7 0 0 1 9.5 15c0-3.04 2.69-5.5 6-5.5.17 0 .34 0 .5.01C15.41 6.67 12.73 4 9.5 4zm8 7c-2.76 0-5 1.79-5 4s2.24 4 5 4c.72 0 1.4-.14 2-.38L22 20l-.62-1.86A3.93 3.93 0 0 0 22.5 15c0-2.21-2.24-4-5-4z"/></svg>
+            </span>
+            <span class="ml-notice-action-body">
+              <span class="ml-notice-action-label">微信</span>
+              <span class="ml-notice-action-title">复制微信号 YuEn</span>
+            </span>
+            <span class="ml-notice-action-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
           </button>
           <button class="ml-notice-action" id="ml-open-ins" type="button">
-            <span class="ml-notice-action-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2"/></svg></span>
-            <span class="ml-notice-action-title">INS 加我</span>
+            <span class="ml-notice-action-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            </span>
+            <span class="ml-notice-action-body">
+              <span class="ml-notice-action-label">Instagram</span>
+              <span class="ml-notice-action-title">打开 YuEn 的主页</span>
+            </span>
+            <span class="ml-notice-action-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
           </button>
           <button class="ml-notice-action" id="ml-open-church-ins" type="button">
-            <span class="ml-notice-action-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 9 9H2l5.5 4-2 7L12 16l6.5 4-2-7L22 9h-7z"/></svg></span>
-            <span class="ml-notice-action-title">教会青年 INS</span>
+            <span class="ml-notice-action-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            </span>
+            <span class="ml-notice-action-body">
+              <span class="ml-notice-action-label">Instagram</span>
+              <span class="ml-notice-action-title">打开教会青年账号</span>
+            </span>
+            <span class="ml-notice-action-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
           </button>
         </div>
       </div>`;
@@ -441,7 +466,7 @@
   /* ── Mini Player ── */
   const _mpAudio = document.getElementById('ml-mp-audio');
   let _mpSongs = [], _mpIdx = -1, _mpLrc = [], _mpLrcIdx = -1;
-  let _mpShuffle = false, _mpRepeat = 0; // repeat: 0=off 1=all 2=one
+  let _mpRepeat = 0; // 0=off 1=all 2=one
 
   function _mpFmt(s){
     const m=Math.floor(s/60),ss=Math.floor(s%60);
@@ -575,10 +600,6 @@
   _mpAudio.addEventListener('pause',_mpUpdateBtn);
   _mpAudio.addEventListener('ended',()=>{
     if(_mpRepeat===2){ _mpAudio.currentTime=0; _mpAudio.play().catch(()=>{}); return; }
-    if(_mpShuffle){
-      const next=Math.floor(Math.random()*_mpSongs.length);
-      _mpPlayIdx(next); return;
-    }
     if(_mpIdx<_mpSongs.length-1){ _mpPlayIdx(_mpIdx+1); }
     else if(_mpRepeat===1){ _mpPlayIdx(0); }
     else { _mpUpdateBtn(); }
@@ -589,15 +610,10 @@
   document.getElementById('ml-mp-vol').oninput=e=>{ _mpAudio.volume=parseFloat(e.target.value); };
   document.getElementById('ml-mp-seek-back').onclick=()=>{ _mpAudio.currentTime=Math.max(0,_mpAudio.currentTime-15); };
   document.getElementById('ml-mp-seek-fwd').onclick=()=>{ _mpAudio.currentTime=Math.min(_mpAudio.duration||0,_mpAudio.currentTime+15); };
-  document.getElementById('ml-mp-shuffle').onclick=()=>{
-    _mpShuffle=!_mpShuffle;
-    const btn=document.getElementById('ml-mp-shuffle');
-    if(btn) btn.classList.toggle('active',_mpShuffle);
-  };
   document.getElementById('ml-mp-repeat').onclick=()=>{
     _mpRepeat=(_mpRepeat+1)%3;
-    const btn=document.getElementById('ml-mp-repeat');
-    if(btn){ btn.classList.toggle('active',_mpRepeat>0); btn.dataset.mode=_mpRepeat; }
+    const rBtns=[document.getElementById('ml-mp-repeat'),document.getElementById('ml-mb-repeat')];
+    rBtns.forEach(b=>{ if(b){ b.classList.toggle('active',_mpRepeat>0); b.dataset.mode=_mpRepeat; } });
   };
   document.getElementById('ml-mp-progress-bar').onclick=e=>{
     if(!_mpAudio.duration) return;
@@ -647,9 +663,21 @@
   _mpAudio.addEventListener('pause', _mbUpdate);
   _mpAudio.addEventListener('timeupdate', _mbUpdate);
   document.getElementById('ml-mb-playpause').onclick = ()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
-  document.getElementById('ml-mb-prev').onclick = ()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1,!_mpAudio.paused); }; 
-  document.getElementById('ml-mb-next').onclick = ()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1,!_mpAudio.paused); }; 
+  document.getElementById('ml-mb-prev').onclick = ()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1,!_mpAudio.paused); };
+  document.getElementById('ml-mb-next').onclick = ()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1,!_mpAudio.paused); };
+  document.getElementById('ml-mb-seek-back').onclick = ()=>{ _mpAudio.currentTime=Math.max(0,_mpAudio.currentTime-15); };
+  document.getElementById('ml-mb-seek-fwd').onclick = ()=>{ _mpAudio.currentTime=Math.min(_mpAudio.duration||0,_mpAudio.currentTime+15); };
+  document.getElementById('ml-mb-repeat').onclick = ()=>{
+    _mpRepeat=(_mpRepeat+1)%3;
+    const rBtns=[document.getElementById('ml-mp-repeat'),document.getElementById('ml-mb-repeat')];
+    rBtns.forEach(b=>{ if(b){ b.classList.toggle('active',_mpRepeat>0); b.dataset.mode=_mpRepeat; } });
+  };
   document.getElementById('ml-mb-vol').oninput = e=>{ _mpAudio.volume=parseFloat(e.target.value); };
+  document.getElementById('ml-mb-progress-bar').onclick = e=>{
+    if(!_mpAudio.duration) return;
+    const r=e.currentTarget.getBoundingClientRect();
+    _mpAudio.currentTime=((e.clientX-r.left)/r.width)*_mpAudio.duration;
+  };
   document.getElementById('ml-mb-progress-bar').onclick = e=>{
     if(!_mpAudio.duration) return;
     const r=e.currentTarget.getBoundingClientRect();
