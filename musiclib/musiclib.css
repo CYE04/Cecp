@@ -378,6 +378,7 @@ body{overflow-x:hidden;}
   position: absolute;
   left: 144px; right: 0;
   top: 0; bottom: 0;
+  height: 100%;
   overflow: hidden;
   opacity: 0;
   transform: translateX(16px);
@@ -399,13 +400,13 @@ body{overflow-x:hidden;}
 .ml-mp-lrc-line {
   width: 100%;
   text-align: center;
-  font-size: clamp(12px, 2.2vw, 16px);
-  line-height: 1.75;
-  padding: 2px 6px;
+  font-size: clamp(13px, 3.5vw, 18px);
+  line-height: 1.8;
+  padding: 3px 4px;
   color: rgba(255,255,255,0.28);
   cursor: pointer;
   border-radius: 6px;
-  transition: color 0.3s ease, font-size 0.3s ease, font-weight 0.3s ease;
+  transition: color 0.3s ease, font-weight 0.3s ease;
   user-select: none;
   white-space: normal;
   word-break: break-word;
@@ -413,8 +414,8 @@ body{overflow-x:hidden;}
 .ml-mp-lrc-line:hover { color: rgba(255,255,255,0.55); }
 .ml-mp-lrc-line.active {
   color: #fff;
-  font-size: clamp(13px, 2.5vw, 17px);
-  font-weight: 600;
+  font-size: clamp(15px, 4vw, 20px);
+  font-weight: 700;
 }
 
 /* Song row */
@@ -431,10 +432,10 @@ body{overflow-x:hidden;}
 .pl-artist { font-size:12px; color:rgba(255,255,255,0.45); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
 
 /* Progress */
-.pl-progress-wrap { padding:0 2px; }
-.pl-progress-bar { height:3px; border-radius:99px; background:rgba(255,255,255,0.15); cursor:pointer; }
+.pl-progress-wrap { padding:8px 2px; cursor:pointer; margin:0 -2px; }
+.pl-progress-bar { height:5px; border-radius:99px; background:rgba(255,255,255,0.15); pointer-events:none; }
 .pl-progress-fill { height:100%; background:#fff; border-radius:99px; width:0%; transition:width .4s linear; }
-.pl-times { display:flex; justify-content:space-between; margin-top:5px; font-size:10px; color:rgba(255,255,255,0.35); font-variant-numeric:tabular-nums; }
+.pl-times { display:flex; justify-content:space-between; margin-top:4px; font-size:11px; color:rgba(255,255,255,0.35); font-variant-numeric:tabular-nums; }
 
 /* Controls */
 .pl-controls { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; }
@@ -453,21 +454,23 @@ body{overflow-x:hidden;}
 .pl-repeat { position:relative; }
 .pl-repeat[data-mode="2"]::after { content:'1'; position:absolute; font-size:7px; bottom:3px; right:3px; font-weight:700; color:#fff; line-height:1; }
 
-/* Volume — compact centered strip (≈1/8 of full width) */
+/* Volume — compact centered strip */
 .pl-vol-wrap {
-  display:flex; align-items:center; gap:6px;
-  width:80px; margin:0 auto;
+  display:flex; align-items:center; gap:8px;
+  width:clamp(80px, 20vw, 130px); margin:0 auto;
   color:rgba(255,255,255,0.35);
+  padding:6px 0;
 }
 .pl-vol {
   -webkit-appearance:none; appearance:none;
-  flex:1; height:2px;
+  flex:1; height:4px;
   background:rgba(255,255,255,0.18); border-radius:99px;
   outline:none; cursor:pointer;
 }
 .pl-vol::-webkit-slider-thumb {
-  -webkit-appearance:none; width:10px; height:10px;
+  -webkit-appearance:none; width:16px; height:16px;
   border-radius:50%; background:#fff; cursor:pointer;
+  box-shadow:0 1px 4px rgba(0,0,0,0.3);
 }
 
 /* Minibar cover (only in list page) */
