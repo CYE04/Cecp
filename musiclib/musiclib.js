@@ -81,20 +81,28 @@
             <div id="ml-mp-lrc-inner"></div>
           </div>
         </div>
+        <div id="ml-mp-progress-wrap">
+          <div id="ml-mp-progress-bar"><div id="ml-mp-progress-fill"></div></div>
+          <div id="ml-mp-times"><span id="ml-mp-cur">0:00</span><span id="ml-mp-dur">0:00</span></div>
+        </div>
         <div id="ml-mp-bottom">
           <div id="ml-mp-info">
             <div id="ml-mp-title"></div>
             <div id="ml-mp-artist"></div>
           </div>
           <div id="ml-mp-controls">
-            <button id="ml-mp-prev">⏮</button>
-            <button id="ml-mp-playpause">▶</button>
-            <button id="ml-mp-next">⏭</button>
+            <button id="ml-mp-shuffle" aria-label="随机播放" title="随机播放"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg></button>
+            <button id="ml-mp-prev" aria-label="上一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1zm3.2 5.65 7.1-4.8A.43.43 0 0 1 17 7.2v9.6a.43.43 0 0 1-.7.35L9.2 12.35a.43.43 0 0 1 0-.7z"/></svg></button>
+            <button id="ml-mp-seek-back" aria-label="后退15秒" title="后退15秒"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="sans-serif">15</text></svg></button>
+            <button id="ml-mp-playpause" aria-label="播放"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg></button>
+            <button id="ml-mp-seek-fwd" aria-label="前进15秒" title="前进15秒"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="15" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="sans-serif">15</text></svg></button>
+            <button id="ml-mp-next" aria-label="下一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6a1 1 0 0 0-1 1v10a1 1 0 1 0 2 0V7a1 1 0 0 0-1-1zm-3.2 5.65-7.1-4.8A.43.43 0 0 0 7 7.2v9.6a.43.43 0 0 0 .7.35l7.1-4.8a.43.43 0 0 0 0-.7z"/></svg></button>
+            <button id="ml-mp-repeat" aria-label="循环" title="循环"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
           </div>
-          <div id="ml-mp-right">
-            <div id="ml-mp-progress-bar"><div id="ml-mp-progress-fill"></div></div>
-            <div id="ml-mp-times"><span id="ml-mp-cur">0:00</span><span id="ml-mp-dur">0:00</span></div>
+          <div id="ml-mp-vol-wrap">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" opacity=".5"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
             <input id="ml-mp-vol" type="range" min="0" max="1" step="0.02" value="1">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" opacity=".5"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM18.5 12c0-2.77-1.5-5.15-3.75-6.45v12.9C16.99 17.14 18.5 14.77 18.5 12z"/></svg>
           </div>
         </div>
       </div>
@@ -199,8 +207,14 @@
     }
   }
 
-  function openNoticeModal(){ $('ml-notice-modal')?.classList.add('open'); }
-  function closeNoticeModal(){ $('ml-notice-modal')?.classList.remove('open'); }
+  function openNoticeModal(){
+    $('ml-notice-modal')?.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeNoticeModal(){
+    $('ml-notice-modal')?.classList.remove('open');
+    document.body.style.overflow='';
+  }
 
   $('ml-contact').addEventListener('click',()=>copyText(WECHAT,'微信号已复制'));
   $('ml-notice')?.addEventListener('click',openNoticeModal);
@@ -427,6 +441,7 @@
   /* ── Mini Player ── */
   const _mpAudio = document.getElementById('ml-mp-audio');
   let _mpSongs = [], _mpIdx = -1, _mpLrc = [], _mpLrcIdx = -1;
+  let _mpShuffle = false, _mpRepeat = 0; // repeat: 0=off 1=all 2=one
 
   function _mpFmt(s){
     const m=Math.floor(s/60),ss=Math.floor(s%60);
@@ -558,11 +573,32 @@
   _mpAudio.addEventListener('timeupdate',_mpUpdateProgress);
   _mpAudio.addEventListener('play',()=>{ _mpSetState(true); _mpUpdateBtn(); });
   _mpAudio.addEventListener('pause',_mpUpdateBtn);
-  _mpAudio.addEventListener('ended',()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); else _mpUpdateBtn(); });
+  _mpAudio.addEventListener('ended',()=>{
+    if(_mpRepeat===2){ _mpAudio.currentTime=0; _mpAudio.play().catch(()=>{}); return; }
+    if(_mpShuffle){
+      const next=Math.floor(Math.random()*_mpSongs.length);
+      _mpPlayIdx(next); return;
+    }
+    if(_mpIdx<_mpSongs.length-1){ _mpPlayIdx(_mpIdx+1); }
+    else if(_mpRepeat===1){ _mpPlayIdx(0); }
+    else { _mpUpdateBtn(); }
+  });
   document.getElementById('ml-mp-playpause').onclick=()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
   document.getElementById('ml-mp-prev').onclick=()=>{ if(_mpIdx>0)_mpPlayIdx(_mpIdx-1,!_mpAudio.paused); };
   document.getElementById('ml-mp-next').onclick=()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1,!_mpAudio.paused); };
   document.getElementById('ml-mp-vol').oninput=e=>{ _mpAudio.volume=parseFloat(e.target.value); };
+  document.getElementById('ml-mp-seek-back').onclick=()=>{ _mpAudio.currentTime=Math.max(0,_mpAudio.currentTime-15); };
+  document.getElementById('ml-mp-seek-fwd').onclick=()=>{ _mpAudio.currentTime=Math.min(_mpAudio.duration||0,_mpAudio.currentTime+15); };
+  document.getElementById('ml-mp-shuffle').onclick=()=>{
+    _mpShuffle=!_mpShuffle;
+    const btn=document.getElementById('ml-mp-shuffle');
+    if(btn) btn.classList.toggle('active',_mpShuffle);
+  };
+  document.getElementById('ml-mp-repeat').onclick=()=>{
+    _mpRepeat=(_mpRepeat+1)%3;
+    const btn=document.getElementById('ml-mp-repeat');
+    if(btn){ btn.classList.toggle('active',_mpRepeat>0); btn.dataset.mode=_mpRepeat; }
+  };
   document.getElementById('ml-mp-progress-bar').onclick=e=>{
     if(!_mpAudio.duration) return;
     const r=e.currentTarget.getBoundingClientRect();
