@@ -7,7 +7,14 @@
 
   if(!document.getElementById('ml-style')){
     const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
-    s.href='https://cye04.github.io/Cecp/musiclib.css';
+    try{
+      const cur=document.currentScript && document.currentScript.src ? new URL(document.currentScript.src, location.href) : null;
+      s.href=cur ? new URL('musiclib.css', cur.href).href : 'musiclib.css';
+      s.onerror=()=>{ if(!/cye04\.github\.io\/Cecp\/musiclib\.css$/.test(s.href)) s.href='https://cye04.github.io/Cecp/musiclib.css'; };
+    }catch(_){
+      s.href='musiclib.css';
+      s.onerror=()=>{ s.href='https://cye04.github.io/Cecp/musiclib.css'; };
+    }
     document.head.appendChild(s);
   }
 
@@ -26,6 +33,7 @@
       <div id="ml-mb-info">
         <div id="ml-mb-title">未播放</div>
         <div id="ml-mb-artist"></div>
+        <div id="ml-mb-lyric"></div>
       </div>
       <div id="ml-mb-controls">
         <button id="ml-mb-prev">⏮</button>
@@ -36,17 +44,6 @@
         <div id="ml-mb-progress-bar"><div id="ml-mb-progress-fill"></div></div>
         <div id="ml-mb-times"><span id="ml-mb-cur">0:00</span><span id="ml-mb-dur">0:00</span></div>
         <input id="ml-mb-vol" type="range" min="0" max="1" step="0.02" value="1">
-      </div>
-      <div id="ml-mb-lyrics" aria-live="polite">
-        <div id="ml-mb-lyric-current">歌词会显示在这里</div>
-        <div id="ml-mb-lyric-next"></div>
-      </div>
-    </div>
-
-    <div id="ml-notice" class="ml-notice-trigger" aria-label="版权与联系说明" role="button" tabindex="0">
-      <div class="ml-notice-track">
-        <div class="ml-notice-item"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
-        <div class="ml-notice-item" aria-hidden="true"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
       </div>
     </div>
     <div id="ml-header">
@@ -77,38 +74,31 @@
       <div id="ml-miniplayer">
         <audio id="ml-mp-audio"></audio>
         <div id="ml-mp-stage">
-          <div id="ml-mp-cover-wrap"><div id="ml-mp-cover"><span>♪</span></div></div>
-          <div id="ml-mp-lrc-panel"><div id="ml-mp-lrc-inner"></div></div>
+          <div id="ml-mp-cover-wrap">
+            <div id="ml-mp-cover"><span>♪</span></div>
+          </div>
+          <div id="ml-mp-lrc-panel">
+            <div id="ml-mp-lrc-inner"></div>
+          </div>
         </div>
         <div id="ml-mp-bottom">
-          <div id="ml-mp-info"><div id="ml-mp-title"></div><div id="ml-mp-artist"></div></div>
-          <div id="ml-mp-controls"><button id="ml-mp-prev">⏮</button><button id="ml-mp-playpause">▶</button><button id="ml-mp-next">⏭</button></div>
-          <div id="ml-mp-right"><div id="ml-mp-progress-bar"><div id="ml-mp-progress-fill"></div></div><div id="ml-mp-times"><span id="ml-mp-cur">0:00</span><span id="ml-mp-dur">0:00</span></div><input id="ml-mp-vol" type="range" min="0" max="1" step="0.02" value="1"></div>
-        </div>
-      </div>
-      <div id="ml-detail-notice" class="ml-notice-trigger" aria-label="版权与联系说明" role="button" tabindex="0">
-        <div class="ml-notice-track">
-          <div class="ml-notice-item"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
-          <div class="ml-notice-item" aria-hidden="true"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
+          <div id="ml-mp-info">
+            <div id="ml-mp-title"></div>
+            <div id="ml-mp-artist"></div>
+          </div>
+          <div id="ml-mp-controls">
+            <button id="ml-mp-prev">⏮</button>
+            <button id="ml-mp-playpause">▶</button>
+            <button id="ml-mp-next">⏭</button>
+          </div>
+          <div id="ml-mp-right">
+            <div id="ml-mp-progress-bar"><div id="ml-mp-progress-fill"></div></div>
+            <div id="ml-mp-times"><span id="ml-mp-cur">0:00</span><span id="ml-mp-dur">0:00</span></div>
+            <input id="ml-mp-vol" type="range" min="0" max="1" step="0.02" value="1">
+          </div>
         </div>
       </div>
       <div id="ml-detail-body"></div>
-    </div>
-    <div id="ml-notice-modal" aria-hidden="true">
-      <div id="ml-notice-backdrop"></div>
-      <div id="ml-notice-sheet" role="dialog" aria-modal="true" aria-labelledby="ml-notice-modal-title">
-        <button id="ml-notice-close" type="button" aria-label="关闭说明">✕</button>
-        <div class="ml-notice-modal-eyebrow">Copyright Notice</div>
-        <div id="ml-notice-modal-title">诗歌版权与申请新歌</div>
-        <div class="ml-notice-modal-body">本站所展示之诗歌、歌词、曲谱、音频及相关资料，其著作权及相关权利均归原权利人所有。本站内容仅用于教会内部诗歌练习、学习与敬拜辅助，不以营利为目的。若相关权利人认为本站任何内容涉及侵权，请与我们联系，我们将在核实后及时处理、修改或下架相关内容。</div>
-        <div class="ml-notice-modal-sub">需要申请新歌练习可联系 <strong>YuEn</strong>。制作一首歌通常需要约 <strong>1–2 小时</strong>，请尽量提前说明。</div>
-        <div class="ml-notice-actions">
-          <button class="ml-notice-action primary" type="button" data-copy="CYuen_290104" data-label="微信号"><span>复制微信号</span><small>CYuen_290104</small></button>
-          <a class="ml-notice-action" href="https://www.instagram.com/_yuen0129/" target="_blank" rel="noopener noreferrer"><span>INS 加我</span><small>@_yuen0129</small></a>
-          <a class="ml-notice-action" href="https://www.instagram.com/cecp.it_youth/" target="_blank" rel="noopener noreferrer"><span>教会青年 INS</span><small>@cecp.it_youth</small></a>
-        </div>
-        <div id="ml-notice-copy-feedback">已复制到剪贴板</div>
-      </div>
     </div>
     <div id="ml-lightbox">
       <button id="ml-lightbox-close">✕</button>
@@ -118,34 +108,112 @@
 
   const $=id=>document.getElementById(id);
   const detail=$('ml-detail');
-  const noticeModal=$('ml-notice-modal');
+
+  (function buildNoticeUI(){
+    const noticeHTML=`
+      <div class="ml-notice-track">
+        <div class="ml-notice-item"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
+        <div class="ml-notice-item" aria-hidden="true"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
+      </div>`;
+
+    const listNotice=document.createElement('button');
+    listNotice.id='ml-notice';
+    listNotice.type='button';
+    listNotice.setAttribute('aria-label','版权与申请新歌说明');
+    listNotice.innerHTML=noticeHTML;
+    root.insertBefore(listNotice, $('ml-header'));
+
+    const detailNotice=document.createElement('button');
+    detailNotice.id='ml-detail-notice';
+    detailNotice.type='button';
+    detailNotice.setAttribute('aria-label','版权与申请新歌说明');
+    detailNotice.innerHTML=noticeHTML;
+    detail.insertBefore(detailNotice, $('ml-detail-body'));
+
+    const modal=document.createElement('div');
+    modal.id='ml-notice-modal';
+    modal.innerHTML=`
+      <div id="ml-notice-dialog" role="dialog" aria-modal="true" aria-labelledby="ml-notice-modal-title">
+        <button id="ml-notice-close" type="button" aria-label="关闭">✕</button>
+        <div id="ml-notice-kicker">COPYRIGHT NOTICE</div>
+        <h2 id="ml-notice-modal-title">诗歌版权与申请新歌</h2>
+        <div id="ml-notice-copy">本站所展示之诗歌、歌词、曲谱、音频及相关资料，其著作权及相关权利均归原权利人所有。本站内容仅用于教会内部诗歌练习、学习与敬拜辅助，不以营利为目的。若相关权利人认为本站任何内容涉及侵权，请与我们联系，我们将在核实后及时处理、修改或下架相关内容。</div>
+        <div id="ml-notice-sub">需要申请新歌练习可联系 <strong>YuEn</strong>。制作一首歌通常需要约 <strong>1–2 小时</strong>，请尽量提前说明。</div>
+        <div id="ml-notice-actions">
+          <button class="ml-notice-action is-copy" id="ml-copy-wechat" type="button">
+            <span class="ml-notice-action-title">复制微信号</span>
+            <span class="ml-notice-action-sub">点击后自动复制</span>
+          </button>
+          <button class="ml-notice-action" id="ml-open-ins" type="button">
+            <span class="ml-notice-action-title">INS 加我</span>
+            <span class="ml-notice-action-sub">打开 YuEn 的 Instagram</span>
+          </button>
+          <button class="ml-notice-action" id="ml-open-church-ins" type="button">
+            <span class="ml-notice-action-title">教会青年 INS</span>
+            <span class="ml-notice-action-sub">打开 CECP 青年账号</span>
+          </button>
+        </div>
+      </div>`;
+    root.appendChild(modal);
+
+    const toast=document.createElement('div');
+    toast.id='ml-toast';
+    root.appendChild(toast);
+
+    const mbLyric=$('ml-mb-lyric');
+    if(mbLyric) mbLyric.textContent='';
+  })();
 
   syncHaloTheme();
   observeThemeChanges();
 
-  function fallbackCopy(text, onOk){
-    const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
-    try{ document.execCommand('copy'); onOk?.(); }catch(err){}
-    ta.remove();
-  }
-  function copyText(text, onOk){
-    if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>onOk?.()).catch(()=>fallbackCopy(text,onOk)); }
-    else{ fallbackCopy(text,onOk); }
-  }
-  function flashBtn(el, okText, baseText){ if(!el)return; const original=baseText||el.textContent; el.textContent=okText; setTimeout(()=>{ el.textContent=original; },1800); }
-  function showNoticeCopied(text){ const tip=$('ml-notice-copy-feedback'); if(!tip)return; tip.textContent=text; tip.classList.add('show'); clearTimeout(showNoticeCopied._t); showNoticeCopied._t=setTimeout(()=>tip.classList.remove('show'),1800); }
-  function openNoticeModal(){ if(!noticeModal)return; noticeModal.classList.add('open'); noticeModal.setAttribute('aria-hidden','false'); document.body.classList.add('ml-modal-open'); }
-  function closeNoticeModal(){ if(!noticeModal)return; noticeModal.classList.remove('open'); noticeModal.setAttribute('aria-hidden','true'); document.body.classList.remove('ml-modal-open'); }
-
   $('ml-search').addEventListener('input',e=>{query=e.target.value.trim();render();});
   $('ml-back').addEventListener('click',closeDetail);
-  $('ml-contact').addEventListener('click',function(){ copyText(WECHAT,()=>flashBtn(this,'✓ 已复制微信号','💬 复制微信号 YuEn')); });
-  document.querySelectorAll('.ml-notice-trigger').forEach(el=>{ el.addEventListener('click',openNoticeModal); el.addEventListener('keydown',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openNoticeModal(); } }); });
+
+  function showToast(text){
+    const t=$('ml-toast');
+    if(!t) return;
+    t.textContent=text;
+    t.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer=setTimeout(()=>t.classList.remove('show'),1800);
+  }
+
+  async function copyText(text, msg){
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+      }else{
+        const ta=document.createElement('textarea');
+        ta.value=text;
+        ta.setAttribute('readonly','');
+        ta.style.cssText='position:fixed;left:-9999px;opacity:0;';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      showToast(msg||'已复制');
+    }catch(_){
+      showToast('复制失败，请手动复制');
+    }
+  }
+
+  function openNoticeModal(){ $('ml-notice-modal')?.classList.add('open'); }
+  function closeNoticeModal(){ $('ml-notice-modal')?.classList.remove('open'); }
+
+  $('ml-contact').addEventListener('click',()=>copyText(WECHAT,'微信号已复制'));
+  $('ml-notice')?.addEventListener('click',openNoticeModal);
+  $('ml-detail-notice')?.addEventListener('click',openNoticeModal);
+  $('ml-copy-wechat')?.addEventListener('click',()=>copyText(WECHAT,'微信号已复制'));
+  $('ml-open-ins')?.addEventListener('click',()=>window.open('https://www.instagram.com/_yuen0129/','_blank','noopener'));
+  $('ml-open-church-ins')?.addEventListener('click',()=>window.open('https://www.instagram.com/cecp.it_youth/','_blank','noopener'));
   $('ml-notice-close')?.addEventListener('click',closeNoticeModal);
-  $('ml-notice-backdrop')?.addEventListener('click',closeNoticeModal);
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && noticeModal?.classList.contains('open')) closeNoticeModal(); });
-  document.querySelectorAll('[data-copy]').forEach(btn=>{ btn.addEventListener('click',()=>{ const text=btn.getAttribute('data-copy')||''; const label=btn.getAttribute('data-label')||'内容'; copyText(text,()=>showNoticeCopied(`已复制${label}：${text}`)); }); });
-  $('ml-lightbox').addEventListener('click',e=>{ if(e.target===e.currentTarget||e.target.id==='ml-lightbox-close') $('ml-lightbox').classList.remove('open'); });
+  $('ml-notice-modal')?.addEventListener('click',e=>{ if(e.target===e.currentTarget) closeNoticeModal(); });
+
+  $('ml-lightbox').addEventListener('click',e=>{
+    if(e.target===e.currentTarget||e.target.id==='ml-lightbox-close') $('ml-lightbox').classList.remove('open');
+  });
   $('ml-lightbox-img').addEventListener('click',e=>e.stopPropagation());
 
   function openLightbox(src){$('ml-lightbox-img').src=src;$('ml-lightbox').classList.add('open');}
@@ -372,14 +440,37 @@
     });
     return lines.sort((a,b)=>a.time-b.time);
   }
+  function _mbUpdateLyric(forceIdx){
+    const el=$('ml-mb-lyric');
+    if(!el) return;
+    if(!_mpLrc.length){
+      el.textContent='';
+      el.classList.remove('show');
+      return;
+    }
+    let idx=typeof forceIdx==='number' ? forceIdx : _mpLrcIdx;
+    if(idx < 0){
+      idx=_mpLrc.findIndex(l=>(l.text||'').trim());
+    }
+    const text=(idx>=0 && _mpLrc[idx] ? (_mpLrc[idx].text||'').trim() : '');
+    if(!text){
+      el.textContent='';
+      el.classList.remove('show');
+      return;
+    }
+    el.textContent=text;
+    el.classList.add('show');
+  }
+
   function _mpHighlightLrc(){
-    if(!_mpLrc.length) return;
+    if(!_mpLrc.length){ _mbUpdateLyric(-1); return; }
     const t=_mpAudio.currentTime;
     let idx=-1;
     _mpLrc.forEach((l,i)=>{ if(l.time<=t) idx=i; });
-    if(idx===_mpLrcIdx) return;
+    if(idx===_mpLrcIdx){ _mbUpdateLyric(idx); return; }
     _mpLrcIdx=idx;
     document.querySelectorAll('.ml-mp-lrc-line').forEach((r,i)=>r.classList.toggle('active',i===idx));
+    _mbUpdateLyric(idx);
     if(idx>=0){
       const el=document.querySelectorAll('.ml-mp-lrc-line')[idx];
       if(el) el.scrollIntoView({block:'center',behavior:'smooth'});
@@ -432,7 +523,10 @@
       fetch(song.lrc).then(r=>r.text()).then(text=>{
         _mpLrc=_mpParseLrc(text);
         _mpRenderLrc();
-      }).catch(()=>{});
+        _mbUpdateLyric(-1);
+      }).catch(()=>{ _mbUpdateLyric(-1); });
+    } else {
+      _mbUpdateLyric(-1);
     }
     // no auto-play — user must press play
   }
@@ -499,6 +593,7 @@
       bar.classList.add('active');
     }
     if(btn) btn.textContent = _mpAudio.paused ? '▶' : '⏸';
+    _mbUpdateLyric();
     const d = _mpAudio.duration||0, t = _mpAudio.currentTime||0;
     if(fill) fill.style.width = (d ? t/d*100 : 0)+'%';
     if(cur) cur.textContent = _mpFmt(t);
