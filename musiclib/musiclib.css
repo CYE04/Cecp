@@ -277,15 +277,15 @@ body{overflow-x:hidden;}
 #ml-mb-controls button {
   background: rgba(255,255,255,0.1);
   border: none; color: rgba(255,255,255,0.85);
-  cursor: pointer; font-size: 13px;
+  cursor: pointer;
   width: 30px; height: 30px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  line-height: 1; transition: background .15s, transform .1s;
-  flex-shrink: 0;
+  transition: background .15s, transform .1s;
+  flex-shrink: 0; padding: 0;
 }
 #ml-mb-playpause {
-  font-size: 16px !important; color: #fff !important;
+  color: #fff !important;
   background: rgba(255,255,255,0.18) !important;
   width: 36px !important; height: 36px !important;
 }
@@ -318,9 +318,9 @@ body{overflow-x:hidden;}
 .ml-mp-play-btn {
   display: none; position:absolute; right:10px;
   background:rgba(255,255,255,0.13); border:none; color:#fff;
-  border-radius:50%; width:28px; height:28px; font-size:12px;
+  border-radius:50%; width:28px; height:28px;
   cursor:pointer; align-items:center; justify-content:center;
-  transition:background .15s;
+  transition:background .15s; padding:0;
 }
 .ml-song-card { position:relative; }
 .ml-song-card:hover .ml-mp-play-btn { display:flex; }
@@ -445,17 +445,17 @@ body{overflow-x:hidden;}
 #ml-mp-controls button {
   background: rgba(255,255,255,0.1);
   border: none; color: rgba(255,255,255,0.85);
-  cursor: pointer; font-size: clamp(12px, 2.8vw, 15px);
-  width: clamp(28px, 6vw, 34px); height: clamp(28px, 6vw, 34px);
+  cursor: pointer;
+  width: 34px; height: 34px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  line-height: 1; transition: background .15s, transform .1s;
-  flex-shrink: 0;
+  transition: background .15s, transform .1s;
+  flex-shrink: 0; padding: 0;
 }
 #ml-mp-playpause {
-  font-size: clamp(15px, 3.5vw, 19px) !important; color: #fff !important;
+  color: #fff !important;
   background: rgba(255,255,255,0.18) !important;
-  width: clamp(32px, 7vw, 40px) !important; height: clamp(32px, 7vw, 40px) !important;
+  width: 40px !important; height: 40px !important;
 }
 #ml-mp-controls button:hover { background: rgba(255,255,255,0.22); transform: scale(1.05); }
 #ml-mp-right { display:flex; flex-direction:column; gap:5px; flex-shrink:0; width:clamp(80px, 22vw, 130px); }
@@ -485,8 +485,8 @@ body{overflow-x:hidden;}
    ════════════════════════════════════════ */
 #ml-notice,
 #ml-detail-notice{
-  width:calc(100% - 28px);
-  margin:16px 14px 0;
+  width:calc(100% - 16px);
+  margin:16px 8px 0;
   padding:0;
   border:none;
   background:#1a1a1f;
@@ -639,7 +639,7 @@ body{overflow-x:hidden;}
 
 @media (max-width:768px){
   #ml-notice,
-  #ml-detail-notice{ width:calc(100% - 20px); margin:14px 10px 0; border-radius:999px; }
+  #ml-detail-notice{ width:calc(100% - 12px); margin:14px 6px 0; border-radius:999px; }
   #ml-detail-notice{ margin-bottom:10px; }
   .ml-notice-item{ padding:18px 28px; font-size:15px; }
   #ml-minibar{ margin:12px 12px 0; padding:12px 14px; border-radius:18px; }

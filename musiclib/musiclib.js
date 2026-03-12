@@ -141,15 +141,15 @@
         <div id="ml-notice-sub">需要申请新歌练习可联系 <strong>YuEn</strong>。制作一首歌通常需要约 <strong>1–2 小时</strong>，请尽量提前说明。</div>
         <div id="ml-notice-actions">
           <button class="ml-notice-action is-copy" id="ml-copy-wechat" type="button">
-            <span class="ml-notice-action-ico">💬</span>
+            <span class="ml-notice-action-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 4C5.36 4 2 6.92 2 10.5c0 2.04 1.06 3.86 2.72 5.08L4 18l2.5-1.25A8.6 8.6 0 0 0 9.5 17c.17 0 .34 0 .5-.01A5.7 5.7 0 0 1 9.5 15c0-3.04 2.69-5.5 6-5.5.17 0 .34 0 .5.01C15.41 6.67 12.73 4 9.5 4zm8 7c-2.76 0-5 1.79-5 4s2.24 4 5 4c.72 0 1.4-.14 2-.38L22 20l-.62-1.86A3.93 3.93 0 0 0 22.5 15c0-2.21-2.24-4-5-4z"/></svg></span>
             <span class="ml-notice-action-title">复制微信号 YuEn</span>
           </button>
           <button class="ml-notice-action" id="ml-open-ins" type="button">
-            <span class="ml-notice-action-ico">◎</span>
+            <span class="ml-notice-action-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2"/></svg></span>
             <span class="ml-notice-action-title">INS 加我</span>
           </button>
           <button class="ml-notice-action" id="ml-open-church-ins" type="button">
-            <span class="ml-notice-action-ico">✦</span>
+            <span class="ml-notice-action-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 9 9H2l5.5 4-2 7L12 16l6.5 4-2-7L22 9h-7z"/></svg></span>
             <span class="ml-notice-action-title">教会青年 INS</span>
           </button>
         </div>
@@ -339,7 +339,7 @@
         // play button on hover
         const playBtn=document.createElement('button');
         playBtn.className='ml-mp-play-btn';
-        playBtn.innerHTML='▶';
+        playBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`;
         playBtn.title='播放';
         playBtn.onclick=e=>{
           e.stopPropagation();
@@ -553,7 +553,7 @@
   }
   function _mpUpdateBtn(){
     const btn=document.getElementById('ml-mp-playpause');
-    if(btn) btn.textContent=_mpAudio.paused?'▶':'⏸';
+    if(btn) btn.innerHTML=_mpAudio.paused?`<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`:`<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h3v14H6V5zm9 0h3v14h-3V5z"/></svg>`;
   }
   _mpAudio.addEventListener('timeupdate',_mpUpdateProgress);
   _mpAudio.addEventListener('play',()=>{ _mpSetState(true); _mpUpdateBtn(); });
@@ -600,7 +600,7 @@
       }
       bar.classList.add('active');
     }
-    if(btn) btn.textContent = _mpAudio.paused ? '▶' : '⏸';
+    if(btn) btn.innerHTML = _mpAudio.paused ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>` : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h3v14H6V5zm9 0h3v14h-3V5z"/></svg>`;
     _mbUpdateLyric();
     const d = _mpAudio.duration||0, t = _mpAudio.currentTime||0;
     if(fill) fill.style.width = (d ? t/d*100 : 0)+'%';
