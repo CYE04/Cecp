@@ -141,16 +141,16 @@
         <div id="ml-notice-sub">需要申请新歌练习可联系 <strong>YuEn</strong>。制作一首歌通常需要约 <strong>1–2 小时</strong>，请尽量提前说明。</div>
         <div id="ml-notice-actions">
           <button class="ml-notice-action is-copy" id="ml-copy-wechat" type="button">
-            <span class="ml-notice-action-title">复制微信号</span>
-            <span class="ml-notice-action-sub">点击后自动复制</span>
+            <span class="ml-notice-action-ico">💬</span>
+            <span class="ml-notice-action-title">复制微信号 YuEn</span>
           </button>
           <button class="ml-notice-action" id="ml-open-ins" type="button">
+            <span class="ml-notice-action-ico">◎</span>
             <span class="ml-notice-action-title">INS 加我</span>
-            <span class="ml-notice-action-sub">打开 YuEn 的 Instagram</span>
           </button>
           <button class="ml-notice-action" id="ml-open-church-ins" type="button">
+            <span class="ml-notice-action-ico">✦</span>
             <span class="ml-notice-action-title">教会青年 INS</span>
-            <span class="ml-notice-action-sub">打开 CECP 青年账号</span>
           </button>
         </div>
       </div>`;
@@ -519,20 +519,28 @@
     const detailPlayer=document.getElementById('ml-miniplayer');
     if(detailPlayer) detailPlayer.classList.toggle('has-mp3', !!song.mp3);
     _mpAudio.src=song.mp3||'';
+    _mbUpdateLyric(-1);
     if(song.lrc){
       fetch(song.lrc).then(r=>r.text()).then(text=>{
         _mpLrc=_mpParseLrc(text);
         _mpRenderLrc();
         _mbUpdateLyric(-1);
+        _mbUpdate();
       }).catch(()=>{ _mbUpdateLyric(-1); });
-    } else {
-      _mbUpdateLyric(-1);
     }
     // no auto-play — user must press play
   }
-  function _mpPlayIdx(idx){
+  function _mpPlayIdx(idx, autoplay=true){
     if(idx<0||idx>=_mpSongs.length) return;
-    _mpIdx=idx; _mpLoadSong(_mpSongs[idx]);
+    _mpIdx=idx;
+    _mpLoadSong(_mpSongs[idx]);
+    if(autoplay && _mpSongs[idx]?.mp3){
+      const playNow=()=>_mpAudio.play().catch(()=>{});
+      if(_mpAudio.readyState >= 1) playNow();
+      else _mpAudio.addEventListener('loadedmetadata', playNow, {once:true});
+    }else{
+      _mbUpdate();
+    }
   }
   function _mpUpdateProgress(){
     const dur=_mpAudio.duration||0, cur=_mpAudio.currentTime||0;
@@ -552,8 +560,8 @@
   _mpAudio.addEventListener('pause',_mpUpdateBtn);
   _mpAudio.addEventListener('ended',()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); else _mpUpdateBtn(); });
   document.getElementById('ml-mp-playpause').onclick=()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
-  document.getElementById('ml-mp-prev').onclick=()=>{ if(_mpIdx>0)_mpPlayIdx(_mpIdx-1); };
-  document.getElementById('ml-mp-next').onclick=()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); };
+  document.getElementById('ml-mp-prev').onclick=()=>{ if(_mpIdx>0)_mpPlayIdx(_mpIdx-1,!_mpAudio.paused); };
+  document.getElementById('ml-mp-next').onclick=()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1,!_mpAudio.paused); };
   document.getElementById('ml-mp-vol').oninput=e=>{ _mpAudio.volume=parseFloat(e.target.value); };
   document.getElementById('ml-mp-progress-bar').onclick=e=>{
     if(!_mpAudio.duration) return;
@@ -603,8 +611,8 @@
   _mpAudio.addEventListener('pause', _mbUpdate);
   _mpAudio.addEventListener('timeupdate', _mbUpdate);
   document.getElementById('ml-mb-playpause').onclick = ()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
-  document.getElementById('ml-mb-prev').onclick = ()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1); };
-  document.getElementById('ml-mb-next').onclick = ()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1); };
+  document.getElementById('ml-mb-prev').onclick = ()=>{ if(_mpIdx>0) _mpPlayIdx(_mpIdx-1,!_mpAudio.paused); }; 
+  document.getElementById('ml-mb-next').onclick = ()=>{ if(_mpIdx<_mpSongs.length-1) _mpPlayIdx(_mpIdx+1,!_mpAudio.paused); }; 
   document.getElementById('ml-mb-vol').oninput = e=>{ _mpAudio.volume=parseFloat(e.target.value); };
   document.getElementById('ml-mb-progress-bar').onclick = e=>{
     if(!_mpAudio.duration) return;
