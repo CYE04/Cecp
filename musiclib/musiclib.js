@@ -7,7 +7,13 @@
 
   if(!document.getElementById('ml-style')){
     const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
-    s.href='https://cye04.github.io/Cecp/musiclib.css';
+    try{
+      const current=(document.currentScript&&document.currentScript.src) ? new URL(document.currentScript.src, location.href) : new URL('musiclib.js', location.href);
+      current.pathname=current.pathname.replace(/[^/]+$/, 'musiclib.css');
+      s.href=current.href;
+    }catch(err){
+      s.href='musiclib.css';
+    }
     document.head.appendChild(s);
   }
 
@@ -328,56 +334,63 @@
   /* ── Mini Player ── */
   const _mpAudio = document.getElementById('ml-mp-audio');
   let _mpSongs = [], _mpIdx = -1, _mpLrc = [], _mpLrcIdx = -1;
-  let _mpManualScrollUntil = 0;
+  let _mpLrcUserScrollingUntil = 0;
 
   function _mpFmt(s){
-    const m=Math.floor(s/60),ss=Math.floor(s%60);
+    const safe=Math.max(0, Number.isFinite(s)?s:0);
+    const m=Math.floor(safe/60),ss=Math.floor(safe%60);
     return m+':'+(ss<10?'0':'')+ss;
   }
   function _mpParseLrc(text){
     const lines=[];
-    text.split('\n').forEach(l=>{
-      const m=l.match(/^\[(\d+):(\d+\.\d+)\](.*)/);
-      if(m) lines.push({time:parseInt(m[1])*60+parseFloat(m[2]),text:m[3].trim()});
+    String(text||'').split(/\r?\n/).forEach(raw=>{
+      const row=raw.trim();
+      if(!row) return;
+      const tags=[...row.matchAll(/\[(\d+):(\d+(?:\.\d+)?)\]/g)];
+      if(!tags.length) return;
+      const lyric=row.replace(/\[(\d+):(\d+(?:\.\d+)?)\]/g,'').trim();
+      tags.forEach(tag=>{
+        lines.push({time:parseInt(tag[1],10)*60+parseFloat(tag[2]),text:lyric||'…'});
+      });
     });
     return lines.sort((a,b)=>a.time-b.time);
   }
-  function _mpCenterLrcLine(el, behavior='smooth'){
+  function _mpMarkManualLrcScroll(ms=1400){
+    _mpLrcUserScrollingUntil=Date.now()+ms;
+  }
+  function _mpCanAutoScroll(){
+    return Date.now()>_mpLrcUserScrollingUntil;
+  }
+  function _mpCenterLrcLine(idx, behavior='smooth', force=false){
     const inner=document.getElementById('ml-mp-lrc-inner');
-    if(!inner || !el) return;
+    if(!inner) return;
+    const nodes=inner.querySelectorAll('.ml-mp-lrc-line');
+    const el=nodes[idx];
+    if(!el) return;
+    if(!force && !_mpCanAutoScroll()) return;
     const top=el.offsetTop - (inner.clientHeight - el.offsetHeight) / 2;
     inner.scrollTo({top:Math.max(0, top), behavior});
   }
   function _mpBindLrcScroll(){
     const inner=document.getElementById('ml-mp-lrc-inner');
-    if(!inner || inner.dataset.bound==='1') return;
-    const pauseAuto=()=>{ _mpManualScrollUntil=Date.now()+4500; };
-    inner.addEventListener('wheel', pauseAuto, {passive:true});
-    inner.addEventListener('touchstart', pauseAuto, {passive:true});
-    inner.addEventListener('pointerdown', pauseAuto, {passive:true});
-    inner.addEventListener('scroll', ()=>{
-      _mpManualScrollUntil=Math.max(_mpManualScrollUntil, Date.now()+2200);
-    }, {passive:true});
-    inner.dataset.bound='1';
+    if(!inner || inner.dataset.lrcBound==='1') return;
+    inner.dataset.lrcBound='1';
+    ['touchstart','wheel','pointerdown'].forEach(evt=>{
+      inner.addEventListener(evt, ()=>_mpMarkManualLrcScroll(), {passive:true});
+    });
+    inner.addEventListener('scroll', ()=>_mpMarkManualLrcScroll(900), {passive:true});
   }
-  function _mpHighlightLrc(forceCenter=false){
-    if(!_mpLrc.length) return;
-    const nodes=document.querySelectorAll('.ml-mp-lrc-line');
+  function _mpHighlightLrc(force=false){
+    const lyricNodes=document.querySelectorAll('.ml-mp-lrc-line');
+    if(!_mpLrc.length || !lyricNodes.length) return;
     const t=_mpAudio.currentTime;
     let idx=-1;
     _mpLrc.forEach((l,i)=>{ if(l.time<=t) idx=i; });
-    if(idx===_mpLrcIdx){
-      if(forceCenter && idx>=0 && nodes[idx]) _mpCenterLrcLine(nodes[idx], 'smooth');
-      return;
-    }
-    _mpLrcIdx=idx;
-    nodes.forEach((r,i)=>r.classList.toggle('active',i===idx));
-    if(idx>=0){
-      const el=nodes[idx];
-      if(el && (forceCenter || Date.now()>_mpManualScrollUntil)){
-        _mpCenterLrcLine(el, 'smooth');
-      }
-    }
+    const activeIdx=idx>=0 ? idx : 0;
+    if(activeIdx===_mpLrcIdx && !force) return;
+    _mpLrcIdx=activeIdx;
+    lyricNodes.forEach((r,i)=>r.classList.toggle('active',i===activeIdx));
+    _mpCenterLrcLine(activeIdx, force?'auto':'smooth', force);
   }
   function _mpSetState(playing){
     // playing=true: cover slides left, lyrics appear
@@ -397,25 +410,34 @@
   function _mpRenderLrc(){
     const inner=document.getElementById('ml-mp-lrc-inner');
     if(!inner) return;
-    inner.innerHTML='';
     _mpBindLrcScroll();
+    inner.innerHTML='';
+    if(!_mpLrc.length){
+      const d=document.createElement('div');
+      d.className='ml-mp-lrc-line active';
+      d.textContent='暂无歌词';
+      inner.appendChild(d);
+      return;
+    }
     _mpLrc.forEach((l,i)=>{
       const d=document.createElement('div');
       d.className='ml-mp-lrc-line';
       d.textContent=l.text || '…';
-      d.dataset.index=String(i);
-      d.dataset.time=String(l.time);
       d.onclick=()=>{
-        _mpManualScrollUntil=0;
+        _mpLrcUserScrollingUntil=0;
         _mpAudio.currentTime=l.time;
-        _mpLrcIdx=-999;
+        _mpLrcIdx=-1;
         _mpHighlightLrc(true);
+        _mpCenterLrcLine(i, 'smooth', true);
       };
       inner.appendChild(d);
     });
+    inner.scrollTop=0;
+    _mpLrcIdx=-1;
+    _mpHighlightLrc(true);
   }
   function _mpLoadSong(song){
-    _mpLrc=[]; _mpLrcIdx=-1; _mpManualScrollUntil=0;
+    _mpLrc=[]; _mpLrcIdx=-1;
     const titleEl=document.getElementById('ml-mp-title');
     const artistEl=document.getElementById('ml-mp-artist');
     if(titleEl) titleEl.textContent=song.title||'';
@@ -435,7 +457,13 @@
         _mpLrc=_mpParseLrc(text);
         _mpRenderLrc();
         _mpHighlightLrc(true);
-      }).catch(()=>{});
+      }).catch(()=>{
+        _mpLrc=[];
+        _mpRenderLrc();
+      });
+    }else{
+      _mpLrc=[];
+      _mpRenderLrc();
     }
     // no auto-play — user must press play
   }
@@ -457,6 +485,7 @@
     if(btn) btn.textContent=_mpAudio.paused?'▶':'⏸';
   }
   _mpAudio.addEventListener('timeupdate',_mpUpdateProgress);
+  _mpAudio.addEventListener('loadedmetadata',_mpUpdateProgress);
   _mpAudio.addEventListener('play',()=>{ _mpSetState(true); _mpUpdateBtn(); });
   _mpAudio.addEventListener('pause',_mpUpdateBtn);
   _mpAudio.addEventListener('ended',()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1); else _mpUpdateBtn(); });
@@ -684,7 +713,19 @@
         if(idx>=0) _mpIdx=idx; else { _mpSongs=[s]; _mpIdx=0; }
         _mpLrc=[]; _mpLrcIdx=-1;
         _mpAudio.src=s.mp3||'';
-        if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();_mpHighlightLrc(true);}).catch(()=>{});
+        if(s.lrc){
+          fetch(s.lrc).then(r=>r.text()).then(text=>{
+            _mpLrc=_mpParseLrc(text);
+            _mpRenderLrc();
+            _mpHighlightLrc(true);
+          }).catch(()=>{
+            _mpLrc=[];
+            _mpRenderLrc();
+          });
+        }else{
+          _mpLrc=[];
+          _mpRenderLrc();
+        }
       }
       // always update UI text & cover
       const titleEl=document.getElementById('ml-mp-title');
@@ -698,6 +739,8 @@
       // restore lrc inner if same song
       if(isSameSong && _mpLrc.length && !document.getElementById('ml-mp-lrc-inner')?.children.length){
         _mpRenderLrc();
+      }
+      if(isSameSong){
         _mpHighlightLrc(true);
       }
       const detailPlayer=document.getElementById('ml-miniplayer');
