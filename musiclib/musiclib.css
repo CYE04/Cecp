@@ -483,22 +483,21 @@ body{overflow-x:hidden;}
   margin:16px 14px 0;
   padding:0;
   border:none;
-  background:linear-gradient(180deg,rgba(26,28,34,.94),rgba(17,18,24,.94));
+  background:#1a1a1f;
   color:#fff;
-  border-radius:22px;
+  border-radius:999px;
   overflow:hidden;
   cursor:pointer;
   text-align:left;
-  box-shadow:0 14px 34px rgba(0,0,0,.24);
+  box-shadow:0 4px 20px rgba(0,0,0,.28);
   position:relative;
+  transition:background .18s ease;
 }
+#ml-notice:hover,
+#ml-detail-notice:hover{ background:#222228; }
 #ml-detail-notice{ margin:16px 14px 12px; }
 #ml-notice::before,
-#ml-detail-notice::before{
-  content:''; position:absolute; inset:0;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:inherit; pointer-events:none;
-}
+#ml-detail-notice::before{ content:none; }
 .ml-notice-track{
   display:flex; width:max-content; min-width:100%;
   animation:ml-notice-marquee 58s linear infinite;
@@ -506,16 +505,17 @@ body{overflow-x:hidden;}
 #ml-notice:hover .ml-notice-track,
 #ml-detail-notice:hover .ml-notice-track{ animation-play-state:paused; }
 .ml-notice-item{
-  display:inline-flex; align-items:center; gap:12px;
-  min-width:max-content; padding:18px 30px;
-  font-size:15px; line-height:1.5; white-space:nowrap;
-  color:rgba(255,255,255,.9);
+  display:inline-flex; align-items:center; gap:14px;
+  min-width:max-content; padding:20px 36px;
+  font-size:17px; line-height:1.4; white-space:nowrap;
+  color:rgba(255,255,255,.88);
+  font-weight:400;
 }
 .ml-notice-dot{
   width:7px; height:7px; flex-shrink:0; border-radius:50%;
-  background:#7c9cff; box-shadow:0 0 0 5px rgba(124,156,255,.14);
+  background:#7c9cff;
 }
-.ml-notice-name{ color:#fff; font-weight:700; letter-spacing:.02em; }
+.ml-notice-name{ color:#fff; font-weight:600; letter-spacing:.01em; }
 @keyframes ml-notice-marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
 #ml-notice-modal{
@@ -636,9 +636,9 @@ body{overflow-x:hidden;}
 
 @media (max-width:768px){
   #ml-notice,
-  #ml-detail-notice{ width:calc(100% - 20px); margin:14px 10px 0; border-radius:18px; }
+  #ml-detail-notice{ width:calc(100% - 20px); margin:14px 10px 0; border-radius:999px; }
   #ml-detail-notice{ margin-bottom:10px; }
-  .ml-notice-item{ padding:16px 24px; font-size:14px; }
+  .ml-notice-item{ padding:18px 28px; font-size:15px; }
   #ml-minibar{ margin:12px 12px 0; padding:12px 14px; border-radius:18px; }
   #ml-mb-title{ font-size:18px; }
   #ml-mb-lyric{ font-size:14px; }
