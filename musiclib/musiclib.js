@@ -496,8 +496,16 @@ div>
     document.querySelectorAll('.ml-mp-lrc-line').forEach((r,i)=>r.classList.toggle('active',i===idx));
     _mbUpdateLyric(idx);
     if(idx>=0){
-      const el=document.querySelectorAll('.ml-mp-lrc-line')[idx];
-      if(el) el.scrollIntoView({block:'center',behavior:'smooth'});
+      const lines=document.querySelectorAll('.ml-mp-lrc-line');
+      const inner=document.getElementById('ml-mp-lrc-inner');
+      const panel=document.getElementById('ml-mp-lrc-panel');
+      if(inner && panel && lines[idx]){
+        const panelH=panel.offsetHeight;
+        const lineTop=lines[idx].offsetTop;
+        const lineH=lines[idx].offsetHeight;
+        inner.style.transition='transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)';
+        inner.style.transform=`translateY(${(panelH/2)-lineTop-(lineH/2)}px)`;
+      }
     }
   }
   function _mpSetState(playing){
