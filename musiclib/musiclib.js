@@ -47,6 +47,13 @@
         <input id="ml-mb-vol" type="range" min="0" max="1" step="0.02" value="1">
       </div>
     </div>
+
+    <div id="ml-notice" aria-label="版权与联系说明">
+      <div class="ml-notice-track">
+        <div class="ml-notice-item"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
+        <div class="ml-notice-item" aria-hidden="true"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
+      </div>
+    </div>
     <div id="ml-header">
       <div id="ml-header-top">
         <div id="ml-title">🎵 诗歌库</div>
@@ -97,6 +104,13 @@
             <div id="ml-mp-times"><span id="ml-mp-cur">0:00</span><span id="ml-mp-dur">0:00</span></div>
             <input id="ml-mp-vol" type="range" min="0" max="1" step="0.02" value="1">
           </div>
+        </div>
+      </div>
+
+      <div id="ml-detail-notice" aria-label="版权与联系说明">
+        <div class="ml-notice-track">
+          <div class="ml-notice-item"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
+          <div class="ml-notice-item" aria-hidden="true"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
         </div>
       </div>
       <div id="ml-detail-body"></div>
