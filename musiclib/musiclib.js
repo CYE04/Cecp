@@ -414,8 +414,7 @@
       if(t==='('){const sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
       if(t==='(['){const so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')so.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(so);continue;}
       if(t==='])'){const sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
-      if(t==='[v1'||t==='[v2'){const vn=(t==='[v1')?'1':'2';const vw=document.createElement('span');vw.className='jp-volta'+((t==='[v2')?' v-close':'');vw.setAttribute('data-v',vn+'.');i++;while(i<toks.length&&toks[i]!==']v')vw.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(vw);continue;}
-      if(t===']v'){i++;continue;}
+      if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;} // volta handled at row level
       const tm2=t.match(/^\{(3|5)$/);if(tm2){const tn=parseInt(tm2[1],10);const tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));d.appendChild(tp);i++;continue;}
       if(t==='}'){i++;continue;}
       d.appendChild(parseJpToken(t));i++;
