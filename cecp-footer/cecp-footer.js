@@ -724,43 +724,15 @@ function unlockPage(){
   try{ window.scrollTo(0,LOCK.y); }catch(e){}
 }
 
-function ap(){ return $('.ym-song-panel.active .aplayer')||$('.aplayer')||$('[class*="aplayer-wrap"]'); }
-function api(s){ var r=ap(); return r?$(s,r):null; }
-function apPlayBtn(){
-  var r=ap(); if(!r) return null;
-  var candidates=[
-    api('.aplayer-icon-play'), api('.aplayer-icon-pause'),
-    api('[class*="aplayer-play"]'), api('[class*="aplayer-pause"]'),
-    api('button[aria-label*="play"]'), api('button[aria-label*="pause"]'),
-    api('i[class*="play"]'), api('i[class*="pause"]'),
-    api('svg[class*="play"]'), api('svg[class*="pause"]')
-  ].filter(Boolean);
-  var found=smallest(candidates);
-  if(found) return found;
-  var ctrl=api('.aplayer-controller')||api('.aplayer-controls')||r;
-  var btns=$$('button,[role="button"],.aplayer-icon',ctrl).filter(function(e){
-    return !/bar|progress|list|volume|time/i.test((e.className||'').toString());
-  });
-  return smallest(btns);
-}
-function apBar(){ return api('.aplayer-bar-wrap')||api('.aplayer-bar')||api('.aplayer-progress-wrap')||api('.aplayer-controller')||ap(); }
-function apTime(){ return api('.aplayer-time')||api('.aplayer-time-inner')||ap(); }
-function apVolBtn(){
-  var r=ap(); if(!r) return null;
-  return smallest([
-    api('.aplayer-icon-volume-down'),api('.aplayer-icon-volume-up'),
-    api('[class*="aplayer-volume"] button'),api('[class*="aplayer-volume"] i'),
-    api('i[class*="volume"]'),api('button[aria-label*="volume"]')
-  ].filter(Boolean));
-}
-function apLoopBtn(){
-  var r=ap(); if(!r) return null;
-  return smallest([
-    api('.aplayer-icon-loop'),api('.aplayer-icon-order'),api('.aplayer-icon-random'),
-    api('i[class*="loop"]'),api('i[class*="order"]')
-  ].filter(Boolean));
-}
-function apList(){ return api('.aplayer-list-cur')||api('.aplayer-list')||ap(); }
+function ymPl(){ return $('.ym-song-panel.active .ym-pl')||$('.ym-pl')||null; }
+function ymPli(s){ var r=ymPl(); return r?$(s,r):null; }
+function ymPlPlayBtn(){ return ymPli('.ym-pl-pp')||ymPli('button[aria-label="播放"]')||ymPli('.ym-pl-btn')||null; }
+function ymPlSeekBack(){ return ymPli('button[aria-label="后退15秒"]')||null; }
+function ymPlSeekFwd(){ return ymPli('button[aria-label="前进15秒"]')||null; }
+function ymPlBar(){ return ymPli('.ym-pl-prog-bar')||ymPli('.ym-pl-prog-wrap')||null; }
+function ymPlTime(){ return ymPli('.ym-pl-times')||null; }
+function ymPlLrc(){ return ymPli('.ym-pl-lrc-panel')||ymPli('.ym-pl-stage')||null; }
+function ymPlVol(){ return ymPli('.ym-pl-vol-wrap')||null; }
 
 function metRoot(){ return $('.sw-metro')||$('[class*="sw-metro"]')||null; }
 function metBpmBg(){ var r=metRoot(); if(!r) return null; return $('.mbg',r)||null; }
@@ -847,17 +819,18 @@ function blurAllInputs(ctx){
 }
 
 var MODS={
-  aplayer:{
-    label:'🎵 APlayer 播放器',
-    desc:'播放/暂停、进度条、时间、音量、循环模式、歌单',
+  player:{
+    label:'🎵 播放器',
+    desc:'播放/暂停、后退前进、进度条、时间、歌词、音量',
     steps:[
-      { ico:'🎵', t:'播放器整体', s:'整个 APlayer 区域', find:function(){ return ap(); }, text:'这是 <b>APlayer 播放器</b>。播放歌曲、调音量、切换模式都在这里 🎶' },
-      { ico:'▶', t:'播放 / 暂停', s:'点击开始，再点暂停', find:function(){ return apPlayBtn(); }, text:'这个图标是 <b>播放/暂停</b>。<br>点一次 ▶ 开始播放，再点一次 ⏸ 暂停。' },
-      { ico:'⏩', t:'进度条', s:'拖动跳到任意位置', find:function(){ return apBar(); }, text:'拖动进度条可以<b>跳到任意位置</b>，方便反复练习某一段 ⏩' },
-      { ico:'🕐', t:'时间显示', s:'当前进度 / 总时长', find:function(){ return apTime(); }, text:'显示 <code>当前时间 / 总时长</code>，卡点练习时非常实用。' },
-      { ico:'🔊', t:'音量控制', s:'点击静音，悬停拖动调节', find:function(){ return apVolBtn(); }, text:'点音量图标 <b>快速静音</b>；悬停后拖动滑块调节大小 🔊' },
-      { ico:'🔁', t:'循环 / 随机模式', s:'切换播放模式', find:function(){ return apLoopBtn(); }, text:'切换模式：<b>列表循环 → 单曲循环 → 随机播放</b>。<br>敬拜时推荐"列表循环"。' },
-      { ico:'📋', t:'歌单列表', s:'查看并切换歌曲', find:function(){ return apList(); }, text:'点击歌单里的歌曲名称<b>直接切换</b> 🎶' }
+      { ico:'🎵', t:'播放器整体', s:'整个播放器区域', find:function(){ return ymPl(); }, text:'这是内置<b>音乐播放器</b>。播放歌曲、查看歌词、控制进度都在这里 🎶' },
+      { ico:'▶', t:'播放 / 暂停', s:'点击开始，再点暂停', find:function(){ return ymPlPlayBtn(); }, text:'点击中间大圆钮 ▶ 开始播放，再点一次 ⏸ 暂停。' },
+      { ico:'⏪', t:'后退 15 秒', s:'回放刚才那段', find:function(){ return ymPlSeekBack(); }, text:'点这个按钮<b>后退 15 秒</b>，方便反复练习难度高的片段 ↩' },
+      { ico:'⏩', t:'前进 15 秒', s:'快速跳过', find:function(){ return ymPlSeekFwd(); }, text:'点这个按钮<b>前进 15 秒</b>，快速跳到后面的部分 ↪' },
+      { ico:'📊', t:'进度条', s:'点击或拖动跳转', find:function(){ return ymPlBar(); }, text:'点击进度条任意位置可以<b>直接跳到那个时间点</b>，非常方便定位 ⏩' },
+      { ico:'🕐', t:'时间显示', s:'当前进度 / 总时长', find:function(){ return ymPlTime(); }, text:'显示 <code>当前时间 / 总时长</code>，卡点练习时非常实用。' },
+      { ico:'📝', t:'滚动歌词', s:'自动跟随高亮，点击跳转', find:function(){ return ymPlLrc(); }, text:'播放时歌词自动高亮跟随。<br>也可以<b>直接点击任意一行歌词</b>跳到对应时间点 🎤' },
+      { ico:'🔊', t:'音量控制', s:'拖动滑块调节（桌面端）', find:function(){ return ymPlVol(); }, text:'桌面端可以拖动滑块调节音量 🔊<br>手机端请直接使用系统音量键。' }
     ]
   },
   metronome:{
