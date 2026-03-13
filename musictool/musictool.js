@@ -200,25 +200,25 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
 .topbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
-.topbar-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);}
+.topbar-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);}
 .topbar-title span{color:var(--accent2);}
 .topbar-tabs{display:flex;gap:2px;margin-left:auto;}
-.top-tab{padding:5px 12px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--ink2);font-family:'Space Mono',monospace;transition:.12s;}
+.top-tab{padding:6px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--ink2);font-family:'Space Mono',monospace;transition:.12s;}
 .top-tab.on{background:var(--accent);color:#fff;border-color:var(--accent);}
 
 .top-area{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
 .top-panel{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 16px;display:none;position:relative;}
 .top-panel.on{display:block;}
 
-.bottom-area{height:52vh;display:flex;flex-shrink:0;border-top:1px solid var(--border2);}
+.bottom-area{height:58vh;display:flex;flex-shrink:0;}
 
 /* ── 左：段落编辑 ── */
 .seg-pane{width:54%;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
 .seg-pane-inner{padding:8px;flex:1;}
 .sec-block{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;}
 .sec-head{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--panel2);border-bottom:1px solid var(--border);}
-.sec-name-input{background:transparent;border:none;color:var(--ink);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;outline:none;flex:1;}
-.sec-btn{font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--ink2);cursor:pointer;font-family:'Space Mono',monospace;}
+.sec-name-input{background:transparent;border:none;color:var(--ink);font-family:'Space Mono',monospace;font-size:13px;font-weight:700;outline:none;flex:1;}
+.sec-btn{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--ink2);cursor:pointer;font-family:'Space Mono',monospace;}
 .sec-btn:hover{background:var(--border);color:var(--ink);}
 .sec-btn.del{color:var(--red);}
 .row-block{border-bottom:1px solid var(--border);padding:6px 10px;}
@@ -231,9 +231,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .row-del:hover{color:var(--red);}
 
 .seg-table{width:100%;border-collapse:collapse;}
-.seg-table th{font-size:7px;color:var(--ink3);padding:2px 3px;text-align:left;letter-spacing:1px;border-bottom:1px solid var(--border);}
+.seg-table th{font-size:9px;color:var(--ink3);padding:2px 3px;text-align:left;letter-spacing:1px;border-bottom:1px solid var(--border);}
 .seg-table td{padding:1px 2px;vertical-align:middle;}
-.seg-table input{background:var(--panel2);border:1px solid var(--border);border-radius:3px;color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;padding:2px 4px;outline:none;transition:border-color .12s;width:100%;}
+.seg-table input{background:var(--panel2);border:1px solid var(--border);border-radius:3px;color:var(--ink);font-family:'Space Mono',monospace;font-size:12px;padding:3px 5px;outline:none;transition:border-color .12s;width:100%;}
 .seg-table input:focus{border-color:var(--accent);}
 .inp-chord{max-width:62px;}
 .inp-lyric{max-width:80px;}
@@ -249,13 +249,26 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .add-row-btn:hover{background:rgba(106,242,168,0.06);border-color:var(--green);}
 .add-sec-btn{width:calc(100% - 16px);padding:5px;border-radius:5px;border:1px dashed var(--border2);background:transparent;font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);cursor:pointer;margin:6px 8px;display:block;}
 
+/* ── 中间状态栏 ── */
+.mid-bar{display:flex;align-items:center;flex-wrap:wrap;gap:0 16px;padding:5px 14px;background:var(--panel2);border-top:1px solid var(--border);border-bottom:1px solid var(--border2);flex-shrink:0;}
+.mid-bar-left{display:flex;align-items:center;flex-wrap:wrap;gap:0;flex:1;}
+.mid-bar-right{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;}
+.mid-sel{font-size:9px;color:var(--sel);margin-left:6px;}
+.mid-tip{font-size:8px;color:var(--ink3);margin-left:8px;}
+
 /* ── 右：键盘 ── */
-.kbd-pane{width:46%;overflow-y:auto;padding:10px;}
+.kbd-pane{width:46%;overflow-y:auto;padding:8px 10px;}
+
+/* ── 跨格子房子线（preview 层） ── */
+.prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
+.prev-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;box-sizing:border-box;}
+.prev-volta.closed::before{border-right:1.5px solid var(--accent2);}
+.prev-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
 
 /* 状态栏 */
 /* ── 输入状态栏（总音符/八度/时值/附点/段落/房子线） ── */
 .kbd-istate{display:flex;align-items:center;flex-wrap:wrap;gap:0;padding:4px 8px;background:var(--bg);border-radius:5px;border:1px solid var(--border);margin-bottom:5px;min-height:24px;font-family:'Space Mono',monospace;}
-.kbd-istate-item{font-size:8px;color:var(--ink3);white-space:nowrap;padding:0 7px 0 0;}
+.kbd-istate-item{font-size:10px;color:var(--ink3);white-space:nowrap;padding:0 7px 0 0;}
 .kbd-istate-item span{color:var(--ink2);}
 .kbd-istate-item.hi span{color:var(--accent2);}
 
@@ -268,11 +281,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .jp-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
 .jp-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;box-sizing:border-box;}
 .jp-volta.v-close::before{border-right:1.5px solid var(--accent2);}
-.jp-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;line-height:1;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
+.jp-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:10px;line-height:1;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
 
-.kbd-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
+.kbd-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
 .kbd-row{display:flex;gap:4px;flex-wrap:wrap;}
-.kbd-btn{font-family:'Space Mono',monospace;font-size:10px;padding:5px 8px;border-radius:5px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;transition:all .1s;min-width:30px;text-align:center;line-height:1;}
+.kbd-btn{font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;border-radius:5px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;transition:all .1s;min-width:30px;text-align:center;line-height:1;}
 .kbd-btn:hover{background:var(--panel);color:var(--ink);border-color:var(--accent);}
 .kbd-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 0 8px rgba(124,106,247,0.4);}
 .kbd-btn.action{color:var(--red);border-color:rgba(242,124,106,0.25);}
@@ -352,14 +365,14 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
 /* 预览 */
 .prev-sec{margin-bottom:20px;}
-.prev-sec-name{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.prev-sec-name{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .prev-sec-name::after{content:'';flex:1;height:1px;background:var(--border);}
 .prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
-.prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:2px;flex-shrink:0;}
-.p-chord{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
+.prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
+.p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
-.p-lyric{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink2);}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
 .p-lyric2{opacity:0.65;margin-top:1px;}
 
@@ -367,11 +380,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 .jp-plain-top{height:12px;}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;}.jp-plain-bot{height:16px;}
-.jp-dot-top,.jp-dot-bot{width:1em;font-size:7px;line-height:1;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;}
+.jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;}
 .jp-dot-top{height:12px;justify-content:flex-end;}.jp-dot-bot{height:12px;justify-content:flex-start;}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;}
-.jp-num{font-size:15px;line-height:1;display:inline-block;text-align:center;width:1em;}
+.jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em;}
 .jp-aug{position:absolute;right:-0.42em;top:0.1em;font-size:10px;line-height:1;pointer-events:none;}
 .jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--ink);}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
@@ -418,7 +431,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
 <div class="topbar">
   <div class="dot"></div>
-  <div class="topbar-title">简谱编辑器 <span>v3.0</span></div>
+  <div class="topbar-title">简谱编辑器 <span>v3.1</span></div>
   <div class="topbar-tabs">
     <button class="top-tab" onclick="openImport()">导入</button>
     <button class="top-tab" onclick="openBulkLyric()" title="批量填歌词">⌨ 填歌词</button>
@@ -483,6 +496,20 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
   </div>
 </div>
 
+<!-- ── 中间状态 + 位置栏 ── -->
+<div class="mid-bar">
+  <div class="mid-bar-left" id="inputStateBar">
+    <span class="kbd-istate-item">总音符: <span id="is-total">0</span></span>
+    <span class="kbd-istate-item">八度: <span id="is-oct">中</span></span>
+    <span class="kbd-istate-item">时值: <span id="is-dur">4分</span></span>
+    <span class="kbd-istate-item">附点: <span id="is-dot">关</span></span>
+    <span class="kbd-istate-item hi">房子线: <span id="is-volta">无</span></span>
+  </div>
+  <div class="mid-bar-right">
+    <span id="statusLoc">点击左边格子开始编辑</span><span class="mid-sel" id="statusSel"></span><span class="mid-tip" id="statusTip"></span>
+  </div>
+</div>
+
 <div class="bottom-area">
   <div class="seg-pane">
     <div class="seg-pane-inner" id="sectionsWrap"></div>
@@ -492,43 +519,26 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
   <div class="kbd-pane">
 
-    <!-- 输入状态栏 -->
-    <div class="kbd-istate" id="inputStateBar">
-      <span class="kbd-istate-item">总音符: <span id="is-total">0</span></span>
-      <span class="kbd-istate-item">八度: <span id="is-oct">中</span></span>
-      <span class="kbd-istate-item">时值: <span id="is-dur">4分</span></span>
-      <span class="kbd-istate-item">附点: <span id="is-dot">关</span></span>
-      <span class="kbd-istate-item">段落: <span id="is-sec">无</span></span>
-      <span class="kbd-istate-item hi">房子线: <span id="is-volta">无</span></span>
-    </div>
-
-    <!-- 状态栏 -->
-    <div class="kbd-status">
-      <span class="kbd-status-loc" id="statusLoc">点击左边格子开始编辑</span>
-      <span class="kbd-status-sel" id="statusSel"></span>
-      <span class="kbd-status-tip" id="statusTip"></span>
-    </div>
-
     <!-- 八度 + 音值 + 模式 -->
     <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
       <div>
         <div class="kbd-label">八度 <span style="color:var(--ink3);font-size:7px;">↑↓</span></div>
         <div class="kbd-row">
-          <button class="kbd-btn" id="oct-low2" onclick="setOct('low2')" style="padding:5px 5px;min-width:24px;font-size:9px;">低2</button>
-          <button class="kbd-btn" id="oct-low1" onclick="setOct('low1')" style="padding:5px 5px;min-width:24px;font-size:9px;">低1</button>
-          <button class="kbd-btn on" id="oct-mid"  onclick="setOct('mid')"  style="padding:5px 5px;min-width:24px;font-size:9px;">中</button>
-          <button class="kbd-btn" id="oct-high1" onclick="setOct('high1')" style="padding:5px 5px;min-width:24px;font-size:9px;">高1</button>
-          <button class="kbd-btn" id="oct-high2" onclick="setOct('high2')" style="padding:5px 5px;min-width:24px;font-size:9px;">高2</button>
+          <button class="kbd-btn" id="oct-low2" onclick="setOct('low2')" style="padding:6px 6px;min-width:30px;font-size:11px;">低2</button>
+          <button class="kbd-btn" id="oct-low1" onclick="setOct('low1')" style="padding:6px 6px;min-width:30px;font-size:11px;">低1</button>
+          <button class="kbd-btn on" id="oct-mid"  onclick="setOct('mid')"  style="padding:6px 6px;min-width:30px;font-size:11px;">中</button>
+          <button class="kbd-btn" id="oct-high1" onclick="setOct('high1')" style="padding:6px 6px;min-width:30px;font-size:11px;">高1</button>
+          <button class="kbd-btn" id="oct-high2" onclick="setOct('high2')" style="padding:6px 6px;min-width:30px;font-size:11px;">高2</button>
         </div>
       </div>
       <div>
         <div class="kbd-label">音值 <span style="color:var(--ink3);font-size:7px;">Q W E R T</span></div>
         <div class="kbd-row">
-          <button class="kbd-btn" id="dur-whole"   onclick="setDur('whole')"   style="padding:5px 5px;min-width:26px;font-size:9px;">全<span class="shortcut">Q</span></button>
-          <button class="kbd-btn" id="dur-half"    onclick="setDur('half')"    style="padding:5px 5px;min-width:26px;font-size:9px;">½<span class="shortcut">W</span></button>
-          <button class="kbd-btn on" id="dur-quarter" onclick="setDur('quarter')" style="padding:5px 5px;min-width:26px;font-size:9px;">¼<span class="shortcut">E</span></button>
-          <button class="kbd-btn" id="dur-eighth"  onclick="setDur('eighth')"  style="padding:5px 5px;min-width:26px;font-size:9px;">⅛<span class="shortcut">R</span></button>
-          <button class="kbd-btn" id="dur-16th"    onclick="setDur('16th')"    style="padding:5px 5px;min-width:26px;font-size:9px;">¹⁄₁₆<span class="shortcut">T</span></button>
+          <button class="kbd-btn" id="dur-whole"   onclick="setDur('whole')"   style="padding:6px 6px;min-width:32px;font-size:11px;">全<span class="shortcut">Q</span></button>
+          <button class="kbd-btn" id="dur-half"    onclick="setDur('half')"    style="padding:6px 6px;min-width:32px;font-size:11px;">½<span class="shortcut">W</span></button>
+          <button class="kbd-btn on" id="dur-quarter" onclick="setDur('quarter')" style="padding:6px 6px;min-width:32px;font-size:11px;">¼<span class="shortcut">E</span></button>
+          <button class="kbd-btn" id="dur-eighth"  onclick="setDur('eighth')"  style="padding:6px 6px;min-width:32px;font-size:11px;">⅛<span class="shortcut">R</span></button>
+          <button class="kbd-btn" id="dur-16th"    onclick="setDur('16th')"    style="padding:6px 6px;min-width:32px;font-size:11px;">¹⁄₁₆<span class="shortcut">T</span></button>
         </div>
       </div>
       <div>
@@ -1199,8 +1209,7 @@ function renderNStr(nStr){
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
     if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') so.appendChild(parseJpToken(toks[i++]));div.appendChild(so);i++;continue;}
     if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));div.appendChild(sc);continue;}
-    if(t==='[v1'||t==='[v2'){var vn=(t==='[v1')?'1':'2';var vw=document.createElement('span');vw.className='jp-volta'+((t==='[v2')?' v-close':'');vw.setAttribute('data-v',vn+'.');i++;while(i<toks.length&&toks[i]!==']v')vw.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;div.appendChild(vw);continue;}
-    if(t===']v'){i++;continue;}
+    if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;} // 跨格volta由renderPreview层处理
     var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));div.appendChild(tp);i++;continue;}
     if(t==='}'){i++;continue;}
     div.appendChild(parseJpToken(t));i++;
@@ -1250,15 +1259,29 @@ function renderPreview(){
     var pn=document.createElement('div');pn.className='prev-sec-name';pn.textContent=sec.name;ps.appendChild(pn);
     sec.lines.forEach(function(line){
       var row=document.createElement('div');row.className='prev-row'+(line.bold?' bold':'');
+      var voltaWrap=null;
       line.segs.forEach(function(seg){
         var s=document.createElement('div');s.className='prev-seg';
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
         if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
         if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
-        row.appendChild(s);
+        // 检测 volta 开始（indexOf 避免反斜杠在 CMS 里丢失）
+        var _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
+        if(_vn){
+          voltaWrap=document.createElement('span');
+          voltaWrap.className='prev-volta';
+          voltaWrap.setAttribute('data-v',_vn+'.');
+        }
+        (voltaWrap||row).appendChild(s);
+        // 检测 volta 结束
+        if(voltaWrap&&seg.n&&seg.n.indexOf(']v')>=0){
+          voltaWrap.classList.add('closed');
+          row.appendChild(voltaWrap);
+          voltaWrap=null;
+        }
       });
-      // rows直接挂到 section（volta 已在 token 层渲染）
+      if(voltaWrap)row.appendChild(voltaWrap); // 未闭合的 volta
       ps.appendChild(row);
     });
     inner.appendChild(ps);
@@ -1563,12 +1586,11 @@ function updateInputState(){
   // 总音符：统计全部 data 中有 n 的 seg
   var total=0;
   data.forEach(function(sec){sec.lines.forEach(function(line){line.segs.forEach(function(seg){if(seg.n&&seg.n.trim())total++;});});});
-  document.getElementById('is-total').textContent=total;
-  document.getElementById('is-oct').textContent=_octLabel[oct]||oct;
-  document.getElementById('is-dur').textContent=_durLabel[dur]||dur;
-  document.getElementById('is-dot').textContent=dotOn?'开':'关';
-  // 段落：当前选中段落名
-  document.getElementById('is-sec').textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
+  var _si=document.getElementById('is-total');if(_si)_si.textContent=total;
+  var _so=document.getElementById('is-oct');if(_so)_so.textContent=_octLabel[oct]||oct;
+  var _sd=document.getElementById('is-dur');if(_sd)_sd.textContent=_durLabel[dur]||dur;
+  var _sp=document.getElementById('is-dot');if(_sp)_sp.textContent=dotOn?'开':'关';
+  var _ss=document.getElementById('is-sec');if(_ss)_ss.textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
   // 房子线：当前格子的 n 里是否含有 [v1 / [v2 token
   var voltaStr='无';
   if(curSi>=0&&curLi>=0&&curGi>=0){
