@@ -128,14 +128,14 @@
         {"chord":"(跳到Coda处)","n":"3_ 2'_ ( 1'_ ) ]v","lyric":"不停息"}
       ],
       { "b": true, "line": [
-        {"chord":"","n":"[v2 ]v","lyric":"|","lyric2":"|"},
+        {"chord":"","n":"[v2","lyric":"|","lyric2":"|"},
         {"chord":"Bb","n":"( 1' ) ( - 1'_ )","lyric":"ㅤ"},
         {"chord":"","n":"3' ([ 2'_","lyric":"祝福｜"},
         {"chord":"","n":"]) 2' ( - - - )","lyric":"ㅤㅤㅤㅤ｜"},
         {"chord":"Am7","n":"2'·","lyric":"ㅤ"},
         {"chord":"","n":"( 3'_ 3'_ ) 2'_","lyric":"永ㅤ 不"},
         {"chord":"","n":"2'_ ([ 1'_","lyric":"停息｜"},
-        {"chord":"","n":"[v2 ]v","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"]v","lyric":"ㅤ","lyric2":"ㅤ"},
         {"chord":"Dm7","n":"]) 1' - -","lyric":"ㅤ"},
         {"chord":"","n":"6'_ ([ 1'_","lyric":"世代｜"},
         {"chord":"Gm7","n":"]) 1'·","lyric":"ㅤ"},
