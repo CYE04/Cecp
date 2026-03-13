@@ -264,19 +264,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .kbd-status-sel{font-size:9px;color:var(--sel);margin-left:4px;white-space:nowrap;}
 .kbd-status-tip{font-size:8px;color:var(--ink3);margin-left:auto;}
 
-/* ── 房子线按钮（行 meta 里）── */
-.volta-group{display:inline-flex;align-items:center;gap:2px;margin-left:4px;}
-.volta-lbl{font-size:8px;color:var(--ink3);margin-right:1px;font-family:'Space Mono',monospace;}
-.volta-btn{font-size:8px;padding:1px 5px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--ink3);cursor:pointer;font-family:'Space Mono',monospace;line-height:1.4;}
-.volta-btn:hover{color:var(--ink);background:var(--border);}
-.volta-btn.on{background:var(--accent2);color:#000;border-color:var(--accent2);}
-
-/* ── 房子线预览（prev-row 外层包裹）── */
-.prev-volta-wrap{position:relative;padding-top:22px;margin-bottom:10px;}
-.prev-volta-bracket{position:absolute;top:3px;left:0;right:0;height:15px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;}
-.prev-volta-bracket.closed{border-right:1.5px solid var(--accent2);}
-.prev-volta-num{position:absolute;top:3px;left:4px;font-size:8px;color:var(--accent2);font-family:'Space Mono',monospace;line-height:15px;}
-.prev-volta-wrap .prev-row{margin-bottom:0;}
+/* ── 房子线（token 式，和连音线一样） ── */
+.jp-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
+.jp-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;box-sizing:border-box;}
+.jp-volta.v-close::before{border-right:1.5px solid var(--accent2);}
+.jp-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;line-height:1;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
 
 .kbd-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
 .kbd-row{display:flex;gap:4px;flex-wrap:wrap;}
@@ -573,6 +565,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
           <button class="kbd-btn slur-btn" id="slur-btn" onclick="toggleSlur()" style="padding:5px 6px;">( ) 连音<span class="shortcut">[</span></button>
           <button class="kbd-btn slur-btn" id="xslur-btn" onclick="toggleXSlur()" style="padding:5px 6px;">跨线开<span class="shortcut">]</span></button>
           <button class="kbd-btn slur-btn" onclick="closeXSlur()" style="padding:5px 6px;">跨线结</button>
+          <button class="kbd-btn" onclick="appendTok('[v1')" style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第1房子线开始">1. 房开</button>
+          <button class="kbd-btn" onclick="appendTok('[v2')" style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第2房子线开始">2. 房开</button>
+          <button class="kbd-btn" onclick="appendTok(']v')"  style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入房子线结束">房结</button>
           <button class="kbd-btn slur-btn" id="t3-btn" onclick="toggleTuplet(3)" style="padding:5px 6px;">3连</button>
           <button class="kbd-btn slur-btn" id="t5-btn" onclick="toggleTuplet(5)" style="padding:5px 6px;">5连</button>
           <button class="kbd-btn action" onclick="deleteSelected()" style="padding:5px 6px;">⌫ 删除<span class="shortcut">Bksp</span></button>
@@ -594,7 +589,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 ════════════════════════════════════════ */
 var data=[
   {name:'前奏',lines:[
-    {bold:false,volta:0,segs:[
+    {bold:false,segs:[
       {chord:'E',    n:"0_ 5_",           lyric:""},
       {chord:"",     n:"1'_ 2'_",         lyric:""},
       {chord:'E/G#', n:"3' 5'",           lyric:""},
@@ -609,7 +604,7 @@ var data=[
     ]}
   ]},
   {name:'主歌',lines:[
-    {bold:false,volta:0,segs:[
+    {bold:false,segs:[
       {chord:"",     n:"3_ 4_",           lyric:"主你"},
       {chord:"",     n:"",                lyric:"｜"},
       {chord:'E',    n:"5 ( 3_ 2_ )",     lyric:"使卑"},
@@ -620,7 +615,7 @@ var data=[
       {chord:'E/G#', n:"1 3 5 ( 3_ 2_ )", lyric:"心流泪转"},
       {chord:"",     n:"",                lyric:"|"},
     ]},
-    {bold:false,volta:0,segs:[
+    {bold:false,segs:[
       {chord:'A',    n:"1 3",             lyric:"为笑"},
       {chord:'B',    n:"2 3_ 4_",         lyric:"颜.患难"},
       {chord:"",     n:"",                lyric:"｜"},
@@ -969,11 +964,6 @@ function renderEditor(){
       var rm=document.createElement('div');rm.className='row-meta';
       rm.innerHTML='<span class="row-idx">ROW '+(li+1)+'</span>'+
         '<label class="bold-toggle"><input type="checkbox" '+(line.bold?'checked':'')+' onchange="data['+si+'].lines['+li+'].bold=this.checked;renderPreview()"> 副歌</label>'+
-        '<span class="volta-group"><span class="volta-lbl">房子线:</span>'+
-          '<button class="volta-btn'+(line.volta===0?' on':'')+'" onclick="setVolta('+si+','+li+',0)" title="无房子线">无</button>'+
-          '<button class="volta-btn'+(line.volta===1?' on':'')+'" onclick="setVolta('+si+','+li+',1)" title="第1房子">1.</button>'+
-          '<button class="volta-btn'+(line.volta===2?' on':'')+'" onclick="setVolta('+si+','+li+',2)" title="第2房子">2.</button>'+
-        '</span>'+
         '<button class="sec-btn" onclick="moveLine('+si+','+li+',-1)" title="上移">↑</button>'+
         '<button class="sec-btn" onclick="moveLine('+si+','+li+',1)" title="下移">↓</button>'+
         '<button class="row-del" onclick="delLine('+si+','+li+')">✕</button>';
@@ -1112,7 +1102,7 @@ function renderEditor(){
   renderPreview();
 }
 
-function addSection(){saveUndo();data.push({name:'新段落',lines:[{bold:false,volta:0,segs:[{chord:'',n:'',lyric:''}]}]});renderEditor();}
+function addSection(){saveUndo();data.push({name:'新段落',lines:[{bold:false,segs:[{chord:'',n:'',lyric:''}]}]});renderEditor();}
 function moveSection(si,dir){
   var ni=si+dir;
   if(ni<0||ni>=data.length)return;
@@ -1122,7 +1112,7 @@ function moveSection(si,dir){
   renderEditor();if(curSi>=0)reactivate();
 }
 function delSection(si){saveUndo();data.splice(si,1);if(curSi===si){curSi=-1;curLi=-1;curGi=-1;}renderEditor();}
-function addLine(si){saveUndo();data[si].lines.push({bold:false,volta:0,segs:[{chord:'',n:'',lyric:''}]});renderEditor();}
+function addLine(si){saveUndo();data[si].lines.push({bold:false,segs:[{chord:'',n:'',lyric:''}]});renderEditor();}
 function moveLine(si,li,dir){
   var ni=li+dir;
   if(ni<0||ni>=data[si].lines.length)return;
@@ -1209,6 +1199,8 @@ function renderNStr(nStr){
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
     if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') so.appendChild(parseJpToken(toks[i++]));div.appendChild(so);i++;continue;}
     if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));div.appendChild(sc);continue;}
+    if(t==='[v1'||t==='[v2'){var vn=(t==='[v1')?'1':'2';var vw=document.createElement('span');vw.className='jp-volta'+((t==='[v2')?' v-close':'');vw.setAttribute('data-v',vn+'.');i++;while(i<toks.length&&toks[i]!==']v')vw.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;div.appendChild(vw);continue;}
+    if(t===']v'){i++;continue;}
     var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));div.appendChild(tp);i++;continue;}
     if(t==='}'){i++;continue;}
     div.appendChild(parseJpToken(t));i++;
@@ -1266,17 +1258,8 @@ function renderPreview(){
         if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
         row.appendChild(s);
       });
-      // 房子线包裹
-      if(line.volta){
-        var vw=document.createElement('div');vw.className='prev-volta-wrap';
-        var vb=document.createElement('div');
-        vb.className='prev-volta-bracket'+(line.volta===1?' closed':'');
-        var vn=document.createElement('span');vn.className='prev-volta-num';vn.textContent=line.volta+'.';
-        vw.appendChild(vb);vw.appendChild(vn);vw.appendChild(row);
-        ps.appendChild(vw);
-      } else {
-        ps.appendChild(row);
-      }
+      // rows直接挂到 section（volta 已在 token 层渲染）
+      ps.appendChild(row);
     });
     inner.appendChild(ps);
   });
@@ -1295,13 +1278,9 @@ function renderCode(){
     lines.push('    "lines": [');
     sec.lines.forEach(function(line,li){
       var lastLine=li===sec.lines.length-1;
-      var isObj=line.bold||line.volta;
+      var isObj=line.bold;
       if(isObj){
-        var header='      {';
-        if(line.bold)header+='"b": true, ';
-        if(line.volta)header+='"v": '+line.volta+', ';
-        header+='"line": [';
-        lines.push(header);
+        lines.push('      { "b": true, "line": [');
       } else {
         lines.push('      [');
       }
@@ -1313,7 +1292,7 @@ function renderCode(){
         if(seg.lyric2)obj.lyric2=seg.lyric2;
         lines.push('        '+JSON.stringify(obj)+(lastSeg?'':','));
       });
-      lines.push((line.bold||line.volta)?'      ]}'+(!lastLine?',':''):'      ]'+(!lastLine?',':''));
+      lines.push(line.bold?'      ]}'+(!lastLine?',':''):'      ]'+(!lastLine?',':''));
     });
     lines.push('    ]');
     lines.push('  }'+(last?'':','));
@@ -1462,8 +1441,8 @@ function doImport(){
     saveUndo();
     data=parsed.map(function(sec){
       return{name:sec.name||'',lines:(sec.lines||[]).map(function(line){
-        if(Array.isArray(line))return{bold:false,volta:0,segs:line};
-        return{bold:!!line.b,volta:line.v||0,segs:line.line||[]};
+        if(Array.isArray(line))return{bold:false,segs:line};
+        return{bold:!!line.b,segs:line.line||[]};
       })};
     });
     curSi=-1;curLi=-1;curGi=-1;curTok=-1;clearSel();
@@ -1576,16 +1555,6 @@ document.getElementById('checkOverlay').addEventListener('click',function(e){if(
 
 
 /* ════════════════════════════════════════
-   房子线设置
-════════════════════════════════════════ */
-function setVolta(si,li,v){
-  saveUndo();
-  data[si].lines[li].volta=v;
-  renderEditor();
-  if(curSi>=0)reactivate();
-}
-
-/* ════════════════════════════════════════
    输入状态栏更新
 ════════════════════════════════════════ */
 var _durLabel={whole:'全音符',half:'2分',quarter:'4分',eighth:'8分','16th':'16分'};
@@ -1600,10 +1569,14 @@ function updateInputState(){
   document.getElementById('is-dot').textContent=dotOn?'开':'关';
   // 段落：当前选中段落名
   document.getElementById('is-sec').textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
-  // 房子线：当前行的 volta
-  var voltaVal=0;
-  if(curSi>=0&&curLi>=0&&data[curSi]&&data[curSi].lines[curLi])voltaVal=data[curSi].lines[curLi].volta||0;
-  document.getElementById('is-volta').textContent=voltaVal?voltaVal+'房':'无';
+  // 房子线：当前格子的 n 里是否含有 [v1 / [v2 token
+  var voltaStr='无';
+  if(curSi>=0&&curLi>=0&&curGi>=0){
+    var curN=(data[curSi]&&data[curSi].lines[curLi]&&data[curSi].lines[curLi].segs[curGi])||{};
+    if(curN.n&&curN.n.indexOf('[v1')>=0)voltaStr='1房';
+    else if(curN.n&&curN.n.indexOf('[v2')>=0)voltaStr='2房';
+  }
+  document.getElementById('is-volta').textContent=voltaStr;
 }
 
 // scoreImg 变更时刷新预览
