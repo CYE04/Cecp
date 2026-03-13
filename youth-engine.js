@@ -527,8 +527,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
       if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')so.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(so);continue;}
       if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
-      if(t==='[v1'||t==='[v2'){var vn=(t==='[v1')?'1':'2';var vw=document.createElement('span');vw.className='jp-volta'+((t==='[v2')?' v-close':'');vw.setAttribute('data-v',vn+'.');i++;while(i<toks.length&&toks[i]!==']v')vw.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(vw);continue;}
-      if(t===']v'){i++;continue;}
+      if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;} // volta handled at row level
       var tm2=t.match(/^\{(3|5)$/);if(tm2){var tn=parseInt(tm2[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));d.appendChild(tp);i++;continue;}
       if(t==='}'){i++;continue;}
       d.appendChild(parseJpToken(t));i++;
