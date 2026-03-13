@@ -371,15 +371,46 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .jp-tuplet{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;margin-right:1px;}
 .jp-tuplet-br{position:absolute;top:2px;left:2px;right:2px;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:3px 3px 0 0;pointer-events:none;}
 .jp-tuplet-num{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:8px;line-height:1;padding:0 3px;background:var(--bg);color:var(--ink);pointer-events:none;}
+
+/* ── 批量填歌词 modal ── */
+.lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
+.lyfill-overlay.open{display:flex;}
+.lyfill-box{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:18px;width:480px;max-width:95vw;}
+.lyfill-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.lyfill-hint{font-size:9px;color:var(--ink2);margin-bottom:10px;line-height:1.6;}
+.lyfill-ta{width:100%;height:110px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--ink);font-family:'Space Mono',monospace;font-size:12px;padding:8px;resize:vertical;outline:none;line-height:1.6;}
+.lyfill-ta:focus{border-color:var(--accent);}
+.lyfill-scope{display:flex;gap:10px;margin:8px 0 6px;}
+.lyfill-scope label{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--ink2);cursor:pointer;font-family:'Space Mono',monospace;}
+.lyfill-stats{font-size:9px;min-height:14px;margin-top:4px;}
+.lyfill-stats.warn{color:#f0c040;}.lyfill-stats.ok{color:var(--green);}
+.lyfill-btns{display:flex;gap:8px;margin-top:10px;}
+.lyfill-ok{flex:1;padding:8px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;}
+.lyfill-ok:hover{opacity:.85;}
+.lyfill-cancel{padding:8px 16px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--ink2);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;}
+
+/* ── 检查状态 modal ── */
+.check-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
+.check-overlay.open{display:flex;}
+.check-box{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:18px;width:420px;max-width:95vw;max-height:80vh;overflow-y:auto;}
+.check-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;}
+.check-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.check-row:last-child{border-bottom:none;}
+.check-sec-name{font-size:10px;color:var(--ink2);flex:1;font-family:'Space Mono',monospace;}
+.check-nums{font-size:10px;font-family:'Space Mono',monospace;}
+.check-ok{color:var(--green);}.check-warn{color:#f0c040;}
+.check-total{margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;font-family:'Space Mono',monospace;color:var(--ink);}
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="dot"></div>
-  <div class="topbar-title">简谱编辑器 <span>v2.9</span></div>
+  <div class="topbar-title">简谱编辑器 <span>v3.0</span></div>
   <div class="topbar-tabs">
     <button class="top-tab" onclick="openImport()">导入</button>
+    <button class="top-tab" onclick="openBulkLyric()" title="批量填歌词">⌨ 填歌词</button>
+    <button class="top-tab" onclick="openCheck()" title="检查音符与歌词数量">⚑ 检查</button>
     <button class="top-tab on" onclick="switchTop('preview',this)">预览</button>
     <button class="top-tab" onclick="switchTop('code',this)">代码</button>
   </div>
@@ -444,6 +475,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
   <div class="seg-pane">
     <div class="seg-pane-inner" id="sectionsWrap"></div>
     <button class="add-sec-btn" onclick="addSection()">+ 新增段落</button>
+    <button class="add-sec-btn" onclick="openBulkLyric()" style="color:var(--accent2);border-color:rgba(124,106,247,0.3);">⌨ 批量填歌词</button>
   </div>
 
   <div class="kbd-pane">
@@ -1370,10 +1402,141 @@ function doImport(){
 }
 document.getElementById('importOverlay').addEventListener('click',function(e){if(e.target===this)closeImport();});
 
+
+/* ════════════════════════════════════════
+   批量填歌词
+════════════════════════════════════════ */
+function _getLyricSlots(scopeSi){
+  // 返回所有有音符的 seg 引用（n 非空）
+  // scopeSi >= 0 时只处理该段落
+  var slots=[];
+  var secs=(scopeSi>=0)?[{sec:data[scopeSi],si:scopeSi}]:data.map(function(s,i){return{sec:s,si:i};});
+  secs.forEach(function(item){
+    item.sec.lines.forEach(function(line,li){
+      line.segs.forEach(function(seg,gi){
+        if(seg.n&&seg.n.trim())slots.push({seg:seg,si:item.si,li:li,gi:gi});
+      });
+    });
+  });
+  return slots;
+}
+function _lyfillScope(){
+  var el=document.querySelector('input[name="lyfill-scope"]:checked');
+  return el?el.value:'all';
+}
+function openBulkLyric(){
+  document.getElementById('lyfillOverlay').classList.add('open');
+  document.getElementById('lyfillTA').value='';
+  document.getElementById('lyfillStats').textContent='';
+  document.getElementById('lyfillStats').className='lyfill-stats';
+  setTimeout(function(){document.getElementById('lyfillTA').focus();},50);
+}
+function closeBulkLyric(){
+  document.getElementById('lyfillOverlay').classList.remove('open');
+}
+function updateLyfillStats(){
+  var text=document.getElementById('lyfillTA').value.replace(/\\s/g,'');
+  var scope=_lyfillScope();
+  var scopeSi=(scope==='cur'&&curSi>=0)?curSi:-1;
+  var slots=_getLyricSlots(scopeSi);
+  var el=document.getElementById('lyfillStats');
+  if(!text){el.textContent='';el.className='lyfill-stats';return;}
+  var msg='歌词字数: '+text.length+'  /  音符格数: '+slots.length;
+  if(text.length===slots.length){el.className='lyfill-stats ok';msg+='  ✓ 完全匹配';}
+  else if(text.length>slots.length){el.className='lyfill-stats warn';msg+='  ⚠ 歌词多 '+(text.length-slots.length)+' 字（多余部分忽略）';}
+  else{el.className='lyfill-stats warn';msg+='  ⚠ 歌词少 '+(slots.length-text.length)+' 字（剩余格子将清空）';}
+  el.textContent=msg;
+}
+function applyBulkLyric(){
+  var text=document.getElementById('lyfillTA').value.replace(/\\s/g,'');
+  if(!text){closeBulkLyric();return;}
+  var scope=_lyfillScope();
+  var scopeSi=(scope==='cur'&&curSi>=0)?curSi:-1;
+  var slots=_getLyricSlots(scopeSi);
+  saveUndo();
+  slots.forEach(function(item,i){
+    item.seg.lyric=i<text.length?text[i]:'';
+  });
+  closeBulkLyric();
+  renderEditor();
+  if(curSi>=0)reactivate();
+}
+document.getElementById('lyfillOverlay').addEventListener('click',function(e){if(e.target===this)closeBulkLyric();});
+document.getElementById('lyfillTA').addEventListener('input',updateLyfillStats);
+(function(){
+  var radios=document.querySelectorAll('input[name="lyfill-scope"]');
+  radios.forEach(function(r){r.addEventListener('change',updateLyfillStats);});
+})();
+
+/* ════════════════════════════════════════
+   检查状态（音符 / 歌词 对照）
+════════════════════════════════════════ */
+function openCheck(){
+  var content=document.getElementById('checkContent');
+  content.innerHTML='';
+  var totalN=0,totalL=0;
+  data.forEach(function(sec){
+    var noteCount=0,lyricCount=0;
+    sec.lines.forEach(function(line){
+      line.segs.forEach(function(seg){
+        if(seg.n&&seg.n.trim()){
+          noteCount++;
+          if(seg.lyric&&seg.lyric.trim())lyricCount++;
+        }
+      });
+    });
+    totalN+=noteCount;totalL+=lyricCount;
+    var row=document.createElement('div');row.className='check-row';
+    var nm=document.createElement('span');nm.className='check-sec-name';nm.textContent=sec.name||'（无名）';row.appendChild(nm);
+    var nums=document.createElement('span');
+    nums.className='check-nums '+(lyricCount===noteCount?'check-ok':'check-warn');
+    nums.textContent='歌词 '+lyricCount+' / 音符 '+noteCount+(lyricCount===noteCount?' ✓':' ⚠');
+    row.appendChild(nums);content.appendChild(row);
+  });
+  var tot=document.createElement('div');tot.className='check-total';
+  var cls=totalL===totalN?'check-ok':'check-warn';
+  tot.innerHTML='合计：歌词 <span class="'+cls+'">'+totalL+'</span> / 音符 '+totalN+(totalL===totalN?' &nbsp;<span class="check-ok">✓ 全部匹配</span>':' &nbsp;<span class="check-warn">⚠ 有未填歌词</span>');
+  content.appendChild(tot);
+  document.getElementById('checkOverlay').classList.add('open');
+}
+function closeCheck(){
+  document.getElementById('checkOverlay').classList.remove('open');
+}
+document.getElementById('checkOverlay').addEventListener('click',function(e){if(e.target===this)closeCheck();});
+
 /* 初始化 */
 refreshTupletBtns();
 renderEditor();
 </script>
+<!-- ── 批量填歌词 modal ── -->
+<div class="lyfill-overlay" id="lyfillOverlay">
+  <div class="lyfill-box">
+    <div class="lyfill-label">批量填歌词</div>
+    <div class="lyfill-hint">粘入歌词文字（连续字符），按顺序自动填入有音符的格子。已有歌词会被覆盖。空格与换行会被忽略。</div>
+    <textarea class="lyfill-ta" id="lyfillTA" placeholder="请在这里粘入歌词…"></textarea>
+    <div class="lyfill-scope">
+      <label><input type="radio" name="lyfill-scope" value="all" checked> 全部段落</label>
+      <label><input type="radio" name="lyfill-scope" value="cur"> 仅当前段落</label>
+    </div>
+    <div class="lyfill-stats" id="lyfillStats"></div>
+    <div class="lyfill-btns">
+      <button class="lyfill-ok" onclick="applyBulkLyric()">填入</button>
+      <button class="lyfill-cancel" onclick="closeBulkLyric()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 检查状态 modal ── -->
+<div class="check-overlay" id="checkOverlay">
+  <div class="check-box">
+    <div class="check-title">音符 / 歌词 对照检查</div>
+    <div id="checkContent"></div>
+    <div style="margin-top:12px;text-align:right;">
+      <button class="lyfill-cancel" onclick="closeCheck()">关闭</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>`;
 
