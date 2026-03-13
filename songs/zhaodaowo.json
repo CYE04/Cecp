@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/zhaodaowo.lrc",
   "youtube": "https://youtu.be/5hkbct1UPK8?si=Hr8buBtevs0hcDsz",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/zhaodaowoF.jpg",
-  "sections": [
+ "sections": [
   {
     "name": "主歌",
     "lines": [
@@ -109,13 +109,11 @@
         {"chord":"","n":"2__ 5·_","lyric":"能力","lyric2":"我的"},
         {"chord":"","lyric":""},
         {"chord":"","n":"3_ ( 3__ 2__ ) ([ sp","lyric":"涌流。｜","lyric2":"所有。｜"},
-        {"chord":"1","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"","n":"]) 2 - - -","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"C/E","n":"[v1 ]) 2 - - - ]v","lyric":"ㅤ","lyric2":"ㅤ"},
         {"chord":"","lyric":"||","lyric2":"||"},
-        {"chord":"2","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"C","n":"( 2 ) sp - sp 0_","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"","n":"( 1_ sp 2__ 1__ )","lyric":"耶","lyric2":"ㅤ"},
-        {"chord":"","n":"( 5_ sp )","lyric":"稣 ||","lyric2":"ㅤ"}
+        {"chord":"C","n":"[v2 ( 2 ) sp - sp 0_","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤ To","n":"( 1_ sp 2__ 1__ )","lyric":"耶","lyric2":"ㅤ"},
+        {"chord":"Chorus","n":"( 5_ sp ) ]v","lyric":"稣 ||","lyric2":"ㅤ"}
       ]
     ]
   }
