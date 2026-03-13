@@ -902,6 +902,7 @@
         for(const line of sec.lines||[]){
           const le=_div('sw-lline');const row=_div('sw-lrow'+((!Array.isArray(line)&&line.b)?' bold':''));
           const segs=Array.isArray(line)?line:(line.line||[]);
+          let voltaWrap=null;
           for(const seg of segs){
             const segEl=_div('sw-seg');
             const chord=document.createElement('span');
@@ -912,8 +913,12 @@
             const lyric=document.createElement('span');lyric.className='sw-lyric';lyric.textContent=seg.lyric||'';
             segEl.appendChild(lyric);
             if(seg.lyric2){const ly2=document.createElement('span');ly2.className='sw-lyric sw-lyric2';ly2.textContent=seg.lyric2;segEl.appendChild(ly2);}
-            row.appendChild(segEl);
+            const _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
+            if(_vn){voltaWrap=document.createElement('span');voltaWrap.className='sw-volta';voltaWrap.setAttribute('data-v',_vn+'.');}
+            (voltaWrap||row).appendChild(segEl);
+            if(voltaWrap&&seg.n&&seg.n.indexOf(']v')>=0){voltaWrap.classList.add('closed');row.appendChild(voltaWrap);voltaWrap=null;}
           }
+          if(voltaWrap)row.appendChild(voltaWrap);
           le.appendChild(row);se.appendChild(le);
         }
         lbDiv.appendChild(se);

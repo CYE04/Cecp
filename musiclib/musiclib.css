@@ -716,3 +716,8 @@ body{overflow-x:hidden;}
 
 
 
+
+#music-library .sw-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
+#music-library .sw-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--text);border-left:1.5px solid var(--text);pointer-events:none;box-sizing:border-box;opacity:0.5;}
+#music-library .sw-volta.closed::before{border-right:1.5px solid var(--text);}
+#music-library .sw-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;color:var(--text);opacity:0.65;pointer-events:none;}
