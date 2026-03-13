@@ -1586,12 +1586,11 @@ function updateInputState(){
   // 总音符：统计全部 data 中有 n 的 seg
   var total=0;
   data.forEach(function(sec){sec.lines.forEach(function(line){line.segs.forEach(function(seg){if(seg.n&&seg.n.trim())total++;});});});
-  document.getElementById('is-total').textContent=total;
-  document.getElementById('is-oct').textContent=_octLabel[oct]||oct;
-  document.getElementById('is-dur').textContent=_durLabel[dur]||dur;
-  document.getElementById('is-dot').textContent=dotOn?'开':'关';
-  // 段落：当前选中段落名
-  document.getElementById('is-sec').textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
+  var _si=document.getElementById('is-total');if(_si)_si.textContent=total;
+  var _so=document.getElementById('is-oct');if(_so)_so.textContent=_octLabel[oct]||oct;
+  var _sd=document.getElementById('is-dur');if(_sd)_sd.textContent=_durLabel[dur]||dur;
+  var _sp=document.getElementById('is-dot');if(_sp)_sp.textContent=dotOn?'开':'关';
+  var _ss=document.getElementById('is-sec');if(_ss)_ss.textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
   // 房子线：当前格子的 n 里是否含有 [v1 / [v2 token
   var voltaStr='无';
   if(curSi>=0&&curLi>=0&&curGi>=0){
