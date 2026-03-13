@@ -210,7 +210,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .top-panel{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 16px;display:none;position:relative;}
 .top-panel.on{display:block;}
 
-.bottom-area{height:52vh;display:flex;flex-shrink:0;border-top:1px solid var(--border2);}
+.bottom-area{height:58vh;display:flex;flex-shrink:0;}
 
 /* ── 左：段落编辑 ── */
 .seg-pane{width:54%;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
@@ -249,8 +249,21 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .add-row-btn:hover{background:rgba(106,242,168,0.06);border-color:var(--green);}
 .add-sec-btn{width:calc(100% - 16px);padding:5px;border-radius:5px;border:1px dashed var(--border2);background:transparent;font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);cursor:pointer;margin:6px 8px;display:block;}
 
+/* ── 中间状态栏 ── */
+.mid-bar{display:flex;align-items:center;flex-wrap:wrap;gap:0 16px;padding:5px 14px;background:var(--panel2);border-top:1px solid var(--border);border-bottom:1px solid var(--border2);flex-shrink:0;}
+.mid-bar-left{display:flex;align-items:center;flex-wrap:wrap;gap:0;flex:1;}
+.mid-bar-right{font-size:9px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;}
+.mid-sel{font-size:9px;color:var(--sel);margin-left:6px;}
+.mid-tip{font-size:8px;color:var(--ink3);margin-left:8px;}
+
 /* ── 右：键盘 ── */
-.kbd-pane{width:46%;overflow-y:auto;padding:10px;}
+.kbd-pane{width:46%;overflow-y:auto;padding:8px 10px;}
+
+/* ── 跨格子房子线（preview 层） ── */
+.prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
+.prev-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;box-sizing:border-box;}
+.prev-volta.closed::before{border-right:1.5px solid var(--accent2);}
+.prev-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
 
 /* 状态栏 */
 /* ── 输入状态栏（总音符/八度/时值/附点/段落/房子线） ── */
@@ -418,7 +431,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
 <div class="topbar">
   <div class="dot"></div>
-  <div class="topbar-title">简谱编辑器 <span>v3.0</span></div>
+  <div class="topbar-title">简谱编辑器 <span>v3.1</span></div>
   <div class="topbar-tabs">
     <button class="top-tab" onclick="openImport()">导入</button>
     <button class="top-tab" onclick="openBulkLyric()" title="批量填歌词">⌨ 填歌词</button>
@@ -483,6 +496,20 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
   </div>
 </div>
 
+<!-- ── 中间状态 + 位置栏 ── -->
+<div class="mid-bar">
+  <div class="mid-bar-left" id="inputStateBar">
+    <span class="kbd-istate-item">总音符: <span id="is-total">0</span></span>
+    <span class="kbd-istate-item">八度: <span id="is-oct">中</span></span>
+    <span class="kbd-istate-item">时值: <span id="is-dur">4分</span></span>
+    <span class="kbd-istate-item">附点: <span id="is-dot">关</span></span>
+    <span class="kbd-istate-item hi">房子线: <span id="is-volta">无</span></span>
+  </div>
+  <div class="mid-bar-right">
+    <span id="statusLoc">点击左边格子开始编辑</span><span class="mid-sel" id="statusSel"></span><span class="mid-tip" id="statusTip"></span>
+  </div>
+</div>
+
 <div class="bottom-area">
   <div class="seg-pane">
     <div class="seg-pane-inner" id="sectionsWrap"></div>
@@ -491,23 +518,6 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
   </div>
 
   <div class="kbd-pane">
-
-    <!-- 输入状态栏 -->
-    <div class="kbd-istate" id="inputStateBar">
-      <span class="kbd-istate-item">总音符: <span id="is-total">0</span></span>
-      <span class="kbd-istate-item">八度: <span id="is-oct">中</span></span>
-      <span class="kbd-istate-item">时值: <span id="is-dur">4分</span></span>
-      <span class="kbd-istate-item">附点: <span id="is-dot">关</span></span>
-      <span class="kbd-istate-item">段落: <span id="is-sec">无</span></span>
-      <span class="kbd-istate-item hi">房子线: <span id="is-volta">无</span></span>
-    </div>
-
-    <!-- 状态栏 -->
-    <div class="kbd-status">
-      <span class="kbd-status-loc" id="statusLoc">点击左边格子开始编辑</span>
-      <span class="kbd-status-sel" id="statusSel"></span>
-      <span class="kbd-status-tip" id="statusTip"></span>
-    </div>
 
     <!-- 八度 + 音值 + 模式 -->
     <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
@@ -1199,8 +1209,7 @@ function renderNStr(nStr){
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
     if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') so.appendChild(parseJpToken(toks[i++]));div.appendChild(so);i++;continue;}
     if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));div.appendChild(sc);continue;}
-    if(t==='[v1'||t==='[v2'){var vn=(t==='[v1')?'1':'2';var vw=document.createElement('span');vw.className='jp-volta'+((t==='[v2')?' v-close':'');vw.setAttribute('data-v',vn+'.');i++;while(i<toks.length&&toks[i]!==']v')vw.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;div.appendChild(vw);continue;}
-    if(t===']v'){i++;continue;}
+    if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;} // 跨格volta由renderPreview层处理
     var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));div.appendChild(tp);i++;continue;}
     if(t==='}'){i++;continue;}
     div.appendChild(parseJpToken(t));i++;
@@ -1250,15 +1259,29 @@ function renderPreview(){
     var pn=document.createElement('div');pn.className='prev-sec-name';pn.textContent=sec.name;ps.appendChild(pn);
     sec.lines.forEach(function(line){
       var row=document.createElement('div');row.className='prev-row'+(line.bold?' bold':'');
+      var voltaWrap=null;
       line.segs.forEach(function(seg){
         var s=document.createElement('div');s.className='prev-seg';
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
         if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
         if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
-        row.appendChild(s);
+        // 检测 volta 开始
+        var vm=seg.n&&seg.n.match(/\[v([12])/);
+        if(vm){
+          voltaWrap=document.createElement('span');
+          voltaWrap.className='prev-volta';
+          voltaWrap.setAttribute('data-v',vm[1]+'.');
+        }
+        (voltaWrap||row).appendChild(s);
+        // 检测 volta 结束
+        if(voltaWrap&&seg.n&&/\]v/.test(seg.n)){
+          voltaWrap.classList.add('closed');
+          row.appendChild(voltaWrap);
+          voltaWrap=null;
+        }
       });
-      // rows直接挂到 section（volta 已在 token 层渲染）
+      if(voltaWrap)row.appendChild(voltaWrap); // 未闭合的 volta
       ps.appendChild(row);
     });
     inner.appendChild(ps);
