@@ -1847,4 +1847,37 @@ function tutCloseJF(){
 }
 
 renderLines();
+
+/* ── 持续隐藏侧边栏（防止动态插入） ── */
+(function hideSidebar(){
+  const SELECTORS = [
+    'aside',
+    '[class*="sidebar"]',
+    '[class*="side-bar"]',
+    '[id*="sidebar"]',
+    '[id*="side-bar"]',
+    '#header-menu',
+    'footer',
+    '.mt-10',
+  ];
+  function hideAll(){
+    SELECTORS.forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('width','0','important');
+        el.style.setProperty('min-width','0','important');
+        el.style.setProperty('visibility','hidden','important');
+      });
+    });
+    // 让 section.mx-auto 保持单列
+    document.querySelectorAll('section.mx-auto').forEach(el => {
+      el.style.setProperty('grid-template-columns','1fr','important');
+      el.style.setProperty('max-width','100%','important');
+    });
+  }
+  hideAll();
+  const observer = new MutationObserver(hideAll);
+  observer.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['style','class'] });
+})();
+
 })();
