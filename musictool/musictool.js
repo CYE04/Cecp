@@ -1266,16 +1266,16 @@ function renderPreview(){
         if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
         if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
-        // 检测 volta 开始
-        var vm=seg.n&&seg.n.match(/\[v([12])/);
-        if(vm){
+        // 检测 volta 开始（indexOf 避免反斜杠在 CMS 里丢失）
+        var _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
+        if(_vn){
           voltaWrap=document.createElement('span');
           voltaWrap.className='prev-volta';
-          voltaWrap.setAttribute('data-v',vm[1]+'.');
+          voltaWrap.setAttribute('data-v',_vn+'.');
         }
         (voltaWrap||row).appendChild(s);
         // 检测 volta 结束
-        if(voltaWrap&&seg.n&&/\]v/.test(seg.n)){
+        if(voltaWrap&&seg.n&&seg.n.indexOf(']v')>=0){
           voltaWrap.classList.add('closed');
           row.appendChild(voltaWrap);
           voltaWrap=null;
