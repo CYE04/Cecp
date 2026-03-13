@@ -253,10 +253,30 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .kbd-pane{width:46%;overflow-y:auto;padding:10px;}
 
 /* 状态栏 */
+/* ── 输入状态栏（总音符/八度/时值/附点/段落/房子线） ── */
+.kbd-istate{display:flex;align-items:center;flex-wrap:wrap;gap:0;padding:4px 8px;background:var(--bg);border-radius:5px;border:1px solid var(--border);margin-bottom:5px;min-height:24px;font-family:'Space Mono',monospace;}
+.kbd-istate-item{font-size:8px;color:var(--ink3);white-space:nowrap;padding:0 7px 0 0;}
+.kbd-istate-item span{color:var(--ink2);}
+.kbd-istate-item.hi span{color:var(--accent2);}
+
 .kbd-status{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-radius:5px;border:1px solid var(--border);margin-bottom:8px;min-height:28px;}
 .kbd-status-loc{font-size:9px;color:var(--ink2);white-space:nowrap;}
 .kbd-status-sel{font-size:9px;color:var(--sel);margin-left:4px;white-space:nowrap;}
 .kbd-status-tip{font-size:8px;color:var(--ink3);margin-left:auto;}
+
+/* ── 房子线按钮（行 meta 里）── */
+.volta-group{display:inline-flex;align-items:center;gap:2px;margin-left:4px;}
+.volta-lbl{font-size:8px;color:var(--ink3);margin-right:1px;font-family:'Space Mono',monospace;}
+.volta-btn{font-size:8px;padding:1px 5px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--ink3);cursor:pointer;font-family:'Space Mono',monospace;line-height:1.4;}
+.volta-btn:hover{color:var(--ink);background:var(--border);}
+.volta-btn.on{background:var(--accent2);color:#000;border-color:var(--accent2);}
+
+/* ── 房子线预览（prev-row 外层包裹）── */
+.prev-volta-wrap{position:relative;padding-top:22px;margin-bottom:10px;}
+.prev-volta-bracket{position:absolute;top:3px;left:0;right:0;height:15px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;}
+.prev-volta-bracket.closed{border-right:1.5px solid var(--accent2);}
+.prev-volta-num{position:absolute;top:3px;left:4px;font-size:8px;color:var(--accent2);font-family:'Space Mono',monospace;line-height:15px;}
+.prev-volta-wrap .prev-row{margin-bottom:0;}
 
 .kbd-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
 .kbd-row{display:flex;gap:4px;flex-wrap:wrap;}
@@ -480,6 +500,16 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 
   <div class="kbd-pane">
 
+    <!-- 输入状态栏 -->
+    <div class="kbd-istate" id="inputStateBar">
+      <span class="kbd-istate-item">总音符: <span id="is-total">0</span></span>
+      <span class="kbd-istate-item">八度: <span id="is-oct">中</span></span>
+      <span class="kbd-istate-item">时值: <span id="is-dur">4分</span></span>
+      <span class="kbd-istate-item">附点: <span id="is-dot">关</span></span>
+      <span class="kbd-istate-item">段落: <span id="is-sec">无</span></span>
+      <span class="kbd-istate-item hi">房子线: <span id="is-volta">无</span></span>
+    </div>
+
     <!-- 状态栏 -->
     <div class="kbd-status">
       <span class="kbd-status-loc" id="statusLoc">点击左边格子开始编辑</span>
@@ -564,7 +594,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 ════════════════════════════════════════ */
 var data=[
   {name:'前奏',lines:[
-    {bold:false,segs:[
+    {bold:false,volta:0,segs:[
       {chord:'E',    n:"0_ 5_",           lyric:""},
       {chord:"",     n:"1'_ 2'_",         lyric:""},
       {chord:'E/G#', n:"3' 5'",           lyric:""},
@@ -579,7 +609,7 @@ var data=[
     ]}
   ]},
   {name:'主歌',lines:[
-    {bold:false,segs:[
+    {bold:false,volta:0,segs:[
       {chord:"",     n:"3_ 4_",           lyric:"主你"},
       {chord:"",     n:"",                lyric:"｜"},
       {chord:'E',    n:"5 ( 3_ 2_ )",     lyric:"使卑"},
@@ -590,7 +620,7 @@ var data=[
       {chord:'E/G#', n:"1 3 5 ( 3_ 2_ )", lyric:"心流泪转"},
       {chord:"",     n:"",                lyric:"|"},
     ]},
-    {bold:false,segs:[
+    {bold:false,volta:0,segs:[
       {chord:'A',    n:"1 3",             lyric:"为笑"},
       {chord:'B',    n:"2 3_ 4_",         lyric:"颜.患难"},
       {chord:"",     n:"",                lyric:"｜"},
@@ -710,6 +740,7 @@ function insertToks(tokArr){
   setToks(toks);
   renderEditor();
   reactivate();
+  updateInputState();
 }
 
 function inputNote(n){
@@ -742,6 +773,7 @@ function deleteSelected(){
   setToks(toks);
   renderEditor();
   reactivate();
+  updateInputState();
 }
 
 function clearN(){
@@ -825,6 +857,7 @@ function focusSeg(si,li,gi,reset){
   curSi=si;curLi=li;curGi=gi;
   reactivate();
   updateStatus();
+  updateInputState();
   renderPreview();
 }
 
@@ -873,12 +906,14 @@ function setInputMode(m){
 function setOct(o){
   oct=o;
   ['low2','low1','mid','high1','high2'].forEach(function(x){document.getElementById('oct-'+x).classList.toggle('on',x===o);});
+  updateInputState();
 }
 function setDur(d){
   dur=d;
   ['whole','half','quarter','eighth','16th'].forEach(function(x){document.getElementById('dur-'+x).classList.toggle('on',x===d);});
+  updateInputState();
 }
-function toggleDot(){dotOn=!dotOn;document.getElementById('dot-btn').classList.toggle('on',dotOn);}
+function toggleDot(){dotOn=!dotOn;document.getElementById('dot-btn').classList.toggle('on',dotOn);updateInputState();}
 function toggleXSlur(){
   xslurOn=!xslurOn;
   document.getElementById('xslur-btn').classList.toggle('on',xslurOn);
@@ -934,6 +969,11 @@ function renderEditor(){
       var rm=document.createElement('div');rm.className='row-meta';
       rm.innerHTML='<span class="row-idx">ROW '+(li+1)+'</span>'+
         '<label class="bold-toggle"><input type="checkbox" '+(line.bold?'checked':'')+' onchange="data['+si+'].lines['+li+'].bold=this.checked;renderPreview()"> 副歌</label>'+
+        '<span class="volta-group"><span class="volta-lbl">房子线:</span>'+
+          '<button class="volta-btn'+(line.volta===0?' on':'')+'" onclick="setVolta('+si+','+li+',0)" title="无房子线">无</button>'+
+          '<button class="volta-btn'+(line.volta===1?' on':'')+'" onclick="setVolta('+si+','+li+',1)" title="第1房子">1.</button>'+
+          '<button class="volta-btn'+(line.volta===2?' on':'')+'" onclick="setVolta('+si+','+li+',2)" title="第2房子">2.</button>'+
+        '</span>'+
         '<button class="sec-btn" onclick="moveLine('+si+','+li+',-1)" title="上移">↑</button>'+
         '<button class="sec-btn" onclick="moveLine('+si+','+li+',1)" title="下移">↓</button>'+
         '<button class="row-del" onclick="delLine('+si+','+li+')">✕</button>';
@@ -1072,7 +1112,7 @@ function renderEditor(){
   renderPreview();
 }
 
-function addSection(){saveUndo();data.push({name:'新段落',lines:[{bold:false,segs:[{chord:'',n:'',lyric:''}]}]});renderEditor();}
+function addSection(){saveUndo();data.push({name:'新段落',lines:[{bold:false,volta:0,segs:[{chord:'',n:'',lyric:''}]}]});renderEditor();}
 function moveSection(si,dir){
   var ni=si+dir;
   if(ni<0||ni>=data.length)return;
@@ -1082,7 +1122,7 @@ function moveSection(si,dir){
   renderEditor();if(curSi>=0)reactivate();
 }
 function delSection(si){saveUndo();data.splice(si,1);if(curSi===si){curSi=-1;curLi=-1;curGi=-1;}renderEditor();}
-function addLine(si){saveUndo();data[si].lines.push({bold:false,segs:[{chord:'',n:'',lyric:''}]});renderEditor();}
+function addLine(si){saveUndo();data[si].lines.push({bold:false,volta:0,segs:[{chord:'',n:'',lyric:''}]});renderEditor();}
 function moveLine(si,li,dir){
   var ni=li+dir;
   if(ni<0||ni>=data[si].lines.length)return;
@@ -1202,6 +1242,17 @@ function fitPreview(){
 function renderPreview(){
   var wrap=document.getElementById('previewWrap');wrap.innerHTML='';
   var inner=document.createElement('div');inner.className='prev-inner';
+
+  // scoreImg 预览
+  var scoreUrl=(document.getElementById('meta-scoreimg')&&document.getElementById('meta-scoreimg').value)||'';
+  if(scoreUrl){
+    var si=document.createElement('div');si.style.cssText='margin-bottom:12px;';
+    var img=document.createElement('img');img.src=scoreUrl;
+    img.style.cssText='max-width:100%;border-radius:6px;border:1px solid var(--border);display:block;';
+    img.onerror=function(){si.style.display='none';};
+    si.appendChild(img);inner.appendChild(si);
+  }
+
   data.forEach(function(sec){
     var ps=document.createElement('div');ps.className='prev-sec';
     var pn=document.createElement('div');pn.className='prev-sec-name';pn.textContent=sec.name;ps.appendChild(pn);
@@ -1209,13 +1260,23 @@ function renderPreview(){
       var row=document.createElement('div');row.className='prev-row'+(line.bold?' bold':'');
       line.segs.forEach(function(seg){
         var s=document.createElement('div');s.className='prev-seg';
-        var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\\u00a0';s.appendChild(c);
+        var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
         if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
         if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
         row.appendChild(s);
       });
-      ps.appendChild(row);
+      // 房子线包裹
+      if(line.volta){
+        var vw=document.createElement('div');vw.className='prev-volta-wrap';
+        var vb=document.createElement('div');
+        vb.className='prev-volta-bracket'+(line.volta===1?' closed':'');
+        var vn=document.createElement('span');vn.className='prev-volta-num';vn.textContent=line.volta+'.';
+        vw.appendChild(vb);vw.appendChild(vn);vw.appendChild(row);
+        ps.appendChild(vw);
+      } else {
+        ps.appendChild(row);
+      }
     });
     inner.appendChild(ps);
   });
@@ -1234,7 +1295,16 @@ function renderCode(){
     lines.push('    "lines": [');
     sec.lines.forEach(function(line,li){
       var lastLine=li===sec.lines.length-1;
-      lines.push(line.bold?'      { "b": true, "line": [':'      [');
+      var isObj=line.bold||line.volta;
+      if(isObj){
+        var header='      {';
+        if(line.bold)header+='"b": true, ';
+        if(line.volta)header+='"v": '+line.volta+', ';
+        header+='"line": [';
+        lines.push(header);
+      } else {
+        lines.push('      [');
+      }
       line.segs.forEach(function(seg,gi){
         var lastSeg=gi===line.segs.length-1;
         var obj={chord:seg.chord||''};
@@ -1243,7 +1313,7 @@ function renderCode(){
         if(seg.lyric2)obj.lyric2=seg.lyric2;
         lines.push('        '+JSON.stringify(obj)+(lastSeg?'':','));
       });
-      lines.push(line.bold?'      ]}'+(!lastLine?',':''):'      ]'+(!lastLine?',':''));
+      lines.push((line.bold||line.volta)?'      ]}'+(!lastLine?',':''):'      ]'+(!lastLine?',':''));
     });
     lines.push('    ]');
     lines.push('  }'+(last?'':','));
@@ -1392,8 +1462,8 @@ function doImport(){
     saveUndo();
     data=parsed.map(function(sec){
       return{name:sec.name||'',lines:(sec.lines||[]).map(function(line){
-        if(Array.isArray(line))return{bold:false,segs:line};
-        return{bold:!!line.b,segs:line.line||[]};
+        if(Array.isArray(line))return{bold:false,volta:0,segs:line};
+        return{bold:!!line.b,volta:line.v||0,segs:line.line||[]};
       })};
     });
     curSi=-1;curLi=-1;curGi=-1;curTok=-1;clearSel();
@@ -1504,9 +1574,48 @@ function closeCheck(){
 }
 document.getElementById('checkOverlay').addEventListener('click',function(e){if(e.target===this)closeCheck();});
 
+
+/* ════════════════════════════════════════
+   房子线设置
+════════════════════════════════════════ */
+function setVolta(si,li,v){
+  saveUndo();
+  data[si].lines[li].volta=v;
+  renderEditor();
+  if(curSi>=0)reactivate();
+}
+
+/* ════════════════════════════════════════
+   输入状态栏更新
+════════════════════════════════════════ */
+var _durLabel={whole:'全音符',half:'2分',quarter:'4分',eighth:'8分','16th':'16分'};
+var _octLabel={low2:'低2',low1:'低1',mid:'中',high1:'高1',high2:'高2'};
+function updateInputState(){
+  // 总音符：统计全部 data 中有 n 的 seg
+  var total=0;
+  data.forEach(function(sec){sec.lines.forEach(function(line){line.segs.forEach(function(seg){if(seg.n&&seg.n.trim())total++;});});});
+  document.getElementById('is-total').textContent=total;
+  document.getElementById('is-oct').textContent=_octLabel[oct]||oct;
+  document.getElementById('is-dur').textContent=_durLabel[dur]||dur;
+  document.getElementById('is-dot').textContent=dotOn?'开':'关';
+  // 段落：当前选中段落名
+  document.getElementById('is-sec').textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
+  // 房子线：当前行的 volta
+  var voltaVal=0;
+  if(curSi>=0&&curLi>=0&&data[curSi]&&data[curSi].lines[curLi])voltaVal=data[curSi].lines[curLi].volta||0;
+  document.getElementById('is-volta').textContent=voltaVal?voltaVal+'房':'无';
+}
+
+// scoreImg 变更时刷新预览
+(function(){
+  var el=document.getElementById('meta-scoreimg');
+  if(el)el.addEventListener('input',function(){renderPreview();});
+})();
+
 /* 初始化 */
 refreshTupletBtns();
 renderEditor();
+updateInputState();
 </script>
 <!-- ── 批量填歌词 modal ── -->
 <div class="lyfill-overlay" id="lyfillOverlay">
