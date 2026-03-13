@@ -678,6 +678,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         });
         lbDiv.appendChild(se);
       });
+      fitRows();
     }
     function fitRows(){
       requestAnimationFrame(function(){
@@ -890,15 +891,20 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     controls.appendChild(btnBack); controls.appendChild(btnPlay); controls.appendChild(btnFwd);
     wrap.appendChild(controls);
 
-    // volume
+    // volume (hidden on touch devices — system volume keys handle it)
     var volWrap = div('ym-pl-vol-wrap');
-    volWrap.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
-    var volSlider = document.createElement('input');
-    volSlider.className = 'ym-pl-vol'; volSlider.type = 'range'; volSlider.min = '0'; volSlider.max = '1'; volSlider.step = '0.02'; volSlider.value = '1';
-    volWrap.appendChild(volSlider);
-    volWrap.innerHTML += '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM18.5 12c0-2.77-1.5-5.15-3.75-6.45v12.9C16.99 17.14 18.5 14.77 18.5 12z"/></svg>';
-    volWrap.insertBefore(volSlider, volWrap.children[1]);
-    wrap.appendChild(volWrap);
+    var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (!isTouchDevice) {
+      var volIconLo = document.createElement('span');
+      volIconLo.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+      var volSlider = document.createElement('input');
+      volSlider.className = 'ym-pl-vol'; volSlider.type = 'range'; volSlider.min = '0'; volSlider.max = '1'; volSlider.step = '0.02'; volSlider.value = '1';
+      var volIconHi = document.createElement('span');
+      volIconHi.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM18.5 12c0-2.77-1.5-5.15-3.75-6.45v12.9C16.99 17.14 18.5 14.77 18.5 12z"/></svg>';
+      volWrap.appendChild(volIconLo); volWrap.appendChild(volSlider); volWrap.appendChild(volIconHi);
+      volSlider.oninput = function(){ audio.volume = parseFloat(volSlider.value); };
+      wrap.appendChild(volWrap);
+    }
 
     // audio engine
     var audio = document.createElement('audio');
@@ -950,8 +956,6 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     btnPlay.onclick = function(){ audio.paused ? audio.play().catch(function(){}) : audio.pause(); };
     btnBack.onclick = function(){ audio.currentTime = Math.max(0, audio.currentTime-15); };
     btnFwd.onclick = function(){ audio.currentTime = Math.min(audio.duration||0, audio.currentTime+15); };
-    volSlider.oninput = function(){ audio.volume = parseFloat(volSlider.value); };
-
     // seek on click
     progWrap.addEventListener('click', function(e){
       if (!audio.duration) return;
