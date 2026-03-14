@@ -188,15 +188,15 @@
   text-align:left;
   border-right:2px solid var(--line2) !important;
   border-left:4px solid transparent; /* 左侧彩色条 */
-  min-width:140px; width:140px;
+  min-width:120px; width:120px;
   background:var(--bg);
 }
 .s9-date {
-  font-size:20px; font-weight:800; line-height:1;
-  letter-spacing:-.01em; display:block; color:var(--txt);
+  font-size:26px; font-weight:900; line-height:1;
+  letter-spacing:-.02em; display:block; color:var(--txt);
 }
 .s9-week {
-  font-size:11px; color:var(--txt2); margin-top:2px; display:block;
+  font-size:14px; font-weight:700; color:var(--txt2); margin-top:4px; display:block;
 }
 .s9-type-tag {
   display:inline-block; margin-top:7px;
@@ -369,10 +369,10 @@
           tbody+='<tr class="s9-group-sep"><td colspan="'+(COLS.length+1)+'"></td></tr>';
         }
 
-        // 日期信息格
+        // 日期信息格：显示「X月」大字 + 「第X周」
         var infoCell='<td class="s9-row-info" style="border-left-color:'+tc.bar+';">'
-          +'<span class="s9-date">'+dateShort(s.date)+'</span>'
-          +'<span class="s9-week">'+weekday(s.date)+'</span>'
+          +'<span class="s9-date">'+monthLabel(s.date)+'</span>'
+          +'<span class="s9-week">'+weekLabel(s.date)+'</span>'
           +'<span class="s9-type-tag" style="background:'+tc.tag_bg+';color:'+tc.tag_txt+'">'+esc(s.type)+'</span>'
           +'</td>';
 
@@ -505,11 +505,23 @@
 
   /* ── 工具 ─────────────────────────────────────────────────────────────────── */
   var WD=['日','一','二','三','四','五','六'];
+  var WEEK_LABELS=['第一周','第二周','第三周','第四周','第五周'];
   function getTc(t){ return TYPE_COLOR[t]||TYPE_DEF; }
   function parseReading(v){
     if(!v) return null;
     var m=v.match(/^(诗\d+)\s+(.+)$/);
     return m?{ref:m[1],name:m[2].trim()}:{ref:v,name:''};
+  }
+  function monthLabel(s){
+    var m=s&&s.match(/\d{4}[-\/](\d{1,2})/);
+    return m?parseInt(m[1],10)+'月':s;
+  }
+  function weekLabel(s){
+    try{
+      var d=new Date(s);
+      var wn=Math.floor((d.getDate()-1)/7); // 0-4
+      return WEEK_LABELS[wn]||('第'+(wn+1)+'周');
+    }catch(e){ return ''; }
   }
   function dateShort(s){
     var m=s&&s.match(/\d{4}[-\/](\d{1,2})[-\/](\d{1,2})/);
