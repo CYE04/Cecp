@@ -1,14 +1,18 @@
 /**
- * service-schedule.js  v11.0  — CECP 事工表
+ * service-schedule.js  v12.0  — CECP 事工表
  * ═══════════════════════════════════════════════════════
- * GitHub: cye04.github.io/Cecp/service-schedule.js
+ * Design system: 统一设计规范，可复用于所有安排表
  *
- * Halo HTML块:
- *   <div id="cecp-schedule" data-api="YOUR_API_URL"></div>
+ * 设计原则:
+ *   · 两层 header：上层=导航+操作，下层=筛选
+ *   · 8px 基础间距单位，统一 border-radius 层级
+ *   · 字体规模: 24px week / 11px month / 12px label / 12px badge
+ *   · 三种按钮规格: nav / pill-filter / icon-action
+ *   · 深浅两套完整主题变量，一键切换
+ *
+ * 用法:
+ *   <div id="cecp-schedule" data-api="API_URL"></div>
  *   <script src="https://cye04.github.io/Cecp/service-schedule.js"></script>
- *
- * API 字段: month / week / type / leader / worship /
- *           band / prayer / reading / note
  * ═══════════════════════════════════════════════════════
  */
 (function () {
@@ -18,7 +22,7 @@
   if (!EL) return;
   var API = (EL.dataset.api || '').trim();
 
-  /* ── 岗位列定义 ──────────────────────────────────────── */
+  /* ── 岗位列 ──────────────────────────────────────────── */
   var COLS = [
     { key: 'leader',  label: '主领 / 司仪', kind: 'badges'  },
     { key: 'worship', label: '敬拜带领',    kind: 'badges'  },
@@ -28,13 +32,29 @@
     { key: 'note',    label: '证道讲员',    kind: 'note'    },
   ];
 
-  /* ── 类型配色 ─────────────────────────────────────────── */
-  var TC = {
-    '主日下午': { bar: '#3a7bd4', tag: '#1a3878', txt: '#82bcf8' },
-    '主日晚上': { bar: '#8a48d8', tag: '#3c1a80', txt: '#c090f0' },
-    '青年团契':  { bar: '#28b868', tag: '#145830', txt: '#60e898' },
+  /* ── 类型主题色 ──────────────────────────────────────── */
+  var TYPE_THEME = {
+    '主日下午': {
+      accent: '#4a8ef0',          /* 左边框、focus 色 */
+      dark:  { tag: '#1c3a70', txt: '#82bcf0' },
+      light: { tag: '#2a5eb8', txt: '#ffffff' },
+    },
+    '主日晚上': {
+      accent: '#9960e8',
+      dark:  { tag: '#3a1c70', txt: '#c090f0' },
+      light: { tag: '#6838b0', txt: '#ffffff' },
+    },
+    '青年团契': {
+      accent: '#30c070',
+      dark:  { tag: '#1a5030', txt: '#60e898' },
+      light: { tag: '#1a7840', txt: '#ffffff' },
+    },
   };
-  var TC_DEF = { bar: '#555', tag: '#2a2a2a', txt: '#aaa' };
+  var TYPE_DEFAULT = {
+    accent: '#606060',
+    dark:  { tag: '#2a2a2a', txt: '#aaaaaa' },
+    light: { tag: '#888888', txt: '#ffffff' },
+  };
 
   /* ── Badge 颜色板 ─────────────────────────────────────── */
   var PAL_D = [
@@ -61,6 +81,11 @@
     return (isDark ? PAL_D : PAL_L)[Math.abs(h) % PAL_D.length];
   }
 
+  function getTC(type) {
+    var t = TYPE_THEME[type] || TYPE_DEFAULT;
+    return { accent: t.accent, tag: isDark ? t.dark.tag : t.light.tag, txt: isDark ? t.dark.txt : t.light.txt };
+  }
+
   /* ── 主题 ─────────────────────────────────────────────── */
   var isDark = true;
   try {
@@ -70,107 +95,468 @@
   } catch (e) {}
 
   function applyTheme() {
-    EL.classList.toggle('cd', isDark);
-    EL.classList.toggle('cl', !isDark);
+    EL.classList.toggle('s-dark',  isDark);
+    EL.classList.toggle('s-light', !isDark);
   }
 
-  /* ── CSS ──────────────────────────────────────────────── */
-  if (!document.getElementById('_cecp11')) {
-    var _s = document.createElement('style');
-    _s.id = '_cecp11';
-    _s.textContent = `
-#cecp-schedule{font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;border-radius:16px;overflow:hidden;box-sizing:border-box;width:100%}
-#cecp-schedule *{box-sizing:border-box;margin:0;padding:0}
+  /* ══════════════════════════════════════════════════════
+     设计系统 CSS
+     ────────────────────────────────────────────────────
+     设计规范:
+       spacing:  8px 基础单位 (xs=4 s=8 m=12 l=16 xl=24)
+       radius:   widget=16px  card=12px  btn=8px  pill=20px
+       font:     system-ui stack (PingFang/Noto/YaHei)
+       weight:   900=week 700=tag/badge 600=colhdr 500=nav 400=label
+     ══════════════════════════════════════════════════════ */
+  if (!document.getElementById('_s12css')) {
+    var el = document.createElement('style');
+    el.id = '_s12css';
+    el.textContent = `
+/* ── 根容器 ── */
+#cecp-schedule {
+  font-family: "PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  border-radius: 16px;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  /* 细微阴影让 widget 和页面背景分离 */
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+}
+#cecp-schedule * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* 深色 */
-#cecp-schedule.cd{background:#0e0e0e;color:#d8d8d8;--bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;--ln:#1e1e1e;--ln2:#2a2a2a;--tx:#d8d8d8;--tx2:#555;--tx3:#2a2a2a;--lbl:#484848;--bar:#111;--tabbg:#1a1a1a;--tabon:#232323;--rd:#3a6a3a;--nt:#7a6838}
-/* 浅色 */
-#cecp-schedule.cl{background:#fff;color:#1a1a1a;--bg:#fff;--bg2:#f6f6f6;--bg3:#eeeeee;--ln:#e8e8e8;--ln2:#d0d0d0;--tx:#1a1a1a;--tx2:#aaa;--tx3:#ccc;--lbl:#888;--bar:#f4f4f4;--tabbg:#ebebeb;--tabon:#fff;--rd:#236a33;--nt:#7a5a20}
+/* ── 主题变量 (深色) ── */
+#cecp-schedule.s-dark {
+  background: #0f0f0f; color: #d4d4d4;
+  /* surface */
+  --s-bg:    #0f0f0f;
+  --s-bg-2:  #181818;
+  --s-bg-3:  #202020;
+  --s-bg-4:  #282828;
+  /* border */
+  --s-line:  #1e1e1e;
+  --s-line2: #2c2c2c;
+  /* text */
+  --s-tx:    #d4d4d4;
+  --s-tx-2:  #606060;
+  --s-tx-3:  #303030;
+  --s-muted: #484848;
+  /* components */
+  --s-hdr:       #111111;
+  --s-nav-bg:    #1a1a1a;
+  --s-nav-on:    #242424;
+  --s-nav-txt:   #f0f0f0;
+  --s-pill-on:   #242424;
+  /* semantic */
+  --s-rd:  #2e6030;   /* reading green */
+  --s-nt:  #6a5420;   /* note amber */
+  --s-sep: #2a2a2a;
+}
 
-/* 顶栏 */
-.cc-bar{display:flex;align-items:center;gap:8px;padding:14px 20px 12px;background:var(--bar);border-bottom:1px solid var(--ln);flex-wrap:wrap}
-.cc-nav{display:flex;gap:2px;background:var(--tabbg);border-radius:10px;padding:3px;flex-shrink:0}
-.cc-nb{padding:6px 14px;font-size:13px;font-weight:500;color:var(--tx2);cursor:pointer;border-radius:8px;border:none;background:none;font-family:inherit;white-space:nowrap;transition:all .15s}
-.cc-nb.on{background:var(--tabon);color:var(--tx);font-weight:700}
-.cc-nb:hover:not(.on){color:var(--tx)}
-.cc-right{margin-left:auto;display:flex;gap:8px;align-items:center}
-.cc-theme{width:34px;height:34px;border-radius:50%;border:1px solid var(--ln2);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:transform .2s,background .15s;flex-shrink:0}
-.cc-theme:hover{background:var(--bg3);transform:scale(1.1) rotate(18deg)}
-.cc-dl{display:flex;align-items:center;gap:5px;padding:6px 13px;font-size:12px;color:var(--tx2);border:1px solid var(--ln2);border-radius:8px;background:none;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s}
-.cc-dl:hover{color:var(--tx);border-color:var(--lbl);background:var(--bg2)}
-.cc-dl:disabled{opacity:.35;cursor:not-allowed}
+/* ── 主题变量 (浅色) ── */
+#cecp-schedule.s-light {
+  background: #ffffff; color: #1a1a1a;
+  --s-bg:    #ffffff;
+  --s-bg-2:  #f5f5f5;
+  --s-bg-3:  #eeeeee;
+  --s-bg-4:  #e8e8e8;
+  --s-line:  #ebebeb;
+  --s-line2: #d8d8d8;
+  --s-tx:    #1a1a1a;
+  --s-tx-2:  #999999;
+  --s-tx-3:  #cccccc;
+  --s-muted: #888888;
+  --s-hdr:       #f7f7f7;
+  --s-nav-bg:    #ebebeb;
+  --s-nav-on:    #ffffff;
+  --s-nav-txt:   #1a1a1a;
+  --s-pill-on:   #ffffff;
+  --s-rd:  #1a5c28;
+  --s-nt:  #6a4a10;
+  --s-sep: #e0e0e0;
+}
 
-/* 筛选 */
-.cc-filters{display:flex;gap:6px;padding:8px 20px;border-bottom:1px solid var(--ln);background:var(--bar);flex-wrap:wrap}
-.cc-fb{padding:4px 14px;font-size:12px;border-radius:20px;cursor:pointer;border:1px solid var(--ln2);background:none;font-family:inherit;color:var(--lbl);transition:all .15s;font-weight:500}
-.cc-fb.on{color:#fff;border-color:transparent}
-.cc-fb.all.on{background:#3a3a3a}
-.cd .cc-fb.all.on{background:#3a3a3a}
-.cl .cc-fb.all.on{background:#777;color:#fff}
-.cc-fb:hover:not(.on){color:var(--tx);border-color:var(--lbl)}
+/* ════════════════════════════════
+   HEADER ZONE 1 — 导航 + 操作
+   ════════════════════════════════ */
+.s-hdr-nav {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--s-hdr);
+  border-bottom: 1px solid var(--s-line);
+  gap: 0;
+}
 
-/* 表格容器 */
-.cc-wrap{width:100%;overflow-x:hidden}
-.cc-table{border-collapse:collapse;width:100%;table-layout:fixed}
-.cc-table th,.cc-table td{border-bottom:1px solid var(--ln);border-right:1px solid var(--ln);vertical-align:middle}
-.cc-table tr th:last-child,.cc-table tr td:last-child{border-right:none}
+/* 月份导航块 (左) */
+.s-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--s-nav-bg);
+  border-radius: 10px;
+  padding: 3px;
+}
 
-/* 列标题 */
-.cc-chdr{background:var(--bar);padding:12px 14px;font-size:12px;font-weight:700;color:var(--lbl);text-align:center;white-space:nowrap;letter-spacing:.04em;position:sticky;top:0;z-index:2;border-bottom:2px solid var(--ln2) !important}
-.cc-corner{background:var(--bar);padding:12px 14px;font-size:11px;color:var(--tx3);text-align:center;position:sticky;top:0;z-index:3;border-bottom:2px solid var(--ln2) !important;border-right:2px solid var(--ln2) !important}
+/* 通用导航按钮 */
+.s-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--s-tx-2);
+  border-radius: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: color .12s, background .12s;
+  line-height: 1.4;
+}
+.s-nav-btn:hover:not(.active) { color: var(--s-tx); }
+.s-nav-btn.active {
+  background: var(--s-nav-on);
+  color: var(--s-nav-txt);
+  font-weight: 700;
+  /* 浅色模式加细边框让 active 更清晰 */
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+/* 箭头按钮：更紧凑 */
+.s-nav-btn.arrow {
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.s-nav-btn.arrow:hover { color: var(--s-tx); background: var(--s-bg-3); }
 
-/* 左侧聚会信息格 */
-.cc-info{padding:12px 16px;vertical-align:middle;text-align:left;border-right:2px solid var(--ln2) !important;border-left:4px solid transparent;min-width:130px;width:130px;background:var(--bg)}
-.cc-week{font-size:24px;font-weight:900;line-height:1;letter-spacing:-.02em;display:block;color:var(--tx)}
-.cc-month{font-size:11px;color:var(--tx2);margin-top:3px;display:block;font-weight:500}
-.cc-tag{display:inline-block;margin-top:7px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:.03em}
+/* 操作按钮组 (右) */
+.s-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 图标按钮 (主题切换) */
+.s-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--s-line2);
+  background: var(--s-bg-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: background .15s, border-color .15s, transform .15s;
+  color: var(--s-tx-2);
+}
+.s-icon-btn:hover {
+  background: var(--s-bg-3);
+  border-color: var(--s-muted);
+  transform: scale(1.06);
+}
+
+/* 文字+图标 操作按钮 (导出) */
+.s-text-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 12px;
+  height: 32px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--s-tx-2);
+  border: 1px solid var(--s-line2);
+  border-radius: 8px;
+  background: var(--s-bg-2);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: color .12s, background .12s, border-color .12s;
+}
+.s-text-btn:hover {
+  color: var(--s-tx);
+  border-color: var(--s-muted);
+  background: var(--s-bg-3);
+}
+.s-text-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ════════════════════════════════
+   HEADER ZONE 2 — 类型筛选
+   ════════════════════════════════ */
+.s-hdr-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--s-hdr);
+  border-bottom: 1px solid var(--s-line);
+  flex-wrap: wrap;
+}
+
+/* 筛选分隔线 */
+.s-filter-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--s-line2);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* Pill 筛选按钮 */
+.s-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 20px;
+  border: 1.5px solid var(--s-line2);
+  background: none;
+  color: var(--s-muted);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: color .12s, background .12s, border-color .12s;
+  letter-spacing: .02em;
+}
+.s-pill:hover:not(.on) {
+  color: var(--s-tx);
+  border-color: var(--s-muted);
+  background: var(--s-bg-2);
+}
+.s-pill.on {
+  color: #fff;
+  border-color: transparent;
+  font-weight: 600;
+}
+/* 「全部」单独样式 */
+.s-pill.all.on {
+  background: var(--s-muted);
+  color: var(--s-bg);
+}
+/* 类型标记点 */
+.s-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════
+   TABLE
+   ════════════════════════════════ */
+.s-table-wrap { width: 100%; overflow-x: hidden; background: var(--s-bg); }
+.s-table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+.s-table th, .s-table td {
+  border-bottom: 1px solid var(--s-line);
+  border-right: 1px solid var(--s-line);
+  vertical-align: middle;
+}
+.s-table tr th:last-child, .s-table tr td:last-child { border-right: none; }
+
+/* 列标题行 */
+.s-col-hdr {
+  background: var(--s-bg-2);
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--s-tx-2);
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 1.5px solid var(--s-line2) !important;
+}
+/* 左上角 */
+.s-corner {
+  background: var(--s-bg-2);
+  padding: 10px 14px;
+  font-size: 10px;
+  color: var(--s-tx-3);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  border-bottom: 1.5px solid var(--s-line2) !important;
+  border-right: 1.5px solid var(--s-line2) !important;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/* 聚会信息格 (左列) */
+.s-row-info {
+  padding: 14px 16px;
+  vertical-align: middle;
+  text-align: left;
+  border-right: 1.5px solid var(--s-line2) !important;
+  border-left: 3px solid transparent;
+  min-width: 130px;
+  width: 130px;
+  background: var(--s-bg);
+  transition: background .1s;
+}
+/* 周次：最大最粗，一眼看到 */
+.s-week-label {
+  display: block;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--s-tx);
+}
+/* 月份：小字辅助信息 */
+.s-month-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--s-tx-2);
+  margin-top: 4px;
+  letter-spacing: .02em;
+}
+/* 类型标签 */
+.s-type-tag {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1.4;
+}
 
 /* 内容格 */
-.cc-cell{padding:10px 12px;text-align:center;background:var(--bg);transition:background .1s}
-.cc-cell:hover{background:var(--bg2)}
+.s-cell {
+  padding: 10px 12px;
+  text-align: center;
+  background: var(--s-bg);
+  transition: background .08s;
+}
+.s-cell:hover { background: var(--s-bg-2); }
 
-/* 读经格 */
-.cc-ref{display:block;font-size:10px;color:var(--rd);margin-bottom:3px;font-weight:700;letter-spacing:.04em}
-/* 证道前缀 */
-.cc-npfx{display:block;font-size:10px;color:var(--nt);margin-bottom:3px;font-weight:700}
+/* 读经：参考编号 + 读经人 */
+.s-rd-ref {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--s-rd);
+  margin-bottom: 3px;
+  letter-spacing: .04em;
+}
+/* 证道：前缀文字 */
+.s-note-pfx {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--s-nt);
+  margin-bottom: 3px;
+  letter-spacing: .02em;
+}
 
-/* Badge */
-.cc-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;line-height:1.4;margin:2px;white-space:nowrap;cursor:pointer;letter-spacing:.02em;transition:opacity .12s,transform .1s,box-shadow .12s;user-select:none;position:relative}
-.cc-badge.lit   {transform:scale(1.12);box-shadow:0 0 0 2px rgba(255,255,255,.3);z-index:1}
-.cc-badge.dim   {opacity:.14}
-.cc-badge.locked{transform:scale(1.15);box-shadow:0 0 0 2.5px rgba(255,255,255,.58);z-index:1}
-.cc-badge.ldim  {opacity:.1}
-.cl .cc-badge.lit   {box-shadow:0 0 0 2px rgba(0,0,0,.22)}
-.cl .cc-badge.locked{box-shadow:0 0 0 2.5px rgba(0,0,0,.42)}
+/* 周次分隔行 */
+.s-week-sep td {
+  padding: 0;
+  height: 6px;
+  background: var(--s-bg-2);
+  border-bottom: 1px solid var(--s-sep) !important;
+  border-right: none !important;
+}
 
-/* 空值 / 分隔线 */
-.cc-empty{color:var(--tx3);font-size:15px}
-.cc-sep td{padding:3px 0;background:var(--bar);border-bottom:2px solid var(--ln2) !important;border-right:none !important}
+/* 空值 */
+.s-empty { color: var(--s-tx-3); font-size: 14px; }
 
-/* 加载 / 错误 */
-.cc-loading{display:flex;align-items:center;gap:12px;padding:56px 24px;color:var(--tx2);font-size:15px}
-.cc-spinner{width:20px;height:20px;border:2px solid var(--ln2);border-top-color:var(--lbl);border-radius:50%;animation:ccspin .7s linear infinite;flex-shrink:0}
-@keyframes ccspin{to{transform:rotate(360deg)}}
-.cc-nodata{padding:56px;text-align:center;color:var(--tx3);font-size:15px}
-.cc-err{padding:24px;color:#a04040;font-size:14px;line-height:1.8}
+/* ════════════════════════════════
+   BADGE
+   ════════════════════════════════ */
+.s-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 2px;
+  white-space: nowrap;
+  cursor: pointer;
+  letter-spacing: .02em;
+  transition: opacity .1s, transform .1s, box-shadow .1s;
+  user-select: none;
+  position: relative;
+}
+/* hover 高亮 */
+.s-badge.lit {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.28);
+  z-index: 1;
+}
+.s-badge.dim { opacity: .14; }
+/* click 锁定 */
+.s-badge.locked {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 2.5px rgba(255,255,255,.55);
+  z-index: 1;
+}
+.s-badge.ldim { opacity: .1; }
+/* 浅色模式阴影调整 */
+.s-light .s-badge.lit    { box-shadow: 0 0 0 2px rgba(0,0,0,.2); }
+.s-light .s-badge.locked { box-shadow: 0 0 0 2.5px rgba(0,0,0,.42); }
 
-/* 响应式：手机 */
-@media(max-width:600px){
-  .cc-week{font-size:18px}
-  .cc-info{min-width:100px;width:100px;padding:10px 10px}
-  .cc-badge{font-size:11px;padding:3px 8px}
-  .cc-cell{padding:8px 8px}
-  .cc-chdr{padding:9px 9px;font-size:11px}
-  .cc-nb{padding:5px 10px;font-size:12px}
+/* ════════════════════════════════
+   状态 UI (加载 / 错误 / 空)
+   ════════════════════════════════ */
+.s-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 64px 24px;
+  color: var(--s-tx-2);
+  font-size: 14px;
+}
+.s-spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--s-line2);
+  border-top-color: var(--s-muted);
+  border-radius: 50%;
+  animation: sspin .7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes sspin { to { transform: rotate(360deg); } }
+.s-error { padding: 24px; color: #b04040; font-size: 14px; line-height: 1.8; }
+
+/* ════════════════════════════════
+   响应式
+   ════════════════════════════════ */
+@media (max-width: 560px) {
+  .s-week-label { font-size: 17px; }
+  .s-row-info   { min-width: 96px; width: 96px; padding: 10px 10px; }
+  .s-cell       { padding: 8px 8px; }
+  .s-col-hdr    { padding: 8px 8px; font-size: 10px; }
+  .s-badge      { font-size: 11px; padding: 3px 8px; }
+  .s-nav-btn    { padding: 5px 10px; font-size: 12px; }
+  .s-hdr-nav    { padding: 10px 12px; }
+  .s-hdr-filter { padding: 7px 12px; }
 }
 `;
-    document.head.appendChild(_s);
+    document.head.appendChild(el);
   }
 
   applyTheme();
-
-  /* ── 加载状态 ─────────────────────────────────────────── */
-  EL.innerHTML = '<div class="cc-loading"><div class="cc-spinner"></div>加载服事安排…</div>';
+  EL.innerHTML = '<div class="s-state"><div class="s-spinner"></div>加载服事安排…</div>';
 
   /* ── 拉取数据 ─────────────────────────────────────────── */
   if (!API || API === 'DEMO') { setTimeout(function () { boot(demo()); }, 200); return; }
@@ -182,8 +568,8 @@
       boot(res.data);
     })
     .catch(function (e) {
-      EL.innerHTML = '<div class="cc-err">⚠ ' + esc(e.message)
-        + '<br><small style="opacity:.5">请确认 Apps Script 已部署最新版本，访问权限为「所有人」</small></div>';
+      EL.innerHTML = '<div class="s-error">⚠ ' + esc(e.message)
+        + '<br><small style="opacity:.5">请确认 Apps Script 已部署，访问权限为「所有人」</small></div>';
     });
 
   /* ── 高亮状态 ─────────────────────────────────────────── */
@@ -192,19 +578,17 @@
   /* ── 初始化 ───────────────────────────────────────────── */
   function boot(rows) {
     if (!rows || !rows.length) {
-      EL.innerHTML = '<div class="cc-nodata">暂无服事安排数据</div>';
+      EL.innerHTML = '<div class="s-state">暂无服事安排数据</div>';
       return;
     }
 
-    // 按月份分组
+    // 按月分组
     var months = {};
     rows.forEach(function (r) {
-      var m = tv(r.month);
-      if (!m) return;
+      var m = tv(r.month); if (!m) return;
       if (!months[m]) months[m] = [];
       months[m].push(r);
     });
-
     var keys = Object.keys(months).sort(function (a, b) { return mord(a) - mord(b); });
     if (!keys.length) return;
 
@@ -220,7 +604,7 @@
     var allTypes = [];
     rows.forEach(function (r) { if (r.type && allTypes.indexOf(r.type) < 0) allTypes.push(r.type); });
     var tord = { '主日下午': 0, '主日晚上': 1, '青年团契': 2 };
-    allTypes.sort(function (a, b) { return (tord[a] || 9) - (tord[b] || 9); });
+    allTypes.sort(function (a, b) { return (tord[a]||9) - (tord[b]||9); });
 
     var activeFilter = '全部';
     render(curIdx);
@@ -229,98 +613,107 @@
       locked = null;
       var key = keys[i];
 
-      // 月份导航
-      var nav = '';
-      if (i > 0)               nav += '<button class="cc-nb" id="ccPrev">← ' + keys[i-1] + '</button>';
-      nav +=                           '<button class="cc-nb on">' + key + '</button>';
-      if (i < keys.length - 1) nav += '<button class="cc-nb" id="ccNext">' + keys[i+1] + ' →</button>';
+      /* ── Zone 1: 月份导航 + 操作按钮 ── */
+      // 月份导航：←  前一月  当前月(active)  下一月  →
+      var navInner = '';
+      if (i > 0) {
+        navInner += '<button class="s-nav-btn arrow" id="sPrev">←</button>'
+          + '<button class="s-nav-btn" id="sPrevM">' + keys[i-1] + '</button>';
+      }
+      navInner += '<button class="s-nav-btn active">' + key + '</button>';
+      if (i < keys.length - 1) {
+        navInner += '<button class="s-nav-btn" id="sNextM">' + keys[i+1] + '</button>'
+          + '<button class="s-nav-btn arrow" id="sNext">→</button>';
+      }
 
-      // 筛选按钮
-      var flt = '<button class="cc-fb all' + (activeFilter==='全部'?' on':'') + '" data-f="全部">全部</button>';
+      /* ── Zone 2: 类型筛选 ── */
+      var filterInner = '<button class="s-pill all' + (activeFilter==='全部'?' on':'') + '" data-f="全部">全部</button>';
+      if (allTypes.length > 1) filterInner += '<span class="s-filter-divider"></span>';
       allTypes.forEach(function (tp) {
-        var tc = TC[tp] || TC_DEF;
+        var tc = getTC(tp);
         var on = activeFilter === tp;
-        flt += '<button class="cc-fb' + (on?' on':'') + '" data-f="' + esc(tp) + '"'
-          + (on ? ' style="background:' + tc.tag + ';color:' + tc.txt + '"' : '') + '>' + esc(tp) + '</button>';
+        filterInner += '<button class="s-pill' + (on?' on':'') + '" data-f="' + esc(tp) + '"'
+          + (on ? ' style="background:' + tc.tag + ';border-color:' + tc.tag + '"' : '') + '>'
+          + '<span class="s-pill-dot" style="background:' + tc.accent + '"></span>'
+          + esc(tp) + '</button>';
       });
 
-      // 过滤 + 排序
+      /* ── 表格 ── */
+      var hdr = '<th class="s-corner">聚会</th>'
+        + COLS.map(function (c) { return '<th class="s-col-hdr">' + c.label + '</th>'; }).join('');
+
+      var cg = '<colgroup><col style="width:130px">'
+        + COLS.map(function () { return '<col>'; }).join('') + '</colgroup>';
+
       var svcs = months[key].filter(function (s) {
         return activeFilter === '全部' || s.type === activeFilter;
       }).sort(function (a, b) {
-        var dw = word(a.week) - word(b.week);
-        if (dw) return dw;
-        return (tord[a.type] || 9) - (tord[b.type] || 9);
+        var dw = word(a.week) - word(b.week); if (dw) return dw;
+        return (tord[a.type]||9) - (tord[b.type]||9);
       });
 
-      // 列标题
-      var hdr = '<th class="cc-corner">聚会</th>'
-        + COLS.map(function (c) { return '<th class="cc-chdr">' + c.label + '</th>'; }).join('');
-
-      // colgroup
-      var cg = '<colgroup><col style="width:130px">' + COLS.map(function () { return '<col>'; }).join('') + '</colgroup>';
-
-      // 行
       var tbody = '';
       var prevWk = '';
       svcs.forEach(function (s, idx) {
-        var tc = TC[s.type] || TC_DEF;
-        var isNewWk = (s.week !== prevWk);
-        prevWk = s.week;
-
-        // 周次分隔线
-        if (isNewWk && idx > 0) {
-          tbody += '<tr class="cc-sep"><td colspan="' + (COLS.length + 1) + '"></td></tr>';
+        var tc = getTC(s.type);
+        if (s.week !== prevWk) {
+          if (idx > 0) tbody += '<tr class="s-week-sep"><td colspan="' + (COLS.length+1) + '"></td></tr>';
+          prevWk = s.week;
         }
 
-        // 聚会信息格
-        var info = '<td class="cc-info" style="border-left-color:' + tc.bar + '">'
-          + '<span class="cc-week">' + esc(s.week) + '</span>'
-          + '<span class="cc-month">' + esc(s.month) + '</span>'
-          + '<span class="cc-tag" style="background:' + tc.tag + ';color:' + tc.txt + '">' + esc(s.type) + '</span>'
+        var info = '<td class="s-row-info" style="border-left-color:' + tc.accent + '">'
+          + '<span class="s-week-label">' + esc(s.week) + '</span>'
+          + '<span class="s-month-label">' + esc(s.month) + '</span>'
+          + '<span class="s-type-tag" style="background:' + tc.tag + ';color:' + tc.txt + '">' + esc(s.type) + '</span>'
           + '</td>';
 
-        var cells = COLS.map(function (col) { return renderTd(col, s[col.key] || ''); }).join('');
-        tbody += '<tr>' + info + cells + '</tr>';
+        tbody += '<tr>' + info + COLS.map(function (c) { return renderTd(c, s[c.key]||''); }).join('') + '</tr>';
       });
 
       if (!svcs.length) {
-        tbody = '<tr><td colspan="' + (COLS.length+1) + '" style="padding:48px;text-align:center;color:var(--tx3);font-size:15px">暂无数据</td></tr>';
+        tbody = '<tr><td colspan="' + (COLS.length+1) + '" style="padding:48px;text-align:center;color:var(--s-tx-3);font-size:14px">暂无数据</td></tr>';
       }
 
       EL.innerHTML =
-        '<div class="cc-bar">'
-          + '<div class="cc-nav">' + nav + '</div>'
-          + '<div class="cc-right">'
-            + '<button class="cc-theme" id="ccTheme">' + (isDark ? '☀️' : '🌙') + '</button>'
-            + '<button class="cc-dl" id="ccExp">' + svgDL() + '导出图片</button>'
+        // Zone 1
+        '<div class="s-hdr-nav">'
+          + '<div class="s-month-nav">' + navInner + '</div>'
+          + '<div class="s-actions">'
+            + '<button class="s-icon-btn" id="sTheme" title="切换主题">' + (isDark ? '☀️' : '🌙') + '</button>'
+            + '<button class="s-text-btn" id="sExp">' + svgDL() + '导出图片</button>'
           + '</div>'
         + '</div>'
-        + '<div class="cc-filters" id="ccFilters">' + flt + '</div>'
-        + '<div class="cc-wrap">'
-          + '<table class="cc-table" id="ccTable">' + cg
+        // Zone 2
+        + '<div class="s-hdr-filter" id="sFilters">' + filterInner + '</div>'
+        // Table
+        + '<div class="s-table-wrap">'
+          + '<table class="s-table" id="sTable">' + cg
             + '<thead><tr>' + hdr + '</tr></thead>'
             + '<tbody>' + tbody + '</tbody>'
           + '</table>'
         + '</div>';
 
-      // 事件绑定
-      var prev  = EL.querySelector('#ccPrev');
-      var next  = EL.querySelector('#ccNext');
-      var exp   = EL.querySelector('#ccExp');
-      var thBtn = EL.querySelector('#ccTheme');
-      var fbox  = EL.querySelector('#ccFilters');
+      // 事件
+      var prev  = EL.querySelector('#sPrev');
+      var prevM = EL.querySelector('#sPrevM');
+      var next  = EL.querySelector('#sNext');
+      var nextM = EL.querySelector('#sNextM');
+      var exp   = EL.querySelector('#sExp');
+      var theme = EL.querySelector('#sTheme');
+      var fbox  = EL.querySelector('#sFilters');
 
-      if (prev)  prev.addEventListener('click', function () { render(i-1); });
-      if (next)  next.addEventListener('click', function () { render(i+1); });
-      if (exp)   exp.addEventListener('click',  function () { exportPng(key); });
-      if (thBtn) thBtn.addEventListener('click', function () {
+      if (prev)  prev.addEventListener('click',  function () { render(i-1); });
+      if (prevM) prevM.addEventListener('click', function () { render(i-1); });
+      if (next)  next.addEventListener('click',  function () { render(i+1); });
+      if (nextM) nextM.addEventListener('click', function () { render(i+1); });
+      if (exp)   exp.addEventListener('click',   function () { exportPng(key); });
+      if (theme) theme.addEventListener('click', function () {
         isDark = !isDark;
-        try { localStorage.setItem('cecp-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+        try { localStorage.setItem('cecp-theme', isDark?'dark':'light'); } catch(e){}
         applyTheme();
         render(i);
       });
-      if (fbox) fbox.querySelectorAll('.cc-fb').forEach(function (b) {
+      if (fbox) fbox.querySelectorAll('.s-pill').forEach(function (b) {
         b.addEventListener('click', function () { activeFilter = this.dataset.f; render(i); });
       });
 
@@ -328,29 +721,29 @@
     }
   }
 
-  /* ── 渲染单元格 ──────────────────────────────────────── */
+  /* ── 渲染 td ──────────────────────────────────────────── */
   function renderTd(col, val) {
     if (col.kind === 'reading') {
       var rd = parseReading(val);
-      if (!rd || !rd.name) return '<td class="cc-cell"><span class="cc-empty">—</span></td>';
-      return '<td class="cc-cell"><span class="cc-ref">' + esc(rd.ref) + '</span>' + badge(rd.name) + '</td>';
+      if (!rd || !rd.name) return '<td class="s-cell"><span class="s-empty">—</span></td>';
+      return '<td class="s-cell"><span class="s-rd-ref">' + esc(rd.ref) + '</span>' + mkBadge(rd.name) + '</td>';
     }
     if (col.kind === 'note') {
-      if (!val) return '<td class="cc-cell"><span class="cc-empty">—</span></td>';
+      if (!val) return '<td class="s-cell"><span class="s-empty">—</span></td>';
       var m = val.match(/^(证道[：:]\s*)(.+)$/);
-      if (m) return '<td class="cc-cell"><span class="cc-npfx">' + esc(m[1]) + '</span>' + badge(m[2]) + '</td>';
-      return '<td class="cc-cell">' + badge(val) + '</td>';
+      if (m) return '<td class="s-cell"><span class="s-note-pfx">' + esc(m[1]) + '</span>' + mkBadge(m[2]) + '</td>';
+      return '<td class="s-cell">' + mkBadge(val) + '</td>';
     }
-    if (!val) return '<td class="cc-cell"><span class="cc-empty">—</span></td>';
-    var names = val.split(/[\/\n]/).map(function (n) { return n.trim(); }).filter(Boolean);
-    return '<td class="cc-cell">' + names.map(badge).join('') + '</td>';
+    if (!val) return '<td class="s-cell"><span class="s-empty">—</span></td>';
+    var ns = val.split(/[\/\n]/).map(function (n) { return n.trim(); }).filter(Boolean);
+    return '<td class="s-cell">' + ns.map(mkBadge).join('') + '</td>';
   }
 
-  function badge(name) {
+  function mkBadge(name) {
     if (!name) return '';
     var c = badgeColor(name);
-    if (!c) return '<span class="cc-badge" style="background:var(--bg2);color:var(--lbl)">' + esc(name) + '</span>';
-    return '<span class="cc-badge" data-n="' + esc(name) + '" style="background:' + c[0] + ';color:' + c[1] + '">' + esc(name) + '</span>';
+    if (!c) return '<span class="s-badge" style="background:var(--s-bg-3);color:var(--s-muted)">' + esc(name) + '</span>';
+    return '<span class="s-badge" data-n="' + esc(name) + '" style="background:' + c[0] + ';color:' + c[1] + '">' + esc(name) + '</span>';
   }
 
   function parseReading(v) {
@@ -359,28 +752,28 @@
     return m ? { ref: m[1], name: m[2].trim() } : { ref: v, name: '' };
   }
 
-  /* ── 高亮逻辑 ─────────────────────────────────────────── */
-  function allBadges() { return EL.querySelectorAll('.cc-badge'); }
+  /* ── 高亮 ─────────────────────────────────────────────── */
+  function allB() { return EL.querySelectorAll('.s-badge'); }
 
-  function applyHL(name, isLock) {
-    allBadges().forEach(function (b) {
+  function applyHL(name, lock) {
+    allB().forEach(function (b) {
       var n = b.dataset.n || b.textContent;
-      b.classList.remove('lit', 'dim', 'locked', 'ldim');
-      if (n === name) b.classList.add(isLock ? 'locked' : 'lit');
-      else            b.classList.add(isLock ? 'ldim'   : 'dim');
+      b.classList.remove('lit','dim','locked','ldim');
+      if (n === name) b.classList.add(lock ? 'locked' : 'lit');
+      else            b.classList.add(lock ? 'ldim'   : 'dim');
     });
   }
-  function clearHL() { allBadges().forEach(function (b) { b.classList.remove('lit','dim','locked','ldim'); }); }
+  function clearHL() { allB().forEach(function (b) { b.classList.remove('lit','dim','locked','ldim'); }); }
 
   function bindHL() {
-    allBadges().forEach(function (b) {
-      var name = b.dataset.n || b.textContent;
-      b.addEventListener('mouseenter', function () { if (!locked) applyHL(name, false); });
+    allB().forEach(function (b) {
+      var n = b.dataset.n || b.textContent;
+      b.addEventListener('mouseenter', function () { if (!locked) applyHL(n, false); });
       b.addEventListener('mouseleave', function () { if (!locked) clearHL(); });
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (locked === name) { locked = null; clearHL(); }
-        else { locked = name; applyHL(name, true); }
+        if (locked === n) { locked = null; clearHL(); }
+        else { locked = n; applyHL(n, true); }
       });
     });
     EL.addEventListener('click', function () { if (locked) { locked = null; clearHL(); } });
@@ -388,21 +781,18 @@
 
   /* ── 导出 PNG ─────────────────────────────────────────── */
   function exportPng(key) {
-    var btn = EL.querySelector('#ccExp');
-    var tbl = EL.querySelector('#ccTable');
+    var btn = EL.querySelector('#sExp');
+    var tbl = EL.querySelector('#sTable');
     if (!btn || !tbl) return;
-    btn.disabled = true;
-    btn.textContent = '处理中…';
+    btn.disabled = true; btn.textContent = '处理中…';
 
     function run() {
-      window.html2canvas(tbl, { backgroundColor: isDark ? '#0e0e0e' : '#fff', scale: 2, useCORS: true, logging: false })
+      window.html2canvas(tbl, { backgroundColor: isDark?'#0f0f0f':'#fff', scale: 2, useCORS: true, logging: false })
         .then(function (c) {
           var a = document.createElement('a');
           a.download = '服事安排_' + key + '.png';
-          a.href = c.toDataURL('image/png');
-          a.click();
-          btn.innerHTML = svgDL() + '导出图片';
-          btn.disabled = false;
+          a.href = c.toDataURL('image/png'); a.click();
+          btn.innerHTML = svgDL() + '导出图片'; btn.disabled = false;
         })
         .catch(function () { btn.textContent = '导出失败'; btn.disabled = false; });
     }
@@ -410,21 +800,20 @@
     if (!window.html2canvas) {
       var sc = document.createElement('script');
       sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      sc.onload = run;
-      document.head.appendChild(sc);
+      sc.onload = run; document.head.appendChild(sc);
     } else { run(); }
   }
 
-  /* ── 工具函数 ─────────────────────────────────────────── */
+  /* ── 工具 ─────────────────────────────────────────────── */
   function mord(s) { var m = String(s).match(/^(\d{1,2})月$/); return m ? parseInt(m[1],10) : 99; }
   function word(s) { return {'第一周':1,'第二周':2,'第三周':3,'第四周':4,'第五周':5}[s] || 99; }
-  function tv(v)   { return String(v == null ? '' : v).trim(); }
+  function tv(v)   { return String(v==null?'':v).trim(); }
   function esc(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function svgDL() {
     return '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>';
   }
 
-  /* ── Demo 数据（测试用） ──────────────────────────────── */
+  /* ── Demo ─────────────────────────────────────────────── */
   function demo() {
     return [
       {month:'3月',week:'第一周',type:'主日下午',leader:'金展',worship:'胡娜',band:'杨亦佳',prayer:'林文宝',reading:'诗9 金Silvia',note:'证道：金美德'},
