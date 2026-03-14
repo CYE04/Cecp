@@ -1,6 +1,6 @@
 /**
- * service-schedule.js  v7.0
- * CECP 服事安排 — 全页宽 · 响应式 · 深浅色主题
+ * service-schedule.js  v8.0
+ * CECP 服事安排 — 日期纵排 · 岗位横排 · 深浅色主题
  * https://cye04.github.io/Cecp/service-schedule.js
  *
  * 用法:
@@ -14,32 +14,32 @@
   if (!EL) return;
   var API = EL.dataset.api || '';
 
-  /* ── 岗位行定义 ─────────────────────────────────────────────────────────── */
-  var ROWS = [
-    { key: 'leader',  label: '主领 / 司仪', type: 'badges' },
-    { key: 'worship', label: '敬拜带领',    type: 'badges' },
-    { key: 'band',    label: '乐手 / 司琴', type: 'badges' },
-    { key: 'prayer',  label: '祷告带领',    type: 'badges' },
+  /* ── 岗位列定义 ─────────────────────────────────────────────────────────── */
+  var COLS = [
+    { key: 'leader',  label: '主领 / 司仪', type: 'badges'  },
+    { key: 'worship', label: '敬拜带领',    type: 'badges'  },
+    { key: 'band',    label: '乐手 / 司琴', type: 'badges'  },
+    { key: 'prayer',  label: '祷告带领',    type: 'badges'  },
     { key: 'reading', label: '读　　经',    type: 'reading' },
     { key: 'note',    label: '证道讲员',    type: 'note'    },
   ];
 
-  /* ── 聚会类型配色 (dark / light 各一套) ──────────────────────────────────── */
+  /* ── 聚会类型配色 ────────────────────────────────────────────────────────── */
   var TYPE_DARK = {
-    '主日下午': { hdr: '#0f2040', pill: '#1a3468', txt: '#78b4f0', col: '#0a1628' },
-    '主日晚上': { hdr: '#20103c', pill: '#341a66', txt: '#b07ae8', col: '#150a28' },
-    '青年团契': { hdr: '#0c2418', pill: '#1a4830', txt: '#5ec48a', col: '#081510' },
+    '主日下午': { bg: '#0c1a38', border: '#1a3468', pill_bg: '#1a3468', pill_txt: '#78b4f0', row_alt: '#0e1f42' },
+    '主日晚上': { bg: '#180e34', border: '#341a66', pill_bg: '#341a66', pill_txt: '#b07ae8', row_alt: '#1c1240' },
+    '青年团契': { bg: '#081e14', border: '#1a4830', pill_bg: '#1a4830', pill_txt: '#5ec48a', row_alt: '#0a2418' },
   };
   var TYPE_LIGHT = {
-    '主日下午': { hdr: '#deeaf8', pill: '#3a6ab8', txt: '#ffffff', col: '#edf4fc' },
-    '主日晚上': { hdr: '#e8ddf8', pill: '#6840b8', txt: '#ffffff', col: '#f2ecfc' },
-    '青年团契': { hdr: '#d8f0e4', pill: '#2a7e50', txt: '#ffffff', col: '#ecf8f2' },
+    '主日下午': { bg: '#edf4fc', border: '#b8d4f0', pill_bg: '#2a5ea8', pill_txt: '#ffffff', row_alt: '#ddeaf8' },
+    '主日晚上': { bg: '#f0ebfc', border: '#c8a8f0', pill_bg: '#5838a8', pill_txt: '#ffffff', row_alt: '#e8def8' },
+    '青年团契': { bg: '#ebf8f0', border: '#90d8b0', pill_bg: '#1e6e42', pill_txt: '#ffffff', row_alt: '#ddf2e8' },
   };
-  var TC_DEF_DARK  = { hdr: '#1a1a1a', pill: '#2a2a2a', txt: '#888', col: '#111' };
-  var TC_DEF_LIGHT = { hdr: '#f0f0f0', pill: '#888',    txt: '#fff', col: '#fafafa' };
+  var TC_DEF_D = { bg: '#111', border: '#222', pill_bg: '#2a2a2a', pill_txt: '#888', row_alt: '#141414' };
+  var TC_DEF_L = { bg: '#fafafa', border: '#ddd', pill_bg: '#888', pill_txt: '#fff', row_alt: '#f4f4f4' };
 
-  /* ── 姓名 badge 颜色 (dark) ─────────────────────────────────────────────── */
-  var PAL_DARK = [
+  /* ── Badge 颜色板 ────────────────────────────────────────────────────────── */
+  var PAL_D = [
     ['#0a2540','#5aaae0'],['#0a3018','#50c07a'],['#280c44','#9c68d8'],
     ['#380a1a','#cc607e'],['#08262e','#48b0be'],['#281a04','#c09030'],
     ['#0a1c38','#5078c0'],['#1c0a38','#8460c0'],['#0a2018','#58b080'],
@@ -47,8 +47,7 @@
     ['#2c0c10','#b06060'],['#0c280c','#60b060'],['#0c0c2c','#6060b0'],
     ['#0e2c26','#50a898'],['#2c1c04','#a89050'],['#141030','#7070b0'],
   ];
-  /* ── 姓名 badge 颜色 (light) ────────────────────────────────────────────── */
-  var PAL_LIGHT = [
+  var PAL_L = [
     ['#ddeef8','#1a5888'],['#d8f0e4','#1a5e38'],['#ede0f8','#5a2888'],
     ['#f8dde6','#882040'],['#d8eef0','#1a5868'],['#f8f0d8','#785010'],
     ['#dde4f8','#1a3878'],['#e8d8f8','#502080'],['#d8eee8','#1a5848'],
@@ -57,28 +56,27 @@
     ['#d8f0ec','#185858'],['#f0e8d8','#604828'],['#e0def8','#303078'],
   ];
 
-  function badgeColor(name, dark) {
+  function badgeColor(name) {
     if (!name) return null;
     var h = 0;
     for (var i = 0; i < name.length; i++) h = (Math.imul(31, h) + name.charCodeAt(i)) | 0;
-    var pal = dark ? PAL_DARK : PAL_LIGHT;
+    var pal = isDark ? PAL_D : PAL_L;
     return pal[Math.abs(h) % pal.length];
   }
 
-  /* ── 主题状态 ────────────────────────────────────────────────────────────── */
+  /* ── 主题 ────────────────────────────────────────────────────────────────── */
   var isDark = true;
   try {
     var saved = localStorage.getItem('cecp-theme');
-    if (saved) isDark = (saved === 'dark');
-    else isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  } catch(e) { isDark = true; }
+    if (saved) isDark = saved === 'dark';
+    else isDark = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  } catch(e) {}
 
-  /* ── CSS ────────────────────────────────────────────────────────────────── */
-  if (!document.getElementById('_cs7css')) {
+  /* ── CSS ─────────────────────────────────────────────────────────────────── */
+  if (!document.getElementById('_cs8css')) {
     var st = document.createElement('style');
-    st.id = '_cs7css';
+    st.id = '_cs8css';
     st.textContent = `
-/* ═══════════ 根容器 ═══════════ */
 #cecp-schedule {
   font-family: "PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
   border-radius: 16px;
@@ -89,391 +87,234 @@
 }
 #cecp-schedule * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ═══════════ 深色主题 ═══════════ */
-#cecp-schedule.cs7-dark {
-  background: #0e0e0e;
-  color: #d0d0d0;
-  --cs-bg:       #0e0e0e;
-  --cs-bg2:      #141414;
-  --cs-bg3:      #1a1a1a;
-  --cs-border:   #1e1e1e;
-  --cs-border2:  #252525;
-  --cs-text:     #d0d0d0;
-  --cs-text2:    #666;
-  --cs-text3:    #3a3a3a;
-  --cs-label:    #444;
-  --cs-bar-bg:   #111;
-  --cs-tab-bg:   #181818;
-  --cs-tab-on:   #222;
-  --cs-tab-txt:  #e0e0e0;
-  --cs-empty:    #1e1e1e;
-  --cs-note:     #7a6838;
-  --cs-reading:  #3a6a3a;
+/* ── 主题变量 ── */
+#cecp-schedule.cs8-dark {
+  background: #0e0e0e; color: #d0d0d0;
+  --bg:     #0e0e0e; --bg2: #141414; --bg3: #1c1c1c;
+  --border: #1e1e1e; --border2: #282828;
+  --text:   #d0d0d0; --text2: #555; --text3: #2a2a2a;
+  --label:  #444;
+  --hdr-bg: #111; --tab-bg: #181818; --tab-on: #242424; --tab-txt: #e0e0e0;
+  --rd-ref: #3a6a3a; --note-pfx: #7a6838;
+  --empty:  #1e1e1e;
+}
+#cecp-schedule.cs8-light {
+  background: #fff; color: #1a1a1a;
+  --bg:     #fff;  --bg2: #f8f8f8; --bg3: #efefef;
+  --border: #e8e8e8; --border2: #d0d0d0;
+  --text:   #1a1a1a; --text2: #999; --text3: #ccc;
+  --label:  #888;
+  --hdr-bg: #f5f5f5; --tab-bg: #ececec; --tab-on: #fff; --tab-txt: #1a1a1a;
+  --rd-ref: #2a6a3a; --note-pfx: #7a6030;
+  --empty:  #d0d0d0;
 }
 
-/* ═══════════ 浅色主题 ═══════════ */
-#cecp-schedule.cs7-light {
-  background: #ffffff;
-  color: #1a1a1a;
-  --cs-bg:       #ffffff;
-  --cs-bg2:      #f8f8f8;
-  --cs-bg3:      #f0f0f0;
-  --cs-border:   #e8e8e8;
-  --cs-border2:  #d8d8d8;
-  --cs-text:     #1a1a1a;
-  --cs-text2:    #888;
-  --cs-text3:    #cccccc;
-  --cs-label:    #888;
-  --cs-bar-bg:   #f5f5f5;
-  --cs-tab-bg:   #ececec;
-  --cs-tab-on:   #ffffff;
-  --cs-tab-txt:  #1a1a1a;
-  --cs-empty:    #d8d8d8;
-  --cs-note:     #7a6030;
-  --cs-reading:  #2a6a3a;
-}
-
-/* ═══════════ 顶部工具栏 ═══════════ */
-.cs7-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 20px 14px;
-  background: var(--cs-bar-bg);
-  border-bottom: 1px solid var(--cs-border);
+/* ── 顶栏 ── */
+.cs8-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px 12px;
+  background: var(--hdr-bg);
+  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
-.cs7-left  { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
-.cs7-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
-/* 月份切换 */
-.cs7-tabs {
-  display: flex;
-  gap: 2px;
-  background: var(--cs-tab-bg);
-  border-radius: 10px;
-  padding: 3px;
+.cs8-tabs {
+  display: flex; gap: 2px;
+  background: var(--tab-bg); border-radius: 10px; padding: 3px;
 }
-.cs7-tab {
-  padding: 6px 16px;
-  font-size: 13px;
-  color: var(--cs-text2);
-  cursor: pointer;
-  border-radius: 8px;
-  border: none;
-  background: none;
-  font-family: inherit;
-  white-space: nowrap;
-  transition: all .15s;
-  letter-spacing: .02em;
+.cs8-tab {
+  padding: 6px 16px; font-size: 13px; color: var(--text2);
+  cursor: pointer; border-radius: 8px; border: none; background: none;
+  font-family: inherit; white-space: nowrap; transition: all .15s; letter-spacing: .02em;
 }
-.cs7-tab.on { background: var(--cs-tab-on); color: var(--cs-tab-txt); font-weight: 600; }
-.cs7-tab:hover:not(.on) { color: var(--cs-text); }
+.cs8-tab.on { background: var(--tab-on); color: var(--tab-txt); font-weight: 600; }
+.cs8-tab:hover:not(.on) { color: var(--text); }
 
-/* 主题切换按钮 */
-.cs7-theme-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--cs-border2);
-  background: var(--cs-bg2);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  transition: all .2s;
-  flex-shrink: 0;
+.cs8-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.cs8-theme {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--border2); background: var(--bg2);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; transition: all .2s; flex-shrink: 0;
 }
-.cs7-theme-btn:hover { background: var(--cs-bg3); transform: scale(1.1); }
+.cs8-theme:hover { background: var(--bg3); transform: scale(1.1) rotate(15deg); }
 
-/* 导出按钮 */
-.cs7-export-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
+.cs8-export {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 13px; font-size: 12px; color: var(--text2);
+  border: 1px solid var(--border2); border-radius: 8px; background: none;
+  cursor: pointer; font-family: inherit; white-space: nowrap; transition: all .15s;
+}
+.cs8-export:hover { color: var(--text); border-color: var(--label); background: var(--bg2); }
+.cs8-export:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ── 类型筛选 ── */
+.cs8-filters {
+  display: flex; gap: 6px; padding: 9px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--hdr-bg); flex-wrap: wrap;
+}
+.cs8-filter {
+  padding: 4px 14px; font-size: 11px; border-radius: 20px; cursor: pointer;
+  border: 1px solid var(--border2); background: none;
+  font-family: inherit; color: var(--label); transition: all .15s; letter-spacing: .03em;
+}
+.cs8-filter.on { color: #fff !important; border-color: transparent; }
+.cs8-filter:hover:not(.on) { color: var(--text); border-color: var(--label); }
+
+/* ── 主表格 ── */
+.cs8-table-wrap {
+  width: 100%; overflow-x: hidden; overflow-y: visible;
+}
+.cs8-table {
+  border-collapse: collapse; width: 100%;
+  table-layout: fixed;
+}
+.cs8-table th, .cs8-table td {
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.cs8-table tr th:last-child,
+.cs8-table tr td:last-child { border-right: none; }
+
+/* 列标题（岗位）*/
+.cs8-col-hdr {
+  background: var(--hdr-bg);
+  padding: 12px 14px;
   font-size: 12px;
-  color: var(--cs-text2);
-  border: 1px solid var(--cs-border2);
-  border-radius: 8px;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  transition: all .15s;
-}
-.cs7-export-btn:hover { color: var(--cs-text); border-color: var(--cs-label); background: var(--cs-bg2); }
-.cs7-export-btn:disabled { opacity: .35; cursor: not-allowed; }
-
-/* 类型筛选 */
-.cs7-filters {
-  display: flex;
-  gap: 6px;
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--cs-border);
-  flex-wrap: wrap;
-  background: var(--cs-bar-bg);
-}
-.cs7-filter-btn {
-  padding: 4px 14px;
-  font-size: 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  border: 1px solid var(--cs-border2);
-  background: none;
-  font-family: inherit;
-  color: var(--cs-label);
-  transition: all .15s;
-  letter-spacing: .03em;
-}
-.cs7-filter-btn.on { color: #fff; border-color: transparent; }
-.cs7-filter-btn:hover:not(.on) { color: var(--cs-text); border-color: var(--cs-label); }
-
-/* ═══════════ 桌面端：横向大表格 ═══════════ */
-.cs7-scroll {
-  overflow-x: auto;
-  overflow-y: visible;
-  background: var(--cs-bg);
-}
-.cs7-scroll::-webkit-scrollbar { height: 4px; }
-.cs7-scroll::-webkit-scrollbar-track { background: var(--cs-bg); }
-.cs7-scroll::-webkit-scrollbar-thumb { background: var(--cs-border2); border-radius: 2px; }
-
-.cs7-table { border-collapse: collapse; width: 100%; }
-.cs7-table th, .cs7-table td { border: 1px solid var(--cs-border); }
-
-/* 左上角 */
-.cs7-corner {
-  background: var(--cs-bg2);
-  position: sticky;
-  left: 0;
-  z-index: 3;
-  padding: 14px 18px;
-  font-size: 12px;
-  color: var(--cs-text3);
-  vertical-align: bottom;
-  min-width: 90px;
-  border-right: 2px solid var(--cs-border2);
-}
-
-/* 列标题（日期+类型） */
-.cs7-col-h {
+  font-weight: 600;
+  color: var(--label);
   text-align: center;
-  vertical-align: bottom;
-  padding: 0;
-  min-width: 110px;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 2px solid var(--border2) !important;
 }
-.cs7-col-date {
-  display: block;
-  padding: 14px 14px 5px;
-  font-size: 26px;
-  font-weight: 800;
-  color: #f0f0f0;
-  line-height: 1;
-  letter-spacing: -.02em;
-}
-.cs7-light .cs7-col-date { color: #1a1a1a; }
-.cs7-col-pill {
-  display: block;
-  padding: 4px 0 12px;
-  font-size: 10px;
-  letter-spacing: .06em;
-  opacity: .85;
+/* 左上角 */
+.cs8-corner {
+  background: var(--hdr-bg);
+  padding: 12px 14px;
+  font-size: 11px;
+  color: var(--text3);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  border-bottom: 2px solid var(--border2) !important;
+  border-right: 2px solid var(--border2) !important;
 }
 
-/* 行标题（左固定） */
-.cs7-row-h {
-  background: var(--cs-bg2);
-  position: sticky;
-  left: 0;
-  z-index: 2;
-  padding: 12px 18px;
-  font-size: 12px;
-  color: var(--cs-label);
+/* 日期+类型格（左侧锚定列）*/
+.cs8-row-info {
+  padding: 12px 14px;
+  vertical-align: middle;
   text-align: left;
+  border-right: 2px solid var(--border2) !important;
   white-space: nowrap;
-  border-right: 2px solid var(--cs-border2);
-  letter-spacing: .04em;
-  font-weight: 500;
+  min-width: 130px;
+  width: 130px;
+}
+.cs8-date-big {
+  font-size: 22px; font-weight: 800;
+  line-height: 1; letter-spacing: -.01em;
+  display: block;
+}
+.cs8-date-sub {
+  font-size: 10px; color: var(--text2);
+  margin-top: 2px; display: block; letter-spacing: .03em;
+}
+.cs8-type-pill {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .04em; color: #fff;
 }
 
 /* 内容格 */
-.cs7-cell {
-  padding: 10px 12px;
+.cs8-cell {
+  padding: 11px 12px;
   text-align: center;
-  background: var(--cs-bg);
   vertical-align: middle;
-  min-width: 110px;
   transition: background .1s;
 }
-.cs7-cell:hover { background: var(--cs-bg2); }
+.cs8-cell:hover { filter: brightness(1.06); }
 
 /* 读经格 */
-.cs7-cell-rd {
-  padding: 10px 12px;
-  text-align: center;
-  background: var(--cs-bg);
-  vertical-align: middle;
-  min-width: 110px;
+.cs8-rd-ref {
+  display: block; font-size: 10px;
+  color: var(--rd-ref); margin-bottom: 3px;
+  letter-spacing: .04em; font-weight: 600;
 }
-.cs7-cell-rd:hover { background: var(--cs-bg2); }
-.cs7-rd-ref {
-  display: block;
-  font-size: 10px;
-  color: var(--cs-reading);
-  margin-bottom: 3px;
-  letter-spacing: .04em;
-  font-weight: 600;
+/* 证道前缀 */
+.cs8-note-pfx {
+  display: block; font-size: 10px;
+  color: var(--note-pfx); margin-bottom: 3px;
+  letter-spacing: .03em; font-weight: 600;
 }
 
-/* 证道格 */
-.cs7-cell-note {
-  padding: 10px 12px;
-  text-align: center;
-  background: var(--cs-bg);
-  vertical-align: middle;
-  min-width: 110px;
-}
-.cs7-cell-note:hover { background: var(--cs-bg2); }
-.cs7-note-pfx {
-  display: block;
-  font-size: 10px;
-  color: var(--cs-note);
-  margin-bottom: 3px;
-  letter-spacing: .03em;
-  font-weight: 600;
-}
-
-/* ═══════════ 姓名 Badge ═══════════ */
-.cs7-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.5;
-  margin: 2px;
-  white-space: nowrap;
-  cursor: pointer;
+/* Badge */
+.cs8-badge {
+  display: inline-block; padding: 4px 10px;
+  border-radius: 20px; font-size: 12px; font-weight: 600;
+  line-height: 1.4; margin: 2px; white-space: nowrap;
+  cursor: pointer; letter-spacing: .02em;
   transition: opacity .12s, transform .1s, box-shadow .12s;
-  user-select: none;
-  position: relative;
-  letter-spacing: .02em;
+  user-select: none; position: relative;
 }
-.cs7-badge.lit    { transform: scale(1.12); box-shadow: 0 0 0 2px rgba(255,255,255,.28); z-index: 1; }
-.cs7-badge.dim    { opacity: .15; }
-.cs7-badge.locked { transform: scale(1.15); box-shadow: 0 0 0 2.5px rgba(255,255,255,.55); z-index: 1; }
-.cs7-badge.ldim   { opacity: .1; }
-.cs7-light .cs7-badge.lit    { box-shadow: 0 0 0 2px rgba(0,0,0,.22); }
-.cs7-light .cs7-badge.locked { box-shadow: 0 0 0 2.5px rgba(0,0,0,.45); }
+.cs8-badge.lit    { transform: scale(1.12); box-shadow: 0 0 0 2px rgba(255,255,255,.3);  z-index: 1; }
+.cs8-badge.dim    { opacity: .14; }
+.cs8-badge.locked { transform: scale(1.15); box-shadow: 0 0 0 2.5px rgba(255,255,255,.55); z-index: 1; }
+.cs8-badge.ldim   { opacity: .1; }
+.cs8-light .cs8-badge.lit    { box-shadow: 0 0 0 2px rgba(0,0,0,.25); }
+.cs8-light .cs8-badge.locked { box-shadow: 0 0 0 2.5px rgba(0,0,0,.45); }
 
 /* 空值 */
-.cs7-empty { color: var(--cs-text3); font-size: 16px; }
+.cs8-empty { color: var(--empty); font-size: 16px; }
 
-/* ═══════════ 移动端：卡片堆叠 ═══════════ */
-.cs7-cards { display: none; flex-direction: column; gap: 12px; padding: 16px; }
-
-.cs7-card {
-  border: 1px solid var(--cs-border);
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--cs-bg);
-}
-.cs7-card-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--cs-border);
-}
-.cs7-card-date {
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -.02em;
-}
-.cs7-card-type-pill {
-  padding: 3px 10px;
-  border-radius: 16px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  color: #fff;
-}
-.cs7-card-body { padding: 10px 0; }
-.cs7-card-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 7px 16px;
-  border-bottom: 1px solid var(--cs-border);
-}
-.cs7-card-row:last-child { border-bottom: none; }
-.cs7-card-label {
-  font-size: 11px;
-  color: var(--cs-label);
-  white-space: nowrap;
-  min-width: 68px;
-  padding-top: 5px;
-  letter-spacing: .03em;
-  font-weight: 500;
-}
-.cs7-card-value {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2px;
+/* 月份分隔标题 */
+.cs8-month-sep td {
+  padding: 8px 16px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border2) !important;
+  border-right: none !important;
+  text-transform: uppercase;
 }
 
-/* ═══════════ 响应式切换 ═══════════ */
-@media (max-width: 700px) {
-  .cs7-scroll  { display: none; }
-  .cs7-cards   { display: flex; }
-  .cs7-tab { padding: 5px 10px; font-size: 12px; }
-  .cs7-bar { padding: 12px 14px 10px; gap: 8px; }
-}
-@media (min-width: 701px) {
-  .cs7-scroll  { display: block; }
-  .cs7-cards   { display: none; }
-}
+/* 加载 / 错误 */
+.cs8-loading { display: flex; align-items: center; gap: 12px; padding: 56px 24px; color: var(--text2); font-size: 15px; }
+.cs8-spinner { width: 20px; height: 20px; border: 2px solid var(--border2); border-top-color: var(--label); border-radius: 50%; animation: cs8spin .7s linear infinite; flex-shrink: 0; }
+@keyframes cs8spin { to { transform: rotate(360deg); } }
+.cs8-nodata { padding: 56px; text-align: center; color: var(--text3); font-size: 15px; }
+.cs8-err { padding: 24px; color: #a04040; font-size: 14px; line-height: 1.8; }
 
-/* ═══════════ 加载 / 错误 ═══════════ */
-.cs7-loading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 56px 24px;
-  color: var(--cs-text2);
-  font-size: 15px;
+/* 移动端列宽收窄 */
+@media (max-width: 600px) {
+  .cs8-col-hdr, .cs8-cell, .cs8-rd-ref, .cs8-note-pfx { padding: 8px 8px; font-size: 11px; }
+  .cs8-badge { font-size: 11px; padding: 3px 7px; }
+  .cs8-date-big { font-size: 18px; }
+  .cs8-row-info { min-width: 100px; width: 100px; padding: 10px 10px; }
+  .cs8-bar { padding: 10px 14px 9px; }
+  .cs8-tab { padding: 5px 10px; font-size: 12px; }
 }
-.cs7-spinner {
-  width: 20px; height: 20px;
-  border: 2px solid var(--cs-border2);
-  border-top-color: var(--cs-label);
-  border-radius: 50%;
-  animation: cs7spin .7s linear infinite;
-  flex-shrink: 0;
-}
-@keyframes cs7spin { to { transform: rotate(360deg); } }
-.cs7-nodata { padding: 56px; text-align: center; color: var(--cs-text3); font-size: 15px; }
-.cs7-err { padding: 24px; color: #a04040; font-size: 14px; line-height: 1.8; }
 `;
     document.head.appendChild(st);
   }
 
-  /* ── 应用主题 ────────────────────────────────────────────────────────────── */
   function applyTheme() {
-    EL.classList.toggle('cs7-dark',  isDark);
-    EL.classList.toggle('cs7-light', !isDark);
+    EL.classList.toggle('cs8-dark',  isDark);
+    EL.classList.toggle('cs8-light', !isDark);
   }
   applyTheme();
 
-  /* ── 加载状态 ────────────────────────────────────────────────────────────── */
-  EL.innerHTML = '<div class="cs7-loading"><div class="cs7-spinner"></div>加载服事安排…</div>';
+  /* ── 加载 ─────────────────────────────────────────────────────────────────── */
+  EL.innerHTML = '<div class="cs8-loading"><div class="cs8-spinner"></div>加载服事安排…</div>';
 
-  /* ── 拉取数据 ─────────────────────────────────────────────────────────────── */
   if (!API || API === 'DEMO') { setTimeout(function () { boot(demo()); }, 200); return; }
 
   fetch(API + '?action=all')
@@ -483,17 +324,18 @@
       boot(res.data);
     })
     .catch(function (e) {
-      EL.innerHTML = '<div class="cs7-err">⚠ ' + esc(e.message) +
-        '<br><small style="opacity:.6">请确认 Apps Script 已部署最新版本</small></div>';
+      EL.innerHTML = '<div class="cs8-err">⚠ ' + esc(e.message)
+        + '<br><small style="opacity:.6">请确认 Apps Script 已部署最新版本</small></div>';
     });
 
-  /* ── 高亮状态 ────────────────────────────────────────────────────────────── */
+  /* ── 高亮 ─────────────────────────────────────────────────────────────────── */
   var locked = null;
 
-  /* ── 初始化 ──────────────────────────────────────────────────────────────── */
+  /* ── 初始化 ───────────────────────────────────────────────────────────────── */
   function boot(rows) {
-    if (!rows || !rows.length) { EL.innerHTML = '<div class="cs7-nodata">暂无服事安排</div>'; return; }
+    if (!rows || !rows.length) { EL.innerHTML = '<div class="cs8-nodata">暂无服事安排</div>'; return; }
 
+    // 按月分组
     var months = {};
     rows.forEach(function (r) {
       var mk = r.date ? r.date.slice(0, 7) : '';
@@ -504,112 +346,125 @@
     var keys = Object.keys(months).sort();
     if (!keys.length) return;
 
+    // 当前月
     var now = new Date();
     var nowKey = now.getFullYear() + '-' + pad(now.getMonth() + 1);
-    var idx = keys.indexOf(nowKey);
-    if (idx < 0) {
-      for (var i = 0; i < keys.length; i++) { if (keys[i] >= nowKey) { idx = i; break; } }
-      if (idx < 0) idx = keys.length - 1;
+    var curIdx = keys.indexOf(nowKey);
+    if (curIdx < 0) {
+      for (var i = 0; i < keys.length; i++) { if (keys[i] >= nowKey) { curIdx = i; break; } }
+      if (curIdx < 0) curIdx = keys.length - 1;
     }
 
+    // 所有类型
     var allTypes = [];
     rows.forEach(function (r) { if (r.type && allTypes.indexOf(r.type) < 0) allTypes.push(r.type); });
     var tOrd = {'主日下午':0,'主日晚上':1,'青年团契':2};
     allTypes.sort(function (a, b) { return (tOrd[a]||9) - (tOrd[b]||9); });
 
     var activeTypes = allTypes.slice();
-    render(idx);
+    render(curIdx);
 
     function render(i) {
       locked = null;
-      var key  = keys[i];
-      var data = months[key];
-      var svcs = data.filter(function (s) { return activeTypes.indexOf(s.type) >= 0; });
+      var key = keys[i];
 
-      /* 月份导航 */
+      // ── 月份切换 tabs ──
       var tabsHtml = '';
-      if (i > 0)               tabsHtml += '<button class="cs7-tab" id="csPrev">← ' + mlabel(keys[i-1]) + '</button>';
-      tabsHtml +=                           '<button class="cs7-tab on">' + mlabel(key) + '</button>';
-      if (i < keys.length - 1) tabsHtml += '<button class="cs7-tab" id="csNext">' + mlabel(keys[i+1]) + ' →</button>';
+      if (i > 0)               tabsHtml += '<button class="cs8-tab" id="csPrev">← ' + mlabel(keys[i-1]) + '</button>';
+      tabsHtml +=                           '<button class="cs8-tab on">' + mlabel(key) + '</button>';
+      if (i < keys.length - 1) tabsHtml += '<button class="cs8-tab" id="csNext">' + mlabel(keys[i+1]) + ' →</button>';
 
-      /* 类型筛选 */
+      // ── 类型筛选 ──
       var fHtml = allTypes.map(function (tp) {
-        var tc = tc4(tp);
+        var tc = getTc(tp);
         var on = activeTypes.indexOf(tp) >= 0;
-        return '<button class="cs7-filter-btn'+(on?' on':'')+'" data-type="'+esc(tp)+'"'
-          +(on?' style="background:'+tc.pill+'"':'')+'>'+esc(tp)+'</button>';
+        return '<button class="cs8-filter'+(on?' on':'')+'" data-type="'+esc(tp)+'"'
+          +(on?' style="background:'+tc.pill_bg+'"':'')+'>'+esc(tp)+'</button>';
       }).join('');
 
-      /* ── 桌面表格 ── */
-      var hdr = '<tr><th class="cs7-corner">服事</th>';
-      svcs.forEach(function (s) {
-        var tc = tc4(s.type);
-        hdr += '<th class="cs7-col-h" style="background:'+tc.hdr+'">'
-          + '<span class="cs7-col-date">'+dayStr(s.date)+'</span>'
-          + '<span class="cs7-col-pill" style="color:'+tc.txt+'">'+esc(s.type)+'</span>'
-          + '</th>';
+      // ── 表格列标题 ──
+      var colHeaders = '<th class="cs8-corner">日期</th>'
+        + COLS.map(function (c) {
+            return '<th class="cs8-col-hdr">'+c.label+'</th>';
+          }).join('');
+
+      // ── 表格行：每场聚会一行 ──
+      // 排序：日期 → 下午→晚上→青年
+      var svcs = months[key].filter(function (s) { return activeTypes.indexOf(s.type) >= 0; });
+      svcs.sort(function (a, b) {
+        if (a.date < b.date) return -1;
+        if (a.date > b.date) return 1;
+        return (tOrd[a.type]||9) - (tOrd[b.type]||9);
       });
-      hdr += '</tr>';
 
-      var tableBody = ROWS.map(function (row) {
-        var tr = '<tr><td class="cs7-row-h">'+row.label+'</td>';
-        svcs.forEach(function (s) { tr += renderTd(row, s[row.key] || ''); });
-        return tr + '</tr>';
-      }).join('');
+      // 按日期分组，让相邻同日行视觉分开
+      var bodyHtml = '';
+      var prevDate = '';
+      svcs.forEach(function (s, idx) {
+        var tc = getTc(s.type);
+        var isNewDate = (s.date !== prevDate);
+        prevDate = s.date;
 
-      /* ── 移动卡片 ── */
-      var cardsHtml = svcs.map(function (s) {
-        var tc = tc4(s.type);
-        var cardRows = ROWS.map(function (row) {
-          var val = s[row.key] || '';
-          var inner = renderValue(row, val);
-          return '<div class="cs7-card-row">'
-            + '<span class="cs7-card-label">'+row.label+'</span>'
-            + '<div class="cs7-card-value">'+inner+'</div>'
-            + '</div>';
+        // 行背景：同类型奇偶交替
+        var rowBg = (idx % 2 === 0) ? tc.bg : tc.row_alt;
+        // 顶部加细线分隔新日期
+        var topBorder = isNewDate && idx > 0
+          ? 'border-top: 2px solid var(--border2) !important;' : '';
+
+        var dateCell = '<td class="cs8-row-info" style="background:'+tc.bg+';'+topBorder+'">'
+          + '<span class="cs8-date-big" style="color:'+(isDark?'#f0f0f0':'#1a1a1a')+'">'+dateShort(s.date)+'</span>'
+          + '<span class="cs8-date-sub">'+weekday(s.date)+'</span>'
+          + '<span class="cs8-type-pill" style="background:'+tc.pill_bg+';color:'+tc.pill_txt+'">'+esc(s.type)+'</span>'
+          + '</td>';
+
+        var dataCells = COLS.map(function (col) {
+          return renderTd(col, s[col.key] || '', rowBg, topBorder);
         }).join('');
-        return '<div class="cs7-card">'
-          + '<div class="cs7-card-head" style="background:'+tc.hdr+'">'
-            + '<span class="cs7-card-date" style="color:'+(isDark?'#f0f0f0':'#1a1a1a')+'">'+dayStr(s.date)+'</span>'
-            + '<span class="cs7-card-type-pill" style="background:'+tc.pill+'">'+esc(s.type)+'</span>'
-          + '</div>'
-          + '<div class="cs7-card-body">'+cardRows+'</div>'
-        + '</div>';
-      }).join('');
+
+        bodyHtml += '<tr>'+dateCell+dataCells+'</tr>';
+      });
+
+      if (!svcs.length) {
+        bodyHtml = '<tr><td colspan="'+(COLS.length+1)+'" style="padding:40px;text-align:center;color:var(--text3)">暂无数据</td></tr>';
+      }
+
+      // 列宽：日期列固定，其余均分
+      var colGroup = '<colgroup><col style="width:130px">'
+        + COLS.map(function () { return '<col>'; }).join('')
+        + '</colgroup>';
 
       EL.innerHTML =
-        '<div class="cs7-bar">'
-          + '<div class="cs7-left">'
-            + '<div class="cs7-tabs">'+tabsHtml+'</div>'
-          + '</div>'
-          + '<div class="cs7-right">'
-            + '<button class="cs7-theme-btn" id="csTheme" title="切换主题">'+(isDark?'☀️':'🌙')+'</button>'
-            + '<button class="cs7-export-btn" id="csExp">'+svgDown()+'导出图片</button>'
+        '<div class="cs8-bar">'
+          + '<div class="cs8-tabs">'+tabsHtml+'</div>'
+          + '<div class="cs8-right">'
+            + '<button class="cs8-theme" id="csTheme">'+(isDark?'☀️':'🌙')+'</button>'
+            + '<button class="cs8-export" id="csExp">'+svgDown()+'导出图片</button>'
           + '</div>'
         + '</div>'
-        + (allTypes.length > 1 ? '<div class="cs7-filters" id="csFilters">'+fHtml+'</div>' : '')
-        + '<div class="cs7-scroll" id="csScroll">'
-          + '<table class="cs7-table" id="csTable"><thead>'+hdr+'</thead><tbody>'+tableBody+'</tbody></table>'
-        + '</div>'
-        + '<div class="cs7-cards" id="csCards">'+cardsHtml+'</div>';
+        + (allTypes.length > 1 ? '<div class="cs8-filters" id="csFilters">'+fHtml+'</div>' : '')
+        + '<div class="cs8-table-wrap"><table class="cs8-table" id="csTable">'
+          + colGroup
+          + '<thead><tr>'+colHeaders+'</tr></thead>'
+          + '<tbody>'+bodyHtml+'</tbody>'
+        + '</table></div>';
 
-      /* 事件绑定 */
-      var prev   = EL.querySelector('#csPrev');
-      var next   = EL.querySelector('#csNext');
-      var exp    = EL.querySelector('#csExp');
-      var themeB = EL.querySelector('#csTheme');
-      var fbox   = EL.querySelector('#csFilters');
+      // 事件
+      var prev    = EL.querySelector('#csPrev');
+      var next    = EL.querySelector('#csNext');
+      var exp     = EL.querySelector('#csExp');
+      var themeB  = EL.querySelector('#csTheme');
+      var fbox    = EL.querySelector('#csFilters');
 
       if (prev)   prev.addEventListener('click', function () { render(i-1); });
       if (next)   next.addEventListener('click', function () { render(i+1); });
       if (exp)    exp.addEventListener('click',  function () { exportPng(key); });
       if (themeB) themeB.addEventListener('click', function () {
         isDark = !isDark;
-        try { localStorage.setItem('cecp-theme', isDark ? 'dark' : 'light'); } catch(e){}
+        try { localStorage.setItem('cecp-theme', isDark?'dark':'light'); } catch(e){}
         applyTheme();
-        render(i);   // 重新渲染颜色
+        render(i);
       });
-      if (fbox) fbox.querySelectorAll('.cs7-filter-btn').forEach(function (b) {
+      if (fbox) fbox.querySelectorAll('.cs8-filter').forEach(function (b) {
         b.addEventListener('click', function () {
           var tp = this.dataset.type;
           var ix = activeTypes.indexOf(tp);
@@ -623,54 +478,50 @@
     }
   }
 
-  /* ── 渲染单元格 td (桌面) ─────────────────────────────────────────────────── */
-  function renderTd(row, val) {
-    if (row.type === 'reading') {
+  /* ── 渲染 td ──────────────────────────────────────────────────────────────── */
+  function renderTd(col, val, rowBg, topBorder) {
+    var style = 'background:'+rowBg+';'+(topBorder||'');
+    var cls = 'cs8-cell';
+
+    if (col.type === 'reading') {
       var rd = parseReading(val);
-      if (!rd || !rd.name) return '<td class="cs7-cell-rd"><span class="cs7-empty">—</span></td>';
-      return '<td class="cs7-cell-rd">'
-        + '<span class="cs7-rd-ref">'+esc(rd.ref)+'</span>'
+      if (!rd || !rd.name) {
+        return '<td class="'+cls+'" style="'+style+'"><span class="cs8-empty">—</span></td>';
+      }
+      return '<td class="'+cls+'" style="'+style+'">'
+        + '<span class="cs8-rd-ref">'+esc(rd.ref)+'</span>'
         + mkBadge(rd.name)
         + '</td>';
     }
-    if (row.type === 'note') {
-      if (!val) return '<td class="cs7-cell-note"><span class="cs7-empty">—</span></td>';
+
+    if (col.type === 'note') {
+      if (!val) return '<td class="'+cls+'" style="'+style+'"><span class="cs8-empty">—</span></td>';
       var m = val.match(/^(证道[：:]\s*)(.+)$/);
-      if (m) return '<td class="cs7-cell-note"><span class="cs7-note-pfx">'+esc(m[1])+'</span>'+mkBadge(m[2])+'</td>';
-      return '<td class="cs7-cell-note">'+mkBadge(val)+'</td>';
+      if (m) {
+        return '<td class="'+cls+'" style="'+style+'">'
+          + '<span class="cs8-note-pfx">'+esc(m[1])+'</span>'
+          + mkBadge(m[2])
+          + '</td>';
+      }
+      return '<td class="'+cls+'" style="'+style+'">'+mkBadge(val)+'</td>';
     }
-    if (!val) return '<td class="cs7-cell"><span class="cs7-empty">—</span></td>';
+
+    // 普通 badges
+    if (!val) return '<td class="'+cls+'" style="'+style+'"><span class="cs8-empty">—</span></td>';
     var names = val.split(/[\/\n]/).map(function (n) { return n.trim(); }).filter(Boolean);
-    return '<td class="cs7-cell">'+names.map(mkBadge).join('')+'</td>';
+    return '<td class="'+cls+'" style="'+style+'">'+names.map(mkBadge).join('')+'</td>';
   }
 
-  /* ── 渲染单元格值 (移动卡片复用) ──────────────────────────────────────────── */
-  function renderValue(row, val) {
-    if (row.type === 'reading') {
-      var rd = parseReading(val);
-      if (!rd || !rd.name) return '<span class="cs7-empty">—</span>';
-      return '<span class="cs7-rd-ref" style="margin-right:4px">'+esc(rd.ref)+'</span>'+mkBadge(rd.name);
-    }
-    if (row.type === 'note') {
-      if (!val) return '<span class="cs7-empty">—</span>';
-      var m = val.match(/^(证道[：:]\s*)(.+)$/);
-      if (m) return '<span class="cs7-note-pfx" style="margin-right:4px">'+esc(m[1])+'</span>'+mkBadge(m[2]);
-      return mkBadge(val);
-    }
-    if (!val) return '<span class="cs7-empty">—</span>';
-    return val.split(/[\/\n]/).map(function (n) { return n.trim(); }).filter(Boolean).map(mkBadge).join('');
-  }
-
-  /* ── Badge 工厂 ───────────────────────────────────────────────────────────── */
+  /* ── Badge ────────────────────────────────────────────────────────────────── */
   function mkBadge(name) {
     if (!name) return '';
-    var c = badgeColor(name, isDark);
-    if (!c) return '<span class="cs7-badge" style="background:var(--cs-bg2);color:var(--cs-label)">'+esc(name)+'</span>';
-    return '<span class="cs7-badge" data-n="'+esc(name)+'" style="background:'+c[0]+';color:'+c[1]+'">'+esc(name)+'</span>';
+    var c = badgeColor(name);
+    if (!c) return '<span class="cs8-badge" style="background:var(--bg2);color:var(--label)">'+esc(name)+'</span>';
+    return '<span class="cs8-badge" data-n="'+esc(name)+'" style="background:'+c[0]+';color:'+c[1]+'">'+esc(name)+'</span>';
   }
 
-  /* ── 高亮逻辑 ─────────────────────────────────────────────────────────────── */
-  function allBadges() { return EL.querySelectorAll('.cs7-badge'); }
+  /* ── 高亮 ─────────────────────────────────────────────────────────────────── */
+  function allBadges() { return EL.querySelectorAll('.cs8-badge'); }
 
   function applyHL(name, isLock) {
     allBadges().forEach(function (b) {
@@ -683,7 +534,6 @@
   function clearHL() {
     allBadges().forEach(function (b) { b.classList.remove('lit','dim','locked','ldim'); });
   }
-
   function bindHighlight() {
     allBadges().forEach(function (b) {
       var name = b.dataset.n || b.textContent;
@@ -698,24 +548,21 @@
     EL.addEventListener('click', function () { if (locked) { locked = null; clearHL(); } });
   }
 
-  /* ── 导出 PNG ─────────────────────────────────────────────────────────────── */
+  /* ── 导出 ─────────────────────────────────────────────────────────────────── */
   function exportPng(key) {
     var btn   = EL.querySelector('#csExp');
-    var wrap  = EL.querySelector('#csScroll');
     var table = EL.querySelector('#csTable');
     if (!btn || !table) return;
     btn.disabled = true; btn.textContent = '处理中…';
 
     function run() {
-      var ov = wrap.style.overflow; wrap.style.overflow = 'visible';
-      window.html2canvas(table, { backgroundColor: isDark ? '#0e0e0e' : '#ffffff', scale: 2, useCORS: true, logging: false })
+      window.html2canvas(table, { backgroundColor: isDark?'#0e0e0e':'#fff', scale: 2, useCORS: true, logging: false })
         .then(function (c) {
-          wrap.style.overflow = ov;
           var a = document.createElement('a');
           a.download = '服事安排_'+key+'.png'; a.href = c.toDataURL('image/png'); a.click();
           btn.innerHTML = svgDown()+'导出图片'; btn.disabled = false;
         })
-        .catch(function () { wrap.style.overflow = ov; btn.textContent = '导出失败'; btn.disabled = false; });
+        .catch(function () { btn.textContent = '导出失败'; btn.disabled = false; });
     }
 
     if (!window.html2canvas) {
@@ -726,15 +573,24 @@
   }
 
   /* ── 工具 ─────────────────────────────────────────────────────────────────── */
-  function tc4(type) {
-    return (isDark ? TYPE_DARK : TYPE_LIGHT)[type] || (isDark ? TC_DEF_DARK : TC_DEF_LIGHT);
+  var WEEK_DAYS = ['日','一','二','三','四','五','六'];
+  var MONTHS_CN = ['一','二','三','四','五','六','七','八','九','十','十一','十二'];
+
+  function getTc(type) {
+    return (isDark ? TYPE_DARK : TYPE_LIGHT)[type] || (isDark ? TC_DEF_D : TC_DEF_L);
   }
   function parseReading(v) {
     if (!v) return null;
     var m = v.match(/^(诗\d+)\s+(.+)$/);
     return m ? { ref: m[1], name: m[2].trim() } : { ref: v, name: '' };
   }
-  function dayStr(s) { var m = s && s.match(/\d{4}[-\/]\d{1,2}[-\/](\d{1,2})/); return m ? +m[1]+'日' : s; }
+  function dateShort(s) {
+    var m = s && s.match(/\d{4}[-\/](\d{1,2})[-\/](\d{1,2})/);
+    return m ? parseInt(m[1],10)+'月'+parseInt(m[2],10)+'日' : s;
+  }
+  function weekday(s) {
+    try { var d = new Date(s); return '周'+WEEK_DAYS[d.getDay()]; } catch(e) { return ''; }
+  }
   function mlabel(k) { var p = k.split('-'); return p[0]+'年'+parseInt(p[1],10)+'月'; }
   function pad(n) { return n < 10 ? '0'+n : ''+n; }
   function esc(s) {
