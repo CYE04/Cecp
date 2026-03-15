@@ -369,11 +369,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .prev-sec-name{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .prev-sec-name::after{content:'';flex:1;height:1px;background:var(--border);}
 .prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;padding-bottom:2px;}
-.prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
+.prev-seg{display:inline-flex;flex-direction:column;align-items:center;margin-right:4px;flex-shrink:0;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
-.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);white-space:pre;}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
 .p-lyric2{opacity:0.65;margin-top:1px;}
 
