@@ -395,21 +395,23 @@ body.cecp-focus-page .row {
   gap:0 !important;
 }
 
-/* ══ Full-bleed 核心：让组件自己突破父容器 ══
-   无论父容器有多少 padding / max-width，
-   这条规则让 #cecp-schedule 强制铺满整个视口宽度。 */
+/* ══ Full-bleed 核心：负 margin 法突破父容器 ══
+   用 calc(50% - 50vw) 向左延伸到视口边缘，
+   不依赖 position/transform，不会被 overflow:hidden 裁剪。 */
 body.cecp-focus-page #cecp-schedule {
-  position:relative !important;
   width:100vw !important;
   max-width:100vw !important;
-  left:50% !important;
-  transform:translateX(-50%) !important;
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+  margin-top:0 !important;
+  margin-bottom:0 !important;
   border-radius:0 !important;
   border-left:none !important;
   border-right:none !important;
   border-top:none !important;
-  margin-top:0 !important;
-  margin-bottom:0 !important;
+  position:static !important;
+  left:auto !important;
+  transform:none !important;
 }
 
 body.cecp-focus-page #cecp-schedule .cec-wrap {
