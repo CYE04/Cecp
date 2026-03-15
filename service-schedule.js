@@ -307,12 +307,15 @@
 
   function applyFocusPageMode() {
     document.body.classList.add('cecp-focus-page');
+    /* 防止 full-bleed 产生水平滚动条 */
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflowX = 'hidden';
 
     if (!document.getElementById('_cecp_focus_page_style_final')) {
       var fs = document.createElement('style');
       fs.id = '_cecp_focus_page_style_final';
       fs.textContent = `
-/* 隐藏常见侧边栏 / 目录 / 推荐 / 评论 */
+/* ── 隐藏侧边栏 / 目录 / 推荐 / 评论 ── */
 body.cecp-focus-page .toc-container,
 body.cecp-focus-page .toc,
 body.cecp-focus-page .post-aside,
@@ -337,50 +340,19 @@ body.cecp-focus-page .share-bar,
 body.cecp-focus-page .ad-wrap {
   display:none !important;
   visibility:hidden !important;
-  width:0 !important;
-  min-width:0 !important;
-  max-width:0 !important;
-  height:0 !important;
-  min-height:0 !important;
-  max-height:0 !important;
+  width:0 !important; min-width:0 !important; max-width:0 !important;
+  height:0 !important; min-height:0 !important; max-height:0 !important;
   overflow:hidden !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
+  margin:0 !important; padding:0 !important; border:0 !important;
 }
 
-/* 页面主容器强制铺满 */
-body.cecp-focus-page .site-content,
-body.cecp-focus-page .main-content,
-body.cecp-focus-page .content-wrapper,
-body.cecp-focus-page .post-content-wrapper,
-body.cecp-focus-page .halo-main,
-body.cecp-focus-page .container,
-body.cecp-focus-page .container-fluid,
-body.cecp-focus-page .row {
-  display:block !important;
-  grid-template-columns:1fr !important;
-  max-width:100vw !important;
-  width:100vw !important;
-  margin-left:calc(50% - 50vw) !important;
-  margin-right:calc(50% - 50vw) !important;
-  padding-left:0 !important;
-  padding-right:0 !important;
-  gap:0 !important;
-}
-
-/* 所有列强制100% */
+/* ── 所有列 / flex 子项强制100% ── */
 body.cecp-focus-page [class*="col-"],
 body.cecp-focus-page .col,
-body.cecp-focus-page .col-lg-8,
-body.cecp-focus-page .col-lg-9,
-body.cecp-focus-page .col-lg-10,
-body.cecp-focus-page .col-md-8,
-body.cecp-focus-page .col-md-9,
-body.cecp-focus-page .content-col,
-body.cecp-focus-page .main-col,
-body.cecp-focus-page .post-main,
-body.cecp-focus-page .article-main {
+body.cecp-focus-page .col-lg-8,body.cecp-focus-page .col-lg-9,body.cecp-focus-page .col-lg-10,
+body.cecp-focus-page .col-md-8,body.cecp-focus-page .col-md-9,
+body.cecp-focus-page .content-col,body.cecp-focus-page .main-col,
+body.cecp-focus-page .post-main,body.cecp-focus-page .article-main {
   flex:0 0 100% !important;
   max-width:100% !important;
   width:100% !important;
@@ -388,7 +360,7 @@ body.cecp-focus-page .article-main {
   margin-right:0 !important;
 }
 
-/* 正文和文章容器铺满 */
+/* ── 正文 / 文章容器去除内边距 ── */
 body.cecp-focus-page article,
 body.cecp-focus-page .post,
 body.cecp-focus-page .post-detail,
@@ -399,21 +371,83 @@ body.cecp-focus-page .entry-content,
 body.cecp-focus-page .article-content {
   max-width:100% !important;
   width:100% !important;
-  margin:0 !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
   padding-left:0 !important;
   padding-right:0 !important;
 }
 
-/* 当前组件铺满 */
-body.cecp-focus-page #cecp-schedule{
+/* ── 页面主容器平铺 ── */
+body.cecp-focus-page .site-content,
+body.cecp-focus-page .main-content,
+body.cecp-focus-page .content-wrapper,
+body.cecp-focus-page .post-content-wrapper,
+body.cecp-focus-page .halo-main,
+body.cecp-focus-page .container,
+body.cecp-focus-page .container-fluid,
+body.cecp-focus-page .row {
+  display:block !important;
+  grid-template-columns:1fr !important;
+  max-width:100% !important;
+  width:100% !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+  gap:0 !important;
+}
+
+/* ══ Full-bleed 核心：让组件自己突破父容器 ══
+   无论父容器有多少 padding / max-width，
+   这条规则让 #cecp-schedule 强制铺满整个视口宽度。 */
+body.cecp-focus-page #cecp-schedule {
+  position:relative !important;
+  width:100vw !important;
+  max-width:100vw !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  border-radius:0 !important;
+  border-left:none !important;
+  border-right:none !important;
+  border-top:none !important;
+  margin-top:0 !important;
+  margin-bottom:0 !important;
+}
+
+body.cecp-focus-page #cecp-schedule .cec-wrap {
   width:100% !important;
   max-width:100% !important;
 }
-body.cecp-focus-page #cecp-schedule .cec-wrap{
-  width:100% !important;
-}
-body.cecp-focus-page #cecp-schedule .cec-tbl{
+body.cecp-focus-page #cecp-schedule .cec-tbl {
   min-width:100% !important;
+}
+
+/* ── 响应式：手机 ── */
+@media (max-width:600px) {
+  body.cecp-focus-page #cecp-schedule .cec-top,
+  body.cecp-focus-page #cecp-schedule .cec-typebar {
+    padding:8px 10px;
+    gap:6px;
+  }
+  body.cecp-focus-page #cecp-schedule .cec-btn-month,
+  body.cecp-focus-page #cecp-schedule .cec-btn-arr,
+  body.cecp-focus-page #cecp-schedule .cec-btn-type {
+    height:30px;
+    font-size:12px;
+  }
+  body.cecp-focus-page #cecp-schedule .cec-cell {
+    min-width:90px;
+    height:66px;
+    padding:6px;
+  }
+  body.cecp-focus-page #cecp-schedule .cec-badge {
+    font-size:10px;
+    padding:4px 8px;
+  }
+  body.cecp-focus-page #cecp-schedule .cec-corner,
+  body.cecp-focus-page #cecp-schedule .cec-h,
+  body.cecp-focus-page #cecp-schedule .cec-rowlbl {
+    padding:8px 6px;
+    font-size:11px;
+  }
 }
 `;
       document.head.appendChild(fs);
@@ -422,6 +456,13 @@ body.cecp-focus-page #cecp-schedule .cec-tbl{
     setTimeout(forceHideSideStuff, 0);
     setTimeout(forceHideSideStuff, 300);
     setTimeout(forceHideSideStuff, 1000);
+    setTimeout(forceHideSideStuff, 2500);
+
+    /* MutationObserver：防止 CMS 动态注入侧边栏 */
+    if (window.MutationObserver) {
+      var _obs = new MutationObserver(function () { forceHideSideStuff(); });
+      _obs.observe(document.body, { childList: true, subtree: true });
+    }
   }
 
   function forceHideSideStuff() {
