@@ -372,7 +372,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
-.p-lyric{font-family:'Space Mono',monospace;font-size:22px;color:var(--ink2);white-space:pre;}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);white-space:pre;}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
 .p-lyric2{opacity:0.65;margin-top:1px;}
 
@@ -384,7 +384,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .jp-dot-top{height:12px;justify-content:flex-end;}.jp-dot-bot{height:12px;justify-content:flex-start;}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;}
-.jp-num{font-size:22px;line-height:1;display:inline-block;text-align:center;width:1em;}
+.jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em;}
 .jp-aug{position:absolute;right:-0.42em;top:0.1em;font-size:10px;line-height:1;pointer-events:none;}
 .jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--ink);}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
