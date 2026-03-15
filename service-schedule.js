@@ -1,12 +1,6 @@
 /**
  * service-schedule.js
- * 年份安全版：
- * - 月份识别：2026年3月
- * - 自动锁定当前年月
- * - 无“全部”
- * - 类型顺序：青年团契 / 主日下午 / 主日晚上 / 祷告会
- * - 普通类型：竖=服事安排，横=周次
- * - 祷告会：竖=周次，横=周三/周六
+ * 年份安全版 + 同名高亮恢复
  */
 (function () {
   'use strict';
@@ -34,9 +28,11 @@
     ['#416746','#9be28e'],['#6b5038','#efad59'],['#5f4450','#e7a4bb'],['#355a56','#75d1c2']
   ];
 
-  if (!document.getElementById('_cecp_yearsafe_style')) {
+  var lockedName = null;
+
+  if (!document.getElementById('_cecp_yearsafe_style_v2')) {
     var st = document.createElement('style');
-    st.id = '_cecp_yearsafe_style';
+    st.id = '_cecp_yearsafe_style_v2';
     st.textContent = `
 #cecp-schedule{
   font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
@@ -110,6 +106,18 @@
   font-size:11px;font-weight:800;line-height:1.2;white-space:nowrap;
   transition:.12s ease;user-select:none;
 }
+.cec-badge.lit{
+  transform:translateY(-1px);
+  filter:brightness(1.08);
+  box-shadow:0 0 0 1px rgba(255,255,255,.18);
+}
+.cec-badge.dim{opacity:.18}
+.cec-badge.locked{
+  transform:translateY(-1px);
+  filter:brightness(1.12);
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.30);
+}
+.cec-badge.ldim{opacity:.10}
 .cec-note,.cec-reading{
   min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
 }
@@ -218,9 +226,12 @@
       EL.querySelectorAll('[data-type]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           activeType = this.getAttribute('data-type');
+          lockedName = null;
           render();
         });
       });
+
+      bindHighlight();
     }
   }
 
@@ -249,7 +260,7 @@
       weeks.forEach(function (w) {
         var item = filtered.find(function (r) { return tv(r.week) === w; });
         var val = item ? item[rowDef.key] : '';
-        tbody += renderMatrixCell(rowDef.kind, val, item);
+        tbody += renderMatrixCell(rowDef.kind, val);
       });
 
       tbody += '</tr>';
@@ -378,13 +389,67 @@
 
   function mkBadge(name) {
     var c = badgeColor(name);
-    return '<span class="cec-badge" style="background:' + c[0] + ';color:' + c[1] + '">' + esc(name) + '</span>';
+    return '<span class="cec-badge" data-name="' + esc(name) + '" style="background:' + c[0] + ';color:' + c[1] + '">' + esc(name) + '</span>';
   }
 
   function badgeColor(name) {
     var h = 0;
     for (var i = 0; i < name.length; i++) h = (Math.imul(31, h) + name.charCodeAt(i)) | 0;
     return PAL[Math.abs(h) % PAL.length];
+  }
+
+  function bindHighlight() {
+    var badges = EL.querySelectorAll('.cec-badge');
+
+    badges.forEach(function (b) {
+      var name = b.getAttribute('data-name') || b.textContent;
+
+      b.addEventListener('mouseenter', function () {
+        if (!lockedName) applyHighlight(name, false);
+      });
+
+      b.addEventListener('mouseleave', function () {
+        if (!lockedName) clearHighlight();
+      });
+
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (lockedName === name) {
+          lockedName = null;
+          clearHighlight();
+        } else {
+          lockedName = name;
+          applyHighlight(name, true);
+        }
+      });
+    });
+
+    EL.addEventListener('click', function () {
+      if (lockedName) {
+        lockedName = null;
+        clearHighlight();
+      }
+    });
+  }
+
+  function applyHighlight(name, locked) {
+    var badges = EL.querySelectorAll('.cec-badge');
+    badges.forEach(function (b) {
+      var n = b.getAttribute('data-name') || b.textContent;
+      b.classList.remove('lit', 'dim', 'locked', 'ldim');
+      if (n === name) {
+        b.classList.add(locked ? 'locked' : 'lit');
+      } else {
+        b.classList.add(locked ? 'ldim' : 'dim');
+      }
+    });
+  }
+
+  function clearHighlight() {
+    var badges = EL.querySelectorAll('.cec-badge');
+    badges.forEach(function (b) {
+      b.classList.remove('lit', 'dim', 'locked', 'ldim');
+    });
   }
 
   function pickCurrentMonth(months) {
