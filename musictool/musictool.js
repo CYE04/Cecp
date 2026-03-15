@@ -346,9 +346,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
   );
 }
 #previewWrap{
-  width:100%;
-  max-width:100%;
-  overflow-x:auto;
+  width:694px; /* 平板竖屏(768px)实测 sw-lb 宽度 */
+  max-width:calc(100% - 2px);
   padding:12px 0;
   min-height:200px;
   border-left:1px solid rgba(255,255,255,0.15);
@@ -368,12 +367,12 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .prev-sec{margin-bottom:20px;}
 .prev-sec-name{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .prev-sec-name::after{content:'';flex:1;height:1px;background:var(--border);}
-.prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;padding-bottom:2px;}
-.prev-seg{display:inline-flex;flex-direction:column;align-items:center;margin-right:4px;flex-shrink:0;}
+.prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
+.prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
-.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);white-space:pre;}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
 .p-lyric2{opacity:0.65;margin-top:1px;}
 
@@ -1082,7 +1081,7 @@ function renderEditor(){
         inpL.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric=this.value;renderPreview();};})(si,li,gi);
         tdL.appendChild(inpL);
         var inpL2=document.createElement('input');inpL2.className='inp-lyric';inpL2.value=seg.lyric2||'';
-        inpL2.placeholder='下行…';inpL2.style.cssText='display:block;margin-top:2px;opacity:0.7;';
+        inpL2.placeholder='下行…';inpL2.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
         inpL2.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric2=this.value;renderPreview();};})(si,li,gi);
         tdL.appendChild(inpL2);tr.appendChild(tdL);
 
@@ -1218,7 +1217,28 @@ function renderNStr(nStr){
   return div;
 }
 function fitPreview(){
-  // 不再缩放，由 #previewWrap overflow-x:auto 处理
+  requestAnimationFrame(function(){
+    var wrap=document.getElementById('previewWrap');
+    var inner=wrap.querySelector('.prev-inner');
+    if(!inner)return;
+    inner.style.transform='';inner.style.transformOrigin='';inner.style.width='';inner.style.marginBottom='';
+    var avail=wrap.clientWidth;
+    if(!avail)return;
+    var maxW=0;
+    inner.querySelectorAll('.prev-row').forEach(function(row){
+      row.style.display='inline-flex';
+      if(row.scrollWidth>maxW)maxW=row.scrollWidth;
+      row.style.display='';
+    });
+    if(maxW>avail){
+      var scale=avail/maxW;
+      inner.style.transform='scale('+scale+')';
+      inner.style.transformOrigin='left top';
+      inner.style.width=maxW+'px';
+      var h=inner.offsetHeight;
+      inner.style.marginBottom=(h*(scale-1))+'px';
+    }
+  });
 }
 function renderPreview(){
   var wrap=document.getElementById('previewWrap');wrap.innerHTML='';
