@@ -384,7 +384,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .jp-dot-top{height:12px;justify-content:flex-end;}.jp-dot-bot{height:12px;justify-content:flex-start;}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;}
-.jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em;}
+.jp-num{font-size:22px;line-height:1;display:inline-block;text-align:center;width:1em;}
 .jp-aug{position:absolute;right:-0.42em;top:0.1em;font-size:10px;line-height:1;pointer-events:none;}
 .jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--ink);}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
