@@ -14,7 +14,7 @@
   var WEEK_ORDER = ['第一周', '第二周', '第三周', '第四周', '第五周'];
 
   var TYPE_C = {
-    '主日下午': { accent:'#4a8df0', bg:'#1b3b73', tx:'#9fc4ff' },
+    '主日下午': { accent:'#fbff00', bg:'#b9a50d', tx:'#fffa9f' },
     '主日晚上': { accent:'#8d49df', bg:'#3f226c', tx:'#c9a0ff' },
     '青年团契': { accent:'#33b46d', bg:'#1b5633', tx:'#8be3ad' },
     '祷告会':   { accent:'#bb7dff', bg:'#4d2d6d', tx:'#e3c8ff' }
