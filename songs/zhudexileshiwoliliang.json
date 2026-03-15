@@ -1,7 +1,7 @@
 {
   "version": "1",
   "created": "YuEn",
-  "createdTime": "2026-03-15 14:51:29",
+  "createdTime": "2026-03-15 15:58:09",
   "id": "zhudexileshiwoliliang",
   "title": "主的喜乐是我力量",
   "artist": "赞美之泉",
@@ -19,17 +19,17 @@
     "name": "主歌",
     "lines": [
       [
-        {"chord":"Emaj7","n":"0 1 7,_ 1 ([ 5,_","lyric":"ㅤ主的喜乐"},
+        {"chord":"Emaj7","n":"0 1 7,_ 1 ([ 5,_","lyric":"   主的喜乐"},
         {"chord":"","lyric":"｜"},
-        {"chord":"","n":"]) 5,_ 1 7,_ 1 ([ 6,_","lyric":"ㅤ是我力量,"},
+        {"chord":"","n":"]) 5,_ 1 7,_ 1 ([ 6,_","lyric":"   是我力量,"},
         {"chord":"","lyric":"｜"},
-        {"chord":"Amaj7","n":"]) 6, ([ - - -","lyric":"ㅤ"},
+        {"chord":"Amaj7","n":"]) 6, ([ - - -","lyric":" "},
         {"chord":"","lyric":"｜"},
-        {"chord":"","n":"]) 6, - - 0","lyric":"ㅤ"},
+        {"chord":"","n":"]) 6, - - 0","lyric":" "},
         {"chord":"","lyric":"｜"},
-        {"chord":"Emaj7","n":"0 1 7,_ 1 ([ 5,_","lyric":"ㅤ你的救恩"},
+        {"chord":"Emaj7","n":"0 1 7,_ 1 ([ 5,_","lyric":"   你的救恩"},
         {"chord":"","lyric":"｜"},
-        {"chord":"","n":"]) 5,","lyric":"ㅤ"},
+        {"chord":"","n":"]) 5,","lyric":" "},
         {"chord":"","n":"1 2_ 3 ( 2_ sp sp )","lyric":"是我盼望｜"}
       ],
       [
