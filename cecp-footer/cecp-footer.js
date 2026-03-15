@@ -1066,18 +1066,3 @@ else updateFab();
 initTourWhenReady();
 })();
 
-/* ===== YuEn 水印 ===== */
-(function(){
-  function addWatermark(){
-    if(document.getElementById('yuen-watermark')) return;
-    var el = document.createElement('div');
-    el.id = 'yuen-watermark';
-    el.textContent = 'YuEn';
-    document.body.appendChild(el);
-  }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', addWatermark);
-  } else {
-    addWatermark();
-  }
-})();

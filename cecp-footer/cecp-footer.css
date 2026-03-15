@@ -451,21 +451,6 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   .rt7-btn{ padding:8px 11px; font-size:12px; }
 }
 
-/* ===== YuEn 姘村嵃 ===== */
-#yuen-watermark {
-  position: fixed;
-  bottom: 10px;
-  right: 13px;
-  z-index: 9999;
-  font-family: 'Georgia', serif;
-  font-size: 11px;
-  font-style: italic;
-  letter-spacing: 0.5px;
-  color: rgba(0, 0, 0, 0.13);
-  pointer-events: none;
-  user-select: none;
-  mix-blend-mode: multiply;
-}
 
 /* ===== 鎶曞睆妯″紡 ===== */
 .hbw.hbw-pres .hbw-panel {
