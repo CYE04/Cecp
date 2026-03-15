@@ -1,6 +1,6 @@
 /**
  * service-schedule.js
- * 年份安全版 + 同名高亮恢复
+ * 年份安全版 + 同名高亮恢复 + 自动聚焦页面（隐藏侧边栏等）
  */
 (function () {
   'use strict';
@@ -30,9 +30,11 @@
 
   var lockedName = null;
 
-  if (!document.getElementById('_cecp_yearsafe_style_v2')) {
+  applyFocusPageMode();
+
+  if (!document.getElementById('_cecp_yearsafe_style_v3')) {
     var st = document.createElement('style');
-    st.id = '_cecp_yearsafe_style_v2';
+    st.id = '_cecp_yearsafe_style_v3';
     st.textContent = `
 #cecp-schedule{
   font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
@@ -163,6 +165,85 @@
       EL.innerHTML = '<div class="cec-err">⚠ ' + esc(e.message) + '</div>';
     });
 
+  function applyFocusPageMode() {
+    document.body.classList.add('cecp-focus-page');
+
+    if (!document.getElementById('_cecp_focus_page_style')) {
+      var fs = document.createElement('style');
+      fs.id = '_cecp_focus_page_style';
+      fs.textContent = `
+body.cecp-focus-page .toc-container,
+body.cecp-focus-page .post-aside,
+body.cecp-focus-page .sidebar,
+body.cecp-focus-page .right-sidebar,
+body.cecp-focus-page .left-sidebar,
+body.cecp-focus-page .widget,
+body.cecp-focus-page .related-posts,
+body.cecp-focus-page .post-related,
+body.cecp-focus-page .comment-area,
+body.cecp-focus-page .comments,
+body.cecp-focus-page .post-comments,
+body.cecp-focus-page .post-navigation,
+body.cecp-focus-page .prev-next,
+body.cecp-focus-page .recommended-posts,
+body.cecp-focus-page .ad-wrap,
+body.cecp-focus-page .share-bar,
+body.cecp-focus-page .toc,
+body.cecp-focus-page .halo-aside,
+body.cecp-focus-page .halo-sidebar {
+  display:none !important;
+}
+
+body.cecp-focus-page .container,
+body.cecp-focus-page .main,
+body.cecp-focus-page .content,
+body.cecp-focus-page .content-wrapper,
+body.cecp-focus-page .post-content-wrapper,
+body.cecp-focus-page .post-container,
+body.cecp-focus-page .article-container,
+body.cecp-focus-page .site-content,
+body.cecp-focus-page .row,
+body.cecp-focus-page .halo-main,
+body.cecp-focus-page .post,
+body.cecp-focus-page .post-detail,
+body.cecp-focus-page .post-content {
+  max-width:100% !important;
+  width:100% !important;
+}
+
+body.cecp-focus-page .col,
+body.cecp-focus-page .col-lg-8,
+body.cecp-focus-page .col-lg-9,
+body.cecp-focus-page .col-md-8,
+body.cecp-focus-page .col-md-9,
+body.cecp-focus-page .content-col,
+body.cecp-focus-page .main-col,
+body.cecp-focus-page .post-main,
+body.cecp-focus-page .article-main {
+  flex:0 0 100% !important;
+  max-width:100% !important;
+  width:100% !important;
+}
+
+body.cecp-focus-page .post-content,
+body.cecp-focus-page .entry-content,
+body.cecp-focus-page .article-content {
+  margin:0 auto !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+
+body.cecp-focus-page .site-content,
+body.cecp-focus-page .main-content,
+body.cecp-focus-page .post-content-wrapper {
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+`;
+      document.head.appendChild(fs);
+    }
+  }
+
   function boot(rows) {
     if (!rows.length) {
       EL.innerHTML = '<div class="cec-state">暂无数据</div>';
@@ -211,16 +292,16 @@
       EL.innerHTML = top + typebar + body;
 
       bind('#mPrev', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; render(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; lockedName = null; render(); }
       });
       bind('#mPrevText', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; render(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; lockedName = null; render(); }
       });
       bind('#mNext', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; render(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; lockedName = null; render(); }
       });
       bind('#mNextText', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; render(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; lockedName = null; render(); }
       });
 
       EL.querySelectorAll('[data-type]').forEach(function (btn) {
@@ -232,6 +313,7 @@
       });
 
       bindHighlight();
+      if (lockedName) applyHighlight(lockedName, true);
     }
   }
 
