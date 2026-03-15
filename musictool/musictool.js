@@ -372,7 +372,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
-.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);white-space:pre;}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
 .p-lyric2{opacity:0.65;margin-top:1px;}
 
@@ -1151,6 +1151,7 @@ function setDots(el,cnt){
 }
 function parseJpToken(tok){
   if(!tok||tok==='-'||tok==='|'||tok==='||'||tok===' ')return makeJpPlain(tok);
+  if(tok==='0')return makeJpPlain('0');
   if(tok==='sp'||tok==='sp_'||tok==='sp__'){
     var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
     var el=parseJpToken(fk);
@@ -1680,14 +1681,14 @@ $('mt-help-btn').onclick = () => {
 const audio = $('mt-audio');
 let lrcData = [], autoScroll = true, curIdx = -1;
 
-audio.addEventListener('timeupdate', () => { updateTime(); updateProg(); if(autoScroll) highlightPlaying(); });
+audio.addEventListener('timeupdate', () => { updateTimeClock(); updateProg(); if(autoScroll) highlightPlaying(); });
 audio.addEventListener('play',  updatePlayBtn);
 audio.addEventListener('pause', updatePlayBtn);
 audio.addEventListener('ended', updatePlayBtn);
 
 function fmt(s){ const m=Math.floor(s/60),sec=s%60; return String(m).padStart(2,'0')+':'+sec.toFixed(2).padStart(5,'0'); }
 function fmtLRC(s){ return '['+fmt(s)+']'; }
-function updateTime(){ $('mt-time').textContent='['+fmt(audio.currentTime)+']'; }
+function updateTimeClock(){ $('mt-time').textContent='['+fmt(audio.currentTime)+']'; }
 function updateProg(){ if(audio.duration) $('mt-progfill').style.width=(audio.currentTime/audio.duration*100)+'%'; }
 function updatePlayBtn(){ $('mt-playbtn').textContent = audio.paused ? '▶' : '⏸'; }
 
