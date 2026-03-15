@@ -1,6 +1,6 @@
 /**
  * service-schedule.js
- * 年份安全版 + 同名高亮恢复
+ * 年份安全版 + 同名高亮 + 强制聚焦页面 + 正文铺满
  */
 (function () {
   'use strict';
@@ -14,7 +14,7 @@
   var WEEK_ORDER = ['第一周', '第二周', '第三周', '第四周', '第五周'];
 
   var TYPE_C = {
-    '主日下午': { accent:'#fbff00', bg:'#b9a50d', tx:'#fffa9f'},
+    '主日下午': { accent:'#fbff00', bg:'#b9a50d', tx:'#fffa9f' },
     '主日晚上': { accent:'#8d49df', bg:'#3f226c', tx:'#c9a0ff' },
     '青年团契': { accent:'#33b46d', bg:'#1b5633', tx:'#8be3ad' },
     '祷告会':   { accent:'#bb7dff', bg:'#4d2d6d', tx:'#e3c8ff' }
@@ -30,114 +30,256 @@
 
   var lockedName = null;
 
-  if (!document.getElementById('_cecp_yearsafe_style_v2')) {
+  applyFocusPageMode();
+
+  if (!document.getElementById('_cecp_yearsafe_style_final')) {
     var st = document.createElement('style');
-    st.id = '_cecp_yearsafe_style_v2';
+    st.id = '_cecp_yearsafe_style_final';
     st.textContent = `
 #cecp-schedule{
   font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
   width:100%;
+  max-width:100%;
   background:#111214;
   color:#e8ebf0;
   border:1px solid #343943;
   border-radius:16px;
   overflow:hidden;
+  box-sizing:border-box;
 }
 #cecp-schedule *{box-sizing:border-box}
-.cec-top,.cec-sub,.cec-typebar{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  padding:10px 12px;border-bottom:1px solid #262a31;background:#17191d;
+
+.cec-top,.cec-typebar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:10px 12px;
+  border-bottom:1px solid #262a31;
+  background:#17191d;
 }
-.cec-sub,.cec-typebar{background:#14171d}
+.cec-typebar{background:#14171d}
+
 .cec-btn{
-  appearance:none;border:none;cursor:pointer;
-  display:inline-flex;align-items:center;justify-content:center;
-  font:inherit;white-space:nowrap;transition:.12s ease;
+  appearance:none;
+  border:none;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font:inherit;
+  white-space:nowrap;
+  transition:.12s ease;
 }
-.cec-btn-month,.cec-btn-arr,.cec-btn-tool,.cec-btn-type{
-  height:34px;border-radius:10px;border:1px solid #343943;
-  background:#1d2026;color:#aeb6c3;
+
+.cec-btn-month,.cec-btn-arr,.cec-btn-type{
+  height:34px;
+  border-radius:10px;
+  border:1px solid #343943;
+  background:#1d2026;
+  color:#aeb6c3;
 }
-.cec-btn-month{padding:0 14px;font-weight:700}
-.cec-btn-arr{width:34px}
-.cec-btn-tool{padding:0 14px;font-weight:700}
-.cec-btn-month:hover,.cec-btn-arr:hover,.cec-btn-tool:hover,.cec-btn-type:hover{background:#242932;color:#fff}
-.cec-btn-month.on,.cec-btn-type.on{background:#2a3040;color:#fff;border-color:#48526a}
-.cec-typebar .cec-btn-type{padding:0 12px;gap:6px;font-size:13px;font-weight:700}
-.cec-dot{width:8px;height:8px;border-radius:50%}
-.cec-wrap{width:100%;overflow-x:auto;background:#111214}
+.cec-btn-month{
+  padding:0 14px;
+  font-weight:700;
+}
+.cec-btn-arr{
+  width:34px;
+}
+.cec-btn-month:hover,
+.cec-btn-arr:hover,
+.cec-btn-type:hover{
+  background:#242932;
+  color:#fff;
+}
+.cec-btn-month.on,
+.cec-btn-type.on{
+  background:#2a3040;
+  color:#fff;
+  border-color:#48526a;
+}
+.cec-typebar .cec-btn-type{
+  padding:0 12px;
+  gap:6px;
+  font-size:13px;
+  font-weight:700;
+}
+.cec-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+}
+
+.cec-wrap{
+  width:100%;
+  overflow-x:auto;
+  background:#111214;
+}
+
 .cec-tbl{
-  border-collapse:separate;border-spacing:0;
-  width:max-content;min-width:100%;table-layout:fixed;
+  border-collapse:separate;
+  border-spacing:0;
+  width:100%;
+  min-width:100%;
+  table-layout:fixed;
 }
-.cec-tbl th,.cec-tbl td{
-  border-right:1px solid #343943;border-bottom:1px solid #343943;
+
+.cec-tbl th,
+.cec-tbl td{
+  border-right:1px solid #343943;
+  border-bottom:1px solid #343943;
   vertical-align:middle;
 }
-.cec-tbl tr th:last-child,.cec-tbl tr td:last-child{border-right:none}
-.cec-corner,.cec-h{
-  position:sticky;top:0;z-index:2;
+.cec-tbl tr th:last-child,
+.cec-tbl tr td:last-child{
+  border-right:none;
+}
+
+.cec-corner,
+.cec-h{
+  position:sticky;
+  top:0;
+  z-index:2;
   background:#17191d;
   color:#aeb6c3;
-  font-size:12px;font-weight:800;
-  text-align:center;padding:14px 10px;
+  font-size:12px;
+  font-weight:800;
+  text-align:center;
+  padding:14px 10px;
 }
-.cec-corner{z-index:3;color:#7f8a9a}
+.cec-corner{
+  z-index:3;
+  color:#7f8a9a;
+}
+
 .cec-rowlbl{
   background:#14171d;
   color:#e8ebf0;
-  font-size:13px;font-weight:800;
+  font-size:13px;
+  font-weight:800;
   padding:14px 12px;
   white-space:nowrap;
 }
+
 .cec-cell{
-  min-width:140px;height:82px;padding:10px;
-  text-align:center;background:#111214;
+  min-width:120px;
+  height:82px;
+  padding:10px;
+  text-align:center;
+  background:#111214;
 }
-.cec-cell:hover{background:#17191d}
-.cec-empty{color:#6e7887;font-size:14px}
+.cec-cell:hover{
+  background:#17191d;
+}
+
+.cec-empty{
+  color:#6e7887;
+  font-size:14px;
+}
+
 .cec-badges{
-  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
-  gap:8px;min-height:56px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  min-height:56px;
 }
+
 .cec-badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-height:32px;padding:6px 12px;border-radius:7px;
-  font-size:11px;font-weight:800;line-height:1.2;white-space:nowrap;
-  transition:.12s ease;user-select:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:32px;
+  padding:6px 12px;
+  border-radius:7px;
+  font-size:11px;
+  font-weight:800;
+  line-height:1.2;
+  white-space:nowrap;
+  transition:.12s ease;
+  user-select:none;
 }
 .cec-badge.lit{
   transform:translateY(-1px);
   filter:brightness(1.08);
   box-shadow:0 0 0 1px rgba(255,255,255,.18);
 }
-.cec-badge.dim{opacity:.18}
+.cec-badge.dim{
+  opacity:.18;
+}
 .cec-badge.locked{
   transform:translateY(-1px);
   filter:brightness(1.12);
   box-shadow:0 0 0 1.5px rgba(255,255,255,.30);
 }
-.cec-badge.ldim{opacity:.10}
-.cec-note,.cec-reading{
-  min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+.cec-badge.ldim{
+  opacity:.10;
 }
-.cec-ref{font-size:12px;font-weight:800;color:#97d8a6}
-.cec-npfx{font-size:11px;font-weight:800;color:#f0cb78}
+
+.cec-note,
+.cec-reading{
+  min-height:56px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.cec-ref{
+  font-size:12px;
+  font-weight:800;
+  color:#97d8a6;
+}
+.cec-npfx{
+  font-size:11px;
+  font-weight:800;
+  color:#f0cb78;
+}
+
 .cec-state{
-  display:flex;align-items:center;justify-content:center;gap:12px;
-  padding:56px 20px;color:#aeb6c3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:56px 20px;
+  color:#aeb6c3;
 }
 .cec-spin{
-  width:18px;height:18px;border:2px solid #48526a;border-top-color:#cfd6df;border-radius:50%;
+  width:18px;
+  height:18px;
+  border:2px solid #48526a;
+  border-top-color:#cfd6df;
+  border-radius:50%;
   animation:cecspin .7s linear infinite;
 }
-@keyframes cecspin{to{transform:rotate(360deg)}}
-.cec-err{padding:24px;color:#cf6b6b;line-height:1.8}
+@keyframes cecspin{
+  to{transform:rotate(360deg)}
+}
+
+.cec-err{
+  padding:24px;
+  color:#cf6b6b;
+  line-height:1.8;
+}
+
 @media(max-width:760px){
-  .cec-cell{min-width:120px;height:74px;padding:8px}
-  .cec-corner,.cec-h,.cec-rowlbl{padding:10px 8px}
-  .cec-badges{gap:6px}
-  .cec-badge{font-size:10px;padding:5px 10px}
+  .cec-cell{
+    min-width:110px;
+    height:74px;
+    padding:8px;
+  }
+  .cec-corner,.cec-h,.cec-rowlbl{
+    padding:10px 8px;
+  }
+  .cec-badges{
+    gap:6px;
+  }
+  .cec-badge{
+    font-size:10px;
+    padding:5px 10px;
+  }
 }
 `;
     document.head.appendChild(st);
@@ -162,6 +304,220 @@
     .catch(function (e) {
       EL.innerHTML = '<div class="cec-err">⚠ ' + esc(e.message) + '</div>';
     });
+
+  function applyFocusPageMode() {
+    document.body.classList.add('cecp-focus-page');
+    /* 防止 full-bleed 产生水平滚动条 */
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflowX = 'hidden';
+
+    if (!document.getElementById('_cecp_focus_page_style_final')) {
+      var fs = document.createElement('style');
+      fs.id = '_cecp_focus_page_style_final';
+      fs.textContent = `
+/* ── 隐藏侧边栏 / 目录 / 推荐 / 评论 ── */
+body.cecp-focus-page .toc-container,
+body.cecp-focus-page .toc,
+body.cecp-focus-page .post-aside,
+body.cecp-focus-page aside,
+body.cecp-focus-page .aside,
+body.cecp-focus-page .sidebar,
+body.cecp-focus-page .right-sidebar,
+body.cecp-focus-page .left-sidebar,
+body.cecp-focus-page .halo-aside,
+body.cecp-focus-page .halo-sidebar,
+body.cecp-focus-page .widget,
+body.cecp-focus-page .widgets,
+body.cecp-focus-page .related-posts,
+body.cecp-focus-page .post-related,
+body.cecp-focus-page .recommended-posts,
+body.cecp-focus-page .comment-area,
+body.cecp-focus-page .comments,
+body.cecp-focus-page .post-comments,
+body.cecp-focus-page .post-navigation,
+body.cecp-focus-page .prev-next,
+body.cecp-focus-page .share-bar,
+body.cecp-focus-page .ad-wrap {
+  display:none !important;
+  visibility:hidden !important;
+  width:0 !important; min-width:0 !important; max-width:0 !important;
+  height:0 !important; min-height:0 !important; max-height:0 !important;
+  overflow:hidden !important;
+  margin:0 !important; padding:0 !important; border:0 !important;
+}
+
+/* ── 所有列 / flex 子项强制100% ── */
+body.cecp-focus-page [class*="col-"],
+body.cecp-focus-page .col,
+body.cecp-focus-page .col-lg-8,body.cecp-focus-page .col-lg-9,body.cecp-focus-page .col-lg-10,
+body.cecp-focus-page .col-md-8,body.cecp-focus-page .col-md-9,
+body.cecp-focus-page .content-col,body.cecp-focus-page .main-col,
+body.cecp-focus-page .post-main,body.cecp-focus-page .article-main {
+  flex:0 0 100% !important;
+  max-width:100% !important;
+  width:100% !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+
+/* ── 正文 / 文章容器去除内边距 ── */
+body.cecp-focus-page article,
+body.cecp-focus-page .post,
+body.cecp-focus-page .post-detail,
+body.cecp-focus-page .article,
+body.cecp-focus-page .article-container,
+body.cecp-focus-page .post-content,
+body.cecp-focus-page .entry-content,
+body.cecp-focus-page .article-content {
+  max-width:100% !important;
+  width:100% !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+
+/* ── 页面主容器平铺 ── */
+body.cecp-focus-page .site-content,
+body.cecp-focus-page .main-content,
+body.cecp-focus-page .content-wrapper,
+body.cecp-focus-page .post-content-wrapper,
+body.cecp-focus-page .halo-main,
+body.cecp-focus-page .container,
+body.cecp-focus-page .container-fluid,
+body.cecp-focus-page .row {
+  display:block !important;
+  grid-template-columns:1fr !important;
+  max-width:100% !important;
+  width:100% !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+  gap:0 !important;
+}
+
+/* ══ Full-bleed 基础声明，实际偏移由 JS 精确计算注入 ══ */
+body.cecp-focus-page #cecp-schedule {
+  border-radius:0 !important;
+  border-left:none !important;
+  border-right:none !important;
+  border-top:none !important;
+  margin-top:0 !important;
+  margin-bottom:0 !important;
+  box-sizing:border-box !important;
+}
+body.cecp-focus-page #cecp-schedule .cec-wrap {
+  width:100% !important;
+  max-width:100% !important;
+}
+body.cecp-focus-page #cecp-schedule .cec-tbl {
+  min-width:100% !important;
+}
+
+/* ── 响应式：手机 ── */
+@media (max-width:600px) {
+  body.cecp-focus-page #cecp-schedule .cec-top,
+  body.cecp-focus-page #cecp-schedule .cec-typebar {
+    padding:8px 10px;
+    gap:6px;
+  }
+  body.cecp-focus-page #cecp-schedule .cec-btn-month,
+  body.cecp-focus-page #cecp-schedule .cec-btn-arr,
+  body.cecp-focus-page #cecp-schedule .cec-btn-type {
+    height:30px;
+    font-size:12px;
+  }
+  body.cecp-focus-page #cecp-schedule .cec-cell {
+    min-width:90px;
+    height:66px;
+    padding:6px;
+  }
+  body.cecp-focus-page #cecp-schedule .cec-badge {
+    font-size:10px;
+    padding:4px 8px;
+  }
+  body.cecp-focus-page #cecp-schedule .cec-corner,
+  body.cecp-focus-page #cecp-schedule .cec-h,
+  body.cecp-focus-page #cecp-schedule .cec-rowlbl {
+    padding:8px 6px;
+    font-size:11px;
+  }
+}
+`;
+      document.head.appendChild(fs);
+    }
+
+    setTimeout(forceHideSideStuff, 0);
+    setTimeout(forceHideSideStuff, 300);
+    setTimeout(forceHideSideStuff, 1000);
+    setTimeout(forceHideSideStuff, 2500);
+
+    /* 首次 full-bleed：等 DOM / 侧边栏隐藏稳定后再量测位置 */
+    setTimeout(applyFullBleed, 60);
+    setTimeout(applyFullBleed, 400);
+    setTimeout(applyFullBleed, 1300);
+
+    /* 窗口缩放时重新计算 */
+    window.addEventListener('resize', applyFullBleed);
+
+    /* MutationObserver：防止 CMS 动态注入侧边栏 */
+    if (window.MutationObserver) {
+      var _obs = new MutationObserver(function () {
+        forceHideSideStuff();
+        applyFullBleed();
+      });
+      _obs.observe(document.body, { childList: true, subtree: false });
+    }
+  }
+
+  /**
+   * JS 精确 Full-bleed：
+   * 直接读取 EL 距视口左边的像素数，
+   * 用精确的负 margin-left 把它推到最左侧，
+   * width 设为 window.innerWidth。
+   * 比任何纯 CSS calc() 都可靠。
+   */
+  function applyFullBleed() {
+    /* 先清掉之前的 margin，让元素回到自然位置，再重新量测 */
+    EL.style.removeProperty('margin-left');
+    EL.style.removeProperty('width');
+    EL.style.removeProperty('max-width');
+
+    var rect = EL.getBoundingClientRect();
+    var scrollX = window.scrollX || window.pageXOffset || 0;
+    var offsetLeft = rect.left + scrollX;   /* 元素左边距文档左边的像素 */
+    var vw = window.innerWidth;
+
+    EL.style.setProperty('margin-left', '-' + offsetLeft + 'px', 'important');
+    EL.style.setProperty('margin-right', '0px', 'important');
+    EL.style.setProperty('width',     vw + 'px', 'important');
+    EL.style.setProperty('max-width', vw + 'px', 'important');
+  }
+
+  function forceHideSideStuff() {
+    var selectors = [
+      '.toc-container','.toc','.post-aside','aside','.aside','.sidebar','.right-sidebar','.left-sidebar',
+      '.halo-aside','.halo-sidebar','.widget','.widgets','.related-posts','.post-related',
+      '.recommended-posts','.comment-area','.comments','.post-comments','.post-navigation',
+      '.prev-next','.share-bar','.ad-wrap'
+    ];
+
+    selectors.forEach(function (sel) {
+      document.querySelectorAll(sel).forEach(function (el) {
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
+        el.style.setProperty('width', '0', 'important');
+        el.style.setProperty('max-width', '0', 'important');
+        el.style.setProperty('min-width', '0', 'important');
+        el.style.setProperty('height', '0', 'important');
+        el.style.setProperty('max-height', '0', 'important');
+        el.style.setProperty('min-height', '0', 'important');
+        el.style.setProperty('overflow', 'hidden', 'important');
+        el.style.setProperty('margin', '0', 'important');
+        el.style.setProperty('padding', '0', 'important');
+        el.style.setProperty('border', '0', 'important');
+      });
+    });
+  }
 
   function boot(rows) {
     if (!rows.length) {
@@ -211,16 +567,16 @@
       EL.innerHTML = top + typebar + body;
 
       bind('#mPrev', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; render(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; lockedName = null; render(); }
       });
       bind('#mPrevText', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; render(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; lockedName = null; render(); }
       });
       bind('#mNext', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; render(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; lockedName = null; render(); }
       });
       bind('#mNextText', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; render(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; lockedName = null; render(); }
       });
 
       EL.querySelectorAll('[data-type]').forEach(function (btn) {
@@ -232,6 +588,10 @@
       });
 
       bindHighlight();
+      if (lockedName) applyHighlight(lockedName, true);
+      forceHideSideStuff();
+      /* 每次重渲染后重新对齐 */
+      setTimeout(applyFullBleed, 0);
     }
   }
 
@@ -246,7 +606,7 @@
     var rowDefs = serviceRowsForType(type);
 
     var cg = '<colgroup><col style="width:132px">' +
-      weeks.map(function () { return '<col style="width:150px">'; }).join('') +
+      weeks.map(function () { return '<col>'; }).join('') +
       '</colgroup>';
 
     var thead = '<thead><tr><th class="cec-corner">服事安排</th>' +
@@ -256,13 +616,11 @@
     var tbody = '<tbody>';
     rowDefs.forEach(function (rowDef) {
       tbody += '<tr><td class="cec-rowlbl">' + esc(rowDef.label) + '</td>';
-
       weeks.forEach(function (w) {
         var item = filtered.find(function (r) { return tv(r.week) === w; });
         var val = item ? item[rowDef.key] : '';
         tbody += renderMatrixCell(rowDef.kind, val);
       });
-
       tbody += '</tr>';
     });
     tbody += '</tbody>';
@@ -278,7 +636,7 @@
       { subtype: '周六祷告会', label: '周六祷告会' }
     ];
 
-    var cg = '<colgroup><col style="width:132px"><col style="width:190px"><col style="width:190px"></colgroup>';
+    var cg = '<colgroup><col style="width:132px"><col><col></colgroup>';
     var thead = '<thead><tr><th class="cec-corner">第几周</th>' +
       cols.map(function (c) { return '<th class="cec-h">' + esc(c.label) + '</th>'; }).join('') +
       '</tr></thead>';
@@ -437,11 +795,8 @@
     badges.forEach(function (b) {
       var n = b.getAttribute('data-name') || b.textContent;
       b.classList.remove('lit', 'dim', 'locked', 'ldim');
-      if (n === name) {
-        b.classList.add(locked ? 'locked' : 'lit');
-      } else {
-        b.classList.add(locked ? 'ldim' : 'dim');
-      }
+      if (n === name) b.classList.add(locked ? 'locked' : 'lit');
+      else b.classList.add(locked ? 'ldim' : 'dim');
     });
   }
 
