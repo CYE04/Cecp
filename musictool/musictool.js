@@ -372,7 +372,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
-.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
+.p-lyric{font-family:'Space Mono',monospace;font-size:19px;color:var(--ink2);white-space:pre;}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
 .p-lyric2{opacity:0.65;margin-top:1px;}
 
@@ -1151,7 +1151,6 @@ function setDots(el,cnt){
 }
 function parseJpToken(tok){
   if(!tok||tok==='-'||tok==='|'||tok==='||'||tok===' ')return makeJpPlain(tok);
-  if(tok==='0')return makeJpPlain('0');
   if(tok==='sp'||tok==='sp_'||tok==='sp__'){
     var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
     var el=parseJpToken(fk);
