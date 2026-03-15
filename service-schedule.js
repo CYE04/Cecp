@@ -1,6 +1,6 @@
 /**
  * service-schedule.js
- * 年份安全版 + 同名高亮恢复 + 强制聚焦页面（隐藏侧边栏等）
+ * 年份安全版 + 同名高亮 + 强制聚焦页面 + 正文铺满
  */
 (function () {
   'use strict';
@@ -32,22 +32,24 @@
 
   applyFocusPageMode();
 
-  if (!document.getElementById('_cecp_yearsafe_style_v4')) {
+  if (!document.getElementById('_cecp_yearsafe_style_final')) {
     var st = document.createElement('style');
-    st.id = '_cecp_yearsafe_style_v4';
+    st.id = '_cecp_yearsafe_style_final';
     st.textContent = `
 #cecp-schedule{
   font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
   width:100%;
+  max-width:100%;
   background:#111214;
   color:#e8ebf0;
   border:1px solid #343943;
   border-radius:16px;
   overflow:hidden;
+  box-sizing:border-box;
 }
 #cecp-schedule *{box-sizing:border-box}
 
-.cec-top,.cec-sub,.cec-typebar{
+.cec-top,.cec-typebar{
   display:flex;
   align-items:center;
   gap:8px;
@@ -56,7 +58,7 @@
   border-bottom:1px solid #262a31;
   background:#17191d;
 }
-.cec-sub,.cec-typebar{background:#14171d}
+.cec-typebar{background:#14171d}
 
 .cec-btn{
   appearance:none;
@@ -70,21 +72,28 @@
   transition:.12s ease;
 }
 
-.cec-btn-month,.cec-btn-arr,.cec-btn-tool,.cec-btn-type{
+.cec-btn-month,.cec-btn-arr,.cec-btn-type{
   height:34px;
   border-radius:10px;
   border:1px solid #343943;
   background:#1d2026;
   color:#aeb6c3;
 }
-.cec-btn-month{padding:0 14px;font-weight:700}
-.cec-btn-arr{width:34px}
-.cec-btn-tool{padding:0 14px;font-weight:700}
-.cec-btn-month:hover,.cec-btn-arr:hover,.cec-btn-tool:hover,.cec-btn-type:hover{
+.cec-btn-month{
+  padding:0 14px;
+  font-weight:700;
+}
+.cec-btn-arr{
+  width:34px;
+}
+.cec-btn-month:hover,
+.cec-btn-arr:hover,
+.cec-btn-type:hover{
   background:#242932;
   color:#fff;
 }
-.cec-btn-month.on,.cec-btn-type.on{
+.cec-btn-month.on,
+.cec-btn-type.on{
   background:#2a3040;
   color:#fff;
   border-color:#48526a;
@@ -106,23 +115,28 @@
   overflow-x:auto;
   background:#111214;
 }
+
 .cec-tbl{
   border-collapse:separate;
   border-spacing:0;
-  width:max-content;
+  width:100%;
   min-width:100%;
   table-layout:fixed;
 }
-.cec-tbl th,.cec-tbl td{
+
+.cec-tbl th,
+.cec-tbl td{
   border-right:1px solid #343943;
   border-bottom:1px solid #343943;
   vertical-align:middle;
 }
-.cec-tbl tr th:last-child,.cec-tbl tr td:last-child{
+.cec-tbl tr th:last-child,
+.cec-tbl tr td:last-child{
   border-right:none;
 }
 
-.cec-corner,.cec-h{
+.cec-corner,
+.cec-h{
   position:sticky;
   top:0;
   z-index:2;
@@ -148,13 +162,15 @@
 }
 
 .cec-cell{
-  min-width:140px;
+  min-width:120px;
   height:82px;
   padding:10px;
   text-align:center;
   background:#111214;
 }
-.cec-cell:hover{background:#17191d}
+.cec-cell:hover{
+  background:#17191d;
+}
 
 .cec-empty{
   color:#6e7887;
@@ -189,15 +205,20 @@
   filter:brightness(1.08);
   box-shadow:0 0 0 1px rgba(255,255,255,.18);
 }
-.cec-badge.dim{opacity:.18}
+.cec-badge.dim{
+  opacity:.18;
+}
 .cec-badge.locked{
   transform:translateY(-1px);
   filter:brightness(1.12);
   box-shadow:0 0 0 1.5px rgba(255,255,255,.30);
 }
-.cec-badge.ldim{opacity:.10}
+.cec-badge.ldim{
+  opacity:.10;
+}
 
-.cec-note,.cec-reading{
+.cec-note,
+.cec-reading{
   min-height:56px;
   display:flex;
   flex-direction:column;
@@ -205,6 +226,7 @@
   justify-content:center;
   gap:6px;
 }
+
 .cec-ref{
   font-size:12px;
   font-weight:800;
@@ -232,7 +254,9 @@
   border-radius:50%;
   animation:cecspin .7s linear infinite;
 }
-@keyframes cecspin{to{transform:rotate(360deg)}}
+@keyframes cecspin{
+  to{transform:rotate(360deg)}
+}
 
 .cec-err{
   padding:24px;
@@ -242,14 +266,16 @@
 
 @media(max-width:760px){
   .cec-cell{
-    min-width:120px;
+    min-width:110px;
     height:74px;
     padding:8px;
   }
   .cec-corner,.cec-h,.cec-rowlbl{
     padding:10px 8px;
   }
-  .cec-badges{gap:6px}
+  .cec-badges{
+    gap:6px;
+  }
   .cec-badge{
     font-size:10px;
     padding:5px 10px;
@@ -282,11 +308,11 @@
   function applyFocusPageMode() {
     document.body.classList.add('cecp-focus-page');
 
-    if (!document.getElementById('_cecp_focus_page_style_v2')) {
+    if (!document.getElementById('_cecp_focus_page_style_final')) {
       var fs = document.createElement('style');
-      fs.id = '_cecp_focus_page_style_v2';
+      fs.id = '_cecp_focus_page_style_final';
       fs.textContent = `
-/* 强制隐藏所有常见侧边栏 / 目录 / 推荐 / 评论 */
+/* 隐藏常见侧边栏 / 目录 / 推荐 / 评论 */
 body.cecp-focus-page .toc-container,
 body.cecp-focus-page .toc,
 body.cecp-focus-page .post-aside,
@@ -323,27 +349,27 @@ body.cecp-focus-page .ad-wrap {
   border:0 !important;
 }
 
-/* 页面布局强制单栏 */
-body.cecp-focus-page .container,
-body.cecp-focus-page .main,
-body.cecp-focus-page .content,
+/* 页面主容器强制铺满 */
+body.cecp-focus-page .site-content,
+body.cecp-focus-page .main-content,
 body.cecp-focus-page .content-wrapper,
 body.cecp-focus-page .post-content-wrapper,
-body.cecp-focus-page .post-container,
-body.cecp-focus-page .article-container,
-body.cecp-focus-page .site-content,
-body.cecp-focus-page .row,
 body.cecp-focus-page .halo-main,
-body.cecp-focus-page .post,
-body.cecp-focus-page .post-detail,
-body.cecp-focus-page .post-content,
-body.cecp-focus-page .entry-content,
-body.cecp-focus-page .article-content {
-  max-width:100% !important;
-  width:100% !important;
+body.cecp-focus-page .container,
+body.cecp-focus-page .container-fluid,
+body.cecp-focus-page .row {
+  display:block !important;
+  grid-template-columns:1fr !important;
+  max-width:100vw !important;
+  width:100vw !important;
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+  gap:0 !important;
 }
 
-/* Bootstrap / grid / theme column 强制占满 */
+/* 所有列强制100% */
 body.cecp-focus-page [class*="col-"],
 body.cecp-focus-page .col,
 body.cecp-focus-page .col-lg-8,
@@ -362,40 +388,37 @@ body.cecp-focus-page .article-main {
   margin-right:0 !important;
 }
 
-/* 额外兜底：如果主题是两栏 grid */
-body.cecp-focus-page .content-wrapper,
-body.cecp-focus-page .site-content,
-body.cecp-focus-page .main-content,
-body.cecp-focus-page .post-content-wrapper,
-body.cecp-focus-page .halo-main {
-  display:block !important;
-  grid-template-columns:1fr !important;
-  gap:0 !important;
-}
-
-/* 当前正文内容更聚焦 */
+/* 正文和文章容器铺满 */
+body.cecp-focus-page article,
+body.cecp-focus-page .post,
+body.cecp-focus-page .post-detail,
+body.cecp-focus-page .article,
+body.cecp-focus-page .article-container,
 body.cecp-focus-page .post-content,
 body.cecp-focus-page .entry-content,
 body.cecp-focus-page .article-content {
-  margin:0 auto !important;
+  max-width:100% !important;
+  width:100% !important;
+  margin:0 !important;
   padding-left:0 !important;
   padding-right:0 !important;
 }
 
-/* 如果主题把正文包在 card 或 wrapper 里，也拉满 */
-body.cecp-focus-page article,
-body.cecp-focus-page .post-detail,
-body.cecp-focus-page .post,
-body.cecp-focus-page .article,
-body.cecp-focus-page .article-container {
-  max-width:100% !important;
+/* 当前组件铺满 */
+body.cecp-focus-page #cecp-schedule{
   width:100% !important;
+  max-width:100% !important;
+}
+body.cecp-focus-page #cecp-schedule .cec-wrap{
+  width:100% !important;
+}
+body.cecp-focus-page #cecp-schedule .cec-tbl{
+  min-width:100% !important;
 }
 `;
       document.head.appendChild(fs);
     }
 
-    // 再做一次运行时隐藏，防止某些主题后来又把侧边栏插回来
     setTimeout(forceHideSideStuff, 0);
     setTimeout(forceHideSideStuff, 300);
     setTimeout(forceHideSideStuff, 1000);
@@ -512,7 +535,7 @@ body.cecp-focus-page .article-container {
     var rowDefs = serviceRowsForType(type);
 
     var cg = '<colgroup><col style="width:132px">' +
-      weeks.map(function () { return '<col style="width:150px">'; }).join('') +
+      weeks.map(function () { return '<col>'; }).join('') +
       '</colgroup>';
 
     var thead = '<thead><tr><th class="cec-corner">服事安排</th>' +
@@ -522,13 +545,11 @@ body.cecp-focus-page .article-container {
     var tbody = '<tbody>';
     rowDefs.forEach(function (rowDef) {
       tbody += '<tr><td class="cec-rowlbl">' + esc(rowDef.label) + '</td>';
-
       weeks.forEach(function (w) {
         var item = filtered.find(function (r) { return tv(r.week) === w; });
         var val = item ? item[rowDef.key] : '';
         tbody += renderMatrixCell(rowDef.kind, val);
       });
-
       tbody += '</tr>';
     });
     tbody += '</tbody>';
@@ -544,7 +565,7 @@ body.cecp-focus-page .article-container {
       { subtype: '周六祷告会', label: '周六祷告会' }
     ];
 
-    var cg = '<colgroup><col style="width:132px"><col style="width:190px"><col style="width:190px"></colgroup>';
+    var cg = '<colgroup><col style="width:132px"><col><col></colgroup>';
     var thead = '<thead><tr><th class="cec-corner">第几周</th>' +
       cols.map(function (c) { return '<th class="cec-h">' + esc(c.label) + '</th>'; }).join('') +
       '</tr></thead>';
@@ -703,11 +724,8 @@ body.cecp-focus-page .article-container {
     badges.forEach(function (b) {
       var n = b.getAttribute('data-name') || b.textContent;
       b.classList.remove('lit', 'dim', 'locked', 'ldim');
-      if (n === name) {
-        b.classList.add(locked ? 'locked' : 'lit');
-      } else {
-        b.classList.add(locked ? 'ldim' : 'dim');
-      }
+      if (n === name) b.classList.add(locked ? 'locked' : 'lit');
+      else b.classList.add(locked ? 'ldim' : 'dim');
     });
   }
 
