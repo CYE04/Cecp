@@ -365,7 +365,7 @@
   function hasLyricMatch(s,q){
     for(const sec of s.sections||[])for(const line of sec.lines||[]){
       const arr=Array.isArray(line)?line:(line.line||[]);
-      for(const c of arr)if((c.lyric||'').toLowerCase().includes(q))return true;
+      for(const c of arr)if((c.lyric||'').toLowerCase().includes(q)||(c.lyric2||'').toLowerCase().includes(q)||(c.lyric3||'').toLowerCase().includes(q)||(c.lyric4||'').toLowerCase().includes(q))return true;
     }return false;
   }
   function hi(t,q){
