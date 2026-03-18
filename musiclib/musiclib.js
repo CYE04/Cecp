@@ -436,7 +436,7 @@
       const pl=document.createElement('span');
       pl.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;';
       const _t=document.createElement('span');_t.style.height='12px';pl.appendChild(_t);
-      const _s=document.createElement('span');_s.style.cssText='font-size:15px;line-height:1;text-align:center;';_s.textContent=tok||'';pl.appendChild(_s);
+      const _s=document.createElement('span');_s.style.cssText='font-size:22px;line-height:1;text-align:center;';_s.textContent=tok||'';pl.appendChild(_s);
       const _b=document.createElement('span');_b.style.height='16px';pl.appendChild(_b);
       return pl;
     }
@@ -457,7 +457,7 @@
     w.appendChild(topDot);
     const lw2=document.createElement('span');lw2.style.cssText='display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;';
     const numRow=document.createElement('span');numRow.style.cssText='display:inline-flex;align-items:center;justify-content:center;position:relative;'+(uline>=1?'border-bottom:1.5px solid currentColor;':'');
-    const ns2=document.createElement('span');ns2.style.cssText='font-size:15px;line-height:1.05;display:inline-block;min-width:10px;text-align:center;';
+    const ns2=document.createElement('span');ns2.style.cssText='font-size:22px;line-height:1;display:inline-block;min-width:1em;text-align:center;';
     ns2.textContent=num||'';
     numRow.appendChild(ns2);
     if(isDot){const dot=document.createElement('span');dot.style.cssText='position:absolute;right:-3px;top:2px;font-size:7px;line-height:1;';dot.textContent='·';numRow.appendChild(dot);}
@@ -533,8 +533,12 @@
     const el=$('ml-mp-cover');
     if(!el) return;
     if(src){
-      el.innerHTML=`<img src="${src}" alt="">`;
+      el.style.backgroundImage=`url("${src}")`;
+      el.classList.add('has-cover');
+      el.innerHTML='';
     }else{
+      el.style.backgroundImage='';
+      el.classList.remove('has-cover');
       el.innerHTML='<span>♪</span>';
     }
   }
@@ -563,16 +567,13 @@
     if(!inner) return;
     inner.innerHTML='';
     if(!_mpLrc.length){
-      inner.innerHTML='<div class="ml-mp-lrc-line">暂无歌词</div>';
+      inner.innerHTML='<div class="pl-lrc-line is-empty">暂无歌词</div>';
       return;
     }
     _mpLrc.forEach((it,i)=>{
       const d=document.createElement('div');
-      d.className='ml-mp-lrc-line'+(i===0?' active':'');
+      d.className='pl-lrc-line'+(i===0?' is-active':'');
       d.textContent=it.tx || '…';
-      d.addEventListener('click',()=>{
-        if(_mpAudio && isFinite(_mpLrc[i].t)) _mpAudio.currentTime=_mpLrc[i].t;
-      });
       inner.appendChild(d);
     });
     _mpLrcIdx=0;
@@ -587,7 +588,7 @@
     _mpLrcIdx=idx;
     const inner=$('ml-mp-lrc-inner');
     if(!inner) return;
-    [...inner.children].forEach((el,i)=>el.classList.toggle('active', i===idx));
+    [...inner.children].forEach((el,i)=>el.classList.toggle('is-active', i===idx));
     const active=inner.children[idx];
     if(active){
       const y=active.offsetTop - inner.clientHeight/2 + active.clientHeight/2;
@@ -680,14 +681,15 @@
   function stopMetronome(){
     _metroRunning=false;
     if(_metroTimer){clearInterval(_metroTimer);_metroTimer=null;}
-    const btn=document.querySelector('.ml-met-toggle');
-    if(btn){btn.textContent='开始';btn.classList.add('off');}
+    const btn=document.querySelector('.mt-start');
+    if(btn) btn.textContent='开始';
+    document.querySelectorAll('.mt-dot').forEach((d,i)=>d.classList.toggle('on',i===0));
   }
 
   function startMetronome(bpm){
     stopMetronome();
     _metroBpm=Math.max(30,Math.min(240,parseInt(bpm||72,10)||72));
-    const bpmNum=document.querySelector('.ml-met-bpm-num');
+    const dots=[...document.querySelectorAll('.mt-dot')];
     let beat=0;
     function tick(){
       if(!_audioCtx){
@@ -704,65 +706,32 @@
         g.gain.exponentialRampToValueAtTime(0.0001, now+0.08);
         o.start(now); o.stop(now+0.09);
       }
-      if(bpmNum){bpmNum.style.opacity='.45';requestAnimationFrame(()=>{bpmNum.style.opacity='';});}
+      dots.forEach((d,i)=>d.classList.toggle('on',i===beat%4));
       beat++;
     }
     tick();
     _metroRunning=true;
     _metroTimer=setInterval(tick,60000/_metroBpm);
-    const btn=document.querySelector('.ml-met-toggle');
-    if(btn){btn.textContent='停止';btn.classList.remove('off');}
+    const btn=document.querySelector('.mt-start');
+    if(btn) btn.textContent='停止';
   }
 
   function createMetronome(defaultBpm){
-    const wrap=document.createElement('div');wrap.className='ml-met';
-
-    /* top row */
-    const top=document.createElement('div');top.className='ml-met-top';
-    const leftDiv=document.createElement('div');
-    const titleEl=document.createElement('div');titleEl.className='ml-met-title';titleEl.textContent='节拍器';
-    const subEl=document.createElement('div');subEl.className='ml-met-sub';subEl.textContent='跟随这首歌的 BPM，也可以手动调整';
-    leftDiv.appendChild(titleEl);leftDiv.appendChild(subEl);
-    const toggle=document.createElement('button');
-    toggle.className='ml-met-toggle off';toggle.type='button';toggle.textContent='开始';
-    top.appendChild(leftDiv);top.appendChild(toggle);
-
-    /* body: grid 1fr auto auto auto */
-    const body=document.createElement('div');body.className='ml-met-body';
-    const bpmEl=document.createElement('div');bpmEl.className='ml-met-bpm';
-    const bpmNum=document.createElement('span');bpmNum.className='ml-met-bpm-num';bpmNum.textContent=String(defaultBpm||72);
-    const bpmSmall=document.createElement('small');bpmSmall.textContent=' BPM';
-    bpmEl.appendChild(bpmNum);bpmEl.appendChild(bpmSmall);
-
-    const minusBtn=document.createElement('button');minusBtn.className='ml-met-btn';minusBtn.type='button';minusBtn.textContent='\u2212';
-    const plusBtn=document.createElement('button');plusBtn.className='ml-met-btn';plusBtn.type='button';plusBtn.textContent='+';
-    const resetBtn=document.createElement('button');resetBtn.className='ml-met-btn';resetBtn.type='button';resetBtn.title='\u91cd\u7f6e';
-    resetBtn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
-
-    const range=document.createElement('input');
-    range.className='ml-met-range';range.type='range';
-    range.min='30';range.max='240';range.value=String(defaultBpm||72);
-
-    const hint=document.createElement('div');hint.className='ml-met-hint';
-    hint.textContent='\u70b9\u5f00\u59cb\u5373\u53ef\u6253\u62cd\u3002\u6ed1\u6746\u53ef\u7ec6\u8c03\uff0c\u00b1 \u53ef\u5feb\u901f\u8c03\u8282\u3002';
-
-    body.appendChild(bpmEl);body.appendChild(minusBtn);body.appendChild(plusBtn);body.appendChild(resetBtn);
-    body.appendChild(range);body.appendChild(hint);
-    wrap.appendChild(top);wrap.appendChild(body);
-
-    /* logic */
-    const getBpm=()=>Math.max(30,Math.min(240,parseInt(range.value,10)||72));
-    const updateDisplay=()=>{bpmNum.textContent=String(getBpm());range.value=String(getBpm());};
-
-    minusBtn.onclick=()=>{range.value=String(getBpm()-1);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
-    plusBtn.onclick=()=>{range.value=String(getBpm()+1);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
-    resetBtn.onclick=()=>{range.value=String(defaultBpm||72);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
-    range.oninput=()=>{updateDisplay();if(_metroRunning)startMetronome(getBpm());};
-    toggle.onclick=()=>{
-      if(_metroRunning){stopMetronome();}
-      else{startMetronome(getBpm());}
-    };
-
+    const wrap=document.createElement('div');wrap.className='mt-wrap';
+    wrap.innerHTML=`
+      <div class="mt-head">
+        <div class="mt-title">节拍器</div>
+        <div class="mt-bpm"><button class="mt-minus">−</button><input class="mt-input" value="${defaultBpm||72}" inputmode="numeric"><button class="mt-plus">＋</button><span>BPM</span></div>
+      </div>
+      <div class="mt-dots"><span class="mt-dot on"></span><span class="mt-dot"></span><span class="mt-dot"></span><span class="mt-dot"></span></div>
+      <div class="mt-actions"><button class="mt-start">开始</button></div>
+    `;
+    const input=wrap.querySelector('.mt-input');
+    const getBpm=()=>Math.max(30,Math.min(240,parseInt(input.value||defaultBpm||72,10)||72));
+    wrap.querySelector('.mt-minus').onclick=()=>{input.value=getBpm()-1;if(_metroRunning)startMetronome(getBpm());};
+    wrap.querySelector('.mt-plus').onclick=()=>{input.value=getBpm()+1;if(_metroRunning)startMetronome(getBpm());};
+    input.onchange=()=>{input.value=getBpm();if(_metroRunning)startMetronome(getBpm());};
+    wrap.querySelector('.mt-start').onclick=()=>{_metroRunning?stopMetronome():startMetronome(getBpm());};
     return wrap;
   }
 
