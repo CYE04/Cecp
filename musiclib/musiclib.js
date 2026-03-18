@@ -469,14 +469,27 @@
     w.appendChild(bot);return w;
   }
 
-  function renderNStr(str){
-    const wrap=document.createElement('span');wrap.style.cssText='display:inline-flex;gap:.08em;align-items:flex-end;vertical-align:bottom;';
-    const parts=(str||'').match(/\[v[12]|\]v|sp__|sp_|sp|\|\||\||\S+/g)||[];
-    parts.forEach(tok=>{
-      if(tok==='[v1'||tok==='[v2'||tok===']v')return;
-      wrap.appendChild(parseJpToken(tok));
-    });
-    return wrap;
+  function makeTuplet(n){
+    var w=document.createElement('span');w.className='jp-tuplet';
+    var br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);
+    var nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);
+    return w;
+  }
+  function renderNStr(nStr){
+    var d=document.createElement('div');d.className='sw-jianpu';
+    if(!nStr||!nStr.trim())return d;
+    var toks=nStr.trim().split(/\s+/),i=0;
+    while(i<toks.length){
+      var t=toks[i];
+      if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
+      if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')so.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(so);continue;}
+      if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
+      if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;}
+      var tm2=t.match(/^\{(3|5)$/);if(tm2){var tn=parseInt(tm2[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));d.appendChild(tp);i++;continue;}
+      if(t==='}'){i++;continue;}
+      d.appendChild(parseJpToken(t));i++;
+    }
+    return d;
   }
 
   const NOTE_MAP={C:0,'B#':0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,Fb:4,'E#':5,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11,Cb:11};
@@ -716,7 +729,6 @@
 
   function createMetronome(defaultBpm){
     const wrap=document.createElement('div');wrap.className='ml-met';
-
     const top=document.createElement('div');top.className='ml-met-top';
     const leftDiv=document.createElement('div');
     const titleEl=document.createElement('div');titleEl.className='ml-met-title';titleEl.textContent='节拍器';
@@ -725,38 +737,30 @@
     const toggle=document.createElement('button');
     toggle.className='ml-met-toggle off';toggle.type='button';toggle.textContent='开始';
     top.appendChild(leftDiv);top.appendChild(toggle);
-
     const body=document.createElement('div');body.className='ml-met-body';
     const bpmEl=document.createElement('div');bpmEl.className='ml-met-bpm';
     const bpmNum=document.createElement('span');bpmNum.className='ml-met-bpm-num';bpmNum.textContent=String(defaultBpm||72);
     const bpmSmall=document.createElement('small');bpmSmall.textContent=' BPM';
     bpmEl.appendChild(bpmNum);bpmEl.appendChild(bpmSmall);
-
     const minusBtn=document.createElement('button');minusBtn.className='ml-met-btn';minusBtn.type='button';minusBtn.textContent='−';
     const plusBtn=document.createElement('button');plusBtn.className='ml-met-btn';plusBtn.type='button';plusBtn.textContent='+';
     const resetBtn=document.createElement('button');resetBtn.className='ml-met-btn';resetBtn.type='button';resetBtn.title='重置';
     resetBtn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
-
     const range=document.createElement('input');
     range.className='ml-met-range';range.type='range';
     range.min='30';range.max='240';range.value=String(defaultBpm||72);
-
     const hint=document.createElement('div');hint.className='ml-met-hint';
     hint.textContent='点开始即可打拍。滑杆可细调，± 可快速调节。';
-
     body.appendChild(bpmEl);body.appendChild(minusBtn);body.appendChild(plusBtn);body.appendChild(resetBtn);
     body.appendChild(range);body.appendChild(hint);
     wrap.appendChild(top);wrap.appendChild(body);
-
     const getBpm=()=>Math.max(30,Math.min(240,parseInt(range.value,10)||72));
     const updateDisplay=()=>{bpmNum.textContent=String(getBpm());range.value=String(getBpm());};
-
     minusBtn.onclick=()=>{range.value=String(getBpm()-1);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
     plusBtn.onclick=()=>{range.value=String(getBpm()+1);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
     resetBtn.onclick=()=>{range.value=String(defaultBpm||72);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
     range.oninput=()=>{updateDisplay();if(_metroRunning)startMetronome(getBpm());};
     toggle.onclick=()=>{if(_metroRunning){stopMetronome();}else{startMetronome(getBpm());}};
-
     return wrap;
   }
 
