@@ -1,1066 +1,2150 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
-/* CECP Music Library v3.2 */
+
+/* musictool.js — 音乐工具箱*/
 (function(){
-  const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
-  const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
-  const WECHAT='CYuen_290104';
+'use strict';
 
-  if(!document.getElementById('ml-style')){
-    const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
-    try{
-      const cur=document.currentScript && document.currentScript.src ? new URL(document.currentScript.src, location.href) : null;
-      s.href=cur ? new URL('musiclib.css', cur.href).href : 'musiclib.css';
-      s.onerror=()=>{ if(!/cye04\.github\.io\/Cecp\/musiclib\.css$/.test(s.href)) s.href='https://cye04.github.io/Cecp/musiclib.css'; };
-    }catch(_){
-      s.href='musiclib.css';
-      s.onerror=()=>{ s.href='https://cye04.github.io/Cecp/musiclib.css'; };
-    }
-    document.head.appendChild(s);
-  }
+/* ── 注入 HTML ── */
+const root = document.getElementById('music-toolbox');
+if(!root) return;
 
-  const root=document.getElementById('music-library');
-  if(!root)return;
-
-  let songs=[],query='';
-  let _apLoaded=false,_ap=null;
-  let _audioCtx=null,_metroTimer=null,_metroNext=0,_metroRunning=false,_metroBpm=72;
-  let _themeObserver=null;
-  let _detailStatePushed=false;
-
-  root.innerHTML=`
-
-    <div id="ml-header">
-      <div id="ml-header-top">
-        <div id="ml-title">🎵 诗歌库</div>
-        <div id="ml-count"></div>
-      </div>
-      <div id="ml-search-wrap">
-        <span id="ml-search-icon">🔍</span>
-        <input id="ml-search" type="text" placeholder="搜索歌名或歌词…" autocomplete="off" autocorrect="off"/>
-      </div>
+root.innerHTML = `
+<!-- HUB -->
+<div class="mt-hub" id="mt-hub">
+  <div class="mt-hub-title">
+    <h1>音 乐 工 具 箱</h1>
+    <p>MUSIC TOOLS · 赞美诗工作站</p>
+  </div>
+  <div class="mt-tool-grid">
+    <div class="mt-tool-card c1" id="mt-card-lrc">
+      <div class="mt-tool-icon">🎵</div>
+      <div class="mt-tool-name">歌词编辑器</div>
+      <div class="mt-tool-desc">LRC 时间轴打轴<br>导入 / 导出 .lrc 文件</div>
+      <div class="mt-tool-arrow">OPEN →</div>
     </div>
-    <div id="ml-loading"><div id="ml-spinner"></div>正在载入诗歌…</div>
-    <div id="ml-list"></div>
-    <div id="ml-empty">
-      <div id="ml-empty-icon">🎵</div>
-      <div id="ml-empty-msg">找不到「<span id="ml-query-text"></span>」</div>
-      <div id="ml-empty-sub">还没有这首歌，可以微信联系 YuEn 申请添加</div>
-      <button id="ml-contact">💬 复制微信号 YuEn</button>
+    <div class="mt-tool-card c2" id="mt-card-jf">
+      <div class="mt-tool-icon">♩</div>
+      <div class="mt-tool-name">简谱编辑器</div>
+      <div class="mt-tool-desc">音符输入 · 和弦标注<br>导出 JSON 文件</div>
+      <div class="mt-tool-arrow">OPEN →</div>
     </div>
-    <div id="ml-detail">
-      <div id="ml-detail-overlay"></div>
-      <div id="ml-detail-swipe-hint"></div>
-      <div id="ml-detail-header">
-        <button id="ml-back">‹ 返回</button>
-        <div id="ml-detail-title"></div>
-      </div>
-      <div id="ml-miniplayer">
-        <audio id="ml-mp-audio"></audio>
-        <div id="ml-mp-stage">
-          <div id="ml-mp-cover-wrap">
-            <div id="ml-mp-cover"><span>♪</span></div>
-          </div>
-          <div id="ml-mp-lrc-panel">
-            <div id="ml-mp-lrc-inner"></div>
+  </div>
+</div>
+
+<!-- TOOLVIEW -->
+<div class="mt-toolview" id="mt-toolview">
+  <div class="mt-topbar">
+    <button class="mt-back" id="mt-back">← 返回</button>
+    <span class="mt-nav-label">工具箱 /</span>
+    <span class="mt-nav-name" id="mt-nav-name"></span>
+    <button class="mt-help-btn" id="mt-help-btn" title="使用教程">?</button>
+  </div>
+  <div class="mt-body">
+
+    <!-- LRC -->
+    <div class="mt-panel" id="mt-panel-lrc">
+      <audio id="mt-audio"></audio>
+      <div class="mt-lrc-top">
+        <div class="mt-lrc-progbar" id="mt-progbar">
+          <div class="mt-lrc-progfill" id="mt-progfill"></div>
+        </div>
+        <div class="mt-lrc-controls">
+          <span class="mt-lrc-time" id="mt-time">[00:00.00]</span>
+          <button class="mt-play-btn" id="mt-playbtn">▶</button>
+          <div class="mt-vol-wrap">
+            <span class="mt-vol-label">音量</span>
+            <input type="range" class="mt-vol-range" id="mt-vol" min="0" max="1" step="0.01" value="1">
           </div>
         </div>
-      <div class="pl-song-row">
-        <div class="pl-info">
-          <div id="ml-mp-title" class="pl-title"></div>
-          <div id="ml-mp-artist" class="pl-artist"></div>
+      </div>
+      <div class="mt-lrc-body">
+        <div class="mt-lrc-left">
+          <button class="mt-side-btn" id="mt-btn-music">⬆ 上传音乐</button>
+          <input type="file" id="mt-music-file" accept="audio/*" style="display:none">
+          <div class="mt-hover-group" id="mt-hg-lyric">
+            <button class="mt-side-btn" id="mt-btn-lyric">⬆ 上传歌词</button>
+            <input type="file" id="mt-lyric-file" accept=".lrc" style="display:none">
+            <div class="mt-sub-btns">
+              <button class="mt-side-btn mt-sub-btn" id="mt-btn-txt">📄 上传文本</button>
+              <input type="file" id="mt-txt-file" accept=".txt" style="display:none">
+              <button class="mt-side-btn mt-sub-btn" id="mt-btn-find">🔍 查找歌词</button>
+            </div>
+          </div>
+          <button class="mt-side-btn" id="mt-btn-create">📄 创建歌词</button>
+          <div class="mt-hover-group" id="mt-hg-dl">
+            <button class="mt-side-btn" id="mt-btn-dl">⬇ 下载歌词</button>
+            <div class="mt-sub-btns">
+              <button class="mt-side-btn mt-sub-btn" id="mt-btn-dl-twin">⬇ 下载双语LRC</button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-lrc-center" id="mt-lrc-center">
+          <div class="mt-info-row">
+            <div class="mt-info-dot"></div>
+            <button class="mt-info-btn" id="mt-btn-info">add info</button>
+          </div>
+          <div id="mt-lines"></div>
+        </div>
+        <div class="mt-lrc-right">
+          <div>
+            <span class="mt-r-label">偏移</span>
+            <div class="mt-offset-row">
+              <input type="number" class="mt-offset-inp" id="mt-offset" value="0" step="0.1">
+              <span class="mt-offset-unit">s</span>
+            </div>
+            <button class="mt-apply-btn" id="mt-btn-offset">应用偏移</button>
+          </div>
+          <div>
+            <span class="mt-r-label">同步滚动</span>
+            <div class="mt-toggle-row">
+              <div class="mt-toggle on" id="mt-toggle"></div>
+              <span class="mt-toggle-lbl" id="mt-toggle-lbl">开</span>
+            </div>
+          </div>
+          <button class="mt-add-end-btn" id="mt-btn-addend">+ 新增歌词</button>
         </div>
       </div>
-      <div class="pl-progress-wrap">
-        <div class="pl-progress-bar"><div class="pl-progress-fill" id="ml-mp-fill"></div></div>
-        <div class="pl-times"><span id="ml-mp-cur">0:00</span><span id="ml-mp-dur">0:00</span></div>
-      </div>
-      <div class="pl-controls">
-        <button class="pl-btn" id="ml-mp-seek-back" aria-label="后退15秒"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15.5" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="system-ui,sans-serif" font-weight="600">15</text></svg></button>
-        <button class="pl-btn" id="ml-mp-prev" aria-label="上一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1zm3.2 5.65 7.1-4.8A.43.43 0 0 1 17 7.2v9.6a.43.43 0 0 1-.7.35L9.2 12.35a.43.43 0 0 1 0-.7z"/></svg></button>
-        <button class="pl-btn pl-playpause" id="ml-mp-playpause" aria-label="播放"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg></button>
-        <button class="pl-btn" id="ml-mp-next" aria-label="下一首"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6a1 1 0 0 0-1 1v10a1 1 0 1 0 2 0V7a1 1 0 0 0-1-1zm-3.2 5.65-7.1-4.8A.43.43 0 0 0 7 7.2v9.6a.43.43 0 0 0 .7.35l7.1-4.8a.43.43 0 0 0 0-.7z"/></svg></button>
-        <button class="pl-btn" id="ml-mp-seek-fwd" aria-label="前进15秒"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="15.5" text-anchor="middle" font-size="5.5" fill="currentColor" font-family="system-ui,sans-serif" font-weight="600">15</text></svg></button>
-        <button class="pl-btn pl-repeat" id="ml-mp-repeat" aria-label="循环"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
-      </div>
-      <div class="pl-vol-wrap">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-        <input class="pl-vol" id="ml-mp-vol" type="range" min="0" max="1" step="0.02" value="1">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM18.5 12c0-2.77-1.5-5.15-3.75-6.45v12.9C16.99 17.14 18.5 14.77 18.5 12z"/></svg>
-      </div>
     </div>
 
-      <div id="ml-detail-body"></div>
+    <!-- 简谱 iframe -->
+    <div class="mt-panel mt-panel-jf" id="mt-panel-jf">
+      <iframe id="mt-jf-iframe" src="" title="简谱编辑器"></iframe>
     </div>
-    <div id="ml-lightbox">
-      <button id="ml-lightbox-close">✕</button>
-      <img id="ml-lightbox-img" src="" alt="">
+  </div>
+</div>
+
+<!-- Modal: info -->
+<div class="mt-modal-overlay" id="mt-modal-info">
+  <div class="mt-modal-box">
+    <div class="mt-modal-title">Add Info · 歌曲信息</div>
+    <div class="mt-modal-row"><label>歌手 Artist</label><input class="mt-modal-inp" id="mt-meta-ar" placeholder="赞美之泉"></div>
+    <div class="mt-modal-row"><label>歌名 Title</label><input class="mt-modal-inp" id="mt-meta-ti" placeholder="展开清晨的翅膀"></div>
+    <div class="mt-modal-row"><label>专辑 Album</label><input class="mt-modal-inp" id="mt-meta-al"></div>
+    <div class="mt-modal-row"><label>制作 By</label><input class="mt-modal-inp" id="mt-meta-by"></div>
+    <div class="mt-modal-footer">
+      <button class="mt-modal-ok" id="mt-info-ok">确定</button>
+      <button class="mt-modal-cancel" id="mt-info-cancel">取消</button>
     </div>
-  `;
+  </div>
+</div>
 
-  const $=id=>document.getElementById(id);
-  const detail=$('ml-detail');
+<!-- Modal: create -->
+<div class="mt-modal-overlay" id="mt-modal-create">
+  <div class="mt-modal-box">
+    <div class="mt-modal-title">创建歌词 · 每行一句</div>
+    <div class="mt-modal-warn">⚠️ 这会删除当前所有歌词，确认继续吗？</div>
+    <textarea class="mt-modal-ta" id="mt-create-ta" placeholder="第一行歌词&#10;第二行歌词&#10;第三行歌词"></textarea>
+    <div class="mt-modal-footer">
+      <button class="mt-modal-ok" id="mt-create-ok">创建</button>
+      <button class="mt-modal-cancel" id="mt-create-cancel">取消</button>
+    </div>
+  </div>
+</div>
 
-  (function buildNoticeUI(){
-    const noticeHTML=`
-      <div class="ml-notice-track">
-        <div class="ml-notice-item"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
-        <div class="ml-notice-item" aria-hidden="true"><span class="ml-notice-dot"></span><span>本页面所展示之诗歌内容，仅作为学习、练习与敬拜辅助之用；其歌词、曲谱、音频及相关版权均归原权利人所有。若你需要其他歌曲，欢迎联系 <span class="ml-notice-name">YuEn</span>。</span></div>
-      </div>`;
+<div class="mt-modal-overlay" id="mt-modal-txt">
+  <div class="mt-modal-box">
+    <div class="mt-modal-title">上传文本 · 粘贴歌词</div>
+    <textarea class="mt-modal-ta" id="mt-txt-ta" placeholder="粘贴纯文本歌词，每行一句&#10;（不需要时间戳）"></textarea>
+    <div class="mt-modal-footer">
+      <button class="mt-modal-ok" id="mt-txt-ok">导入</button>
+      <button class="mt-modal-cancel" id="mt-txt-cancel">取消</button>
+    </div>
+  </div>
+</div>
 
-    const listNotice=document.createElement('button');
-    listNotice.id='ml-notice';
-    listNotice.type='button';
-    listNotice.setAttribute('aria-label','版权与申请新歌说明');
-    listNotice.innerHTML=noticeHTML;
-    root.insertBefore(listNotice, $('ml-header'));
+<!-- 教程弹窗 -->
+<div class="mt-tut-overlay" id="mt-tut">
+  <div class="mt-tut-box">
+    <button class="mt-tut-close" id="mt-tut-close">✕</button>
+    <div class="mt-tut-icon" id="mt-tut-icon">🎵</div>
+    <div class="mt-tut-step-label" id="mt-tut-step-label">步骤 1 / 4</div>
+    <div class="mt-tut-title" id="mt-tut-title"></div>
+    <div class="mt-tut-desc" id="mt-tut-desc"></div>
+    <div class="mt-tut-items" id="mt-tut-items"></div>
+    <div class="mt-tut-footer">
+      <div class="mt-tut-dots" id="mt-tut-dots"></div>
+      <div class="mt-tut-btns">
+        <button class="mt-tut-nevershow" id="mt-tut-never">以后不再显示</button>
+        <button class="mt-tut-skip" id="mt-tut-skip">跳过</button>
+        <button class="mt-tut-next" id="mt-tut-next">下一步 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
 
-    const detailNotice=document.createElement('button');
-    detailNotice.id='ml-detail-notice';
-    detailNotice.type='button';
-    detailNotice.setAttribute('aria-label','版权与申请新歌说明');
-    detailNotice.innerHTML=noticeHTML;
-    detail.insertBefore(detailNotice, $('ml-detail-body'));
+/* ── 路由 ── */
+const hub      = $('mt-hub');
+const toolview = $('mt-toolview');
+const navName  = $('mt-nav-name');
+const panels   = { lrc: $('mt-panel-lrc'), jf: $('mt-panel-jf') };
 
-    const modal=document.createElement('div');
-    modal.id='ml-notice-modal';
-    modal.innerHTML=`
-      <div id="ml-notice-dialog" role="dialog" aria-modal="true" aria-labelledby="ml-notice-modal-title">
-        <button id="ml-notice-close" type="button" aria-label="关闭">✕</button>
-        <div id="ml-notice-kicker">COPYRIGHT NOTICE</div>
-        <h2 id="ml-notice-modal-title">诗歌版权与申请新歌</h2>
-        <div id="ml-notice-copy">本站所展示之诗歌、歌词、曲谱、音频及相关资料，其著作权及相关权利均归原权利人所有。本站内容仅用于教会内部诗歌练习、学习与敬拜辅助，不以营利为目的。若相关权利人认为本站任何内容涉及侵权，请与我们联系，我们将在核实后及时处理、修改或下架相关内容。</div>
-        <div id="ml-notice-sub">需要申请新歌练习可联系 <strong>YuEn</strong>。制作一首歌通常需要约 <strong>1–2 小时</strong>，请尽量提前说明。</div>
-        <div id="ml-notice-actions">
-          <button class="ml-notice-action is-copy" id="ml-copy-wechat" type="button">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 4C5.36 4 2 6.92 2 10.5c0 2.04 1.06 3.86 2.72 5.08L4 18l2.5-1.25A8.6 8.6 0 0 0 9.5 17c.17 0 .34 0 .5-.01A5.7 5.7 0 0 1 9.5 15c0-3.04 2.69-5.5 6-5.5.17 0 .34 0 .5.01C15.41 6.67 12.73 4 9.5 4zm8 7c-2.76 0-5 1.79-5 4s2.24 4 5 4c.72 0 1.4-.14 2-.38L22 20l-.62-1.86A3.93 3.93 0 0 0 22.5 15c0-2.21-2.24-4-5-4z"/></svg>
-            <span class="ml-notice-action-title">复制微信号 YuEn</span>
-          </button>
-          <button class="ml-notice-action" id="ml-open-ins" type="button">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-            <span class="ml-notice-action-title">打开 YuEn 的 Instagram</span>
-          </button>
-          <button class="ml-notice-action" id="ml-open-church-ins" type="button">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-            <span class="ml-notice-action-title">教会青年 Instagram</span>
-          </button>
+function $(id){ return document.getElementById(id); }
+
+const jianpuHTML = `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>简谱编辑器</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0e10;--panel:#18181c;--panel2:#222228;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
+  --ink:rgba(255,255,255,0.88);--ink2:rgba(255,255,255,0.44);--ink3:rgba(255,255,255,0.18);
+  --accent:#7c6af7;--accent2:#a89af9;--red:#f27c6a;--green:#6af2a8;--sel:#f0c040;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+.topbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+.topbar-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);}
+.topbar-title span{color:var(--accent2);}
+.topbar-tabs{display:flex;gap:2px;margin-left:auto;}
+.top-tab{padding:6px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--ink2);font-family:'Space Mono',monospace;transition:.12s;}
+.top-tab.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+.top-area{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+.top-panel{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 16px;display:none;position:relative;}
+.top-panel.on{display:block;}
+
+.bottom-area{height:58vh;display:flex;flex-shrink:0;}
+
+/* ── 左：段落编辑 ── */
+.seg-pane{width:54%;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+.seg-pane-inner{padding:8px;flex:1;}
+.sec-block{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+.sec-head{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--panel2);border-bottom:1px solid var(--border);}
+.sec-name-input{background:transparent;border:none;color:var(--ink);font-family:'Space Mono',monospace;font-size:13px;font-weight:700;outline:none;flex:1;}
+.sec-btn{font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--ink2);cursor:pointer;font-family:'Space Mono',monospace;}
+.sec-btn:hover{background:var(--border);color:var(--ink);}
+.sec-btn.del{color:var(--red);}
+.row-block{border-bottom:1px solid var(--border);padding:6px 10px;}
+.row-block:last-child{border-bottom:none;}
+.row-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.row-idx{font-size:8px;color:var(--ink3);}
+.bold-toggle{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--ink2);cursor:pointer;}
+.bold-toggle input{accent-color:var(--accent);}
+.row-del{margin-left:auto;background:none;border:none;color:var(--ink3);cursor:pointer;font-size:11px;}
+.row-del:hover{color:var(--red);}
+
+.seg-table{width:100%;border-collapse:collapse;}
+.seg-table th{font-size:9px;color:var(--ink3);padding:2px 3px;text-align:left;letter-spacing:1px;border-bottom:1px solid var(--border);}
+.seg-table td{padding:1px 2px;vertical-align:middle;}
+.seg-table input{background:var(--panel2);border:1px solid var(--border);border-radius:3px;color:var(--ink);font-family:'Space Mono',monospace;font-size:12px;padding:3px 5px;outline:none;transition:border-color .12s;width:100%;}
+.seg-table input:focus{border-color:var(--accent);}
+.inp-chord{max-width:62px;}
+.inp-lyric{max-width:80px;}
+.btn-del-seg{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:11px;}
+.btn-del-seg:hover{color:var(--red);}
+.drag-handle{cursor:grab;color:var(--ink3);font-size:11px;padding:0 2px;user-select:none;}
+.drag-handle:hover{color:var(--ink2);}
+.seg-row{transition:opacity .15s;}
+.seg-row.dragging{opacity:0.35;}
+.seg-row.drag-over{border-left:2px solid var(--accent);}
+.btn-add-seg{font-size:9px;color:var(--accent2);background:none;border:none;cursor:pointer;margin-top:4px;font-family:'Space Mono',monospace;}
+.add-row-btn{width:100%;padding:5px;border-radius:5px;border:1px dashed rgba(106,242,168,0.3);background:transparent;font-family:'Space Mono',monospace;font-size:9px;color:var(--green);cursor:pointer;margin-top:5px;}
+.add-row-btn:hover{background:rgba(106,242,168,0.06);border-color:var(--green);}
+.add-sec-btn{width:calc(100% - 16px);padding:5px;border-radius:5px;border:1px dashed var(--border2);background:transparent;font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);cursor:pointer;margin:6px 8px;display:block;}
+
+/* ── 中间状态栏 ── */
+.mid-bar{display:flex;align-items:center;flex-wrap:wrap;gap:0 16px;padding:5px 14px;background:var(--panel2);border-top:1px solid var(--border);border-bottom:1px solid var(--border2);flex-shrink:0;}
+.mid-bar-left{display:flex;align-items:center;flex-wrap:wrap;gap:0;flex:1;}
+.mid-bar-right{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;}
+.mid-sel{font-size:9px;color:var(--sel);margin-left:6px;}
+.mid-tip{font-size:8px;color:var(--ink3);margin-left:8px;}
+
+/* ── 右：键盘 ── */
+.kbd-pane{width:46%;overflow-y:auto;padding:8px 10px;}
+
+/* ── 跨格子房子线（preview 层） ── */
+.prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
+.prev-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;box-sizing:border-box;}
+.prev-volta.closed::before{border-right:1.5px solid var(--accent2);}
+.prev-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
+
+/* 状态栏 */
+/* ── 输入状态栏（总音符/八度/时值/附点/段落/房子线） ── */
+.kbd-istate{display:flex;align-items:center;flex-wrap:wrap;gap:0;padding:4px 8px;background:var(--bg);border-radius:5px;border:1px solid var(--border);margin-bottom:5px;min-height:24px;font-family:'Space Mono',monospace;}
+.kbd-istate-item{font-size:10px;color:var(--ink3);white-space:nowrap;padding:0 7px 0 0;}
+.kbd-istate-item span{color:var(--ink2);}
+.kbd-istate-item.hi span{color:var(--accent2);}
+
+.kbd-status{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-radius:5px;border:1px solid var(--border);margin-bottom:8px;min-height:28px;}
+.kbd-status-loc{font-size:9px;color:var(--ink2);white-space:nowrap;}
+.kbd-status-sel{font-size:9px;color:var(--sel);margin-left:4px;white-space:nowrap;}
+.kbd-status-tip{font-size:8px;color:var(--ink3);margin-left:auto;}
+
+/* ── 房子线（token 式，和连音线一样） ── */
+.jp-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
+.jp-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;box-sizing:border-box;}
+.jp-volta.v-close::before{border-right:1.5px solid var(--accent2);}
+.jp-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:10px;line-height:1;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
+
+.kbd-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
+.kbd-row{display:flex;gap:4px;flex-wrap:wrap;}
+.kbd-btn{font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;border-radius:5px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;transition:all .1s;min-width:30px;text-align:center;line-height:1;}
+.kbd-btn:hover{background:var(--panel);color:var(--ink);border-color:var(--accent);}
+.kbd-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 0 8px rgba(124,106,247,0.4);}
+.kbd-btn.action{color:var(--red);border-color:rgba(242,124,106,0.25);}
+.kbd-btn.action:hover{background:rgba(242,124,106,0.1);}
+.kbd-btn.slur-btn{color:var(--green);border-color:rgba(106,242,168,0.25);}
+.kbd-btn.slur-btn:hover{background:rgba(106,242,168,0.08);}
+.kbd-btn.slur-btn.on{background:var(--green);color:#000;border-color:var(--green);}
+.shortcut{font-size:7px;opacity:0.4;display:block;margin-top:1px;}
+
+/* 九宫格 */
+.numpad{display:grid;grid-template-columns:repeat(3,44px);gap:4px;}
+.numpad .kbd-btn{font-size:16px;font-weight:700;padding:9px 0;width:44px;color:var(--ink);min-width:0;}
+.numpad .kbd-btn:hover{color:var(--accent2);}
+.kbd-btn.zero{font-size:14px;font-weight:700;color:var(--ink);width:100%;margin-top:4px;}
+
+/* ── token 格子 ── */
+.tok-field{background:var(--panel2);border:1px solid var(--border);border-radius:3px;color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;padding:2px 4px;min-height:22px;display:flex;flex-wrap:wrap;gap:2px;align-items:center;cursor:pointer;width:100%;box-sizing:border-box;}
+.tok-field.n-active{border-color:var(--accent);}
+.tok-chip{padding:1px 4px;border-radius:2px;cursor:pointer;white-space:nowrap;user-select:none;}
+.tok-chip:hover{background:var(--border2);}
+/* 选中 = 黄色高亮 */
+.tok-chip.sel{background:var(--sel);color:#000;}
+/* 插入游标：在选中起点前显示绿竖线 */
+.tok-chip.cursor{border-left:2px solid var(--green);}
+.tok-chip.sel.cursor{border-left:2px solid #000;}
+/* 末尾游标 */
+.tok-end{color:var(--ink3);cursor:pointer;font-size:8px;padding:1px 3px;user-select:none;}
+.tok-end.cursor{color:var(--green);}
+
+/* ── 导入弹窗 ── */
+.import-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
+.import-overlay.open{display:flex;}
+.import-box{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:18px;width:520px;max-width:95vw;}
+.import-box textarea{width:100%;height:180px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;padding:8px;resize:vertical;outline:none;line-height:1.6;}
+.import-box textarea:focus{border-color:var(--accent);}
+.import-btns{display:flex;gap:8px;margin-top:10px;}
+.import-ok{flex:1;padding:8px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;}
+.import-ok:hover{opacity:.85;}
+.import-cancel{padding:8px 16px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--ink2);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;}
+.import-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;}
+.import-err{font-size:9px;color:var(--red);margin-top:6px;min-height:14px;}
+
+.code-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:10px;color:var(--ink2);white-space:pre;overflow-x:auto;max-height:100%;line-height:1.8;}
+.copy-btn{margin-top:8px;width:100%;padding:8px;border-radius:6px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;}
+.copy-btn:hover{background:var(--accent);border-color:var(--accent);}
+
+
+
+/* 编辑器 A4 纸张背景 - 匹配帖子显示宽度 */
+/* 帖子 sw-wrap+sw-lb = 各16px padding，共32px per side
+   top-panel 已有 16px padding per side
+   所以 previewWrap margin = 32-16 = 16px per side */
+#top-preview{
+  background-image:repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 35px,
+    rgba(255,255,255,0.05) 35px, rgba(255,255,255,0.05) 36px
+  );
+}
+#previewWrap{
+  width:694px; /* 平板竖屏(768px)实测 sw-lb 宽度 */
+  max-width:calc(100% - 2px);
+  padding:12px 0;
+  min-height:200px;
+  border-left:1px solid rgba(255,255,255,0.15);
+  border-right:1px solid rgba(255,255,255,0.15);
+  position:relative;
+}
+#previewWrap::before{
+  content:'帖子内容区';
+  position:absolute;top:4px;right:4px;
+  font-size:8px;letter-spacing:1px;
+  color:rgba(255,255,255,0.2);
+  pointer-events:none;
+  font-family:monospace;
+}
+
+/* 预览 */
+.prev-sec{margin-bottom:20px;}
+.prev-sec-name{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.prev-sec-name::after{content:'';flex:1;height:1px;background:var(--border);}
+.prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
+.prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
+.p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
+.p-chord.empty{visibility:hidden;}
+.p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
+.p-lyric.bold{font-weight:700;color:var(--ink);}
+.p-lyric2{opacity:0.65;margin-top:1px;}
+
+/* 音符结构 */
+.jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
+.jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
+.jp-plain-top{height:12px;}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;}.jp-plain-bot{height:16px;}
+.jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;}
+.jp-dot-top{height:12px;justify-content:flex-end;}.jp-dot-bot{height:12px;justify-content:flex-start;}
+.jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
+.jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;}
+.jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em;}
+.jp-aug{position:absolute;right:-0.42em;top:0.1em;font-size:10px;line-height:1;pointer-events:none;}
+.jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--ink);}
+.jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
+.jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:50% 50% 0 0/100% 100% 0 0;}
+.jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
+.jp-slur-open::before{content:'';position:absolute;top:2px;left:15%;right:-4px;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-radius:50% 0 0 0/100% 0 0 0;}
+.jp-slur-close{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
+.jp-slur-close::before{content:'';position:absolute;top:2px;left:-4px;right:15%;height:8px;border-top:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:0 50% 0 0/0 100% 0 0;}
+.jp-tuplet{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;margin-right:1px;}
+.jp-tuplet-br{position:absolute;top:2px;left:2px;right:2px;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:3px 3px 0 0;pointer-events:none;}
+.jp-tuplet-num{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:8px;line-height:1;padding:0 3px;background:var(--bg);color:var(--ink);pointer-events:none;}
+
+/* ── 批量填歌词 modal ── */
+.lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
+.lyfill-overlay.open{display:flex;}
+.lyfill-box{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:18px;width:480px;max-width:95vw;}
+.lyfill-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.lyfill-hint{font-size:9px;color:var(--ink2);margin-bottom:10px;line-height:1.6;}
+.lyfill-ta{width:100%;height:110px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--ink);font-family:'Space Mono',monospace;font-size:12px;padding:8px;resize:vertical;outline:none;line-height:1.6;}
+.lyfill-ta:focus{border-color:var(--accent);}
+.lyfill-scope{display:flex;gap:10px;margin:8px 0 6px;}
+.lyfill-scope label{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--ink2);cursor:pointer;font-family:'Space Mono',monospace;}
+.lyfill-stats{font-size:9px;min-height:14px;margin-top:4px;}
+.lyfill-stats.warn{color:#f0c040;}.lyfill-stats.ok{color:var(--green);}
+.lyfill-btns{display:flex;gap:8px;margin-top:10px;}
+.lyfill-ok{flex:1;padding:8px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;}
+.lyfill-ok:hover{opacity:.85;}
+.lyfill-cancel{padding:8px 16px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--ink2);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;}
+
+/* ── 检查状态 modal ── */
+.check-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
+.check-overlay.open{display:flex;}
+.check-box{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:18px;width:420px;max-width:95vw;max-height:80vh;overflow-y:auto;}
+.check-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;}
+.check-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.check-row:last-child{border-bottom:none;}
+.check-sec-name{font-size:10px;color:var(--ink2);flex:1;font-family:'Space Mono',monospace;}
+.check-nums{font-size:10px;font-family:'Space Mono',monospace;}
+.check-ok{color:var(--green);}.check-warn{color:#f0c040;}
+.check-total{margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;font-family:'Space Mono',monospace;color:var(--ink);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="dot"></div>
+  <div class="topbar-title">简谱编辑器 <span>v3.1</span></div>
+  <div class="topbar-tabs">
+    <button class="top-tab" onclick="openImport()">导入</button>
+    <button class="top-tab" onclick="openBulkLyric()" title="批量填歌词">⌨ 填歌词</button>
+    <button class="top-tab" onclick="openCheck()" title="检查音符与歌词数量">⚑ 检查</button>
+    <button class="top-tab on" onclick="switchTop('preview',this)">预览</button>
+    <button class="top-tab" onclick="switchTop('code',this)">代码</button>
+  </div>
+</div>
+
+<div class="import-overlay" id="importOverlay">
+  <div class="import-box">
+    <div class="import-label">粘贴 简谱数组代码（[ ... ] 或 var SECTIONS = [...]）</div>
+    <textarea id="importTA" placeholder="sections: [&#10;  { name: '主歌', lines: [ ... ] },&#10;],"></textarea>
+    <div class="import-err" id="importErr"></div>
+    <div class="import-btns">
+      <button class="import-ok" onclick="doImport()">导入</button>
+      <button class="import-cancel" onclick="closeImport()">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="top-area">
+  <div class="top-panel on" id="top-preview"><div id="previewWrap"></div></div>
+  <div class="top-panel" id="top-code">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+      <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">ID（文件名）
+        <input id="meta-id" placeholder="zmzq-shunfu" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">歌名
+        <input id="meta-title" placeholder="顺服" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">艺人
+        <input id="meta-artist" placeholder="赞美之泉" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">副标题 / 词曲
+        <input id="meta-sub" placeholder="余盈盈 词曲" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">原调
+        <input id="meta-key" placeholder="A" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">BPM
+        <input id="meta-bpm" placeholder="72" type="number" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">YouTube 链接
+        <input id="meta-youtube" placeholder="https://youtu.be/..." style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">封面图 cover <span style="color:var(--ink3);font-weight:normal;">（图片 URL）</span>
+        <input id="meta-cover" placeholder="https://..." style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">歌词文件 lrc <span style="color:var(--ink3);font-weight:normal;">（.lrc 文件 URL）</span>
+        <input id="meta-lrc" placeholder="https://..." style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">乐谱图 scoreImg <span style="color:var(--ink3);font-weight:normal;">（图片 URL）</span>
+        <input id="meta-scoreimg" placeholder="https://..." style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+    </div>
+    <div class="code-box" id="codeBox"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">
+      <button class="copy-btn" onclick="copyCode()" style="margin-top:0;">复制 sections 数组</button>
+      <button class="copy-btn" onclick="copyFullJson()" style="margin-top:0;background:var(--accent);border-color:var(--accent);color:#fff;">复制完整 JSON 文件</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 中间状态 + 位置栏 ── -->
+<div class="mid-bar">
+  <div class="mid-bar-left" id="inputStateBar">
+    <span class="kbd-istate-item">总音符: <span id="is-total">0</span></span>
+    <span class="kbd-istate-item">八度: <span id="is-oct">中</span></span>
+    <span class="kbd-istate-item">时值: <span id="is-dur">4分</span></span>
+    <span class="kbd-istate-item">附点: <span id="is-dot">关</span></span>
+    <span class="kbd-istate-item hi">房子线: <span id="is-volta">无</span></span>
+  </div>
+  <div class="mid-bar-right">
+    <span id="statusLoc">点击左边格子开始编辑</span><span class="mid-sel" id="statusSel"></span><span class="mid-tip" id="statusTip"></span>
+  </div>
+</div>
+
+<div class="bottom-area">
+  <div class="seg-pane">
+    <div class="seg-pane-inner" id="sectionsWrap"></div>
+    <button class="add-sec-btn" onclick="addSection()">+ 新增段落</button>
+    <button class="add-sec-btn" onclick="openBulkLyric()" style="color:var(--accent2);border-color:rgba(124,106,247,0.3);">⌨ 批量填歌词</button>
+  </div>
+
+  <div class="kbd-pane">
+
+    <!-- 八度 + 音值 + 模式 -->
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <div>
+        <div class="kbd-label">八度 <span style="color:var(--ink3);font-size:7px;">↑↓</span></div>
+        <div class="kbd-row">
+          <button class="kbd-btn" id="oct-low2" onclick="setOct('low2')" style="padding:6px 6px;min-width:30px;font-size:11px;">低2</button>
+          <button class="kbd-btn" id="oct-low1" onclick="setOct('low1')" style="padding:6px 6px;min-width:30px;font-size:11px;">低1</button>
+          <button class="kbd-btn on" id="oct-mid"  onclick="setOct('mid')"  style="padding:6px 6px;min-width:30px;font-size:11px;">中</button>
+          <button class="kbd-btn" id="oct-high1" onclick="setOct('high1')" style="padding:6px 6px;min-width:30px;font-size:11px;">高1</button>
+          <button class="kbd-btn" id="oct-high2" onclick="setOct('high2')" style="padding:6px 6px;min-width:30px;font-size:11px;">高2</button>
         </div>
-      </div>`;
-    root.appendChild(modal);
-
-    const toast=document.createElement('div');
-    toast.id='ml-toast';
-    root.appendChild(toast);
-
-    const mbLyric=$('ml-mb-lyric');
-    if(mbLyric) mbLyric.textContent='';
-  })();
-
-  syncHaloTheme();
-  observeThemeChanges();
-
-  $('ml-search').addEventListener('input',e=>{query=e.target.value.trim();render();});
-  $('ml-back').addEventListener('click',closeDetail);
-
-  function showToast(text){
-    const t=$('ml-toast');
-    if(!t) return;
-    t.textContent=text;
-    t.classList.add('show');
-    clearTimeout(showToast._timer);
-    showToast._timer=setTimeout(()=>t.classList.remove('show'),1800);
-  }
-
-  async function copyText(text, msg){
-    try{
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        await navigator.clipboard.writeText(text);
-      }else{
-        const ta=document.createElement('textarea');
-        ta.value=text;
-        ta.setAttribute('readonly','');
-        ta.style.cssText='position:fixed;left:-9999px;opacity:0;';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        ta.remove();
-      }
-      showToast(msg||'已复制');
-    }catch(_){
-      showToast('复制失败，请手动复制');
-    }
-  }
-
-  function openNoticeModal(){
-    $('ml-notice-modal')?.classList.add('open');
-    document.body.style.overflow='hidden';
-  }
-  function closeNoticeModal(){
-    $('ml-notice-modal')?.classList.remove('open');
-    document.body.style.overflow='';
-  }
-
-  $('ml-contact').addEventListener('click',()=>copyText(WECHAT,'微信号已复制'));
-  $('ml-notice')?.addEventListener('click',openNoticeModal);
-  $('ml-detail-notice')?.addEventListener('click',openNoticeModal);
-  $('ml-copy-wechat')?.addEventListener('click',()=>copyText(WECHAT,'微信号已复制'));
-  $('ml-open-ins')?.addEventListener('click',()=>window.open('https://www.instagram.com/_yuen0129/','_blank','noopener'));
-  $('ml-open-church-ins')?.addEventListener('click',()=>window.open('https://www.instagram.com/cecp.it_youth/','_blank','noopener'));
-  $('ml-notice-close')?.addEventListener('click',closeNoticeModal);
-  $('ml-notice-modal')?.addEventListener('click',e=>{ if(e.target===e.currentTarget) closeNoticeModal(); });
-
-  $('ml-lightbox').addEventListener('click',e=>{
-    if(e.target===e.currentTarget||e.target.id==='ml-lightbox-close') $('ml-lightbox').classList.remove('open');
-  });
-  $('ml-lightbox-img').addEventListener('click',e=>e.stopPropagation());
-
-  function openLightbox(src){$('ml-lightbox-img').src=src;$('ml-lightbox').classList.add('open');}
-  function getSongIdFromUrl(){
-    try{
-      const u=new URL(location.href);
-      return u.searchParams.get('song')||'';
-    }catch(_){
-      return '';
-    }
-  }
-
-  function buildSongUrl(songId){
-    try{
-      const u=new URL(location.href);
-      if(songId) u.searchParams.set('song', songId);
-      else u.searchParams.delete('song');
-      return u.toString();
-    }catch(_){
-      return location.href;
-    }
-  }
-
-  function setSongUrl(songId, replaceOnly=true){
-    try{
-      const nextUrl=buildSongUrl(songId);
-      const nextState=Object.assign({}, history.state||{}, {
-        __mlSongId: songId||'',
-        __mlDetail: !!songId
-      });
-      (replaceOnly?history.replaceState:history.pushState).call(history, nextState, '', nextUrl);
-    }catch(_){}
-  }
-
-  function shareSong(song){
-    const urlText=buildSongUrl(song.id);
-    const title=song.title||'诗歌';
-    if(navigator.share){
-      navigator.share({ title, url:urlText }).then(()=>{
-        showToast('分享成功');
-      }).catch(()=>{
-        copyText(urlText,'链接已复制');
-      });
-    }else{
-      copyText(urlText,'链接已复制');
-    }
-  }
-
-  function openSongFromUrl(){
-    const songId=getSongIdFromUrl();
-    if(!songId||!songs.length) return;
-    const target=songs.find(x=>x.id===songId);
-    if(target) openDetail(target,{fromUrl:true});
-  }
-
-  function closeDetail(fromPop){
-    if(!fromPop && _detailStatePushed){
-      history.back();
-      return;
-    }
-    destroyAP();
-    stopMetronome();
-    detail.classList.remove('open');
-    detail.style.transform='';
-    detail.classList.remove('swiping');
-    $('ml-detail-overlay').style.opacity='0';
-    _detailStatePushed=false;
-    setSongUrl('', true);
-  }
-
-  function tryColor(el, prop){
-    if(!el)return '';
-    const v=getComputedStyle(el).getPropertyValue(prop).trim();
-    return v && v!=='transparent' && v!=='rgba(0, 0, 0, 0)' ? v : '';
-  }
-
-  function getThemeGuess(){
-    const cs=getComputedStyle(document.body);
-    const bg=cs.backgroundColor || 'rgb(255,255,255)';
-    const m=bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
-    if(!m)return 'light';
-    const avg=(+m[1] + +m[2] + +m[3]) / 3;
-    return avg < 120 ? 'dark' : 'light';
-  }
-
-  function syncHaloTheme(){
-    const rb=root.style;
-    const body=document.body, html=document.documentElement;
-    const mode=getThemeGuess();
-
-    const bg = tryColor(body,'--theme-bg') || tryColor(html,'--theme-bg') || tryColor(body,'background-color') || (mode==='dark'?'#0b0b0d':'#f5f5f7');
-    const bg2 = tryColor(body,'--card-bg') || tryColor(html,'--card-bg') || tryColor(body,'--halo-card-bg') || (mode==='dark'?'#17171a':'#ffffff');
-    const bg3 = tryColor(body,'--muted-bg') || tryColor(html,'--muted-bg') || (mode==='dark'?'#222227':'#ececf1');
-    const text = tryColor(body,'--theme-text') || tryColor(html,'--theme-text') || tryColor(body,'color') || (mode==='dark'?'#f5f7fb':'#1d1d1f');
-    const text2 = tryColor(body,'--theme-text-secondary') || tryColor(html,'--theme-text-secondary') || (mode==='dark'?'rgba(245,247,251,.68)':'#6e6e73');
-    const text3 = tryColor(body,'--theme-text-tertiary') || tryColor(html,'--theme-text-tertiary') || (mode==='dark'?'rgba(245,247,251,.36)':'#aeaeb2');
-    const accent = tryColor(body,'--theme-primary') || tryColor(html,'--theme-primary') || tryColor(body,'--halo-accent') || (mode==='dark'?'#7c9cff':'#007aff');
-    const border = tryColor(body,'--theme-border') || tryColor(html,'--theme-border') || (mode==='dark'?'rgba(255,255,255,.08)':'rgba(0,0,0,.08)');
-    const borderMd = tryColor(body,'--theme-border-strong') || tryColor(html,'--theme-border-strong') || (mode==='dark'?'rgba(255,255,255,.13)':'rgba(0,0,0,.13)');
-
-    rb.setProperty('--halo-bg', bg);
-    rb.setProperty('--halo-bg2', bg2);
-    rb.setProperty('--halo-bg3', bg3);
-    rb.setProperty('--halo-text', text);
-    rb.setProperty('--halo-text2', text2);
-    rb.setProperty('--halo-text3', text3);
-    rb.setProperty('--halo-accent', accent);
-    rb.setProperty('--halo-border', border);
-    rb.setProperty('--halo-border-md', borderMd);
-    rb.setProperty('--halo-accent-light', colorMix(accent, 0.16));
-  }
-
-  function colorMix(color, alpha){
-    if(color.startsWith('rgb')){
-      const m=color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
-      if(m)return `rgba(${m[1]},${m[2]},${m[3]},${alpha})`;
-    }
-    if(color.startsWith('#')){
-      const hex=color.slice(1);
-      const full=hex.length===3?hex.split('').map(x=>x+x).join(''):hex;
-      const r=parseInt(full.slice(0,2),16),g=parseInt(full.slice(2,4),16),b=parseInt(full.slice(4,6),16);
-      return `rgba(${r},${g},${b},${alpha})`;
-    }
-    return `rgba(0,122,255,${alpha})`;
-  }
-
-  function observeThemeChanges(){
-    if(_themeObserver)_themeObserver.disconnect();
-    _themeObserver=new MutationObserver(()=>syncHaloTheme());
-    _themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
-    _themeObserver.observe(document.body,{attributes:true,attributeFilter:['class','style','data-theme']});
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',syncHaloTheme);
-  }
-
-  async function loadSongs(){
-    try{
-      const res=await fetch(GITHUB_API);if(!res.ok)throw 0;
-      const files=await res.json();
-      const jsons=files.filter(f=>f.name.endsWith('.json')&&f.name!=='test.json');
-      const all=await Promise.all(jsons.map(f=>fetch(RAW_BASE+f.name).then(r=>r.json()).catch(()=>null)));
-      songs=all.filter(Boolean);
-      $('ml-loading').style.display='none';
-      $('ml-count').textContent=songs.length+' 首';
-      render();
-      openSongFromUrl();
-    }catch(e){
-      $('ml-loading').innerHTML='<div style="color:#ff3b30;font-size:14px">载入失败，请刷新重试</div>';
-    }
-  }
-
-  function hasLyricMatch(s,q){
-    for(const sec of s.sections||[])for(const line of sec.lines||[]){
-      const arr=Array.isArray(line)?line:(line.line||[]);
-      for(const c of arr)if((c.lyric||'').toLowerCase().includes(q))return true;
-    }return false;
-  }
-  function hi(t,q){
-    if(!q||!t)return t||'';
-    return t.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'),'<mark class="ml-highlight">$1</mark>');
-  }
-
-  function render(){
-    const list=$('ml-list'),empty=$('ml-empty'),q=query.toLowerCase();
-    const filtered=q
-      ?songs.filter(s=>(s.title||'').toLowerCase().includes(q)||(s.artist||'').toLowerCase().includes(q)||hasLyricMatch(s,q))
-      :[...songs];
-    if(!filtered.length){
-      list.innerHTML='';$('ml-query-text').textContent=query;empty.style.display='block';
-    }else{
-      empty.style.display='none';
-      list.innerHTML=filtered.map(s=>cardHTML(s,q)).join('')+'<div id="ml-list-end"></div>';
-      _mpSongs = songs.filter(s=>s.mp3);
-      list.querySelectorAll('.ml-song-card').forEach(el=>{
-        el.addEventListener('click',()=>{const s=songs.find(x=>x.id===el.dataset.id);if(s)openDetail(s);});
-
-        const shareBtn=document.createElement('button');
-        shareBtn.className='ml-share-btn';
-        shareBtn.type='button';
-        shareBtn.title='分享';
-        shareBtn.innerHTML='🔗';
-        shareBtn.style.cssText='position:absolute;right:38px;top:50%;transform:translateY(-50%);border:none;background:transparent;cursor:pointer;font-size:14px;line-height:1;padding:6px;border-radius:999px;z-index:2;';
-        shareBtn.onclick=e=>{
-          e.stopPropagation();
-          const s=songs.find(x=>x.id===el.dataset.id);
-          if(s) shareSong(s);
-        };
-        el.appendChild(shareBtn);
-
-        const playBtn=document.createElement('button');
-        playBtn.className='ml-mp-play-btn';
-        playBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`;
-        playBtn.title='播放';
-        playBtn.onclick=e=>{
-          e.stopPropagation();
-          const s=songs.find(x=>x.id===el.dataset.id);
-          if(!s||!s.mp3) return;
-          const idx=_mpSongs.findIndex(x=>x.id===s.id);
-          if(idx>=0) _mpPlayIdx(idx);
-        };
-        el.appendChild(playBtn);
-      });
-    }
-  }
-
-  function cardHTML(s,q){
-    const cover=s.cover
-      ?`<img class="ml-cover" src="${s.cover}" loading="lazy" onerror="this.outerHTML='<div class=\\'ml-cover-placeholder\\'>♪</div>'">`
-      :`<div class="ml-cover-placeholder">♪</div>`;
-    return`<div class="ml-song-card" data-id="${s.id}">
-      ${cover}
-      <div class="ml-info">
-        <div class="ml-song-title">${hi(s.title,q)}</div>
-        <div class="ml-song-meta">${hi([s.artist,s.sub].filter(Boolean).join(' · '),q)}</div>
       </div>
-      ${s.origKey?`<span class="ml-song-key">${s.origKey}</span>`:''}
-      <span class="ml-chevron">›</span>
-    </div>`;
+      <div>
+        <div class="kbd-label">音值 <span style="color:var(--ink3);font-size:7px;">Q W E R T</span></div>
+        <div class="kbd-row">
+          <button class="kbd-btn" id="dur-whole"   onclick="setDur('whole')"   style="padding:6px 6px;min-width:32px;font-size:11px;">全<span class="shortcut">Q</span></button>
+          <button class="kbd-btn" id="dur-half"    onclick="setDur('half')"    style="padding:6px 6px;min-width:32px;font-size:11px;">½<span class="shortcut">W</span></button>
+          <button class="kbd-btn on" id="dur-quarter" onclick="setDur('quarter')" style="padding:6px 6px;min-width:32px;font-size:11px;">¼<span class="shortcut">E</span></button>
+          <button class="kbd-btn" id="dur-eighth"  onclick="setDur('eighth')"  style="padding:6px 6px;min-width:32px;font-size:11px;">⅛<span class="shortcut">R</span></button>
+          <button class="kbd-btn" id="dur-16th"    onclick="setDur('16th')"    style="padding:6px 6px;min-width:32px;font-size:11px;">¹⁄₁₆<span class="shortcut">T</span></button>
+        </div>
+      </div>
+      <div>
+        <div class="kbd-label">输入模式 <span style="color:var(--ink3);font-size:7px;">I / O</span></div>
+        <div class="kbd-row">
+          <button class="kbd-btn on" id="mode-insert"    onclick="setInputMode('insert')"    style="padding:5px 6px;font-size:9px;">插入 I</button>
+          <button class="kbd-btn"    id="mode-overwrite" onclick="setInputMode('overwrite')" style="padding:5px 6px;font-size:9px;">覆盖 O</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 九宫格 + 功能 -->
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+      <div>
+        <div class="kbd-label">音符 <span style="color:var(--ink3);font-size:7px;">键盘数字</span></div>
+        <div class="numpad">
+          <button class="kbd-btn" onclick="inputNote(1)">1</button>
+          <button class="kbd-btn" onclick="inputNote(2)">2</button>
+          <button class="kbd-btn" onclick="inputNote(3)">3</button>
+          <button class="kbd-btn" onclick="inputNote(4)">4</button>
+          <button class="kbd-btn" onclick="inputNote(5)">5</button>
+          <button class="kbd-btn" onclick="inputNote(6)">6</button>
+          <button class="kbd-btn" onclick="inputNote(7)" style="grid-column:span 3;max-width:44px;">7</button>
+        </div>
+        <button class="kbd-btn zero" onclick="inputNote(0)">0 休止</button>
+      </div>
+
+      <div style="flex:1;">
+        <div class="kbd-label">功能 <span style="color:var(--ink3);font-size:7px;">\\=延 ,=附点 [=连音</span></div>
+        <div class="kbd-row">
+          <button class="kbd-btn" onclick="inputSpecial('-')" style="padding:5px 6px;">— 延音<span class="shortcut">\\</span></button>
+          <button class="kbd-btn" id="dot-btn" onclick="toggleDot()" style="padding:5px 6px;">· 附点<span class="shortcut">,</span></button>
+          <button class="kbd-btn" onclick="appendTok(buildSpacerTok())" style="padding:5px 6px;">␣ 空格<span class="shortcut">Space</span></button>
+          <button class="kbd-btn slur-btn" id="slur-btn" onclick="toggleSlur()" style="padding:5px 6px;">( ) 连音<span class="shortcut">[</span></button>
+          <button class="kbd-btn slur-btn" id="xslur-btn" onclick="toggleXSlur()" style="padding:5px 6px;">跨线开<span class="shortcut">]</span></button>
+          <button class="kbd-btn slur-btn" onclick="closeXSlur()" style="padding:5px 6px;">跨线结</button>
+          <button class="kbd-btn" onclick="appendTok('[v1')" style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第1房子线开始">1. 房开</button>
+          <button class="kbd-btn" onclick="appendTok('[v2')" style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第2房子线开始">2. 房开</button>
+          <button class="kbd-btn" onclick="appendTok(']v')"  style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入房子线结束">房结</button>
+          <button class="kbd-btn slur-btn" id="t3-btn" onclick="toggleTuplet(3)" style="padding:5px 6px;">3连</button>
+          <button class="kbd-btn slur-btn" id="t5-btn" onclick="toggleTuplet(5)" style="padding:5px 6px;">5连</button>
+          <button class="kbd-btn action" onclick="deleteSelected()" style="padding:5px 6px;">⌫ 删除<span class="shortcut">Bksp</span></button>
+          <button class="kbd-btn action" onclick="undoAction()" style="padding:5px 6px;">↩ 撤销<span class="shortcut">⌘Z</span></button>
+          <button class="kbd-btn action" onclick="clearN()" style="padding:5px 6px;">✕ 清空</button>
+          <button class="kbd-btn" onclick="copySeg()" style="padding:5px 6px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="复制整格 (Alt+C)">⬡ 复制格<span class="shortcut">Alt+C</span></button>
+          <button class="kbd-btn" onclick="pasteSeg()" style="padding:5px 6px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="粘贴到后面 (Alt+V)">⬡ 粘贴格<span class="shortcut">Alt+V</span></button>
+          <button class="kbd-btn" onclick="pasteSegReplace()" style="padding:5px 6px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="覆盖当前格 (Alt+R)">⬡ 覆盖格<span class="shortcut">Alt+R</span></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   数据
+════════════════════════════════════════ */
+var data=[
+  {name:'前奏',lines:[
+    {bold:false,segs:[
+      {chord:'E',    n:"0_ 5_",           lyric:""},
+      {chord:"",     n:"1'_ 2'_",         lyric:""},
+      {chord:'E/G#', n:"3' 5'",           lyric:""},
+      {chord:"",     n:"",                lyric:"｜"},
+      {chord:'A',    n:"6 - - -",         lyric:""},
+      {chord:"",     n:"",                lyric:"｜"},
+      {chord:'E',    n:"0_ 5_",           lyric:""},
+      {chord:"",     n:"1'_ 2'_",         lyric:""},
+      {chord:"",     n:"3' 5'",           lyric:""},
+      {chord:"",     n:"",                lyric:"｜"},
+      {chord:'A',    n:"6 - -",           lyric:""},
+    ]}
+  ]},
+  {name:'主歌',lines:[
+    {bold:false,segs:[
+      {chord:"",     n:"3_ 4_",           lyric:"主你"},
+      {chord:"",     n:"",                lyric:"｜"},
+      {chord:'E',    n:"5 ( 3_ 2_ )",     lyric:"使卑"},
+      {chord:'E/G#', n:"1 ( 7,_ 1_ )",    lyric:"微转"},
+      {chord:"",     n:"",                lyric:"｜"},
+      {chord:'A',    n:"1 6, 5, 5,_ 5,_", lyric:"为尊贵,是伤"},
+      {chord:"",     n:"",                lyric:"|"},
+      {chord:'E/G#', n:"1 3 5 ( 3_ 2_ )", lyric:"心流泪转"},
+      {chord:"",     n:"",                lyric:"|"},
+    ]},
+    {bold:false,segs:[
+      {chord:'A',    n:"1 3",             lyric:"为笑"},
+      {chord:'B',    n:"2 3_ 4_",         lyric:"颜.患难"},
+      {chord:"",     n:"",                lyric:"｜"},
+    ]},
+  ]},
+];
+
+/* ════════════════════════════════════════
+   编辑器状态
+════════════════════════════════════════ */
+var curSi=-1, curLi=-1, curGi=-1;
+// 游标位置（插入点）：-1 = 末尾，>=0 = 在 curTok 前面插入
+var curTok=-1;
+// 多选范围（含）：selA 是锚点，selB 是终点
+var selA=-1, selB=-1;
+
+var oct='mid', dur='quarter', dotOn=false, slurOn=false, xslurOn=false, tupletOn=0;
+var inputMode='insert';
+var tokClipboard=[]; // 存 token 数组
+var segClipboard=null; // 存整格子
+
+/* ════════════════════════════════════════
+   撤销
+════════════════════════════════════════ */
+var undoStack=[];
+function saveUndo(){
+  undoStack.push(JSON.stringify({d:data,si:curSi,li:curLi,gi:curGi,ct:curTok,sa:selA,sb:selB}));
+  if(undoStack.length>80)undoStack.shift();
+}
+function undoAction(){
+  if(!undoStack.length)return;
+  var s=JSON.parse(undoStack.pop());
+  data=s.d; curSi=s.si; curLi=s.li; curGi=s.gi; curTok=s.ct; selA=s.sa; selB=s.sb;
+  renderEditor();
+  if(curSi>=0)reactivate();
+}
+
+/* ════════════════════════════════════════
+   工具函数
+════════════════════════════════════════ */
+function getToks(){
+  if(curSi<0)return[];
+  var n=data[curSi].lines[curLi].segs[curGi].n;
+  return(n&&n.trim())?n.trim().split(/\\s+/):[];
+}
+function setToks(toks){
+  data[curSi].lines[curLi].segs[curGi].n=toks.join(' ');
+}
+function getSelRange(){
+  if(selA<0||selB<0)return null;
+  return{lo:Math.min(selA,selB),hi:Math.max(selA,selB)};
+}
+function clearSel(){selA=-1;selB=-1;}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
+
+/* ════════════════════════════════════════
+   选择操作
+════════════════════════════════════════ */
+function clickToken(ti, shiftKey){
+  if(shiftKey && selA>=0){
+    // 扩展选区
+    selB=ti;
+  } else {
+    // 新选区，单选
+    selA=ti; selB=ti;
   }
+  curTok=ti; // 游标跟随
+  renderEditor();
+  reactivate();
+}
 
-  function _div(cls){const d=document.createElement('div');d.className=cls;return d;}
-
-  function parseJpToken(tok){
-    if(!tok||tok==='|'||tok==='||'||tok===' '){
-      const pl=document.createElement('span');
-      pl.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;';
-      const _t=document.createElement('span');_t.style.height='12px';pl.appendChild(_t);
-      const _s=document.createElement('span');_s.style.cssText='font-size:15px;line-height:1;text-align:center;';_s.textContent=tok||'';pl.appendChild(_s);
-      const _b=document.createElement('span');_b.style.height='16px';pl.appendChild(_b);
-      return pl;
-    }
-    if(tok==='sp'||tok==='sp_'||tok==='sp__'){
-      const fake=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
-      const e2=parseJpToken(fake);const lw=e2.children[1];
-      if(lw){const nr=lw.children[0];if(nr){const ns=nr.children[0];if(ns)ns.style.visibility='hidden';}}
-      return e2;
-    }
-    let num=tok,isHigh=0,isLow=0,isDot=false,uline=0;
-    if(num.slice(-2)==='__'){uline=2;num=num.slice(0,-2);} else if(num.slice(-1)==='_'){uline=1;num=num.slice(0,-1);}
-    if(num.indexOf('\u00b7')>-1){isDot=true;num=num.replace(/\u00b7/g,'');}
-    const hm=num.match(/^(.+?)('+)$/);if(hm){isHigh=hm[2].length;num=hm[1];}
-    const lm=num.match(/^(.+?)(,+)$/);if(lm){isLow=lm[2].length;num=lm[1];}
-    const w=document.createElement('span');w.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;';
-    const topDot=document.createElement('span');topDot.style.cssText='font-size:7px;line-height:1;height:12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;';
-    if(isHigh>=2)topDot.innerHTML='\u00b7<br>\u00b7';else if(isHigh===1)topDot.textContent='\u00b7';
-    w.appendChild(topDot);
-    const lw2=document.createElement('span');lw2.style.cssText='display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;'+(uline>=1?'border-bottom:1.5px solid currentColor;':'');
-    const numRow=document.createElement('span');numRow.style.cssText='display:inline-flex;align-items:center;justify-content:center;position:relative;'+(uline>=1?'border-bottom:1.5px solid currentColor;':'');
-    const ns2=document.createElement('span');ns2.style.cssText='font-size:15px;line-height:1.05;display:inline-block;min-width:10px;text-align:center;';
-    ns2.textContent=num||'';
-    numRow.appendChild(ns2);
-    if(isDot){const dot=document.createElement('span');dot.style.cssText='position:absolute;right:-3px;top:2px;font-size:7px;line-height:1;';dot.textContent='·';numRow.appendChild(dot);}
-    lw2.appendChild(numRow);
-    if(uline===2){const l2=document.createElement('span');l2.style.cssText='display:block;border-bottom:1.5px solid currentColor;margin-top:2px;';lw2.appendChild(l2);}
-    w.appendChild(lw2);
-    const bot=document.createElement('span');bot.style.cssText='font-size:7px;line-height:1;height:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;';
-    if(isLow>=2)bot.innerHTML='\u00b7<br>\u00b7';else if(isLow===1)bot.textContent='\u00b7';
-    w.appendChild(bot);return w;
+function clickEnd(shiftKey){
+  if(shiftKey && selA>=0){
+    // 扩展到末尾：selB = length（用特殊值表示末尾）
+    var toks=getToks();
+    selB=toks.length; // 超出 = 末尾游标
+  } else {
+    clearSel();
   }
+  curTok=-1;
+  renderEditor();
+  reactivate();
+}
 
-  function renderNStr(str){
-    const wrap=document.createElement('span');wrap.style.cssText='display:inline-flex;gap:.08em;align-items:flex-end;vertical-align:bottom;';
-    const parts=(str||'').match(/\[v[12]|\]v|sp__|sp_|sp|\|\||\||\S+/g)||[];
-    parts.forEach(tok=>{
-      if(tok==='[v1'||tok==='[v2'||tok===']v')return;
-      wrap.appendChild(parseJpToken(tok));
-    });
-    return wrap;
+/* ════════════════════════════════════════
+   插入 / 覆盖
+════════════════════════════════════════ */
+function appendTok(tok){ insertToks([tok]); }
+function inputSpecial(tok){ insertToks([tok]); }
+
+function insertToks(tokArr){
+  if(curSi<0)return;
+  saveUndo();
+  var toks=getToks();
+  var range=getSelRange();
+
+  if(range){
+    // 有选区：替换选区内容
+    var hi=Math.min(range.hi, toks.length-1);
+    var lo=range.lo;
+    toks.splice(lo, hi-lo+1, ...tokArr);
+    curTok=lo+tokArr.length; if(curTok>=toks.length)curTok=-1;
+    clearSel();
+  } else if(inputMode==='overwrite' && curTok>=0 && curTok<toks.length){
+    // 覆盖单个
+    toks.splice(curTok,1,...tokArr);
+    curTok=curTok+tokArr.length; if(curTok>=toks.length)curTok=-1;
+  } else if(curTok>=0 && curTok<toks.length){
+    // 插入在游标前
+    toks.splice(curTok,0,...tokArr);
+    curTok=curTok+tokArr.length;
+  } else {
+    // 追加到末尾
+    toks.push(...tokArr);
+    curTok=-1;
   }
+  setToks(toks);
+  renderEditor();
+  reactivate();
+  updateInputState();
+}
 
-  const NOTE_MAP={C:0,'B#':0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,Fb:4,'E#':5,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11,Cb:11};
-  const NOTES_SHARP=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-  const NOTES_FLAT =['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
-  const FLAT_KEYS=new Set(['F','Bb','Eb','Ab','Db','Gb','Cb']);
-  const USE_FLAT_MINOR_ROOTS=new Set(['D','G','C','F','Bb','Eb']);
-  function parseKeyName(key){
-    const k=(key||'').trim();
-    if(!k)return {root:'C',suf:''};
-    const m=k.match(/^([A-G](?:#|b)?)(.*)$/);
-    if(!m)return {root:k,suf:''};
-    return {root:m[1],suf:m[2]||''};
+function inputNote(n){
+  var tok=buildTok(n);
+  var extra=[];
+  if(n!==0 && dur==='whole'){extra=['-','-','-'];}
+  else if(n!==0 && dur==='half'){extra=['-'];}
+  insertToks([tok,...extra]);
+}
+
+function deleteSelected(){
+  if(curSi<0)return;
+  saveUndo();
+  var toks=getToks();
+  var range=getSelRange();
+  if(range){
+    var hi=Math.min(range.hi, toks.length-1);
+    var lo=range.lo;
+    toks.splice(lo, hi-lo+1);
+    curTok=toks.length===0?-1:Math.min(lo,toks.length-1);
+    clearSel();
+  } else if(curTok>=0 && curTok<toks.length){
+    toks.splice(curTok,1);
+    if(toks.length===0)curTok=-1;
+    else curTok=Math.min(curTok,toks.length-1);
+  } else {
+    toks.pop();
+    curTok=-1;
   }
-  function needFlat(root,suf){
-    const minor=/m(?!aj)/i.test(suf);
-    if(minor) return USE_FLAT_MINOR_ROOTS.has(root);
-    return FLAT_KEYS.has(root);
+  setToks(toks);
+  renderEditor();
+  reactivate();
+  updateInputState();
+}
+
+function clearN(){
+  if(curSi<0)return;
+  saveUndo();
+  data[curSi].lines[curLi].segs[curGi].n='';
+  curTok=-1; clearSel();
+  renderEditor(); reactivate();
+}
+
+/* ════════════════════════════════════════
+   复制 / 剪切 / 粘贴
+════════════════════════════════════════ */
+function copyToks(){
+  if(curSi<0)return;
+  var toks=getToks();
+  var range=getSelRange();
+  if(range){
+    var hi=Math.min(range.hi,toks.length-1);
+    tokClipboard=toks.slice(range.lo,hi+1);
+  } else if(curTok>=0&&curTok<toks.length){
+    tokClipboard=[toks[curTok]];
   }
-  function trKeyName(key,st){
-    const {root,suf}=parseKeyName(key);
-    const n=(NOTE_MAP[root]+st+120)%12;
-    const nr=needFlat(root,suf)?NOTES_FLAT[n]:NOTES_SHARP[n];
-    return nr+suf;
+  updateStatus();
+}
+function cutToks(){copyToks();deleteSelected();}
+function pasteToks(){
+  if(tokClipboard.length)insertToks(tokClipboard.slice());
+}
+function copySeg(){
+  if(curSi<0)return;
+  segClipboard=JSON.parse(JSON.stringify(data[curSi].lines[curLi].segs[curGi]));
+  updateStatus();
+}
+function cutSeg(){
+  copySeg();
+  if(curSi<0)return;
+  saveUndo();
+  delSeg(curSi,curLi,curGi);
+  curSi=-1;curLi=-1;curGi=-1;
+}
+function pasteSeg(){
+  if(!segClipboard||curSi<0)return;
+  saveUndo();
+  var copy=JSON.parse(JSON.stringify(segClipboard));
+  // 粘贴到当前格子后面
+  data[curSi].lines[curLi].segs.splice(curGi+1,0,copy);
+  curGi=curGi+1;
+  renderEditor();reactivate();
+}
+function pasteSegReplace(){
+  if(!segClipboard||curSi<0)return;
+  saveUndo();
+  var copy=JSON.parse(JSON.stringify(segClipboard));
+  data[curSi].lines[curLi].segs[curGi]=copy;
+  renderEditor();reactivate();
+}
+
+/* ════════════════════════════════════════
+   游标移动
+════════════════════════════════════════ */
+function moveCursor(dir){
+  if(curSi<0)return;
+  clearSel();
+  var toks=getToks();
+  if(dir==='left'){
+    if(curTok===-1)curTok=toks.length>0?toks.length-1:-1;
+    else if(curTok>0)curTok--;
+  } else {
+    if(curTok>=0&&curTok<toks.length-1)curTok++;
+    else curTok=-1;
   }
-  function trBass(bass,st){
-    return trKeyName(bass,st);
+  renderEditor(); reactivate();
+}
+
+/* ════════════════════════════════════════
+   focusSeg + 状态栏
+════════════════════════════════════════ */
+function focusSeg(si,li,gi,reset){
+  if(reset||(si!==curSi||li!==curLi||gi!==curGi)){curTok=-1;clearSel();}
+  curSi=si;curLi=li;curGi=gi;
+  reactivate();
+  updateStatus();
+  updateInputState();
+  renderPreview();
+}
+
+function reactivate(){
+  document.querySelectorAll('.tok-field').forEach(function(el){el.classList.remove('n-active');});
+  if(curSi<0)return;
+  var f=document.querySelector('.tok-field[data-key="'+curSi+'-'+curLi+'-'+curGi+'"]');
+  if(f)f.classList.add('n-active');
+  updateStatus();
+}
+
+function updateStatus(){
+  var loc=document.getElementById('statusLoc');
+  var sel=document.getElementById('statusSel');
+  var tip=document.getElementById('statusTip');
+  if(curSi<0){
+    loc.textContent='点击左边格子开始编辑';
+    sel.textContent=''; tip.textContent=''; return;
   }
-  function trChord(ch,st){
-    if(!ch)return ch;
-    const m=ch.match(/^([A-G](?:#|b)?)(.*)$/);
-    if(!m)return ch;
-    let rest=m[2]||'';
-    rest=rest.replace(/\/([A-G](?:#|b)?)/g,(a,b)=>'/'+trBass(b,st));
-    return trKeyName(m[1],st)+rest;
+  loc.textContent=data[curSi].name+' 行'+(curLi+1)+' 格'+(curGi+1);
+  var range=getSelRange();
+  var toks=getToks();
+  if(range){
+    var cnt=Math.min(range.hi,toks.length-1)-range.lo+1;
+    sel.textContent='已选 '+cnt+' 个';
+    tip.textContent='⌘C复制 ⌘X剪切 ⌘V粘贴 | Alt+C/V/R 格子操作';
+  } else if(segClipboard){
+    sel.textContent='格子已复制';
+    tip.textContent='Alt+V插到后面 Alt+R覆盖当前 | 剪贴板: '+(tokClipboard.length?tokClipboard.join(' '):'空');
+  } else if(tokClipboard.length){
+    sel.textContent='';
+    tip.textContent='剪贴板: '+tokClipboard.join(' ');
+  } else {
+    sel.textContent=''; tip.textContent='Alt+C 复制格子';
   }
-  function calcCapo(target,orig){
-    const t=NOTE_MAP[parseKeyName(target).root], o=NOTE_MAP[parseKeyName(orig).root];
-    let up=(o - t + 12)%12;
-    let down=(t - o + 12)%12;
-    let st = up<=6 ? up : -down;
-    let capo=(12-st)%12; if(capo===12) capo=0;
-    return {st, capo, playKey: target};
+}
+
+/* ════════════════════════════════════════
+   设置函数
+════════════════════════════════════════ */
+function setInputMode(m){
+  inputMode=m;
+  document.getElementById('mode-insert').classList.toggle('on',m==='insert');
+  document.getElementById('mode-overwrite').classList.toggle('on',m==='overwrite');
+}
+function setOct(o){
+  oct=o;
+  ['low2','low1','mid','high1','high2'].forEach(function(x){document.getElementById('oct-'+x).classList.toggle('on',x===o);});
+  updateInputState();
+}
+function setDur(d){
+  dur=d;
+  ['whole','half','quarter','eighth','16th'].forEach(function(x){document.getElementById('dur-'+x).classList.toggle('on',x===d);});
+  updateInputState();
+}
+function toggleDot(){dotOn=!dotOn;document.getElementById('dot-btn').classList.toggle('on',dotOn);updateInputState();}
+function toggleXSlur(){
+  xslurOn=!xslurOn;
+  document.getElementById('xslur-btn').classList.toggle('on',xslurOn);
+  if(xslurOn)appendTok('([');
+}
+function closeXSlur(){xslurOn=false;document.getElementById('xslur-btn').classList.remove('on');appendTok('])'); }
+function toggleSlur(){
+  slurOn=!slurOn;
+  document.getElementById('slur-btn').classList.toggle('on',slurOn);
+  appendTok(slurOn?'(':')');
+}
+function refreshTupletBtns(){
+  document.getElementById('t3-btn').classList.toggle('on',tupletOn===3);
+  document.getElementById('t5-btn').classList.toggle('on',tupletOn===5);
+}
+function toggleTuplet(n){
+  if(tupletOn===n){tupletOn=0;refreshTupletBtns();appendTok('}');return;}
+  if(tupletOn!==0)appendTok('}');
+  tupletOn=n;refreshTupletBtns();appendTok('{'+n);
+}
+function buildTok(n){
+  var s=''+n;
+  if(n!==0){
+    if(oct==='high1')s+="'";else if(oct==='high2')s+="''";
+    else if(oct==='low1')s+=',';else if(oct==='low2')s+=',,';
   }
+  if(dotOn)s+='\\u00b7';
+  if(dur==='eighth')s+='_';else if(dur==='16th')s+='__';
+  return s;
+}
+function buildSpacerTok(){
+  var s='sp';if(dur==='eighth')s+='_';else if(dur==='16th')s+='__';return s;
+}
 
-  let _mpAudio=null,_mpSongs=[],_mpIdx=-1,_mpLoop=false,_mpLrc=[],_mpLrcIdx=-1,_mpCoverFallback='';
+/* ════════════════════════════════════════
+   渲染编辑器
+════════════════════════════════════════ */
+// 拖动状态
+var dragSrc={si:-1,li:-1,gi:-1};
 
-  function _mpFmt(t){
-    if(!isFinite(t)) return '0:00';
-    const m=Math.floor(t/60), s=Math.floor(t%60);
-    return m+':'+String(s).padStart(2,'0');
-  }
-  function _mpSetCover(src){
-    const el=$('ml-mp-cover');
-    if(!el) return;
-    if(src){
-      el.innerHTML=`<img src="${src}" alt="">`;
-    }else{
-      el.innerHTML='<span>♪</span>';
-    }
-  }
-  function _mpSetPlayUI(isPlaying){
-    const btn=$('ml-mp-playpause');
-    const stage=$('ml-mp-stage');
-    if(btn){
-      btn.innerHTML=isPlaying
-        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5h3v14H8zm5 0h3v14h-3z"/></svg>`
-        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`;
-    }
-    if(stage) stage.classList.toggle('playing', !!isPlaying);
-  }
-  function _mpParseLrc(text){
-    const arr=[];
-    String(text||'').split(/\r?\n/).forEach(line=>{
-      const m=line.match(/\[(\d+):(\d+(?:\.\d+)?)\](.*)/);
-      if(m){
-        arr.push({ t:(+m[1])*60 + parseFloat(m[2]), tx:(m[3]||'').trim() });
-      }
-    });
-    return arr.sort((a,b)=>a.t-b.t);
-  }
-  function _mpRenderLrc(){
-    const inner=$('ml-mp-lrc-inner');
-    if(!inner) return;
-    inner.innerHTML='';
-    if(!_mpLrc.length){
-      inner.innerHTML='<div class="ml-mp-lrc-line">暂无歌词</div>';
-      return;
-    }
-    _mpLrc.forEach((it,i)=>{
-      const d=document.createElement('div');
-      d.className='ml-mp-lrc-line'+(i===0?' active':'');
-      d.textContent=it.tx || '…';
-      d.addEventListener('click',()=>{
-        if(_mpAudio && isFinite(_mpLrc[i].t)) _mpAudio.currentTime=_mpLrc[i].t;
-      });
-      inner.appendChild(d);
-    });
-    _mpLrcIdx=0;
-  }
-  function _mpSyncLrc(cur){
-    if(!_mpLrc.length) return;
-    let idx=0;
-    for(let i=0;i<_mpLrc.length;i++){
-      if(cur>=_mpLrc[i].t) idx=i; else break;
-    }
-    if(idx===_mpLrcIdx) return;
-    _mpLrcIdx=idx;
-    const inner=$('ml-mp-lrc-inner');
-    if(!inner) return;
-    [...inner.children].forEach((el,i)=>el.classList.toggle('active', i===idx));
-    const active=inner.children[idx];
-    if(active){
-      const y=active.offsetTop - inner.clientHeight/2 + active.clientHeight/2;
-      inner.scrollTo({ top: Math.max(0,y), behavior:'smooth' });
-    }
-  }
-  function _mpBind(){
-    if(_mpAudio) return;
-    _mpAudio=$('ml-mp-audio');
-    if(!_mpAudio) return;
+function renderEditor(){
+  var wrap=document.getElementById('sectionsWrap');wrap.innerHTML='';
+  data.forEach(function(sec,si){
+    var sb=document.createElement('div');sb.className='sec-block';
+    var sh=document.createElement('div');sh.className='sec-head';
+    sh.innerHTML='<input class="sec-name-input" value="'+esc(sec.name)+'" oninput="data['+si+'].name=this.value;renderPreview()">'+
+      '<button class="sec-btn" onclick="addLine('+si+')">+行</button>'+
+      '<button class="sec-btn del" onclick="delSection('+si+')">删</button>';
+    sb.appendChild(sh);
 
-    _mpAudio.addEventListener('loadedmetadata',()=>{
-      $('ml-mp-dur').textContent=_mpFmt(_mpAudio.duration);
-    });
-    _mpAudio.addEventListener('timeupdate',()=>{
-      $('ml-mp-cur').textContent=_mpFmt(_mpAudio.currentTime);
-      const dur=_mpAudio.duration||0;
-      $('ml-mp-fill').style.width=dur?((_mpAudio.currentTime/dur)*100)+'%':'0%';
-      _mpSyncLrc(_mpAudio.currentTime);
-    });
-    _mpAudio.addEventListener('play',()=>_mpSetPlayUI(true));
-    _mpAudio.addEventListener('pause',()=>_mpSetPlayUI(false));
-    _mpAudio.addEventListener('ended',()=>{
-      if(_mpLoop){
-        _mpAudio.currentTime=0;
-        _mpAudio.play().catch(()=>{});
-      }else{
-        _mpPlayIdx(_mpIdx+1,true);
-      }
-    });
+    sec.lines.forEach(function(line,li){
+      var rb=document.createElement('div');rb.className='row-block';
+      var rm=document.createElement('div');rm.className='row-meta';
+      rm.innerHTML='<span class="row-idx">ROW '+(li+1)+'</span>'+
+        '<label class="bold-toggle"><input type="checkbox" '+(line.bold?'checked':'')+' onchange="data['+si+'].lines['+li+'].bold=this.checked;renderPreview()"> 副歌</label>'+
+        '<button class="sec-btn" onclick="moveLine('+si+','+li+',-1)" title="上移">↑</button>'+
+        '<button class="sec-btn" onclick="moveLine('+si+','+li+',1)" title="下移">↓</button>'+
+        '<button class="row-del" onclick="delLine('+si+','+li+')">✕</button>';
+      rb.appendChild(rm);
 
-    $('ml-mp-playpause')?.addEventListener('click',()=>{
-      if(!_mpAudio.src) return;
-      if(_mpAudio.paused) _mpAudio.play().catch(()=>{});
-      else _mpAudio.pause();
-    });
-    $('ml-mp-prev')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx-1,true));
-    $('ml-mp-next')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx+1,true));
-    $('ml-mp-seek-back')?.addEventListener('click',()=>{
-      if(!_mpAudio.src) return;
-      _mpAudio.currentTime=Math.max(0, (_mpAudio.currentTime||0)-15);
-    });
-    $('ml-mp-seek-fwd')?.addEventListener('click',()=>{
-      if(!_mpAudio.src) return;
-      _mpAudio.currentTime=Math.min(_mpAudio.duration||1e9, (_mpAudio.currentTime||0)+15);
-    });
-    $('ml-mp-repeat')?.addEventListener('click',e=>{
-      _mpLoop=!_mpLoop;
-      e.currentTarget.classList.toggle('on',_mpLoop);
-    });
-    $('ml-mp-vol')?.addEventListener('input',e=>{
-      _mpAudio.volume=parseFloat(e.target.value||'1');
-    });
-    document.querySelector('.pl-progress-bar')?.addEventListener('click',e=>{
-      if(!_mpAudio.src || !_mpAudio.duration) return;
-      const r=e.currentTarget.getBoundingClientRect();
-      const p=Math.max(0, Math.min(1, (e.clientX-r.left)/r.width));
-      _mpAudio.currentTime=_mpAudio.duration*p;
-    });
-  }
+      var tbl=document.createElement('table');tbl.className='seg-table';
+      tbl.innerHTML='<tr><th style="width:16px;"></th><th style="width:64px;">和弦</th><th>简谱</th><th style="width:76px;">歌词</th><th style="width:18px;"></th></tr>';
 
-  function _mpPlayIdx(idx,autoplay){
-    _mpBind();
-    if(!_mpSongs.length) return;
-    if(idx<0) idx=_mpSongs.length-1;
-    if(idx>=_mpSongs.length) idx=0;
-    _mpIdx=idx;
-    const s=_mpSongs[idx];
-    if(!s) return;
-    const mini=$('ml-miniplayer');
-    if(mini) mini.classList.add('has-mp3');
-    $('ml-mp-title').textContent=s.title||'';
-    $('ml-mp-artist').textContent=s.artist||'';
-    _mpSetCover(s.cover||'');
-    _mpAudio.src=s.mp3||'';
-    $('ml-mp-cur').textContent='0:00';
-    $('ml-mp-dur').textContent='0:00';
-    $('ml-mp-fill').style.width='0%';
-    _mpLrc=[]; _mpLrcIdx=-1; _mpRenderLrc();
-    if(s.lrc){
-      fetch(s.lrc).then(r=>r.text()).then(text=>{
-        _mpLrc=_mpParseLrc(text); _mpRenderLrc();
-      }).catch(()=>{});
-    }
-    if(autoplay) _mpAudio.play().catch(()=>{});
-  }
+      line.segs.forEach(function(seg,gi){
+        var key=si+'-'+li+'-'+gi;
+        var isActive=(si===curSi&&li===curLi&&gi===curGi);
+        var tr=document.createElement('tr');
+        tr.className='seg-row';
 
-  function destroyAP(){}
-
-  function stopMetronome(){
-    _metroRunning=false;
-    if(_metroTimer){clearInterval(_metroTimer);_metroTimer=null;}
-    const btn=document.querySelector('.ml-met-toggle');
-    if(btn){btn.textContent='开始';btn.classList.add('off');}
-  }
-
-  function startMetronome(bpm){
-    stopMetronome();
-    _metroBpm=Math.max(30,Math.min(240,parseInt(bpm||72,10)||72));
-    const bpmNum=document.querySelector('.ml-met-bpm-num');
-    let beat=0;
-    function tick(){
-      if(!_audioCtx){
-        const AC=window.AudioContext||window.webkitAudioContext;
-        if(AC) _audioCtx=new AC();
-      }
-      if(_audioCtx){
-        const o=_audioCtx.createOscillator(),g=_audioCtx.createGain();
-        o.type='sine'; o.frequency.value=beat%4===0?1200:900;
-        g.gain.value=0.0001;
-        o.connect(g); g.connect(_audioCtx.destination);
-        const now=_audioCtx.currentTime;
-        g.gain.exponentialRampToValueAtTime(0.15, now+0.005);
-        g.gain.exponentialRampToValueAtTime(0.0001, now+0.08);
-        o.start(now); o.stop(now+0.09);
-      }
-      if(bpmNum){bpmNum.style.opacity='.45';requestAnimationFrame(()=>{bpmNum.style.opacity='';});}
-      beat++;
-    }
-    tick();
-    _metroRunning=true;
-    _metroTimer=setInterval(tick,60000/_metroBpm);
-    const btn=document.querySelector('.ml-met-toggle');
-    if(btn){btn.textContent='停止';btn.classList.remove('off');}
-  }
-
-  function createMetronome(defaultBpm){
-    const wrap=document.createElement('div');wrap.className='ml-met';
-
-    const top=document.createElement('div');top.className='ml-met-top';
-    const leftDiv=document.createElement('div');
-    const titleEl=document.createElement('div');titleEl.className='ml-met-title';titleEl.textContent='节拍器';
-    const subEl=document.createElement('div');subEl.className='ml-met-sub';subEl.textContent='跟随这首歌的 BPM，也可以手动调整';
-    leftDiv.appendChild(titleEl);leftDiv.appendChild(subEl);
-    const toggle=document.createElement('button');
-    toggle.className='ml-met-toggle off';toggle.type='button';toggle.textContent='开始';
-    top.appendChild(leftDiv);top.appendChild(toggle);
-
-    const body=document.createElement('div');body.className='ml-met-body';
-    const bpmEl=document.createElement('div');bpmEl.className='ml-met-bpm';
-    const bpmNum=document.createElement('span');bpmNum.className='ml-met-bpm-num';bpmNum.textContent=String(defaultBpm||72);
-    const bpmSmall=document.createElement('small');bpmSmall.textContent=' BPM';
-    bpmEl.appendChild(bpmNum);bpmEl.appendChild(bpmSmall);
-
-    const minusBtn=document.createElement('button');minusBtn.className='ml-met-btn';minusBtn.type='button';minusBtn.textContent='−';
-    const plusBtn=document.createElement('button');plusBtn.className='ml-met-btn';plusBtn.type='button';plusBtn.textContent='+';
-    const resetBtn=document.createElement('button');resetBtn.className='ml-met-btn';resetBtn.type='button';resetBtn.title='重置';
-    resetBtn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
-
-    const range=document.createElement('input');
-    range.className='ml-met-range';range.type='range';
-    range.min='30';range.max='240';range.value=String(defaultBpm||72);
-
-    const hint=document.createElement('div');hint.className='ml-met-hint';
-    hint.textContent='点开始即可打拍。滑杆可细调，± 可快速调节。';
-
-    body.appendChild(bpmEl);body.appendChild(minusBtn);body.appendChild(plusBtn);body.appendChild(resetBtn);
-    body.appendChild(range);body.appendChild(hint);
-    wrap.appendChild(top);wrap.appendChild(body);
-
-    const getBpm=()=>Math.max(30,Math.min(240,parseInt(range.value,10)||72));
-    const updateDisplay=()=>{bpmNum.textContent=String(getBpm());range.value=String(getBpm());};
-
-    minusBtn.onclick=()=>{range.value=String(getBpm()-1);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
-    plusBtn.onclick=()=>{range.value=String(getBpm()+1);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
-    resetBtn.onclick=()=>{range.value=String(defaultBpm||72);updateDisplay();if(_metroRunning)startMetronome(getBpm());};
-    range.oninput=()=>{updateDisplay();if(_metroRunning)startMetronome(getBpm());};
-    toggle.onclick=()=>{if(_metroRunning){stopMetronome();}else{startMetronome(getBpm());}};
-
-    return wrap;
-  }
-
-  function attachSwipeBack(){
-    const panel=detail;
-    const overlay=$('ml-detail-overlay');
-    let sx=0,sy=0,dx=0,dragging=false,started=false;
-    function canStart(t){
-      if(!panel.classList.contains('open')) return false;
-      const header=t.closest('#ml-detail-header');
-      const body=t.closest('#ml-detail');
-      if(header) return true;
-      if(!body) return false;
-      const scroller=t.closest('#ml-detail-body');
-      if(scroller && scroller.scrollTop>0) return false;
-      return (window.innerWidth<=900);
-    }
-    panel.addEventListener('touchstart',e=>{
-      if(!canStart(e.target)) return;
-      const t=e.touches[0];
-      sx=t.clientX; sy=t.clientY; dx=0; dragging=false; started=true;
-      panel.classList.remove('swiping');
-    },{passive:true});
-    panel.addEventListener('touchmove',e=>{
-      if(!started) return;
-      const t=e.touches[0];
-      const mx=t.clientX-sx, my=t.clientY-sy;
-      if(!dragging){
-        if(Math.abs(mx)>10 && Math.abs(mx)>Math.abs(my) && mx>0) dragging=true;
-        else if(Math.abs(my)>10) { started=false; return; }
-      }
-      if(!dragging) return;
-      dx=Math.max(0,mx);
-      panel.classList.add('swiping');
-      panel.style.transform=`translateX(${dx}px)`;
-      overlay.style.opacity=String(Math.max(0,1-dx/(window.innerWidth*0.9)));
-      e.preventDefault();
-    },{passive:false});
-    function end(){
-      if(!started) return;
-      started=false;
-      if(!dragging){
-        panel.style.transform=''; overlay.style.opacity=''; return;
-      }
-      if(dx>Math.min(140,window.innerWidth*0.28)){
-        panel.style.transition='transform .22s ease, opacity .22s ease';
-        panel.style.transform=`translateX(${window.innerWidth}px)`;
-        overlay.style.opacity='0';
-        setTimeout(()=>{
-          panel.style.transition='';
-          closeDetail();
-        },220);
-      }else{
-        panel.style.transition='transform .22s ease, opacity .22s ease';
-        panel.style.transform='';
-        overlay.style.opacity='';
-        setTimeout(()=>{panel.style.transition='';panel.classList.remove('swiping');},220);
-      }
-      dragging=false; dx=0;
-    }
-    panel.addEventListener('touchend',end,{passive:true});
-    panel.addEventListener('touchcancel',end,{passive:true});
-
-    window.addEventListener('popstate',()=>{
-      if(panel.classList.contains('open')) closeDetail(true);
-    });
-  }
-
-  function openDetail(s, opts={}){
-    const fromUrl=!!opts.fromUrl;
-    destroyAP();
-    stopMetronome();
-    syncHaloTheme();
-
-    _mpBind();
-    if(s.mp3){
-      const idx=_mpSongs.findIndex(x=>x.id===s.id);
-      const isSameSong = (idx>=0 && idx===_mpIdx);
-      if(!isSameSong){
-        if(idx>=0) _mpIdx=idx; else { _mpSongs=[s]; _mpIdx=0; }
-        _mpLrc=[]; _mpLrcIdx=-1;
-        _mpAudio.src=s.mp3||'';
-        if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});
-      }
-      const titleEl=document.getElementById('ml-mp-title');
-      const artistEl=document.getElementById('ml-mp-artist');
-      if(titleEl) titleEl.textContent=s.title||'';
-      if(artistEl) artistEl.textContent=s.artist||'';
-      _mpSetCover(s.cover||null);
-      const stage=document.getElementById('ml-mp-stage');
-      if(stage) stage.classList.toggle('playing', !_mpAudio.paused);
-      if(isSameSong && _mpLrc.length && !document.getElementById('ml-mp-lrc-inner')?.children.length){
-        _mpRenderLrc();
-      }
-      const detailPlayer=document.getElementById('ml-miniplayer');
-      if(detailPlayer) detailPlayer.classList.add('has-mp3');
-    } else {
-      const detailPlayer=document.getElementById('ml-miniplayer');
-      if(detailPlayer) detailPlayer.classList.remove('has-mp3');
-    }
-    if(!fromUrl){
-      try{
-        history.pushState(
-          Object.assign({}, history.state||{}, {__mlDetail:true,__mlSongId:s.id}),
-          '',
-          buildSongUrl(s.id)
-        );
-        _detailStatePushed=true;
-      }catch(err){}
-    }else{
-      _detailStatePushed=false;
-      setSongUrl(s.id, true);
-    }
-    $('ml-detail-title').textContent=s.title||'';
-    const body=$('ml-detail-body');
-    body.innerHTML='';
-
-    const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
-    let curKey=s.origKey||'C';
-
-    const wrap=document.createElement('div');wrap.className='sw-wrap';
-    const kPill=document.createElement('span');kPill.className='sw-pill sw-kpill';kPill.textContent='1 = '+curKey;
-
-    const coverThumb=document.createElement(s.cover?'img':'div');
-    coverThumb.className='sw-cover-thumb';
-    if(s.cover){coverThumb.src=s.cover;coverThumb.alt=s.title||'';}
-    else{coverThumb.textContent='♪';}
-
-    const infoDiv=document.createElement('div');infoDiv.className='sw-info';
-    infoDiv.innerHTML=`<div class="sw-eyebrow">Worship Song</div>
-      <div class="sw-title">${s.title||''}</div>
-      <div class="sw-sub">${s.sub||''}</div>`;
-    const pillsDiv=document.createElement('div');pillsDiv.className='sw-pills';
-    pillsDiv.appendChild(kPill);
-    if(s.timeSign){const p=document.createElement('span');p.className='sw-pill';p.textContent=s.timeSign;pillsDiv.appendChild(p);}
-    if(s.bpm){const p=document.createElement('span');p.className='sw-pill';p.textContent='♩ = '+s.bpm;pillsDiv.appendChild(p);}
-    infoDiv.appendChild(pillsDiv);
-
-    const titleRow=document.createElement('div');titleRow.className='sw-title-row';
-    titleRow.appendChild(coverThumb);titleRow.appendChild(infoDiv);
-
-    const togBtn=document.createElement('button');togBtn.className='sw-tog';
-    togBtn.innerHTML='<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg> 移调';
-    const hd=document.createElement('div');hd.className='sw-hd';
-    hd.appendChild(titleRow);hd.appendChild(togBtn);wrap.appendChild(hd);
-
-    const kg=document.createElement('div');kg.className='sw-kg';
-    const capoEl=document.createElement('div');
-    capoEl.className='sw-capo plain';
-    capoEl.innerHTML=`<div style="font-size:15px;flex-shrink:0">🎸</div>
-      <div style="flex:1"><div class="sw-capo-t"></div><div class="sw-capo-s"></div></div>
-      <div class="sw-capo-n"></div>`;
-    const lbDiv=document.createElement('div');lbDiv.className='sw-lb';
-
-    const ksDiv=document.createElement('div');ksDiv.className='sw-ks';
-    const slabel=document.createElement('div');slabel.className='sw-slabel';slabel.textContent='目标调';
-    ksDiv.appendChild(slabel);ksDiv.appendChild(kg);
-    const panelInner=document.createElement('div');panelInner.className='sw-panel-inner';
-    panelInner.appendChild(ksDiv);panelInner.appendChild(capoEl);panelInner.appendChild(lbDiv);
-    const panel=document.createElement('div');panel.className='sw-panel';panel.appendChild(panelInner);wrap.appendChild(panel);
-    body.appendChild(wrap);
-
-    togBtn.addEventListener('click',()=>{
-      panel.classList.toggle('open');
-      togBtn.classList.toggle('on',panel.classList.contains('open'));
-    });
-
-    KEYS.forEach(k=>{
-      const b=document.createElement('button');
-      b.className='sw-kb'+(k===curKey?' on':'');b.textContent=k;
-      b.addEventListener('click',()=>{
-        curKey=k;
-        kg.querySelectorAll('.sw-kb').forEach(x=>x.classList.remove('on'));
-        b.classList.add('on');renderScore();
-      });
-      kg.appendChild(b);
-    });
-
-    const tools=document.createElement('div');tools.className='sw-tools';
-    const toolsRow=document.createElement('div');toolsRow.className='sw-tools-row';
-
-    const shareBtn=document.createElement('button');
-    shareBtn.className='sw-pill';
-    shareBtn.type='button';
-    shareBtn.style.cssText='font-size:12px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border:none;';
-    shareBtn.textContent='🔗 分享';
-    shareBtn.addEventListener('click',()=>shareSong(s));
-    toolsRow.appendChild(shareBtn);
-
-    if(s.youtube){
-      const yt=document.createElement('a');yt.className='yt-btn';yt.href=s.youtube;yt.target='_blank';yt.title='YouTube';
-      yt.innerHTML='<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>';
-      toolsRow.appendChild(yt);
-    }
-    if(s.lrc){
-      const lrc=document.createElement('a');lrc.className='sw-pill';
-      lrc.href=s.lrc;lrc.target='_blank';
-      lrc.style.cssText='font-size:12px;padding:5px 12px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;';
-      lrc.textContent='📝 LRC';toolsRow.appendChild(lrc);
-    }
-    if(toolsRow.children.length){tools.appendChild(toolsRow);body.appendChild(tools);}
-
-    body.appendChild(createMetronome(s.bpm || 72));
-
-    let scoreKeyBadge=null;
-    if(s.scoreImg){
-      const scoreDiv=document.createElement('div');scoreDiv.className='sw-score';
-      const scoreTop=document.createElement('div');scoreTop.className='sw-score-top';
-      scoreKeyBadge=document.createElement('span');scoreKeyBadge.className='sw-score-key';scoreKeyBadge.textContent='1 = '+curKey;
-      const lbl=document.createElement('span');lbl.className='sw-score-lbl';lbl.textContent='简谱原稿';
-      scoreTop.appendChild(lbl);scoreTop.appendChild(scoreKeyBadge);
-      const img=document.createElement('img');img.src=s.scoreImg;img.loading='lazy';img.alt='简谱';
-      img.addEventListener('click',()=>openLightbox(s.scoreImg));
-      scoreDiv.appendChild(scoreTop);scoreDiv.appendChild(img);
-      body.appendChild(scoreDiv);
-    }
-
-    function renderScore(){
-      const info=calcCapo(curKey,s.origKey||'C'),st=info.st;
-      kPill.textContent='1 = '+curKey;
-      if(scoreKeyBadge)scoreKeyBadge.textContent='1 = '+curKey;
-      if(curKey===(s.origKey||'C')){
-        capoEl.className='sw-capo plain';
-        capoEl.querySelector('.sw-capo-t').textContent='原调演奏';
-        capoEl.querySelector('.sw-capo-s').textContent='不需要变调夹';
-        capoEl.querySelector('.sw-capo-n').textContent='—';
-      }else if(info.capo===0){
-        capoEl.className='sw-capo plain';
-        capoEl.querySelector('.sw-capo-t').textContent='不需要变调夹';
-        capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法演奏';
-        capoEl.querySelector('.sw-capo-n').textContent='开放';
-      }else{
-        capoEl.className='sw-capo';
-        capoEl.querySelector('.sw-capo-t').textContent='变调夹夹第 '+info.capo+' 格';
-        capoEl.querySelector('.sw-capo-s').textContent='按 '+info.playKey+' 调指法 → 实际 '+curKey;
-        capoEl.querySelector('.sw-capo-n').textContent=info.capo;
-      }
-      lbDiv.innerHTML='';
-      for(const sec of s.sections||[]){
-        const se=_div('sw-lsec');
-        const sn=_div('sw-lsec-name');sn.textContent=sec.name||'';se.appendChild(sn);
-        for(const line of sec.lines||[]){
-          const le=_div('sw-lline');const row=_div('sw-lrow'+((!Array.isArray(line)&&line.b)?' bold':''));
-          const segs=Array.isArray(line)?line:(line.line||[]);
-          let voltaWrap=null;
-          for(const seg of segs){
-            const segEl=_div('sw-seg');
-            const chord=document.createElement('span');
-            chord.className='sw-chord'+(seg.chord?'':' empty');
-            if(seg.chord)chord.textContent=trChord(seg.chord,st);
-            segEl.appendChild(chord);
-            if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
-            const lyric=document.createElement('span');lyric.className='sw-lyric';lyric.textContent=seg.lyric||'';
-            segEl.appendChild(lyric);
-            if(seg.lyric2){const ly2=document.createElement('span');ly2.className='sw-lyric sw-lyric2';ly2.textContent=seg.lyric2;segEl.appendChild(ly2);}
-            if(seg.lyric3){const ly3=document.createElement('span');ly3.className='sw-lyric sw-lyric3';ly3.textContent=seg.lyric3;segEl.appendChild(ly3);}
-            if(seg.lyric4){const ly4=document.createElement('span');ly4.className='sw-lyric sw-lyric4';ly4.textContent=seg.lyric4;segEl.appendChild(ly4);}
-            const _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
-            if(_vn){voltaWrap=document.createElement('span');voltaWrap.className='sw-volta';voltaWrap.setAttribute('data-v',_vn+'.');}
-            (voltaWrap||row).appendChild(segEl);
-            if(voltaWrap&&seg.n&&seg.n.indexOf(']v')>=0){voltaWrap.classList.add('closed');row.appendChild(voltaWrap);voltaWrap=null;}
-          }
-          if(voltaWrap)row.appendChild(voltaWrap);
-          le.appendChild(row);se.appendChild(le);
-        }
-        lbDiv.appendChild(se);
-      }
-    }
-    function fitRows(){
-      requestAnimationFrame(function(){
-        lbDiv.style.transform='';lbDiv.style.transformOrigin='';
-        lbDiv.style.width='';lbDiv.style.marginBottom='';
-        var avail=lbDiv.parentElement.clientWidth;
-        if(!avail)return;
-        var maxW=0;
-        lbDiv.querySelectorAll('.sw-lrow').forEach(function(row){
-          row.style.display='inline-flex';
-          if(row.scrollWidth>maxW)maxW=row.scrollWidth;
-          row.style.display='';
+        // 拖动
+        tr.addEventListener('dragstart',function(e){
+          dragSrc={si:si,li:li,gi:gi};
+          tr.classList.add('dragging');
+          e.dataTransfer.effectAllowed='move';
+          e.dataTransfer.setData('text/plain','');
         });
-        if(maxW>avail){
-          var scale=avail/maxW;
-          lbDiv.style.transform='scale('+scale+')';
-          lbDiv.style.transformOrigin='left top';
-          lbDiv.style.width=maxW+'px';
-          var naturalH=lbDiv.offsetHeight;
-          lbDiv.style.marginBottom=(naturalH*(scale-1))+'px';
-          lbDiv.parentElement.style.overflow='hidden';
-        } else {
-          lbDiv.parentElement.style.overflow='';
-        }
-      });
-    }
-    renderScore();
-    fitRows();
-    if(window._mlFitObs)window._mlFitObs.disconnect();
-    window._mlFitObs=new ResizeObserver(fitRows);
-    window._mlFitObs.observe(lbDiv);
+        tr.addEventListener('dragend',function(){
+          tr.classList.remove('dragging');
+          document.querySelectorAll('.seg-row').forEach(function(r){r.classList.remove('drag-over');});
+        });
+        tr.addEventListener('dragover',function(e){
+          e.preventDefault();e.dataTransfer.dropEffect='move';
+          tr.classList.add('drag-over');
+        });
+        tr.addEventListener('dragleave',function(){tr.classList.remove('drag-over');});
+        tr.addEventListener('drop',function(e){
+          e.preventDefault();tr.classList.remove('drag-over');
+          if(dragSrc.si<0||dragSrc.si!==si||dragSrc.li!==li||dragSrc.gi===gi)return;
+          saveUndo();
+          var segs=data[si].lines[li].segs;
+          var item=segs.splice(dragSrc.gi,1)[0];
+          var tgi=gi>dragSrc.gi?gi-1:gi;
+          segs.splice(tgi,0,item);
+          if(curSi===si&&curLi===li&&curGi===dragSrc.gi){
+            for(var i=0;i<segs.length;i++){if(segs[i]===item)curGi=i;}
+          }
+          dragSrc={si:-1,li:-1,gi:-1};
+          renderEditor();if(curSi>=0)reactivate();
+        });
 
-    detail.classList.add('open');
-    detail.scrollTop=0;
+        // 手柄
+        var tdH=document.createElement('td');
+        var h=document.createElement('span');h.className='drag-handle';h.textContent='⠿';h.title='拖动排序';
+        tr.draggable=false;
+        h.addEventListener('mousedown',function(){tr.draggable=true;});
+        h.addEventListener('mouseup',function(){tr.draggable=false;});
+        document.addEventListener('dragend',function(){tr.draggable=false;},{once:true});
+        tdH.appendChild(h);tr.appendChild(tdH);
+
+        // 和弦
+        var tdC=document.createElement('td');
+        var inpC=document.createElement('input');inpC.className='inp-chord';inpC.value=seg.chord||'';
+        inpC.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].chord=this.value;renderPreview();};})(si,li,gi);
+        tdC.appendChild(inpC);tr.appendChild(tdC);
+
+        // token field
+        var tdN=document.createElement('td');
+        var tf=document.createElement('div');
+        tf.className='tok-field'+(isActive?' n-active':'');
+        tf.setAttribute('data-key',key);
+        tf.onclick=(function(si,li,gi){return function(e){
+          if(e.target===tf){
+            if(curSi===si&&curLi===li&&curGi===gi)clickEnd(e.shiftKey);
+            else focusSeg(si,li,gi,true);
+          }
+        };})(si,li,gi);
+        if(seg.n&&seg.n.trim()){
+          seg.n.trim().split(/\\s+/).forEach(function(tok,ti){
+            var chip=document.createElement('span');
+            var classes='tok-chip';
+            if(isActive){
+              var range=getSelRange();
+              if(range&&ti>=range.lo&&ti<=Math.min(range.hi,seg.n.trim().split(/\\s+/).length-1))classes+=' sel';
+              if(curTok===ti)classes+=' cursor';
+            }
+            chip.className=classes;chip.textContent=tok;
+            chip.onclick=(function(si,li,gi,ti){return function(e){
+              e.stopPropagation();
+              if(curSi===si&&curLi===li&&curGi===gi)clickToken(ti,e.shiftKey);
+              else{curSi=si;curLi=li;curGi=gi;selA=ti;selB=ti;curTok=ti;renderEditor();reactivate();}
+            };})(si,li,gi,ti);
+            tf.appendChild(chip);
+          });
+        }
+        var endSpan=document.createElement('span');
+        endSpan.className='tok-end'+(isActive&&curTok===-1?' cursor':'');
+        endSpan.textContent='▏';
+        endSpan.onclick=(function(si,li,gi){return function(e){
+          e.stopPropagation();
+          if(curSi===si&&curLi===li&&curGi===gi)clickEnd(e.shiftKey);
+          else focusSeg(si,li,gi,true);
+        };})(si,li,gi);
+        tf.appendChild(endSpan);
+        tdN.appendChild(tf);tr.appendChild(tdN);
+
+        // 歌词（上行 + 可选下行）
+        var tdL=document.createElement('td');tdL.style.cssText='vertical-align:middle;';
+        var inpL=document.createElement('input');inpL.className='inp-lyric';inpL.value=seg.lyric||'';
+        inpL.style.display='block';
+        inpL.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric=this.value;renderPreview();};})(si,li,gi);
+        tdL.appendChild(inpL);
+        var inpL2=document.createElement('input');inpL2.className='inp-lyric';inpL2.value=seg.lyric2||'';
+        inpL2.placeholder='下行…';inpL2.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
+        inpL2.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric2=this.value;renderPreview();};})(si,li,gi);
+        tdL.appendChild(inpL2);tr.appendChild(tdL);
+
+        // 删除
+        var tdD=document.createElement('td');
+        var btnD=document.createElement('button');btnD.className='btn-del-seg';btnD.textContent='✕';
+        btnD.onclick=(function(si,li,gi){return function(){saveUndo();delSeg(si,li,gi);};})(si,li,gi);
+        tdD.appendChild(btnD);tr.appendChild(tdD);
+        tbl.appendChild(tr);
+      });
+
+      // + 格子
+      var trAdd=document.createElement('tr');
+      var tdAdd=document.createElement('td');tdAdd.colSpan=5;tdAdd.style.paddingTop='3px';
+      var ab=document.createElement('button');ab.className='btn-add-seg';ab.textContent='+ 格子';
+      ab.onclick=(function(si,li){return function(){saveUndo();addSeg(si,li);};})(si,li);
+      tdAdd.appendChild(ab);trAdd.appendChild(tdAdd);tbl.appendChild(trAdd);
+
+      rb.appendChild(tbl);
+      sb.appendChild(rb);
+    });
+
+    var arb=document.createElement('button');arb.className='add-row-btn';arb.textContent='+ 新行';
+    arb.onclick=(function(si){return function(){saveUndo();addLine(si);};})(si);
+    sb.appendChild(arb);
+    wrap.appendChild(sb);
+  });
+  renderPreview();
+}
+
+function addSection(){saveUndo();data.push({name:'新段落',lines:[{bold:false,segs:[{chord:'',n:'',lyric:''}]}]});renderEditor();}
+function moveSection(si,dir){
+  var ni=si+dir;
+  if(ni<0||ni>=data.length)return;
+  saveUndo();
+  var tmp=data[si];data[si]=data[ni];data[ni]=tmp;
+  if(curSi===si)curSi=ni;else if(curSi===ni)curSi=si;
+  renderEditor();if(curSi>=0)reactivate();
+}
+function delSection(si){saveUndo();data.splice(si,1);if(curSi===si){curSi=-1;curLi=-1;curGi=-1;}renderEditor();}
+function addLine(si){saveUndo();data[si].lines.push({bold:false,segs:[{chord:'',n:'',lyric:''}]});renderEditor();}
+function moveLine(si,li,dir){
+  var ni=li+dir;
+  if(ni<0||ni>=data[si].lines.length)return;
+  saveUndo();
+  var tmp=data[si].lines[li];data[si].lines[li]=data[si].lines[ni];data[si].lines[ni]=tmp;
+  if(curSi===si&&curLi===li)curLi=ni;else if(curSi===si&&curLi===ni)curLi=li;
+  renderEditor();if(curSi>=0)reactivate();
+}
+function delLine(si,li){saveUndo();data[si].lines.splice(li,1);renderEditor();}
+function addSeg(si,li){data[si].lines[li].segs.push({chord:'',n:'',lyric:''});renderEditor();}
+function delSeg(si,li,gi){data[si].lines[li].segs.splice(gi,1);renderEditor();}
+
+/* ════════════════════════════════════════
+   音符渲染
+════════════════════════════════════════ */
+function makeJpPlain(sym){
+  var pl=document.createElement('span');pl.className='jp-plain';
+  var t=document.createElement('span');t.className='jp-plain-top';pl.appendChild(t);
+  var s=document.createElement('span');s.className='jp-plain-sym';s.textContent=sym;pl.appendChild(s);
+  var b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
+  return pl;
+}
+function setDots(el,cnt){
+  el.innerHTML='';
+  for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
+}
+function parseJpToken(tok){
+  if(!tok||tok==='-'||tok==='|'||tok==='||'||tok===' ')return makeJpPlain(tok);
+  if(tok==='0')return makeJpPlain('0');
+  if(tok==='sp'||tok==='sp_'||tok==='sp__'){
+    var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
+    var el=parseJpToken(fk);
+    var ns=el.querySelector('.jp-num')||el.querySelector('.jp-plain-sym');
+    if(ns)ns.style.visibility='hidden';
+    return el;
+  }
+  var zm=tok.match(/^(0·?)(_*)$/);
+  if(zm){
+    var w=document.createElement('span');w.className='jp-wrap';
+    var td=document.createElement('span');td.className='jp-dot-top';w.appendChild(td);
+    var lw=document.createElement('span');lw.className='jp-lines-wrap';
+    var nr=document.createElement('span');nr.className='jp-num-row';
+    var ns=document.createElement('span');ns.className='jp-num';ns.textContent='0';nr.appendChild(ns);
+    if(zm[1].indexOf('\\u00b7')>-1){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';nr.appendChild(ag);}
+    var ul=zm[2].length;
+    if(ul>=1)nr.style.borderBottom='1.5px solid currentColor';
+    lw.appendChild(nr);
+    if(ul===2){var ul2=document.createElement('span');ul2.className='jp-u2-line';lw.appendChild(ul2);}
+    w.appendChild(lw);
+    var bd=document.createElement('span');bd.className='jp-dot-bot';w.appendChild(bd);
+    return w;
+  }
+  var num=tok,isH=0,isL=0,isDot=false,ul=0;
+  if(num.slice(-2)==='__'){ul=2;num=num.slice(0,-2);}
+  else if(num.slice(-1)==='_'){ul=1;num=num.slice(0,-1);}
+  if(num.indexOf('\\u00b7')>-1){isDot=true;num=num.replace(/\\u00b7/g,'');}
+  var hm=num.match(/^(.+?)('+)$/);if(hm){isH=hm[2].length;num=hm[1];}
+  var lm=num.match(/^(.+?)(,+)$/);if(lm){isL=lm[2].length;num=lm[1];}
+  var w=document.createElement('span');w.className='jp-wrap';
+  var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isH>=2?2:isH);w.appendChild(td);
+  var lw=document.createElement('span');lw.className='jp-lines-wrap';
+  var nr=document.createElement('span');nr.className='jp-num-row';
+  var ns=document.createElement('span');ns.className='jp-num';ns.textContent=num;nr.appendChild(ns);
+  if(isDot){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';nr.appendChild(ag);}
+  if(ul>=1)nr.style.borderBottom='1.5px solid currentColor';
+  lw.appendChild(nr);
+  if(ul===2){var ul2=document.createElement('span');ul2.className='jp-u2-line';lw.appendChild(ul2);}
+  w.appendChild(lw);
+  var bd=document.createElement('span');bd.className='jp-dot-bot';setDots(bd,isL>=2?2:isL);w.appendChild(bd);
+  return w;
+}
+function makeTuplet(n){
+  var w=document.createElement('span');w.className='jp-tuplet';
+  var br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);
+  var nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);
+  return w;
+}
+function renderNStr(nStr){
+  var div=document.createElement('div');div.className='p-n';
+  if(!nStr||!nStr.trim())return div;
+  var toks=nStr.trim().split(/\\s+/),i=0;
+  while(i<toks.length){
+    var t=toks[i];
+    if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
+    if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') so.appendChild(parseJpToken(toks[i++]));div.appendChild(so);i++;continue;}
+    if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));div.appendChild(sc);continue;}
+    if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;} // 跨格volta由renderPreview层处理
+    var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));div.appendChild(tp);i++;continue;}
+    if(t==='}'){i++;continue;}
+    div.appendChild(parseJpToken(t));i++;
+  }
+  return div;
+}
+function fitPreview(){
+  requestAnimationFrame(function(){
+    var wrap=document.getElementById('previewWrap');
+    var inner=wrap.querySelector('.prev-inner');
+    if(!inner)return;
+    inner.style.transform='';inner.style.transformOrigin='';inner.style.width='';inner.style.marginBottom='';
+    var avail=wrap.clientWidth;
+    if(!avail)return;
+    var maxW=0;
+    inner.querySelectorAll('.prev-row').forEach(function(row){
+      row.style.display='inline-flex';
+      if(row.scrollWidth>maxW)maxW=row.scrollWidth;
+      row.style.display='';
+    });
+    if(maxW>avail){
+      var scale=avail/maxW;
+      inner.style.transform='scale('+scale+')';
+      inner.style.transformOrigin='left top';
+      inner.style.width=maxW+'px';
+      var h=inner.offsetHeight;
+      inner.style.marginBottom=(h*(scale-1))+'px';
+    }
+  });
+}
+function renderPreview(){
+  var wrap=document.getElementById('previewWrap');wrap.innerHTML='';
+  var inner=document.createElement('div');inner.className='prev-inner';
+
+  // scoreImg 预览
+  var scoreUrl=(document.getElementById('meta-scoreimg')&&document.getElementById('meta-scoreimg').value)||'';
+  if(scoreUrl){
+    var si=document.createElement('div');si.style.cssText='margin-bottom:12px;';
+    var img=document.createElement('img');img.src=scoreUrl;
+    img.style.cssText='max-width:100%;border-radius:6px;border:1px solid var(--border);display:block;';
+    img.onerror=function(){si.style.display='none';};
+    si.appendChild(img);inner.appendChild(si);
   }
 
-  attachSwipeBack();
-  loadSongs();
+  data.forEach(function(sec){
+    var ps=document.createElement('div');ps.className='prev-sec';
+    var pn=document.createElement('div');pn.className='prev-sec-name';pn.textContent=sec.name;ps.appendChild(pn);
+    sec.lines.forEach(function(line){
+      var row=document.createElement('div');row.className='prev-row'+(line.bold?' bold':'');
+      var voltaWrap=null;
+      line.segs.forEach(function(seg){
+        var s=document.createElement('div');s.className='prev-seg';
+        var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
+        if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
+        var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
+        if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
+        // 检测 volta 开始（indexOf 避免反斜杠在 CMS 里丢失）
+        var _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
+        if(_vn){
+          voltaWrap=document.createElement('span');
+          voltaWrap.className='prev-volta';
+          voltaWrap.setAttribute('data-v',_vn+'.');
+        }
+        (voltaWrap||row).appendChild(s);
+        // 检测 volta 结束
+        if(voltaWrap&&seg.n&&seg.n.indexOf(']v')>=0){
+          voltaWrap.classList.add('closed');
+          row.appendChild(voltaWrap);
+          voltaWrap=null;
+        }
+      });
+      if(voltaWrap)row.appendChild(voltaWrap); // 未闭合的 volta
+      ps.appendChild(row);
+    });
+    inner.appendChild(ps);
+  });
+  wrap.appendChild(inner);
+  fitPreview();
+  renderCode();
+}
+function jq(s){ return JSON.stringify(s); }
+function renderCode(){
+  // 输出合法 JSON，可直接存成 .json 文件
+  var lines=['"sections": ['];
+  data.forEach(function(sec,si){
+    var last=si===data.length-1;
+    lines.push('  {');
+    lines.push('    "name": '+jq(sec.name)+',');
+    lines.push('    "lines": [');
+    sec.lines.forEach(function(line,li){
+      var lastLine=li===sec.lines.length-1;
+      var isObj=line.bold;
+      if(isObj){
+        lines.push('      { "b": true, "line": [');
+      } else {
+        lines.push('      [');
+      }
+      line.segs.forEach(function(seg,gi){
+        var lastSeg=gi===line.segs.length-1;
+        var obj={chord:seg.chord||''};
+        if(seg.n&&seg.n.trim())obj.n=seg.n;
+        obj.lyric=seg.lyric||'';
+        if(seg.lyric2)obj.lyric2=seg.lyric2;
+        lines.push('        '+JSON.stringify(obj)+(lastSeg?'':','));
+      });
+      lines.push(line.bold?'      ]}'+(!lastLine?',':''):'      ]'+(!lastLine?',':''));
+    });
+    lines.push('    ]');
+    lines.push('  }'+(last?'':','));
+  });
+  lines.push(']');
+  document.getElementById('codeBox').textContent=lines.join('\\n');
+}
+function copyCode(){
+  navigator.clipboard.writeText(document.getElementById('codeBox').textContent).then(function(){
+    var btns=document.querySelectorAll('.copy-btn');btns[0].textContent='已复制 ✓';
+    setTimeout(function(){btns[0].textContent='复制 sections 数组';},2000);
+  });
+}
+function copyFullJson(){
+  // Build sections array from codeBox (already rendered JSON)
+  renderCode();
+  var secText=document.getElementById('codeBox').textContent;
+  // Extract just the array part (between first [ and last ])
+  var firstBracket=secText.indexOf('[');
+  var lastBracket=secText.lastIndexOf(']');
+  var secArr=secText.slice(firstBracket,lastBracket+1);
+
+  var bpm=parseInt(document.getElementById('meta-bpm').value)||72;
+  var now=new Date();
+  var pad=function(n){return n<10?'0'+n:n;};
+  var ts=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+  var song={
+    version:'1',
+    created:'YuEn',
+    createdTime:ts,
+    id:document.getElementById('meta-id').value||'song-id',
+    title:document.getElementById('meta-title').value||'',
+    artist:document.getElementById('meta-artist').value||'',
+    sub:document.getElementById('meta-sub').value||'',
+    origKey:document.getElementById('meta-key').value||'C',
+    timeSign:'4/4',
+    bpm:bpm,
+    mp3:'',
+    cover:document.getElementById('meta-cover').value||'',
+    lrc:document.getElementById('meta-lrc').value||'',
+    youtube:document.getElementById('meta-youtube').value||'',
+    scoreImg:document.getElementById('meta-scoreimg').value||''
+  };
+
+  // Build JSON string manually to embed sections as raw JSON (already valid)
+  var lines=[];
+  lines.push('{');
+  Object.keys(song).forEach(function(k){
+    var v=song[k];
+    if(typeof v==='number') lines.push('  "'+k+'": '+v+',');
+    else lines.push('  "'+k+'": '+JSON.stringify(v)+',');
+  });
+  lines.push('  "sections": '+secArr);
+  lines.push('}');
+  var fullJson=lines.join('\\n');
+
+  // Validate before copying
+  try{
+    JSON.parse(fullJson);
+  }catch(e){
+    alert('JSON 格式有误: '+e.message);
+    return;
+  }
+
+  navigator.clipboard.writeText(fullJson).then(function(){
+    var btns=document.querySelectorAll('.copy-btn');
+    btns[1].textContent='已复制 ✓';
+    setTimeout(function(){btns[1].textContent='复制完整 JSON 文件';},2000);
+  });
+}
+function switchTop(name,btn){
+  document.querySelectorAll('.top-tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.top-panel').forEach(function(p){p.classList.remove('on');});
+  btn.classList.add('on');document.getElementById('top-'+name).classList.add('on');
+}
+
+/* ════════════════════════════════════════
+   键盘
+════════════════════════════════════════ */
+document.addEventListener('keydown',function(e){
+  var el=document.activeElement;
+  if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')return;
+  var isMeta=e.metaKey||e.ctrlKey;
+  var k=e.key;
+  if(isMeta){
+    if(k==='z'||k==='Z'){e.preventDefault();undoAction();return;}
+    if(k==='c'||k==='C'){e.preventDefault();copyToks();return;}
+    if(k==='x'||k==='X'){e.preventDefault();cutToks();return;}
+    if(k==='v'||k==='V'){e.preventDefault();pasteToks();return;}
+    return;
+  }
+  // Alt/Option 快捷键：格子级别操作
+  // 用 e.code 而不是 e.key，因为 Mac Option+字母 会产生特殊字符
+  if(e.altKey){
+    var code=e.code||'';
+    if(code==='KeyC'){e.preventDefault();copySeg();return;}
+    if(code==='KeyV'){e.preventDefault();pasteSeg();return;}
+    if(code==='KeyR'){e.preventDefault();pasteSegReplace();return;}
+    if(code==='KeyX'){e.preventDefault();cutSeg();return;}
+    return;
+  }
+  if(curSi<0)return;
+  if(/^[0-7]$/.test(k)){e.preventDefault();inputNote(parseInt(k));return;}
+  if(k===' '){e.preventDefault();appendTok(buildSpacerTok());return;}
+  if(k==='\\\\'){e.preventDefault();inputSpecial('-');return;}
+  if(k==='Backspace'){e.preventDefault();deleteSelected();return;}
+  if(k==='ArrowLeft'){e.preventDefault();moveCursor('left');return;}
+  if(k==='ArrowRight'){e.preventDefault();moveCursor('right');return;}
+  if(k==='ArrowUp'){e.preventDefault();var os=['low2','low1','mid','high1','high2'];var i=os.indexOf(oct);if(i<os.length-1)setOct(os[i+1]);return;}
+  if(k==='ArrowDown'){e.preventDefault();var os=['low2','low1','mid','high1','high2'];var i=os.indexOf(oct);if(i>0)setOct(os[i-1]);return;}
+  if(k===','){e.preventDefault();toggleDot();return;}
+  if(k==='['){e.preventDefault();toggleSlur();return;}
+  if(k==='i'||k==='I'){e.preventDefault();setInputMode('insert');return;}
+  if(k==='o'||k==='O'){e.preventDefault();setInputMode('overwrite');return;}
+  if(k==='q'||k==='Q'){e.preventDefault();setDur('whole');return;}
+  if(k==='w'||k==='W'){e.preventDefault();setDur('half');return;}
+  if(k==='e'||k==='E'){e.preventDefault();setDur('quarter');return;}
+  if(k==='r'||k==='R'){e.preventDefault();setDur('eighth');return;}
+  if(k==='t'||k==='T'){e.preventDefault();setDur('16th');return;}
+});
+
+/* ════════════════════════════════════════
+   导入
+════════════════════════════════════════ */
+function openImport(){
+  document.getElementById('importOverlay').classList.add('open');
+  document.getElementById('importTA').value='';
+  document.getElementById('importErr').textContent='';
+  setTimeout(function(){document.getElementById('importTA').focus();},50);
+}
+function closeImport(){document.getElementById('importOverlay').classList.remove('open');}
+function doImport(){
+  var raw=document.getElementById('importTA').value.trim();
+  var err=document.getElementById('importErr');err.textContent='';
+  try{
+    var arrStr=raw;
+    // 找第一个 [ 到最后一个 ]，支持所有格式：
+    // sections: [...],  /  var SECTIONS = [...];  / 直接粘贴数组
+    var firstBracket=raw.indexOf('[');
+    if(firstBracket>=0){
+      var lastBracket=raw.lastIndexOf(']');
+      if(lastBracket>firstBracket)arrStr=raw.slice(firstBracket,lastBracket+1);
+    }
+    var parsed=eval('('+arrStr+')');
+    if(!Array.isArray(parsed))throw new Error('不是数组');
+    saveUndo();
+    data=parsed.map(function(sec){
+      return{name:sec.name||'',lines:(sec.lines||[]).map(function(line){
+        if(Array.isArray(line))return{bold:false,segs:line};
+        return{bold:!!line.b,segs:line.line||[]};
+      })};
+    });
+    curSi=-1;curLi=-1;curGi=-1;curTok=-1;clearSel();
+    closeImport();renderEditor();
+  }catch(e){err.textContent='解析失败：'+e.message;}
+}
+document.getElementById('importOverlay').addEventListener('click',function(e){if(e.target===this)closeImport();});
+
+
+/* ════════════════════════════════════════
+   批量填歌词
+════════════════════════════════════════ */
+function _getLyricSlots(scopeSi){
+  // 返回所有有音符的 seg 引用（n 非空）
+  // scopeSi >= 0 时只处理该段落
+  var slots=[];
+  var secs=(scopeSi>=0)?[{sec:data[scopeSi],si:scopeSi}]:data.map(function(s,i){return{sec:s,si:i};});
+  secs.forEach(function(item){
+    item.sec.lines.forEach(function(line,li){
+      line.segs.forEach(function(seg,gi){
+        if(seg.n&&seg.n.trim())slots.push({seg:seg,si:item.si,li:li,gi:gi});
+      });
+    });
+  });
+  return slots;
+}
+function _lyfillScope(){
+  var el=document.querySelector('input[name="lyfill-scope"]:checked');
+  return el?el.value:'all';
+}
+function openBulkLyric(){
+  document.getElementById('lyfillOverlay').classList.add('open');
+  document.getElementById('lyfillTA').value='';
+  document.getElementById('lyfillStats').textContent='';
+  document.getElementById('lyfillStats').className='lyfill-stats';
+  setTimeout(function(){document.getElementById('lyfillTA').focus();},50);
+}
+function closeBulkLyric(){
+  document.getElementById('lyfillOverlay').classList.remove('open');
+}
+function updateLyfillStats(){
+  var text=document.getElementById('lyfillTA').value.replace(/\\s/g,'');
+  var scope=_lyfillScope();
+  var scopeSi=(scope==='cur'&&curSi>=0)?curSi:-1;
+  var slots=_getLyricSlots(scopeSi);
+  var el=document.getElementById('lyfillStats');
+  if(!text){el.textContent='';el.className='lyfill-stats';return;}
+  var msg='歌词字数: '+text.length+'  /  音符格数: '+slots.length;
+  if(text.length===slots.length){el.className='lyfill-stats ok';msg+='  ✓ 完全匹配';}
+  else if(text.length>slots.length){el.className='lyfill-stats warn';msg+='  ⚠ 歌词多 '+(text.length-slots.length)+' 字（多余部分忽略）';}
+  else{el.className='lyfill-stats warn';msg+='  ⚠ 歌词少 '+(slots.length-text.length)+' 字（剩余格子将清空）';}
+  el.textContent=msg;
+}
+function applyBulkLyric(){
+  var text=document.getElementById('lyfillTA').value.replace(/\\s/g,'');
+  if(!text){closeBulkLyric();return;}
+  var scope=_lyfillScope();
+  var scopeSi=(scope==='cur'&&curSi>=0)?curSi:-1;
+  var slots=_getLyricSlots(scopeSi);
+  saveUndo();
+  slots.forEach(function(item,i){
+    item.seg.lyric=i<text.length?text[i]:'';
+  });
+  closeBulkLyric();
+  renderEditor();
+  if(curSi>=0)reactivate();
+}
+document.getElementById('lyfillOverlay').addEventListener('click',function(e){if(e.target===this)closeBulkLyric();});
+document.getElementById('lyfillTA').addEventListener('input',updateLyfillStats);
+(function(){
+  var radios=document.querySelectorAll('input[name="lyfill-scope"]');
+  radios.forEach(function(r){r.addEventListener('change',updateLyfillStats);});
+})();
+
+/* ════════════════════════════════════════
+   检查状态（音符 / 歌词 对照）
+════════════════════════════════════════ */
+function openCheck(){
+  var content=document.getElementById('checkContent');
+  content.innerHTML='';
+  var totalN=0,totalL=0;
+  data.forEach(function(sec){
+    var noteCount=0,lyricCount=0;
+    sec.lines.forEach(function(line){
+      line.segs.forEach(function(seg){
+        if(seg.n&&seg.n.trim()){
+          noteCount++;
+          if(seg.lyric&&seg.lyric.trim())lyricCount++;
+        }
+      });
+    });
+    totalN+=noteCount;totalL+=lyricCount;
+    var row=document.createElement('div');row.className='check-row';
+    var nm=document.createElement('span');nm.className='check-sec-name';nm.textContent=sec.name||'（无名）';row.appendChild(nm);
+    var nums=document.createElement('span');
+    nums.className='check-nums '+(lyricCount===noteCount?'check-ok':'check-warn');
+    nums.textContent='歌词 '+lyricCount+' / 音符 '+noteCount+(lyricCount===noteCount?' ✓':' ⚠');
+    row.appendChild(nums);content.appendChild(row);
+  });
+  var tot=document.createElement('div');tot.className='check-total';
+  var cls=totalL===totalN?'check-ok':'check-warn';
+  tot.innerHTML='合计：歌词 <span class="'+cls+'">'+totalL+'</span> / 音符 '+totalN+(totalL===totalN?' &nbsp;<span class="check-ok">✓ 全部匹配</span>':' &nbsp;<span class="check-warn">⚠ 有未填歌词</span>');
+  content.appendChild(tot);
+  document.getElementById('checkOverlay').classList.add('open');
+}
+function closeCheck(){
+  document.getElementById('checkOverlay').classList.remove('open');
+}
+document.getElementById('checkOverlay').addEventListener('click',function(e){if(e.target===this)closeCheck();});
+
+
+/* ════════════════════════════════════════
+   输入状态栏更新
+════════════════════════════════════════ */
+var _durLabel={whole:'全音符',half:'2分',quarter:'4分',eighth:'8分','16th':'16分'};
+var _octLabel={low2:'低2',low1:'低1',mid:'中',high1:'高1',high2:'高2'};
+function updateInputState(){
+  // 总音符：统计全部 data 中有 n 的 seg
+  var total=0;
+  data.forEach(function(sec){sec.lines.forEach(function(line){line.segs.forEach(function(seg){if(seg.n&&seg.n.trim())total++;});});});
+  var _si=document.getElementById('is-total');if(_si)_si.textContent=total;
+  var _so=document.getElementById('is-oct');if(_so)_so.textContent=_octLabel[oct]||oct;
+  var _sd=document.getElementById('is-dur');if(_sd)_sd.textContent=_durLabel[dur]||dur;
+  var _sp=document.getElementById('is-dot');if(_sp)_sp.textContent=dotOn?'开':'关';
+  var _ss=document.getElementById('is-sec');if(_ss)_ss.textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
+  // 房子线：当前格子的 n 里是否含有 [v1 / [v2 token
+  var voltaStr='无';
+  if(curSi>=0&&curLi>=0&&curGi>=0){
+    var curN=(data[curSi]&&data[curSi].lines[curLi]&&data[curSi].lines[curLi].segs[curGi])||{};
+    if(curN.n&&curN.n.indexOf('[v1')>=0)voltaStr='1房';
+    else if(curN.n&&curN.n.indexOf('[v2')>=0)voltaStr='2房';
+  }
+  document.getElementById('is-volta').textContent=voltaStr;
+}
+
+// scoreImg 变更时刷新预览
+(function(){
+  var el=document.getElementById('meta-scoreimg');
+  if(el)el.addEventListener('input',function(){renderPreview();});
+})();
+
+/* 初始化 */
+refreshTupletBtns();
+renderEditor();
+updateInputState();
+</script>
+<!-- ── 批量填歌词 modal ── -->
+<div class="lyfill-overlay" id="lyfillOverlay">
+  <div class="lyfill-box">
+    <div class="lyfill-label">批量填歌词</div>
+    <div class="lyfill-hint">粘入歌词文字（连续字符），按顺序自动填入有音符的格子。已有歌词会被覆盖。空格与换行会被忽略。</div>
+    <textarea class="lyfill-ta" id="lyfillTA" placeholder="请在这里粘入歌词…"></textarea>
+    <div class="lyfill-scope">
+      <label><input type="radio" name="lyfill-scope" value="all" checked> 全部段落</label>
+      <label><input type="radio" name="lyfill-scope" value="cur"> 仅当前段落</label>
+    </div>
+    <div class="lyfill-stats" id="lyfillStats"></div>
+    <div class="lyfill-btns">
+      <button class="lyfill-ok" onclick="applyBulkLyric()">填入</button>
+      <button class="lyfill-cancel" onclick="closeBulkLyric()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 检查状态 modal ── -->
+<div class="check-overlay" id="checkOverlay">
+  <div class="check-box">
+    <div class="check-title">音符 / 歌词 对照检查</div>
+    <div id="checkContent"></div>
+    <div style="margin-top:12px;text-align:right;">
+      <button class="lyfill-cancel" onclick="closeCheck()">关闭</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>`;
+
+function openTool(id, name){
+  navName.textContent = name;
+  hub.style.display = 'none';
+  toolview.classList.add('on');
+  Object.values(panels).forEach(p => p.classList.remove('on'));
+  panels[id].classList.add('on');
+  if(id === 'lrc' && !localStorage.getItem(TUT_KEY)) setTimeout(tutOpen, 400);
+  if(id === 'jf'  && !localStorage.getItem(TUT_KEY_JF)) setTimeout(tutOpenJF, 400);
+  if(id === 'jf'){
+    const fr = $('mt-jf-iframe');
+    if(!fr.srcdoc && !fr._loaded){
+      fr._loaded = true;
+      fr.srcdoc = jianpuHTML;
+    }
+  }
+}
+function closeTool(){
+  toolview.classList.remove('on');
+  hub.style.display = '';
+  audio.pause();
+  updatePlayBtn();
+}
+
+$('mt-card-lrc').onclick = () => openTool('lrc','歌词编辑器');
+$('mt-card-jf').onclick  = () => openTool('jf','简谱编辑器');
+$('mt-back').onclick     = closeTool;
+$('mt-help-btn').onclick = () => {
+  const isJF = $('mt-panel-jf').classList.contains('on');
+  if(isJF){ tutIdxJF=0; tutRenderJF(); $('mt-tut-next').onclick = () => { if(tutIdxJF < tutStepsJF.length-1){ tutIdxJF++; tutRenderJF(); } else tutCloseJF(); }; $('mt-tut-close').onclick=tutCloseJF; $('mt-tut-skip').onclick=tutCloseJF; $('mt-tut-never').onclick=()=>{ localStorage.setItem(TUT_KEY_JF,'1'); tutCloseJF(); }; }
+  else { tutIdx=0; tutRender(); $('mt-tut-next').onclick = () => { if(tutIdx < tutSteps.length-1){ tutIdx++; tutRender(); } else tutClose(); }; $('mt-tut-close').onclick=tutClose; $('mt-tut-skip').onclick=tutClose; $('mt-tut-never').onclick=()=>{ localStorage.setItem(TUT_KEY,'1'); tutClose(); }; }
+  $('mt-tut').classList.add('open');
+};
+
+/* ── LRC 播放器 ── */
+const audio = $('mt-audio');
+let lrcData = [], autoScroll = true, curIdx = -1;
+
+audio.addEventListener('timeupdate', () => { updateTimeClock(); updateProg(); if(autoScroll) highlightPlaying(); });
+audio.addEventListener('play',  updatePlayBtn);
+audio.addEventListener('pause', updatePlayBtn);
+audio.addEventListener('ended', updatePlayBtn);
+
+function fmt(s){ const m=Math.floor(s/60),sec=s%60; return String(m).padStart(2,'0')+':'+sec.toFixed(2).padStart(5,'0'); }
+function fmtLRC(s){ return '['+fmt(s)+']'; }
+function updateTimeClock(){ $('mt-time').textContent='['+fmt(audio.currentTime)+']'; }
+function updateProg(){ if(audio.duration) $('mt-progfill').style.width=(audio.currentTime/audio.duration*100)+'%'; }
+function updatePlayBtn(){ $('mt-playbtn').textContent = audio.paused ? '▶' : '⏸'; }
+
+function highlightPlaying(){
+  const t = audio.currentTime;
+  let idx = -1;
+  lrcData.forEach((l,i) => { if(l.time !== null && l.time <= t) idx = i; });
+  if(idx === curIdx) return;
+  curIdx = idx;
+  document.querySelectorAll('.mt-ly-row').forEach((r,i) => r.classList.toggle('playing', i===idx));
+  if(idx >= 0 && autoScroll){
+    const rows = document.querySelectorAll('.mt-ly-row');
+    if(rows[idx]) rows[idx].scrollIntoView({block:'center',behavior:'smooth'});
+  }
+}
+
+$('mt-playbtn').onclick = () => { audio.paused ? audio.play() : audio.pause(); };
+$('mt-progbar').onclick = e => {
+  if(!audio.duration) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+};
+$('mt-vol').oninput = e => { audio.volume = e.target.value; };
+
+/* 上传音乐 */
+$('mt-btn-music').onclick = () => $('mt-music-file').click();
+$('mt-music-file').onchange = function(){ if(this.files[0]){ audio.src=URL.createObjectURL(this.files[0]); audio.load(); }};
+
+/* 上传歌词 */
+$('mt-btn-lyric').onclick = () => $('mt-lyric-file').click();
+$('mt-lyric-file').onchange = function(){
+  if(!this.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const parsed = [];
+    const timeMap = {}; // 相同时间戳合并为双语（用 | 连接）
+    e.target.result.split('\n').forEach(l => {
+      const mm = l.match(/^\[(ar|ti|al|by):([^\]]*)\]/i);
+      if(mm){ const k=mm[1].toLowerCase(),v=mm[2].trim(); $('mt-meta-'+k) && ($('mt-meta-'+k).value=v); return; }
+      const m = l.match(/^\[(\d+):(\d+\.\d+)\](.*)/);
+      if(m){
+        const t = parseInt(m[1])*60+parseFloat(m[2]);
+        const txt = m[3].trim();
+        const key = t.toFixed(2);
+        if(timeMap[key] !== undefined){
+          // 双语LRC：相同时间戳 → 合并用 | 连接
+          parsed[timeMap[key]].text += ' | ' + txt;
+        } else {
+          timeMap[key] = parsed.length;
+          parsed.push({time:t, text:txt});
+        }
+      }
+    });
+    if(parsed.length){ lrcData=parsed; renderLines(); }
+  };
+  reader.readAsText(this.files[0]);
+};
+
+/* 上传文本 */
+$('mt-btn-txt').onclick = () => $('mt-modal-txt').classList.add('open');
+$('mt-txt-file').onchange = function(){
+  if(!this.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    lrcData = e.target.result.split('\n').map(t => ({time:null, text:t.trim()})).filter(l=>l.text);
+    renderLines();
+  };
+  reader.readAsText(this.files[0]);
+};
+$('mt-txt-ok').onclick = () => {
+  const raw = $('mt-txt-ta').value;
+  if(!raw.trim()) return;
+  lrcData = raw.split('\n').map(t => ({time:null, text:t.trim()})).filter(l=>l.text);
+  $('mt-modal-txt').classList.remove('open');
+  $('mt-txt-ta').value = '';
+  renderLines();
+};
+$('mt-txt-cancel').onclick = () => { $('mt-modal-txt').classList.remove('open'); };
+
+/* 查找歌词 */
+$('mt-btn-find').onclick = () => window.open('https://music.liuzhijin.cn/', '_blank');
+
+/* 创建歌词 */
+$('mt-btn-create').onclick  = () => $('mt-modal-create').classList.add('open');
+$('mt-create-cancel').onclick = () => $('mt-modal-create').classList.remove('open');
+$('mt-create-ok').onclick = () => {
+  const raw = $('mt-create-ta').value.trim();
+  if(!raw) return;
+  lrcData = raw.split('\n').map(t => ({time:null, text:t}));
+  $('mt-modal-create').classList.remove('open');
+  renderLines();
+};
+
+/* 下载歌词 */
+function buildLRCmeta(){
+  const ar=$('mt-meta-ar').value, ti=$('mt-meta-ti').value,
+        al=$('mt-meta-al').value, by=$('mt-meta-by').value;
+  const lines=[];
+  if(ar) lines.push('[ar:'+ar+']');
+  if(ti) lines.push('[ti:'+ti+']');
+  if(al) lines.push('[al:'+al+']');
+  if(by) lines.push('[by:'+by+']');
+  return {lines, ti};
+}
+function doDownloadLRC(twin){
+  const {lines, ti} = buildLRCmeta();
+  if(!twin){
+    lrcData.forEach(l => { if(l.time!==null) lines.push(fmtLRC(l.time)+l.text); });
+  } else {
+    // 双语LRC：同一时间戳出现两次，分别为 | 左边和右边
+    const left=[], right=[];
+    lrcData.forEach(l => {
+      if(l.time===null) return;
+      const parts = l.text.split(/(?<!\\)\|/); // 按未转义 | 分割
+      left.push({time:l.time, text:(parts[0]||'').trim()});
+      right.push({time:l.time, text:(parts[1]||'').trim()});
+    });
+    left.forEach(l => lines.push(fmtLRC(l.time)+l.text));
+    right.forEach(l => lines.push(fmtLRC(l.time)+l.text));
+  }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain'}));
+  a.download=(ti||'lyrics')+'.lrc';
+  a.click();
+}
+$('mt-btn-dl').onclick = () => doDownloadLRC(false);
+$('mt-btn-dl-twin').onclick = () => doDownloadLRC(true);
+
+/* Info modal */
+$('mt-btn-info').onclick   = () => $('mt-modal-info').classList.add('open');
+$('mt-info-ok').onclick    = () => $('mt-modal-info').classList.remove('open');
+$('mt-info-cancel').onclick= () => $('mt-modal-info').classList.remove('open');
+
+/* 偏移 */
+$('mt-btn-offset').onclick = () => {
+  const offset = parseFloat($('mt-offset').value)||0;
+  if(!offset) return;
+  lrcData.forEach(l => { if(l.time!==null) l.time=Math.max(0,l.time+offset); });
+  $('mt-offset').value='0';
+  renderLines();
+};
+
+/* 同步滚动 toggle */
+$('mt-toggle').onclick = () => {
+  autoScroll = !autoScroll;
+  $('mt-toggle').classList.toggle('on', autoScroll);
+  $('mt-toggle-lbl').textContent = autoScroll ? '开' : '关';
+};
+
+/* 新增歌词（末尾） */
+$('mt-btn-addend').onclick = () => {
+  lrcData.push({time:null, text:''});
+  renderLines();
+  setTimeout(()=>{ const inp=document.querySelectorAll('.mt-ly-inp'); if(inp.length) inp[inp.length-1].focus(); },50);
+};
+
+/* ── 渲染歌词列表 ── */
+function renderLines(){
+  const wrap = $('mt-lines');
+  const st   = $('mt-lrc-center').scrollTop;
+  wrap.innerHTML = '';
+  lrcData.forEach((l, i) => {
+    const row = document.createElement('div');
+    row.className = 'mt-ly-row' + (i===curIdx?' playing':'');
+
+    // 时间戳（双击编辑）
+    const tsWrap = document.createElement('div');
+    tsWrap.className = 'mt-ly-ts-wrap';
+    const ts = document.createElement('span');
+    ts.className = 'mt-ly-time' + (l.time===null?' unstamped':'');
+    ts.textContent = l.time!==null ? fmtLRC(l.time) : '[--:--.--]';
+    if(l.time!==null) ts.onclick = () => { audio.currentTime=l.time; };
+    // 双击进入编辑模式
+    ts.ondblclick = (e) => {
+      e.stopPropagation();
+      const inp = document.createElement('input');
+      inp.type='text'; inp.className='mt-ly-time-edit';
+      inp.value = l.time!==null ? fmtLRC(l.time) : '[00:00.00]';
+      inp.select();
+      const commit = () => {
+        const m = inp.value.match(/\[?(\d+):(\d+\.\d+)\]?/);
+        if(m){ lrcData[i].time = parseInt(m[1])*60+parseFloat(m[2]); }
+        renderLines();
+      };
+      inp.onblur = commit;
+      inp.onkeydown = e2 => { if(e2.key==='Enter') inp.blur(); if(e2.key==='Escape'){ inp.onblur=null; tsWrap.replaceChild(ts,inp); } };
+      tsWrap.replaceChild(inp, ts);
+      inp.focus(); inp.select();
+    };
+    tsWrap.appendChild(ts);
+    row.appendChild(tsWrap);
+
+    // 打轴圆圈
+    const sb = document.createElement('button');
+    sb.className='mt-ly-stamp'; sb.textContent='○';
+    sb.onclick = () => stampLine(i);
+    row.appendChild(sb);
+
+    // 文字输入
+    const inp = document.createElement('input');
+    inp.type='text'; inp.className='mt-ly-inp'; inp.value=l.text;
+    inp.oninput = () => lrcData[i].text = inp.value;
+    inp.onkeydown = e => {
+      if(e.key==='Enter'){ e.preventDefault(); addAfter(i); }
+      if(e.key==='Tab'){
+        e.preventDefault(); stampLine(i);
+        const all=document.querySelectorAll('.mt-ly-inp');
+        if(all[i+1]) all[i+1].focus();
+      }
+    };
+    row.appendChild(inp);
+
+    // 悬停操作
+    const act = document.createElement('div');
+    act.className='mt-ly-actions';
+    act.innerHTML=`<button class="mt-ly-act update" onclick="mtLRC.updateTime(${i})">更新时间</button>`
+                 +`<button class="mt-ly-act add"    onclick="mtLRC.addAfter(${i})">新增歌词</button>`
+                 +`<button class="mt-ly-act del"    onclick="mtLRC.delLine(${i})">删除歌词</button>`;
+    row.appendChild(act);
+    wrap.appendChild(row);
+  });
+  $('mt-lrc-center').scrollTop = st;
+}
+
+function stampLine(i){ lrcData[i].time=audio.currentTime; renderLines(); }
+function addAfter(i){
+  lrcData.splice(i+1,0,{time:null,text:''});
+  renderLines();
+  setTimeout(()=>{ const all=document.querySelectorAll('.mt-ly-inp'); if(all[i+1]) all[i+1].focus(); },50);
+}
+function delLine(i){ lrcData.splice(i,1); renderLines(); }
+function updateTime(i){ lrcData[i].time=audio.currentTime; renderLines(); }
+
+/* 暴露给 inline onclick 使用 */
+window.mtLRC = { stampLine, addAfter, delLine, updateTime };
+
+/* 键盘快捷键 */
+document.addEventListener('keydown', e => {
+  if(!$('mt-panel-lrc').classList.contains('on')) return;
+  const tag = document.activeElement.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA') return;
+  if(e.key===' '){ e.preventDefault(); audio.paused?audio.play():audio.pause(); }
+  if(e.key==='ArrowLeft'){ e.preventDefault(); audio.currentTime=Math.max(0,audio.currentTime-3); }
+  if(e.key==='ArrowRight'){ e.preventDefault(); audio.currentTime=Math.min(audio.duration||0,audio.currentTime+3); }
+});
+
+/* 点击 modal 背景关闭 */
+['mt-modal-info','mt-modal-create'].forEach(id => {
+  $(id).addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
+});
+
+
+/* ── 教程系统 ── */
+const TUT_KEY = 'mt_lrc_tut_done';
+
+const tutSteps = [
+  {
+    icon: '🎵',
+    title: '欢迎使用歌词编辑器',
+    desc: '几步教你快速上手 LRC 时间轴打轴',
+    items: [
+      '支持导入 .lrc 歌词文件，或从零创建',
+      '上传音频后可边播放边打时间轴',
+      '导出标准 LRC 格式，可直接用于播放器'
+    ]
+  },
+  {
+    icon: '⬆',
+    title: '步骤 1：准备音乐与歌词',
+    desc: '从左侧栏开始操作',
+    items: [
+      '点「上传音乐」选择 MP3/M4A 等音频文件',
+      '点「上传歌词」导入已有 .lrc 文件',
+      '或点「创建歌词」输入纯文字歌词，每行一句'
+    ]
+  },
+  {
+    icon: '○',
+    title: '步骤 2：打时间轴',
+    desc: '播放音乐，对准每句歌词点击打轴',
+    items: [
+      '点顶部 ▶ 播放音乐',
+      '点每行左边的圆圈 ○ 给该行打上当前时间',
+      '快捷键：Tab 打轴并跳下一行，Space 播放/暂停，← → 快退快进 3 秒'
+    ]
+  },
+  {
+    icon: '⬇',
+    title: '步骤 3：导出歌词',
+    desc: '打好时间轴后下载 LRC 文件',
+    items: [
+      '点「add info」可填写歌手、歌名等信息',
+      '右侧「偏移」可整体调整所有时间轴',
+      '点左侧「下载歌词」导出 .lrc 文件'
+    ]
+  }
+];
+
+let tutIdx = 0;
+
+function tutRender(){
+  const step = tutSteps[tutIdx];
+  $('mt-tut-icon').textContent = step.icon;
+  $('mt-tut-step-label').textContent = '步骤 ' + (tutIdx+1) + ' / ' + tutSteps.length;
+  $('mt-tut-title').textContent = step.title;
+  $('mt-tut-desc').textContent = step.desc;
+
+  const itemsEl = $('mt-tut-items');
+  itemsEl.innerHTML = step.items.map(t =>
+    `<div class="mt-tut-item"><div class="mt-tut-item-dot"></div><span>${t}</span></div>`
+  ).join('');
+
+  const dotsEl = $('mt-tut-dots');
+  dotsEl.innerHTML = tutSteps.map((_,i) =>
+    `<div class="mt-tut-dot${i===tutIdx?' active':''}"></div>`
+  ).join('');
+
+  const isLast = tutIdx === tutSteps.length - 1;
+  $('mt-tut-next').textContent = isLast ? '开始使用 ✓' : '下一步 →';
+}
+
+function tutOpen(){
+  tutIdx = 0;
+  tutRender();
+  $('mt-tut').classList.add('open');
+}
+function tutClose(){
+  $('mt-tut').classList.remove('open');
+  localStorage.setItem(TUT_KEY, '1');
+}
+
+$('mt-tut-close').onclick = tutClose;
+$('mt-tut-skip').onclick  = tutClose;
+$('mt-tut-never').onclick = () => { localStorage.setItem(TUT_KEY,'1'); tutClose(); };
+$('mt-tut-next').onclick  = () => {
+  if(tutIdx < tutSteps.length - 1){ tutIdx++; tutRender(); }
+  else tutClose();
+};
+
+
+/* ── 简谱编辑器教程 ── */
+const TUT_KEY_JF = 'mt_jf_tut_done';
+
+const tutStepsJF = [
+  {
+    icon: '♩',
+    title: '欢迎使用简谱编辑器',
+    desc: '快速了解如何用简谱编辑器编写乐谱',
+    items: [
+      '支持完整简谱（数字音符 1-7）输入',
+      '可标注和弦、升降号、连音线',
+      '导出 JSON 格式，方便保存与分享'
+    ]
+  },
+  {
+    icon: '🎼',
+    title: '步骤 1：输入音符',
+    desc: '用数字键盘输入简谱音符',
+    items: [
+      '数字 1-7 对应 Do-Si 七个音',
+      '0 表示休止符，点击音符可加上下点（高低八度）',
+      '左边面板选择调号、拍号与速度'
+    ]
+  },
+  {
+    icon: '🎵',
+    title: '步骤 2：添加歌词与和弦',
+    desc: '为每个音符标注文字与和弦',
+    items: [
+      '点击音符下方输入对应歌词',
+      '点击音符上方输入和弦标记（如 C, Am, G7）',
+      '支持升号 # 与降号 ♭'
+    ]
+  },
+  {
+    icon: '💾',
+    title: '步骤 3：保存与导出',
+    desc: '完成编辑后保存你的简谱',
+    items: [
+      '点「导出 JSON」保存为文件',
+      '下次可点「导入 JSON」重新载入',
+      '也可直接复制简谱字符串分享给他人'
+    ]
+  }
+];
+
+let tutIdxJF = 0;
+
+function tutRenderJF(){
+  const step = tutStepsJF[tutIdxJF];
+  $('mt-tut-icon').textContent = step.icon;
+  $('mt-tut-step-label').textContent = '步骤 ' + (tutIdxJF+1) + ' / ' + tutStepsJF.length;
+  $('mt-tut-title').textContent = step.title;
+  $('mt-tut-desc').textContent = step.desc;
+  $('mt-tut-items').innerHTML = step.items.map(t =>
+    `<div class="mt-tut-item"><div class="mt-tut-item-dot"></div><span>${t}</span></div>`
+  ).join('');
+  $('mt-tut-dots').innerHTML = tutStepsJF.map((_,i) =>
+    `<div class="mt-tut-dot${i===tutIdxJF?' active':''}"></div>`
+  ).join('');
+  $('mt-tut-next').textContent = tutIdxJF === tutStepsJF.length-1 ? '开始使用 ✓' : '下一步 →';
+}
+
+function tutOpenJF(){
+  tutIdxJF = 0;
+  // Rebind next button for JF flow
+  $('mt-tut-next').onclick = () => {
+    if(tutIdxJF < tutStepsJF.length-1){ tutIdxJF++; tutRenderJF(); }
+    else tutCloseJF();
+  };
+  $('mt-tut-close').onclick = tutCloseJF;
+  $('mt-tut-skip').onclick  = tutCloseJF;
+  tutRenderJF();
+  $('mt-tut').classList.add('open');
+}
+function tutCloseJF(){
+  $('mt-tut').classList.remove('open');
+  localStorage.setItem(TUT_KEY_JF, '1');
+  // Restore LRC handlers
+  $('mt-tut-next').onclick  = () => { if(tutIdx < tutSteps.length-1){ tutIdx++; tutRender(); } else tutClose(); };
+  $('mt-tut-close').onclick = tutClose;
+  $('mt-tut-skip').onclick  = tutClose;
+}
+
+renderLines();
+
+/* ── 持续隐藏侧边栏（防止动态插入） ── */
+(function hideSidebar(){
+  const SELECTORS = [
+    'aside',
+    '[class*="sidebar"]',
+    '[class*="side-bar"]',
+    '[id*="sidebar"]',
+    '[id*="side-bar"]',
+    '#header-menu',
+    'footer',
+    '.mt-10',
+  ];
+  function hideAll(){
+    SELECTORS.forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('width','0','important');
+        el.style.setProperty('min-width','0','important');
+        el.style.setProperty('visibility','hidden','important');
+      });
+    });
+    // 让 section.mx-auto 保持单列
+    document.querySelectorAll('section.mx-auto').forEach(el => {
+      el.style.setProperty('grid-template-columns','1fr','important');
+      el.style.setProperty('max-width','100%','important');
+    });
+  }
+  hideAll();
+  const observer = new MutationObserver(hideAll);
+  observer.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['style','class'] });
+})();
+
 })();
