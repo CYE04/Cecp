@@ -374,7 +374,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
 .p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
-.p-lyric2{opacity:0.65;margin-top:1px;}
+.p-lyric2{opacity:0.65;margin-top:1px;}.p-lyric3{opacity:0.65;margin-top:1px;}.p-lyric4{opacity:0.65;margin-top:1px;}
 
 /* 音符结构 */
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
@@ -1083,7 +1083,15 @@ function renderEditor(){
         var inpL2=document.createElement('input');inpL2.className='inp-lyric';inpL2.value=seg.lyric2||'';
         inpL2.placeholder='下行…';inpL2.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
         inpL2.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric2=this.value;renderPreview();};})(si,li,gi);
-        tdL.appendChild(inpL2);tr.appendChild(tdL);
+        tdL.appendChild(inpL2);
+        var inpL3=document.createElement('input');inpL3.className='inp-lyric';inpL3.value=seg.lyric3||'';
+        inpL3.placeholder='第三行…';inpL3.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
+        inpL3.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric3=this.value;renderPreview();};})(si,li,gi);
+        tdL.appendChild(inpL3);
+        var inpL4=document.createElement('input');inpL4.className='inp-lyric';inpL4.value=seg.lyric4||'';
+        inpL4.placeholder='第四行…';inpL4.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
+        inpL4.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric4=this.value;renderPreview();};})(si,li,gi);
+        tdL.appendChild(inpL4);tr.appendChild(tdL);
 
         // 删除
         var tdD=document.createElement('td');
@@ -1266,6 +1274,8 @@ function renderPreview(){
         if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
         if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
+        if(seg.lyric3){var l3=document.createElement('div');l3.className='p-lyric p-lyric3'+(line.bold?' bold':'');l3.textContent=seg.lyric3;s.appendChild(l3);}
+        if(seg.lyric4){var l4=document.createElement('div');l4.className='p-lyric p-lyric4'+(line.bold?' bold':'');l4.textContent=seg.lyric4;s.appendChild(l4);}
         // 检测 volta 开始（indexOf 避免反斜杠在 CMS 里丢失）
         var _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
         if(_vn){
@@ -1313,6 +1323,8 @@ function renderCode(){
         if(seg.n&&seg.n.trim())obj.n=seg.n;
         obj.lyric=seg.lyric||'';
         if(seg.lyric2)obj.lyric2=seg.lyric2;
+        if(seg.lyric3)obj.lyric3=seg.lyric3;
+        if(seg.lyric4)obj.lyric4=seg.lyric4;
         lines.push('        '+JSON.stringify(obj)+(lastSeg?'':','));
       });
       lines.push(line.bold?'      ]}'+(!lastLine?',':''):'      ]'+(!lastLine?',':''));
