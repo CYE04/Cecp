@@ -476,7 +476,7 @@ body{overflow-x:hidden;}
   flex-direction: column;
   align-items: center;
   gap: 0;
-  padding: 50% 0;  /* lets first & last line scroll to vertical center */
+  padding: 100px 0;  /* lets first & last line scroll to vertical center (stage = 200px) */
   will-change: scroll-position;
 }
 .ml-mp-lrc-line {
