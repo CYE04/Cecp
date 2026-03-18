@@ -348,10 +348,10 @@
 
   async function loadSongs(){
     try{
-      const res=await fetch(GITHUB_API);if(!res.ok)throw 0;
+      const res=await fetch(GITHUB_API+'?t='+Date.now(),{cache:'no-store'});if(!res.ok)throw 0;
       const files=await res.json();
       const jsons=files.filter(f=>f.name.endsWith('.json')&&f.name!=='test.json');
-      const all=await Promise.all(jsons.map(f=>fetch(RAW_BASE+f.name).then(r=>r.json()).catch(()=>null)));
+      const all=await Promise.all(jsons.map(f=>fetch(RAW_BASE+f.name,{cache:'no-store'}).then(r=>r.json()).catch(()=>null)));
       songs=all.filter(Boolean);
       $('ml-loading').style.display='none';
       $('ml-count').textContent=songs.length+' 首';
