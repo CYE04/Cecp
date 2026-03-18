@@ -215,6 +215,58 @@
 
   function openLightbox(src){$('ml-lightbox-img').src=src;$('ml-lightbox').classList.add('open');}
 
+  function getSongIdFromUrl(){
+    try{
+      const u=new URL(location.href);
+      return u.searchParams.get('song')||'';
+    }catch(_){
+      return '';
+    }
+  }
+
+  function buildSongUrl(songId){
+    try{
+      const u=new URL(location.href);
+      if(songId) u.searchParams.set('song', songId);
+      else u.searchParams.delete('song');
+      return u.toString();
+    }catch(_){
+      return location.href;
+    }
+  }
+
+  function setSongUrl(songId, replaceOnly=true){
+    try{
+      const nextUrl=buildSongUrl(songId);
+      const nextState=Object.assign({}, history.state||{}, {
+        __mlSongId: songId||'',
+        __mlDetail: !!songId
+      });
+      (replaceOnly?history.replaceState:history.pushState).call(history, nextState, '', nextUrl);
+    }catch(_){ }
+  }
+
+  function shareSong(song){
+    const urlText=buildSongUrl(song.id);
+    const title=song.title||'诗歌';
+    if(navigator.share){
+      navigator.share({ title, url:urlText }).then(()=>{
+        showToast('分享成功');
+      }).catch(()=>{
+        copyText(urlText,'链接已复制');
+      });
+    }else{
+      copyText(urlText,'链接已复制');
+    }
+  }
+
+  function openSongFromUrl(){
+    const songId=getSongIdFromUrl();
+    if(!songId||!songs.length) return;
+    const target=songs.find(x=>x.id===songId);
+    if(target) openDetail(target,{fromUrl:true});
+  }
+
   function closeDetail(fromPop){
     if(!fromPop && _detailStatePushed){
       history.back();
@@ -227,6 +279,7 @@
     detail.classList.remove('swiping');
     $('ml-detail-overlay').style.opacity='0';
     _detailStatePushed=false;
+    setSongUrl('', true);
   }
 
   function tryColor(el, prop){
@@ -303,6 +356,7 @@
       $('ml-loading').style.display='none';
       $('ml-count').textContent=songs.length+' 首';
       render();
+      openSongFromUrl();
     }catch(e){
       $('ml-loading').innerHTML='<div style="color:#ff3b30;font-size:14px">载入失败，请刷新重试</div>';
     }
@@ -329,11 +383,21 @@
     }else{
       empty.style.display='none';
       list.innerHTML=filtered.map(s=>cardHTML(s,q)).join('')+'<div id="ml-list-end"></div>';
-      // update playlist for mini player
       _mpSongs = songs.filter(s=>s.mp3);
       list.querySelectorAll('.ml-song-card').forEach(el=>{
         el.addEventListener('click',()=>{const s=songs.find(x=>x.id===el.dataset.id);if(s)openDetail(s);});
-        // play button on hover
+
+        const shareBtn=document.createElement('button');
+        shareBtn.className='ml-share-btn';
+        shareBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>`;
+        shareBtn.title='分享';
+        shareBtn.onclick=e=>{
+          e.stopPropagation();
+          const s=songs.find(x=>x.id===el.dataset.id);
+          if(s) shareSong(s);
+        };
+        el.appendChild(shareBtn);
+
         const playBtn=document.createElement('button');
         playBtn.className='ml-mp-play-btn';
         playBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`;
@@ -393,375 +457,371 @@
     w.appendChild(topDot);
     const lw2=document.createElement('span');lw2.style.cssText='display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;';
     const numRow=document.createElement('span');numRow.style.cssText='display:inline-flex;align-items:center;justify-content:center;position:relative;'+(uline>=1?'border-bottom:1.5px solid currentColor;':'');
-    const ns2=document.createElement('span');ns2.style.cssText='font-size:22px;line-height:1;display:inline-block;text-align:center;min-width:1em;';ns2.textContent=num;numRow.appendChild(ns2);
-    if(isDot){const dt=document.createElement('span');dt.style.cssText='font-size:10px;position:absolute;right:-0.42em;top:0.1em;line-height:1;';dt.textContent='\u00b7';numRow.appendChild(dt);}
+    const ns2=document.createElement('span');ns2.style.cssText='font-size:15px;line-height:1.05;display:inline-block;min-width:10px;text-align:center;';
+    ns2.textContent=num||'';
+    numRow.appendChild(ns2);
+    if(isDot){const dot=document.createElement('span');dot.style.cssText='position:absolute;right:-3px;top:2px;font-size:7px;line-height:1;';dot.textContent='·';numRow.appendChild(dot);}
     lw2.appendChild(numRow);
-    if(uline===2){const u2=document.createElement('span');u2.style.cssText='position:absolute;bottom:0;left:0;right:0;height:1.5px;background:currentColor;';lw2.appendChild(u2);}
+    if(uline===2){const l2=document.createElement('span');l2.style.cssText='display:block;border-bottom:1.5px solid currentColor;margin-top:2px;';lw2.appendChild(l2);}
     w.appendChild(lw2);
-    const botDot=document.createElement('span');botDot.style.cssText='font-size:7px;line-height:1;height:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;';
-    if(isLow>=2)botDot.innerHTML='\u00b7<br>\u00b7';else if(isLow===1)botDot.textContent='\u00b7';
-    w.appendChild(botDot);
-    return w;
+    const bot=document.createElement('span');bot.style.cssText='font-size:7px;line-height:1;height:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;';
+    if(isLow>=2)bot.innerHTML='\u00b7<br>\u00b7';else if(isLow===1)bot.textContent='\u00b7';
+    w.appendChild(bot);return w;
   }
 
-  function makeTuplet(n){const w=document.createElement('span');w.className='jp-tuplet';const br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);const nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);return w;}
-  function renderNStr(nStr){
-    const d=document.createElement('div');d.className='sw-jianpu';
-    if(!nStr||!nStr.trim())return d;
-    const toks=nStr.trim().split(/\s+/);let i=0;
-    while(i<toks.length){
-      const t=toks[i];
-      if(t==='('){const sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
-      if(t==='(['){const so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')so.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(so);continue;}
-      if(t==='])'){const sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
-      if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;} // volta handled at row level
-      const tm2=t.match(/^\{(3|5)$/);if(tm2){const tn=parseInt(tm2[1],10);const tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));d.appendChild(tp);i++;continue;}
-      if(t==='}'){i++;continue;}
-      d.appendChild(parseJpToken(t));i++;
-    }
-    return d;
-  }
-
-  /* ── Mini Player ── */
-  const _mpAudio = document.getElementById('ml-mp-audio');
-  let _mpSongs = [], _mpIdx = -1, _mpLrc = [], _mpLrcIdx = -1;
-  let _mpRepeat = 0; // 0=off 1=all 2=one
-
-  function _mpFmt(s){
-    const m=Math.floor(s/60),ss=Math.floor(s%60);
-    return m+':'+(ss<10?'0':'')+ss;
-  }
-  function _mpParseLrc(text){
-    const lines=[];
-    text.split('\n').forEach(l=>{
-      const m=l.match(/^\[(\d+):(\d+\.\d+)\](.*)/);
-      if(m) lines.push({time:parseInt(m[1])*60+parseFloat(m[2]),text:m[3].trim()});
+  function renderNStr(str){
+    const wrap=document.createElement('span');wrap.style.cssText='display:inline-flex;gap:.08em;align-items:flex-end;vertical-align:bottom;';
+    const parts=(str||'').match(/\[v[12]|\]v|sp__|sp_|sp|\|\||\||\S+/g)||[];
+    parts.forEach(tok=>{
+      if(tok==='[v1'||tok==='[v2'||tok===']v')return;
+      wrap.appendChild(parseJpToken(tok));
     });
-    return lines.sort((a,b)=>a.time-b.time);
+    return wrap;
   }
-  function _mbUpdateLyric(){ /* minibar removed */ }
 
-  function _mpHighlightLrc(){
-    if(!_mpLrc.length){ _mbUpdateLyric(-1); return; }
-    const t=_mpAudio.currentTime;
-    let idx=-1;
-    _mpLrc.forEach((l,i)=>{ if(l.time<=t) idx=i; });
-    if(idx===_mpLrcIdx){ _mbUpdateLyric(idx); return; }
-    _mpLrcIdx=idx;
-    document.querySelectorAll('.ml-mp-lrc-line').forEach((r,i)=>r.classList.toggle('active',i===idx));
-    _mbUpdateLyric(idx);
-    if(idx>=0){
-      const lines=document.querySelectorAll('.ml-mp-lrc-line');
-      const panel=document.getElementById('ml-mp-lrc-panel');
-      if(panel && lines[idx]){
-        const panelCenter = panel.offsetHeight / 2;
-        const lineTop = lines[idx].offsetTop;
-        const lineCenter = lines[idx].offsetHeight / 2;
-        panel.scrollTo({ top: lineTop - panelCenter + lineCenter, behavior:'smooth' });
-      }
-    }
+  const NOTE_MAP={C:0,'B#':0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,Fb:4,'E#':5,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11,Cb:11};
+  const NOTES_SHARP=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const NOTES_FLAT =['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+  const FLAT_KEYS=new Set(['F','Bb','Eb','Ab','Db','Gb','Cb']);
+  const USE_FLAT_MINOR_ROOTS=new Set(['D','G','C','F','Bb','Eb']);
+  function parseKeyName(key){
+    const k=(key||'').trim();
+    if(!k)return {root:'C',suf:''};
+    const m=k.match(/^([A-G](?:#|b)?)(.*)$/);
+    if(!m)return {root:k,suf:''};
+    return {root:m[1],suf:m[2]||''};
   }
-  function _mpSetState(playing){
-    // playing=true: cover slides left, lyrics appear
-    // playing=false (initial/paused first time): cover center
-    // once played, always stay in played layout
-    const stage=document.getElementById('ml-mp-stage');
-    if(!stage) return;
-    if(playing) stage.classList.add('playing');
-    // never remove 'playing' class after first play
+  function needFlat(root,suf){
+    const minor=/m(?!aj)/i.test(suf);
+    if(minor) return USE_FLAT_MINOR_ROOTS.has(root);
+    return FLAT_KEYS.has(root);
+  }
+  function trKeyName(key,st){
+    const {root,suf}=parseKeyName(key);
+    const n=(NOTE_MAP[root]+st+120)%12;
+    const nr=needFlat(root,suf)?NOTES_FLAT[n]:NOTES_SHARP[n];
+    return nr+suf;
+  }
+  function trBass(bass,st){
+    return trKeyName(bass,st);
+  }
+  function trChord(ch,st){
+    if(!ch)return ch;
+    const m=ch.match(/^([A-G](?:#|b)?)(.*)$/);
+    if(!m)return ch;
+    let rest=m[2]||'';
+    rest=rest.replace(/\/([A-G](?:#|b)?)/g,(a,b)=>'/'+trBass(b,st));
+    return trKeyName(m[1],st)+rest;
+  }
+  function calcCapo(target,orig){
+    const t=NOTE_MAP[parseKeyName(target).root], o=NOTE_MAP[parseKeyName(orig).root];
+    let up=(o - t + 12)%12;
+    let down=(t - o + 12)%12;
+    let st = up<=6 ? up : -down;
+    let capo=(12-st)%12; if(capo===12) capo=0;
+    return {st, capo, playKey: target};
+  }
+
+  let _mpAudio=null,_mpSongs=[],_mpIdx=-1,_mpLoop=false,_mpLrc=[],_mpLrcIdx=-1,_mpCoverFallback='';
+
+  function _mpFmt(t){
+    if(!isFinite(t)) return '0:00';
+    const m=Math.floor(t/60), s=Math.floor(t%60);
+    return m+':'+String(s).padStart(2,'0');
   }
   function _mpSetCover(src){
-    const c=document.getElementById('ml-mp-cover');
-    if(!c) return;
-    if(src){ const img=new Image(); img.src=src; img.alt=''; c.innerHTML=''; c.appendChild(img); }
-    else { c.innerHTML='<span>♪</span>'; }
+    const el=$('ml-mp-cover');
+    if(!el) return;
+    if(src){
+      el.style.backgroundImage=`url("${src}")`;
+      el.classList.add('has-cover');
+      el.innerHTML='';
+    }else{
+      el.style.backgroundImage='';
+      el.classList.remove('has-cover');
+      el.innerHTML='<span>♪</span>';
+    }
+  }
+  function _mpSetPlayUI(isPlaying){
+    const btn=$('ml-mp-playpause');
+    const stage=$('ml-mp-stage');
+    if(btn){
+      btn.innerHTML=isPlaying
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5h3v14H8zm5 0h3v14h-3z"/></svg>`
+        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`;
+    }
+    if(stage) stage.classList.toggle('playing', !!isPlaying);
+  }
+  function _mpParseLrc(text){
+    const arr=[];
+    String(text||'').split(/\r?\n/).forEach(line=>{
+      const m=line.match(/\[(\d+):(\d+(?:\.\d+)?)\](.*)/);
+      if(m){
+        arr.push({ t:(+m[1])*60 + parseFloat(m[2]), tx:(m[3]||'').trim() });
+      }
+    });
+    return arr.sort((a,b)=>a.t-b.t);
   }
   function _mpRenderLrc(){
-    const inner=document.getElementById('ml-mp-lrc-inner');
+    const inner=$('ml-mp-lrc-inner');
     if(!inner) return;
-    inner.style.transform='';
     inner.innerHTML='';
-    _mpLrc.forEach(l=>{
+    if(!_mpLrc.length){
+      inner.innerHTML='<div class="pl-lrc-line is-empty">暂无歌词</div>';
+      return;
+    }
+    _mpLrc.forEach((it,i)=>{
       const d=document.createElement('div');
-      d.className='ml-mp-lrc-line';
-      d.textContent=l.text;
-      d.onclick=()=>{ _mpAudio.currentTime=l.time; };
+      d.className='pl-lrc-line'+(i===0?' is-active':'');
+      d.textContent=it.tx || '…';
       inner.appendChild(d);
     });
+    _mpLrcIdx=0;
   }
-  function _mpLoadSong(song){
-    _mpLrc=[]; _mpLrcIdx=-1;
-    const titleEl=document.getElementById('ml-mp-title');
-    const artistEl=document.getElementById('ml-mp-artist');
-    if(titleEl) titleEl.textContent=song.title||'';
-    if(artistEl) artistEl.textContent=song.artist||'';
-    _mpSetCover(song.cover||null);
-    // reset stage: cover back to center for new song
-    const stage=document.getElementById('ml-mp-stage');
-    if(stage) stage.classList.remove('playing');
-    const inner=document.getElementById('ml-mp-lrc-inner');
-    if(inner) inner.innerHTML='';
-    // show/hide detail player based on mp3
-    const detailPlayer=document.getElementById('ml-miniplayer');
-    if(detailPlayer) detailPlayer.classList.toggle('has-mp3', !!song.mp3);
-    _mpAudio.src=song.mp3||'';
-    _mbUpdateLyric(-1);
-    if(song.lrc){
-      fetch(song.lrc).then(r=>r.text()).then(text=>{
-        _mpLrc=_mpParseLrc(text);
-        _mpRenderLrc();
-        _mbUpdateLyric(-1);
-        _mbUpdate();
-      }).catch(()=>{ _mbUpdateLyric(-1); });
+  function _mpSyncLrc(cur){
+    if(!_mpLrc.length) return;
+    let idx=0;
+    for(let i=0;i<_mpLrc.length;i++){
+      if(cur>=_mpLrc[i].t) idx=i; else break;
     }
-    // no auto-play — user must press play
+    if(idx===_mpLrcIdx) return;
+    _mpLrcIdx=idx;
+    const inner=$('ml-mp-lrc-inner');
+    if(!inner) return;
+    [...inner.children].forEach((el,i)=>el.classList.toggle('is-active', i===idx));
+    const active=inner.children[idx];
+    if(active){
+      const y=active.offsetTop - inner.clientHeight/2 + active.clientHeight/2;
+      inner.scrollTo({ top: Math.max(0,y), behavior:'smooth' });
+    }
   }
-  function _mpPlayIdx(idx, autoplay=true){
-    if(idx<0||idx>=_mpSongs.length) return;
+  function _mpBind(){
+    if(_mpAudio) return;
+    _mpAudio=$('ml-mp-audio');
+    if(!_mpAudio) return;
+
+    _mpAudio.addEventListener('loadedmetadata',()=>{
+      $('ml-mp-dur').textContent=_mpFmt(_mpAudio.duration);
+    });
+    _mpAudio.addEventListener('timeupdate',()=>{
+      $('ml-mp-cur').textContent=_mpFmt(_mpAudio.currentTime);
+      const dur=_mpAudio.duration||0;
+      $('ml-mp-fill').style.width=dur?((_mpAudio.currentTime/dur)*100)+'%':'0%';
+      _mpSyncLrc(_mpAudio.currentTime);
+    });
+    _mpAudio.addEventListener('play',()=>_mpSetPlayUI(true));
+    _mpAudio.addEventListener('pause',()=>_mpSetPlayUI(false));
+    _mpAudio.addEventListener('ended',()=>{
+      if(_mpLoop){
+        _mpAudio.currentTime=0;
+        _mpAudio.play().catch(()=>{});
+      }else{
+        _mpPlayIdx(_mpIdx+1,true);
+      }
+    });
+
+    $('ml-mp-playpause')?.addEventListener('click',()=>{
+      if(!_mpAudio.src) return;
+      if(_mpAudio.paused) _mpAudio.play().catch(()=>{});
+      else _mpAudio.pause();
+    });
+    $('ml-mp-prev')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx-1,true));
+    $('ml-mp-next')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx+1,true));
+    $('ml-mp-seek-back')?.addEventListener('click',()=>{
+      if(!_mpAudio.src) return;
+      _mpAudio.currentTime=Math.max(0, (_mpAudio.currentTime||0)-15);
+    });
+    $('ml-mp-seek-fwd')?.addEventListener('click',()=>{
+      if(!_mpAudio.src) return;
+      _mpAudio.currentTime=Math.min(_mpAudio.duration||1e9, (_mpAudio.currentTime||0)+15);
+    });
+    $('ml-mp-repeat')?.addEventListener('click',e=>{
+      _mpLoop=!_mpLoop;
+      e.currentTarget.classList.toggle('on',_mpLoop);
+    });
+    $('ml-mp-vol')?.addEventListener('input',e=>{
+      _mpAudio.volume=parseFloat(e.target.value||'1');
+    });
+    document.querySelector('.pl-progress-bar')?.addEventListener('click',e=>{
+      if(!_mpAudio.src || !_mpAudio.duration) return;
+      const r=e.currentTarget.getBoundingClientRect();
+      const p=Math.max(0, Math.min(1, (e.clientX-r.left)/r.width));
+      _mpAudio.currentTime=_mpAudio.duration*p;
+    });
+  }
+
+  function _mpPlayIdx(idx,autoplay){
+    _mpBind();
+    if(!_mpSongs.length) return;
+    if(idx<0) idx=_mpSongs.length-1;
+    if(idx>=_mpSongs.length) idx=0;
     _mpIdx=idx;
-    _mpLoadSong(_mpSongs[idx]);
-    if(autoplay && _mpSongs[idx]?.mp3){
-      const playNow=()=>_mpAudio.play().catch(()=>{});
-      if(_mpAudio.readyState >= 1) playNow();
-      else _mpAudio.addEventListener('loadedmetadata', playNow, {once:true});
-    }else{
-      _mbUpdate();
+    const s=_mpSongs[idx];
+    if(!s) return;
+    const mini=$('ml-miniplayer');
+    if(mini) mini.classList.add('has-mp3');
+    $('ml-mp-title').textContent=s.title||'';
+    $('ml-mp-artist').textContent=s.artist||'';
+    _mpSetCover(s.cover||'');
+    _mpAudio.src=s.mp3||'';
+    $('ml-mp-cur').textContent='0:00';
+    $('ml-mp-dur').textContent='0:00';
+    $('ml-mp-fill').style.width='0%';
+    _mpLrc=[]; _mpLrcIdx=-1; _mpRenderLrc();
+    if(s.lrc){
+      fetch(s.lrc).then(r=>r.text()).then(text=>{
+        _mpLrc=_mpParseLrc(text); _mpRenderLrc();
+      }).catch(()=>{});
     }
-  }
-  function _mpUpdateProgress(){
-    const dur=_mpAudio.duration||0, cur=_mpAudio.currentTime||0;
-    const c=document.getElementById('ml-mp-cur'),d=document.getElementById('ml-mp-dur');
-    if(c) c.textContent=_mpFmt(cur);
-    if(d) d.textContent=_mpFmt(dur);
-    const fill=document.getElementById('ml-mp-fill');
-    if(fill) fill.style.width=(dur?cur/dur*100:0)+'%';
-    _mpHighlightLrc();
-  }
-  function _mpUpdateBtn(){
-    const btn=document.getElementById('ml-mp-playpause');
-    if(btn) btn.innerHTML=_mpAudio.paused?`<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`:`<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h3v14H6V5zm9 0h3v14h-3V5z"/></svg>`;
-  }
-  _mpAudio.addEventListener('timeupdate',_mpUpdateProgress);
-  _mpAudio.addEventListener('play',()=>{ _mpSetState(true); _mpUpdateBtn(); });
-  _mpAudio.addEventListener('pause',_mpUpdateBtn);
-  _mpAudio.addEventListener('ended',()=>{
-    if(_mpRepeat===2){ _mpAudio.currentTime=0; _mpAudio.play().catch(()=>{}); return; }
-    if(_mpIdx<_mpSongs.length-1){ _mpPlayIdx(_mpIdx+1); }
-    else if(_mpRepeat===1){ _mpPlayIdx(0); }
-    else { _mpUpdateBtn(); }
-  });
-  document.getElementById('ml-mp-playpause').onclick=()=>{ _mpAudio.paused?_mpAudio.play():_mpAudio.pause(); };
-  document.getElementById('ml-mp-prev').onclick=()=>{ if(_mpIdx>0)_mpPlayIdx(_mpIdx-1,!_mpAudio.paused); };
-  document.getElementById('ml-mp-next').onclick=()=>{ if(_mpIdx<_mpSongs.length-1)_mpPlayIdx(_mpIdx+1,!_mpAudio.paused); };
-  document.getElementById('ml-mp-vol').oninput=e=>{ _mpAudio.volume=parseFloat(e.target.value); };
-  document.getElementById('ml-mp-seek-back').onclick=()=>{ _mpAudio.currentTime=Math.max(0,_mpAudio.currentTime-15); };
-  document.getElementById('ml-mp-seek-fwd').onclick=()=>{ _mpAudio.currentTime=Math.min(_mpAudio.duration||0,_mpAudio.currentTime+15); };
-  document.getElementById('ml-mp-repeat').onclick=()=>{
-    _mpRepeat=(_mpRepeat+1)%3;
-    const rBtn=document.getElementById('ml-mp-repeat'); if(rBtn){ rBtn.classList.toggle('active',_mpRepeat>0); rBtn.dataset.mode=_mpRepeat; }
-  };
-  (()=>{
-    const wrap=document.querySelector('#ml-miniplayer .pl-progress-wrap');
-    const bar=document.querySelector('#ml-miniplayer .pl-progress-bar');
-    if(!wrap||!bar) return;
-    function seek(clientX){
-      if(!_mpAudio.duration) return;
-      const r=bar.getBoundingClientRect();
-      const ratio=Math.min(1,Math.max(0,(clientX-r.left)/r.width));
-      _mpAudio.currentTime=ratio*_mpAudio.duration;
-    }
-    let dragging=false;
-    wrap.addEventListener('mousedown',e=>{ dragging=true; seek(e.clientX); });
-    window.addEventListener('mousemove',e=>{ if(dragging) seek(e.clientX); });
-    window.addEventListener('mouseup',()=>{ dragging=false; });
-    wrap.addEventListener('touchstart',e=>{ dragging=true; seek(e.touches[0].clientX); },{passive:true});
-    window.addEventListener('touchmove',e=>{ if(dragging) seek(e.touches[0].clientX); },{passive:true});
-    window.addEventListener('touchend',()=>{ dragging=false; });
-  })();
-
-  function destroyAP(){ _mpAudio.pause(); }
-
-  /* ── Compact Minibar (list page) ── */
-  let _mbCoverSrc = '';
-  function _mbUpdate(){ /* minibar removed */ }
-  // minibar removed
-
-  const CHR=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-  const ENH={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
-  const FLT={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb'};
-  function nIdx(n){return CHR.indexOf(ENH[n]||n);} 
-  function trNote(n,st){const i=nIdx(n);if(i<0)return n;const r=CHR[(i+st+12)%12];return FLT[r]||r;}
-  function trS(c,st){const m=c.match(/^([A-G][b#]?)(.*)$/);if(!m)return c;return trNote(m[1],st)+m[2];}
-  function trChord(c,st){if(!st)return c;const s=c.indexOf('/');if(s>-1)return trS(c.slice(0,s),st)+'/'+trS(c.slice(s+1),st);return trS(c,st);} 
-  function calcCapo(t,o){
-    const st=(nIdx(t)-nIdx(o)+12)%12;let best=null;
-    ['C','D','E','F','G','A','B'].forEach(pk=>{const c=(nIdx(t)-nIdx(pk)+12)%12;if(c<=7&&(!best||c<best.capo))best={playKey:pk,capo:c};});
-    return{st,capo:best?best.capo:0,playKey:best?best.playKey:t};
+    if(autoplay) _mpAudio.play().catch(()=>{});
   }
 
-  function ensureAudioCtx(){
-    if(_audioCtx)return _audioCtx;
-    const AC=window.AudioContext||window.webkitAudioContext;
-    if(!AC)return null;
-    _audioCtx=new AC();
-    return _audioCtx;
-  }
-
-  function clickAt(time, accent=false){
-    const ctx=ensureAudioCtx();
-    if(!ctx)return;
-    const osc=ctx.createOscillator();
-    const gain=ctx.createGain();
-    osc.type='triangle';
-    osc.frequency.setValueAtTime(accent?1480:1080,time);
-    gain.gain.setValueAtTime(0.0001,time);
-    gain.gain.exponentialRampToValueAtTime(accent?0.18:0.11,time+0.004);
-    gain.gain.exponentialRampToValueAtTime(0.0001,time+0.06);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(time); osc.stop(time+0.07);
-  }
-
-  function scheduler(){
-    const ctx=ensureAudioCtx();
-    if(!_metroRunning||!ctx)return;
-    while(_metroNext < ctx.currentTime + 0.12){
-      clickAt(_metroNext, true);
-      _metroNext += 60 / _metroBpm;
-    }
-  }
-
-  function startMetronome(){
-    const ctx=ensureAudioCtx();
-    if(!ctx)return;
-    ctx.resume?.();
-    _metroRunning=true;
-    _metroNext=ctx.currentTime + 0.04;
-    scheduler();
-    clearInterval(_metroTimer);
-    _metroTimer=setInterval(scheduler, 25);
-    syncMetUI();
-  }
+  function destroyAP(){}
 
   function stopMetronome(){
     _metroRunning=false;
     if(_metroTimer){clearInterval(_metroTimer);_metroTimer=null;}
-    syncMetUI();
+    const btn=document.querySelector('.mt-start');
+    if(btn) btn.textContent='开始';
+    document.querySelectorAll('.mt-dot').forEach((d,i)=>d.classList.toggle('on',i===0));
   }
 
-  function syncMetUI(){
-    const btn=document.getElementById('ml-met-toggle');
-    const bpm=document.getElementById('ml-met-bpm');
-    const range=document.getElementById('ml-met-range');
-    if(btn){btn.textContent=_metroRunning?'停止':'开始';btn.classList.toggle('off',!_metroRunning);}
-    if(bpm)bpm.innerHTML=`${_metroBpm}<small>BPM</small>`;
-    if(range && +range.value!==_metroBpm)range.value=_metroBpm;
+  function startMetronome(bpm){
+    stopMetronome();
+    _metroBpm=Math.max(30,Math.min(240,parseInt(bpm||72,10)||72));
+    const dots=[...document.querySelectorAll('.mt-dot')];
+    let beat=0;
+    function tick(){
+      if(!_audioCtx){
+        const AC=window.AudioContext||window.webkitAudioContext;
+        if(AC) _audioCtx=new AC();
+      }
+      if(_audioCtx){
+        const o=_audioCtx.createOscillator(),g=_audioCtx.createGain();
+        o.type='sine'; o.frequency.value=beat%4===0?1200:900;
+        g.gain.value=0.0001;
+        o.connect(g); g.connect(_audioCtx.destination);
+        const now=_audioCtx.currentTime;
+        g.gain.exponentialRampToValueAtTime(0.15, now+0.005);
+        g.gain.exponentialRampToValueAtTime(0.0001, now+0.08);
+        o.start(now); o.stop(now+0.09);
+      }
+      dots.forEach((d,i)=>d.classList.toggle('on',i===beat%4));
+      beat++;
+    }
+    tick();
+    _metroRunning=true;
+    _metroTimer=setInterval(tick,60000/_metroBpm);
+    const btn=document.querySelector('.mt-start');
+    if(btn) btn.textContent='停止';
   }
 
-  function createMetronome(initialBpm){
-    _metroBpm=Math.max(40, Math.min(240, initialBpm||72));
-    const box=document.createElement('div');box.className='ml-met';
-    box.innerHTML=`
-      <div class="ml-met-top">
-        <div>
-          <div class="ml-met-title">节拍器</div>
-          <div class="ml-met-sub">跟随这首歌的 BPM，也可以手动调整</div>
-        </div>
-        <button id="ml-met-toggle" class="ml-met-toggle off" type="button">开始</button>
+  function createMetronome(defaultBpm){
+    const wrap=document.createElement('div');wrap.className='mt-wrap';
+    wrap.innerHTML=`
+      <div class="mt-head">
+        <div class="mt-title">节拍器</div>
+        <div class="mt-bpm"><button class="mt-minus">−</button><input class="mt-input" value="${defaultBpm||72}" inputmode="numeric"><button class="mt-plus">＋</button><span>BPM</span></div>
       </div>
-      <div class="ml-met-body">
-        <div id="ml-met-bpm" class="ml-met-bpm"></div>
-        <button id="ml-met-minus" class="ml-met-btn" type="button">−</button>
-        <button id="ml-met-plus" class="ml-met-btn" type="button">+</button>
-        <button id="ml-met-reset" class="ml-met-btn" type="button" title="恢复歌曲 BPM">↺</button>
-        <input id="ml-met-range" class="ml-met-range" type="range" min="40" max="240" step="1" value="${_metroBpm}">
-        <div class="ml-met-hint">点开始即可打拍。滑杆可细调，± 可快速调节。</div>
-      </div>`;
-    queueMicrotask(()=>{
-      const toggle=$('ml-met-toggle'), minus=$('ml-met-minus'), plus=$('ml-met-plus'), reset=$('ml-met-reset'), range=$('ml-met-range');
-      toggle?.addEventListener('click',()=>_metroRunning?stopMetronome():startMetronome());
-      minus?.addEventListener('click',()=>{_metroBpm=Math.max(40,_metroBpm-1);syncMetUI();});
-      plus?.addEventListener('click',()=>{_metroBpm=Math.min(240,_metroBpm+1);syncMetUI();});
-      reset?.addEventListener('click',()=>{_metroBpm=Math.max(40, Math.min(240, initialBpm||72));syncMetUI();});
-      range?.addEventListener('input',e=>{_metroBpm=+e.target.value;syncMetUI();});
-      syncMetUI();
-    });
-    return box;
+      <div class="mt-dots"><span class="mt-dot on"></span><span class="mt-dot"></span><span class="mt-dot"></span><span class="mt-dot"></span></div>
+      <div class="mt-actions"><button class="mt-start">开始</button></div>
+    `;
+    const input=wrap.querySelector('.mt-input');
+    const getBpm=()=>Math.max(30,Math.min(240,parseInt(input.value||defaultBpm||72,10)||72));
+    wrap.querySelector('.mt-minus').onclick=()=>{input.value=getBpm()-1;if(_metroRunning)startMetronome(getBpm());};
+    wrap.querySelector('.mt-plus').onclick=()=>{input.value=getBpm()+1;if(_metroRunning)startMetronome(getBpm());};
+    input.onchange=()=>{input.value=getBpm();if(_metroRunning)startMetronome(getBpm());};
+    wrap.querySelector('.mt-start').onclick=()=>{_metroRunning?stopMetronome():startMetronome(getBpm());};
+    return wrap;
   }
-
-  window.addEventListener('popstate',()=>{
-    if(detail.classList.contains('open')) closeDetail(true);
-  });
 
   function attachSwipeBack(){
-    let startX=0,startY=0,dragging=false,active=false;
+    const panel=detail;
     const overlay=$('ml-detail-overlay');
-    const maxShift=Math.min(window.innerWidth*0.32, 120);
-
-    function begin(x,y){
-      if(detail.scrollTop>6 || !detail.classList.contains('open')) return;
-      startX=x; startY=y; dragging=true; active=false; detail.classList.add('swiping');
+    let sx=0,sy=0,dx=0,dragging=false,started=false;
+    function canStart(t){
+      if(!panel.classList.contains('open')) return false;
+      const header=t.closest('#ml-detail-header');
+      const body=t.closest('#ml-detail');
+      if(header) return true;
+      if(!body) return false;
+      const scroller=t.closest('#ml-detail-body');
+      if(scroller && scroller.scrollTop>0) return false;
+      return (window.innerWidth<=900);
     }
-    function move(x,y){
-      if(!dragging) return;
-      const dx=x-startX, dy=y-startY;
-      if(!active){
-        if(Math.abs(dx)<10 && Math.abs(dy)<10) return;
-        if(dx>10 && Math.abs(dx)>Math.abs(dy) && startX<42) active=true;
-        else if(Math.abs(dy)>Math.abs(dx)){ cancel(); return; }
+    panel.addEventListener('touchstart',e=>{
+      if(!canStart(e.target)) return;
+      const t=e.touches[0];
+      sx=t.clientX; sy=t.clientY; dx=0; dragging=false; started=true;
+      panel.classList.remove('swiping');
+    },{passive:true});
+    panel.addEventListener('touchmove',e=>{
+      if(!started) return;
+      const t=e.touches[0];
+      const mx=t.clientX-sx, my=t.clientY-sy;
+      if(!dragging){
+        if(Math.abs(mx)>10 && Math.abs(mx)>Math.abs(my) && mx>0) dragging=true;
+        else if(Math.abs(my)>10) { started=false; return; }
       }
-      if(!active) return;
-      const shift=Math.max(0, Math.min(dx, maxShift));
-      detail.style.transform=`translateX(${shift}px)`;
-      overlay.style.opacity=String(Math.min(shift / maxShift, .95));
-    }
-    function end(x){
       if(!dragging) return;
-      const dx=x-startX;
-      const shouldClose=active && dx>Math.max(70, window.innerWidth*0.18);
-      detail.classList.remove('swiping');
-      detail.style.transition='transform .2s ease';
-      detail.style.transform=shouldClose?`translateX(${window.innerWidth}px)`:'';
-      overlay.style.opacity=shouldClose?'1':'0';
-      setTimeout(()=>{detail.style.transition=''; if(shouldClose) closeDetail(); else detail.style.transform='';}, shouldClose?160:200);
-      dragging=false; active=false;
+      dx=Math.max(0,mx);
+      panel.classList.add('swiping');
+      panel.style.transform=`translateX(${dx}px)`;
+      overlay.style.opacity=String(Math.max(0,1-dx/(window.innerWidth*0.9)));
+      e.preventDefault();
+    },{passive:false});
+    function end(){
+      if(!started) return;
+      started=false;
+      if(!dragging){
+        panel.style.transform=''; overlay.style.opacity=''; return;
+      }
+      if(dx>Math.min(140,window.innerWidth*0.28)){
+        panel.style.transition='transform .22s ease, opacity .22s ease';
+        panel.style.transform=`translateX(${window.innerWidth}px)`;
+        overlay.style.opacity='0';
+        setTimeout(()=>{
+          panel.style.transition='';
+          closeDetail();
+        },220);
+      }else{
+        panel.style.transition='transform .22s ease, opacity .22s ease';
+        panel.style.transform='';
+        overlay.style.opacity='';
+        setTimeout(()=>{panel.style.transition='';panel.classList.remove('swiping');},220);
+      }
+      dragging=false; dx=0;
     }
-    function cancel(){dragging=false;active=false;detail.classList.remove('swiping');detail.style.transform='';overlay.style.opacity='0';}
+    panel.addEventListener('touchend',end,{passive:true});
+    panel.addEventListener('touchcancel',end,{passive:true});
 
-    detail.addEventListener('touchstart',e=>{if(e.touches[0])begin(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
-    detail.addEventListener('touchmove',e=>{if(e.touches[0])move(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
-    detail.addEventListener('touchend',e=>{const t=e.changedTouches&&e.changedTouches[0];end(t?t.clientX:startX);},{passive:true});
-
-    detail.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse' && e.clientX>24)return; begin(e.clientX,e.clientY);});
-    detail.addEventListener('pointermove',e=>move(e.clientX,e.clientY));
-    detail.addEventListener('pointerup',e=>end(e.clientX));
-    detail.addEventListener('pointercancel',cancel);
+    window.addEventListener('popstate',()=>{
+      if(panel.classList.contains('open')) closeDetail(true);
+    });
   }
 
-  function openDetail(s){
+  function openDetail(s,opts={}){
     destroyAP();
     stopMetronome();
     syncHaloTheme();
-    // load song into mini player if it has mp3
+
+    _mpBind();
     if(s.mp3){
       const idx=_mpSongs.findIndex(x=>x.id===s.id);
       const isSameSong = (idx>=0 && idx===_mpIdx);
       if(!isSameSong){
-        // different song: load fresh
         if(idx>=0) _mpIdx=idx; else { _mpSongs=[s]; _mpIdx=0; }
         _mpLrc=[]; _mpLrcIdx=-1;
         _mpAudio.src=s.mp3||'';
         if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});
       }
-      // always update UI text & cover
       const titleEl=document.getElementById('ml-mp-title');
       const artistEl=document.getElementById('ml-mp-artist');
       if(titleEl) titleEl.textContent=s.title||'';
       if(artistEl) artistEl.textContent=s.artist||'';
       _mpSetCover(s.cover||null);
-      // stage: show playing layout only if audio is actually playing
       const stage=document.getElementById('ml-mp-stage');
       if(stage) stage.classList.toggle('playing', !_mpAudio.paused);
-      // restore lrc inner if same song
       if(isSameSong && _mpLrc.length && !document.getElementById('ml-mp-lrc-inner')?.children.length){
         _mpRenderLrc();
       }
@@ -771,17 +831,19 @@
       const detailPlayer=document.getElementById('ml-miniplayer');
       if(detailPlayer) detailPlayer.classList.remove('has-mp3');
     }
-    if(!detail.classList.contains('open') && !(_detailStatePushed && history.state && history.state.__mlDetail)){
+    const fromUrl=!!opts.fromUrl;
+    if(!fromUrl){
       try{
-        history.pushState(Object.assign({}, history.state||{}, {__mlDetail:true}), '');
+        history.pushState(Object.assign({}, history.state||{}, {__mlDetail:true,__mlSongId:s.id}), '', buildSongUrl(s.id));
         _detailStatePushed=true;
       }catch(err){}
+    }else{
+      _detailStatePushed=false;
+      setSongUrl(s.id, true);
     }
     $('ml-detail-title').textContent=s.title||'';
     const body=$('ml-detail-body');
     body.innerHTML='';
-
-
 
     const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
     let curKey=s.origKey||'C';
@@ -846,6 +908,15 @@
 
     const tools=document.createElement('div');tools.className='sw-tools';
     const toolsRow=document.createElement('div');toolsRow.className='sw-tools-row';
+
+    const shareBtn=document.createElement('button');
+    shareBtn.className='sw-pill';
+    shareBtn.type='button';
+    shareBtn.style.cssText='font-size:12px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border:none;';
+    shareBtn.textContent='🔗 分享';
+    shareBtn.addEventListener('click',()=>shareSong(s));
+    toolsRow.appendChild(shareBtn);
+
     if(s.youtube){
       const yt=document.createElement('a');yt.className='yt-btn';yt.href=s.youtube;yt.target='_blank';yt.title='YouTube';
       yt.innerHTML='<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>';
@@ -925,12 +996,10 @@
     }
     function fitRows(){
       requestAnimationFrame(function(){
-        // 重置
         lbDiv.style.transform='';lbDiv.style.transformOrigin='';
         lbDiv.style.width='';lbDiv.style.marginBottom='';
         var avail=lbDiv.parentElement.clientWidth;
         if(!avail)return;
-        // 找最宽的行
         var maxW=0;
         lbDiv.querySelectorAll('.sw-lrow').forEach(function(row){
           row.style.display='inline-flex';
@@ -939,7 +1008,6 @@
         });
         if(maxW>avail){
           var scale=avail/maxW;
-          // 整个 lbDiv 等比缩放，像图片一样
           lbDiv.style.transform='scale('+scale+')';
           lbDiv.style.transformOrigin='left top';
           lbDiv.style.width=maxW+'px';
