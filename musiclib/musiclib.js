@@ -1014,6 +1014,8 @@
             const lyric=document.createElement('span');lyric.className='sw-lyric';lyric.textContent=seg.lyric||'';
             segEl.appendChild(lyric);
             if(seg.lyric2){const ly2=document.createElement('span');ly2.className='sw-lyric sw-lyric2';ly2.textContent=seg.lyric2;segEl.appendChild(ly2);}
+            if(seg.lyric3){const ly3=document.createElement('span');ly3.className='sw-lyric sw-lyric3';ly3.textContent=seg.lyric3;segEl.appendChild(ly3);}
+            if(seg.lyric4){const ly4=document.createElement('span');ly4.className='sw-lyric sw-lyric4';ly4.textContent=seg.lyric4;segEl.appendChild(ly4);}
             const _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
             if(_vn){voltaWrap=document.createElement('span');voltaWrap.className='sw-volta';voltaWrap.setAttribute('data-v',_vn+'.');}
             (voltaWrap||row).appendChild(segEl);
