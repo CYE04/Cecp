@@ -533,12 +533,8 @@
     const el=$('ml-mp-cover');
     if(!el) return;
     if(src){
-      el.style.backgroundImage=`url("${src}")`;
-      el.classList.add('has-cover');
-      el.innerHTML='';
+      el.innerHTML=`<img src="${src}" alt="">`;
     }else{
-      el.style.backgroundImage='';
-      el.classList.remove('has-cover');
       el.innerHTML='<span>♪</span>';
     }
   }
@@ -567,13 +563,16 @@
     if(!inner) return;
     inner.innerHTML='';
     if(!_mpLrc.length){
-      inner.innerHTML='<div class="pl-lrc-line is-empty">暂无歌词</div>';
+      inner.innerHTML='<div class="ml-mp-lrc-line">暂无歌词</div>';
       return;
     }
     _mpLrc.forEach((it,i)=>{
       const d=document.createElement('div');
-      d.className='pl-lrc-line'+(i===0?' is-active':'');
+      d.className='ml-mp-lrc-line'+(i===0?' active':'');
       d.textContent=it.tx || '…';
+      d.addEventListener('click',()=>{
+        if(_mpAudio && isFinite(_mpLrc[i].t)) _mpAudio.currentTime=_mpLrc[i].t;
+      });
       inner.appendChild(d);
     });
     _mpLrcIdx=0;
@@ -588,7 +587,7 @@
     _mpLrcIdx=idx;
     const inner=$('ml-mp-lrc-inner');
     if(!inner) return;
-    [...inner.children].forEach((el,i)=>el.classList.toggle('is-active', i===idx));
+    [...inner.children].forEach((el,i)=>el.classList.toggle('active', i===idx));
     const active=inner.children[idx];
     if(active){
       const y=active.offsetTop - inner.clientHeight/2 + active.clientHeight/2;
