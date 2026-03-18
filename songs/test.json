@@ -1,4 +1,7 @@
 {
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-03-18 23:35:52",
   "id": "song-id",
   "title": "",
   "artist": "",
@@ -34,7 +37,7 @@
     "name": "主歌",
     "lines": [
       [
-        {"chord":"","n":"3_ 4_","lyric":"主你"},
+        {"chord":"","n":"3_ 4_","lyric":"主你","lyric2":"啊啊啊","lyric3":"啊啊啊","lyric4":"啊啊安"},
         {"chord":"","lyric":"｜"},
         {"chord":"E","n":"5 ( 3_ 2_ )","lyric":"使卑"},
         {"chord":"E/G#","n":"1 ( 7,_ 1_ )","lyric":"微转"},
@@ -48,6 +51,14 @@
         {"chord":"A","n":"1 3","lyric":"为笑"},
         {"chord":"B","n":"2 3_ 4_","lyric":"颜.患难"},
         {"chord":"","lyric":"｜"}
+      ]
+    ]
+  },
+  {
+    "name": "新段落",
+    "lines": [
+      [
+        {"chord":"","lyric":""}
       ]
     ]
   }
