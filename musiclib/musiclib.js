@@ -4,6 +4,18 @@
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
+  const parseSegWidth=v=>{
+    if(v===undefined||v===null||v==='') return '';
+    const n=parseFloat(v);
+    return Number.isFinite(n)&&n>0 ? String(n) : '';
+  };
+  const applySegWidth=(el,seg)=>{
+    const w=parseSegWidth(seg&&seg.w);
+    if(!w) return;
+    el.style.width=w+'em';
+    el.style.minWidth=w+'em';
+    el.style.flex='0 0 '+w+'em';
+  };
 
   if(!document.getElementById('ml-style')){
     const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
@@ -1004,6 +1016,7 @@
           let voltaWrap=null;
           for(const seg of segs){
             const segEl=_div('sw-seg');
+            applySegWidth(segEl, seg);
             const chord=document.createElement('span');
             chord.className='sw-chord'+(seg.chord?'':' empty');
             if(seg.chord)chord.textContent=trChord(seg.chord,st);
