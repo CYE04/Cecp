@@ -1173,7 +1173,7 @@ function setDots(el,cnt){
 }
 function getVoltaStartLabel(nStr){
   if(!nStr)return '';
-  var m=nStr.match(/\[v:([^\]\s]+)\]/);
+  var m=nStr.match(/\\[v:([^\\]\\s]+)\\]/);
   if(m&&m[1])return m[1];
   if(nStr.indexOf('[v1')>=0)return '1';
   if(nStr.indexOf('[v2')>=0)return '2';
@@ -1242,7 +1242,7 @@ function renderNStr(nStr){
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
     if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') so.appendChild(parseJpToken(toks[i++]));div.appendChild(so);i++;continue;}
     if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));div.appendChild(sc);continue;}
-    if(t==='[v1'||t==='[v2'||t===']v'||/^\[v:(.+)\]$/.test(t)){i++;continue;} // 跨格volta由renderPreview层处理
+    if(t==='[v1'||t==='[v2'||t===']v'||/^\\[v:(.+)\\]$/.test(t)){i++;continue;} // 跨格volta由renderPreview层处理
     var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));div.appendChild(tp);i++;continue;}
     if(t==='}'){i++;continue;}
     div.appendChild(parseJpToken(t));i++;
@@ -1644,6 +1644,44 @@ function updateInputState(){
   var el=document.getElementById('meta-scoreimg');
   if(el)el.addEventListener('input',function(){renderPreview();});
 })();
+
+// Expose handlers for inline onclick/oninput hooks rendered in HTML strings.
+Object.assign(window, {
+  openImport: openImport,
+  closeImport: closeImport,
+  doImport: doImport,
+  openBulkLyric: openBulkLyric,
+  closeBulkLyric: closeBulkLyric,
+  applyBulkLyric: applyBulkLyric,
+  openCheck: openCheck,
+  closeCheck: closeCheck,
+  switchTop: switchTop,
+  copyCode: copyCode,
+  copyFullJson: copyFullJson,
+  addSection: addSection,
+  addLine: addLine,
+  delSection: delSection,
+  moveLine: moveLine,
+  delLine: delLine,
+  setOct: setOct,
+  setDur: setDur,
+  setInputMode: setInputMode,
+  inputNote: inputNote,
+  inputSpecial: inputSpecial,
+  appendTok: appendTok,
+  appendCustomVolta: appendCustomVolta,
+  toggleDot: toggleDot,
+  toggleSlur: toggleSlur,
+  toggleXSlur: toggleXSlur,
+  closeXSlur: closeXSlur,
+  toggleTuplet: toggleTuplet,
+  deleteSelected: deleteSelected,
+  undoAction: undoAction,
+  clearN: clearN,
+  copySeg: copySeg,
+  pasteSeg: pasteSeg,
+  pasteSegReplace: pasteSegReplace
+});
 
 /* 初始化 */
 refreshTupletBtns();
