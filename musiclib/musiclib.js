@@ -12,9 +12,8 @@
   const applySegWidth=(el,seg)=>{
     const w=parseSegWidth(seg&&seg.w);
     if(!w) return;
-    el.style.width=w+'em';
     el.style.minWidth=w+'em';
-    el.style.flex='0 0 '+w+'em';
+    el.style.flex='0 0 auto';
   };
 
   if(!document.getElementById('ml-style')){
