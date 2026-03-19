@@ -683,6 +683,17 @@ function getSelRange(){
 }
 function clearSel(){selA=-1;selB=-1;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
+function getVoltaStartLabel(nStr){
+  if(!nStr)return '';
+  var m=nStr.match(/\[v:([^\]\s]+)\]/);
+  if(m&&m[1])return m[1];
+  if(nStr.indexOf('[v1')>=0)return '1';
+  if(nStr.indexOf('[v2')>=0)return '2';
+  return '';
+}
+function hasVoltaEnd(nStr){
+  return !!(nStr&&nStr.indexOf(']v')>=0);
+}
 function parseSegWidth(v){
   if(v===undefined||v===null||v==='')return '';
   var n=parseFloat(v);
@@ -1187,7 +1198,7 @@ function setDots(el,cnt){
   for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
 }
 function parseJpToken(tok){
-  if(!tok||tok==='-'||tok==='|'||tok==='||'||tok===' ')return makeJpPlain(tok);
+  if(!tok||tok==='-'||tok==='|'||tok==='||'||tok==='||:'||tok===':||'||tok===':||:'||tok===' ')return makeJpPlain(tok);
   if(tok==='0')return makeJpPlain('0');
   if(tok==='sp'||tok==='sp_'||tok==='sp__'){
     var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
@@ -1246,7 +1257,7 @@ function renderNStr(nStr){
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
     if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') so.appendChild(parseJpToken(toks[i++]));div.appendChild(so);i++;continue;}
     if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));div.appendChild(sc);continue;}
-    if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;} // 跨格volta由renderPreview层处理
+    if(t===']v'||/^\[v:(.+)\]$/.test(t)||t==='[v1'||t==='[v2'){i++;continue;} // 跨格volta由renderPreview层处理
     var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));div.appendChild(tp);i++;continue;}
     if(t==='}'){i++;continue;}
     div.appendChild(parseJpToken(t));i++;
@@ -1307,7 +1318,7 @@ function renderPreview(){
         if(seg.lyric3){var l3=document.createElement('div');l3.className='p-lyric p-lyric3'+(line.bold?' bold':'');l3.textContent=seg.lyric3;s.appendChild(l3);}
         if(seg.lyric4){var l4=document.createElement('div');l4.className='p-lyric p-lyric4'+(line.bold?' bold':'');l4.textContent=seg.lyric4;s.appendChild(l4);}
         // 检测 volta 开始（indexOf 避免反斜杠在 CMS 里丢失）
-        var _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
+        var _vn=getVoltaStartLabel(seg.n);
         if(_vn){
           voltaWrap=document.createElement('span');
           voltaWrap.className='prev-volta';
@@ -1315,7 +1326,7 @@ function renderPreview(){
         }
         (voltaWrap||row).appendChild(s);
         // 检测 volta 结束
-        if(voltaWrap&&seg.n&&seg.n.indexOf(']v')>=0){
+        if(voltaWrap&&hasVoltaEnd(seg.n)){
           voltaWrap.classList.add('closed');
           row.appendChild(voltaWrap);
           voltaWrap=null;
@@ -1634,12 +1645,13 @@ function updateInputState(){
   var _sd=document.getElementById('is-dur');if(_sd)_sd.textContent=_durLabel[dur]||dur;
   var _sp=document.getElementById('is-dot');if(_sp)_sp.textContent=dotOn?'开':'关';
   var _ss=document.getElementById('is-sec');if(_ss)_ss.textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
-  // 房子线：当前格子的 n 里是否含有 [v1 / [v2 token
+  // 房子线：当前格子的 n 里是否含有 volta token
   var voltaStr='无';
   if(curSi>=0&&curLi>=0&&curGi>=0){
     var curN=(data[curSi]&&data[curSi].lines[curLi]&&data[curSi].lines[curLi].segs[curGi])||{};
-    if(curN.n&&curN.n.indexOf('[v1')>=0)voltaStr='1房';
-    else if(curN.n&&curN.n.indexOf('[v2')>=0)voltaStr='2房';
+    var vl=getVoltaStartLabel(curN.n);
+    if(vl)voltaStr=vl+'房';
+    else if(hasVoltaEnd(curN.n))voltaStr='房尾';
   }
   document.getElementById('is-volta').textContent=voltaStr;
 }
