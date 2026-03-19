@@ -526,6 +526,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       var lw=el2.children[1]; if(lw){var nr=lw.children[0];if(nr){var ns=nr.children[0];if(ns)ns.style.visibility='hidden';}}
       return el2;
     }
+    var hasFermata=false;
+    if(tok.slice(-1)==='^'){hasFermata=true;tok=tok.slice(0,-1);}
     var num=tok,isHigh=0,isLow=0,isDot=false,uline=0;
     if(num.slice(-2)==='__'){uline=2;num=num.slice(0,-2);}
     else if(num.slice(-1)==='_'){uline=1;num=num.slice(0,-1);}
@@ -546,6 +548,14 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var botDot=document.createElement('span');botDot.style.cssText='font-size:7px;line-height:1;height:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;';
     if(isLow>=2)botDot.innerHTML='\u00b7<br>\u00b7';else if(isLow===1)botDot.textContent='\u00b7';
     w.appendChild(botDot);
+    if(hasFermata){
+      var fw=document.createElement('span');
+      fw.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:22px;';
+      var arc=document.createElement('span');arc.style.cssText='position:absolute;top:2px;left:20%;right:20%;height:11px;border-top:1.5px solid currentColor;border-left:1.5px solid currentColor;border-right:1.5px solid currentColor;border-radius:50% 50% 0 0/100% 100% 0 0;pointer-events:none;';
+      var fdot=document.createElement('span');fdot.style.cssText='position:absolute;top:9px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:currentColor;pointer-events:none;';
+      fw.appendChild(arc);fw.appendChild(fdot);fw.appendChild(w);
+      return fw;
+    }
     return w;
   }
   function makeTuplet(n){var w=document.createElement('span');w.className='jp-tuplet';var br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);var nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);return w;}
