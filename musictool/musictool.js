@@ -407,9 +407,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .jb-dot{width:3px;height:3px;border-radius:50%;background:currentColor;}
 
 /* ── 延长号 ── */
-.jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:22px;}
-.jp-fermata::before{content:'';position:absolute;top:2px;left:20%;right:20%;height:11px;border-top:1.5px solid currentColor;border-left:1.5px solid currentColor;border-right:1.5px solid currentColor;border-radius:50% 50% 0 0/100% 100% 0 0;pointer-events:none;}
-.jp-fermata::after{content:'';position:absolute;top:9px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:currentColor;pointer-events:none;}
+.jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px;}
+.jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box;}
+.jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none;}
 
 /* ── 批量填歌词 modal ── */
 .lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
