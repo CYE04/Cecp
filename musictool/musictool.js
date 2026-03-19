@@ -575,11 +575,18 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
           <button class="kbd-btn" onclick="inputSpecial('-')" style="padding:5px 6px;">— 延音<span class="shortcut">\\</span></button>
           <button class="kbd-btn" id="dot-btn" onclick="toggleDot()" style="padding:5px 6px;">· 附点<span class="shortcut">,</span></button>
           <button class="kbd-btn" onclick="appendTok(buildSpacerTok())" style="padding:5px 6px;">␣ 空格<span class="shortcut">Space</span></button>
+          <button class="kbd-btn" onclick="appendTok('|')" style="padding:5px 6px;">| 小节线</button>
+          <button class="kbd-btn" onclick="appendTok('||')" style="padding:5px 6px;">|| 双小节</button>
+          <button class="kbd-btn" onclick="appendTok('||/')" style="padding:5px 6px;">||/ 终止线</button>
+          <button class="kbd-btn" onclick="appendTok('|:')" style="padding:5px 6px;">|: 反复开</button>
+          <button class="kbd-btn" onclick="appendTok(':|')" style="padding:5px 6px;">:| 反复结</button>
+          <button class="kbd-btn" onclick="appendTok('|:|')" style="padding:5px 6px;">|:| 反复段</button>
           <button class="kbd-btn slur-btn" id="slur-btn" onclick="toggleSlur()" style="padding:5px 6px;">( ) 连音<span class="shortcut">[</span></button>
           <button class="kbd-btn slur-btn" id="xslur-btn" onclick="toggleXSlur()" style="padding:5px 6px;">跨线开<span class="shortcut">]</span></button>
           <button class="kbd-btn slur-btn" onclick="closeXSlur()" style="padding:5px 6px;">跨线结</button>
           <button class="kbd-btn" onclick="appendTok('[v1')" style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第1房子线开始">1. 房开</button>
           <button class="kbd-btn" onclick="appendTok('[v2')" style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第2房子线开始">2. 房开</button>
+          <button class="kbd-btn" onclick="appendCustomVolta()" style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入自定义房子线开始">自定义房</button>
           <button class="kbd-btn" onclick="appendTok(']v')"  style="padding:5px 6px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入房子线结束">房结</button>
           <button class="kbd-btn slur-btn" id="t3-btn" onclick="toggleTuplet(3)" style="padding:5px 6px;">3连</button>
           <button class="kbd-btn slur-btn" id="t5-btn" onclick="toggleTuplet(5)" style="padding:5px 6px;">5连</button>
@@ -600,6 +607,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 /* ════════════════════════════════════════
    数据
 ════════════════════════════════════════ */
+var SongCore=window.CECPSongCore||{};
 var data=[
   {name:'前奏',lines:[
     {bold:false,segs:[
@@ -684,6 +692,7 @@ function getSelRange(){
 function clearSel(){selA=-1;selB=-1;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
 function getVoltaStartLabel(nStr){
+  if(SongCore.getVoltaStartLabel)return SongCore.getVoltaStartLabel(nStr);
   if(!nStr)return '';
   var m=nStr.match(/\[v:([^\]\s]+)\]/);
   if(m&&m[1])return m[1];
@@ -692,15 +701,18 @@ function getVoltaStartLabel(nStr){
   return '';
 }
 function hasVoltaEnd(nStr){
+  if(SongCore.hasVoltaEnd)return SongCore.hasVoltaEnd(nStr);
   return !!(nStr&&nStr.indexOf(']v')>=0);
 }
 function parseSegWidth(v){
+  if(SongCore.parseSegWidth)return SongCore.parseSegWidth(v);
   if(v===undefined||v===null||v==='')return '';
   var n=parseFloat(v);
   if(!isFinite(n)||n<=0)return '';
   return String(n);
 }
 function applySegWidthStyle(el, seg){
+  if(SongCore.applySegWidth){SongCore.applySegWidth(el, seg);return;}
   var w=parseSegWidth(seg&&seg.w);
   if(!w)return;
   el.style.minWidth=w+'em';
@@ -741,6 +753,13 @@ function clickEnd(shiftKey){
 ════════════════════════════════════════ */
 function appendTok(tok){ insertToks([tok]); }
 function inputSpecial(tok){ insertToks([tok]); }
+function appendCustomVolta(){
+  var label=prompt('输入房线标签，例如 1.2、1.3、2.3');
+  if(!label)return;
+  label=String(label).trim();
+  if(!label)return;
+  appendTok('[v:'+label+']');
+}
 
 function insertToks(tokArr){
   if(curSi<0)return;
@@ -1198,7 +1217,7 @@ function setDots(el,cnt){
   for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
 }
 function parseJpToken(tok){
-  if(!tok||tok==='-'||tok==='|'||tok==='||'||tok==='||:'||tok===':||'||tok===':||:'||tok===' ')return makeJpPlain(tok);
+  if(!tok||tok==='-'||tok==='|'||tok==='||'||tok==='||/'||tok==='|:'||tok===':|'||tok==='|:|'||tok==='||:'||tok===':||'||tok===':||:'||tok===' ')return makeJpPlain(tok);
   if(tok==='0')return makeJpPlain('0');
   if(tok==='sp'||tok==='sp_'||tok==='sp__'){
     var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
@@ -1661,6 +1680,44 @@ function updateInputState(){
   var el=document.getElementById('meta-scoreimg');
   if(el)el.addEventListener('input',function(){renderPreview();});
 })();
+
+// 供内联 onclick 使用
+Object.assign(window, {
+  openImport: openImport,
+  closeImport: closeImport,
+  doImport: doImport,
+  openBulkLyric: openBulkLyric,
+  closeBulkLyric: closeBulkLyric,
+  applyBulkLyric: applyBulkLyric,
+  openCheck: openCheck,
+  closeCheck: closeCheck,
+  switchTop: switchTop,
+  copyCode: copyCode,
+  copyFullJson: copyFullJson,
+  addSection: addSection,
+  addLine: addLine,
+  delSection: delSection,
+  delLine: delLine,
+  moveLine: moveLine,
+  setOct: setOct,
+  setDur: setDur,
+  setInputMode: setInputMode,
+  inputNote: inputNote,
+  inputSpecial: inputSpecial,
+  appendTok: appendTok,
+  appendCustomVolta: appendCustomVolta,
+  toggleDot: toggleDot,
+  toggleSlur: toggleSlur,
+  toggleXSlur: toggleXSlur,
+  closeXSlur: closeXSlur,
+  toggleTuplet: toggleTuplet,
+  deleteSelected: deleteSelected,
+  undoAction: undoAction,
+  clearN: clearN,
+  copySeg: copySeg,
+  pasteSeg: pasteSeg,
+  pasteSegReplace: pasteSegReplace
+});
 
 /* 初始化 */
 refreshTupletBtns();
