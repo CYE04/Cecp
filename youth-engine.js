@@ -480,8 +480,19 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   }
 
   /* ══════════════ Jianpu helpers ══════════════ */
+  function getVoltaStartLabel(nStr){
+    if(!nStr)return '';
+    var m=nStr.match(/\[v:([^\]\s]+)\]/);
+    if(m&&m[1])return m[1];
+    if(nStr.indexOf('[v1')>=0)return '1';
+    if(nStr.indexOf('[v2')>=0)return '2';
+    return '';
+  }
+  function hasVoltaEnd(nStr){
+    return !!(nStr&&nStr.indexOf(']v')>=0);
+  }
   function parseJpToken(tok) {
-    if(!tok||tok==='|'||tok==='||'||tok===' '){
+    if(!tok||tok==='|'||tok==='||'||tok==='||:'||tok===':||'||tok===':||:'||tok===' '){
       var pl=document.createElement('span');
       pl.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;';
       var _t=document.createElement('span');_t.style.height='12px';pl.appendChild(_t);
@@ -518,6 +529,17 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     return w;
   }
   function makeTuplet(n){var w=document.createElement('span');w.className='jp-tuplet';var br=document.createElement('span');br.className='jp-tuplet-br';w.appendChild(br);var nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);return w;}
+  function parseSegWidth(v){
+    if(v===undefined||v===null||v==='')return '';
+    var n=parseFloat(v);
+    return isFinite(n)&&n>0?String(n):'';
+  }
+  function applySegWidth(el,seg){
+    var w=parseSegWidth(seg&&seg.w);
+    if(!w)return;
+    el.style.minWidth=w+'em';
+    el.style.flex='0 0 auto';
+  }
   function renderNStr(nStr){
     var d=document.createElement('div');d.className='sw-jianpu';
     if(!nStr||!nStr.trim())return d;
@@ -527,7 +549,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
       if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')so.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(so);continue;}
       if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
-      if(t==='[v1'||t==='[v2'||t===']v'){i++;continue;} // volta handled at row level
+      if(t===']v'||/^\[v:(.+)\]$/.test(t)||t==='[v1'||t==='[v2'){i++;continue;} // volta handled at row level
       var tm2=t.match(/^\{(3|5)$/);if(tm2){var tn=parseInt(tm2[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));d.appendChild(tp);i++;continue;}
       if(t==='}'){i++;continue;}
       d.appendChild(parseJpToken(t));i++;
@@ -662,6 +684,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
           var voltaWrap=null;
           segs.forEach(function(seg){
             var s=div('sw-seg');
+            applySegWidth(s,seg);
             var c=div('sw-chord'+(seg.chord?'':' empty'));
             if(seg.chord) c.textContent=trChord(seg.chord,st);
             s.appendChild(c);
@@ -670,10 +693,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
             if(seg.lyric2){var l2=div('sw-lyric sw-lyric2');l2.textContent=seg.lyric2;s.appendChild(l2);}
             if(seg.lyric3){var l3=div('sw-lyric sw-lyric3');l3.textContent=seg.lyric3;s.appendChild(l3);}
             if(seg.lyric4){var l4=div('sw-lyric sw-lyric4');l4.textContent=seg.lyric4;s.appendChild(l4);}
-            var _vn=seg.n?(seg.n.indexOf('[v1')>=0?'1':seg.n.indexOf('[v2')>=0?'2':null):null;
+            var _vn=getVoltaStartLabel(seg.n);
             if(_vn){voltaWrap=document.createElement('span');voltaWrap.className='jp-volta';voltaWrap.setAttribute('data-v',_vn+'.');}
             (voltaWrap||row).appendChild(s);
-            if(voltaWrap&&seg.n&&seg.n.indexOf(']v')>=0){voltaWrap.classList.add('v-close');row.appendChild(voltaWrap);voltaWrap=null;}
+            if(voltaWrap&&hasVoltaEnd(seg.n)){voltaWrap.classList.add('v-close');row.appendChild(voltaWrap);voltaWrap=null;}
           });
           if(voltaWrap)row.appendChild(voltaWrap);
           le.appendChild(row); se.appendChild(le);
