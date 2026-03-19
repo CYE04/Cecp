@@ -397,6 +397,15 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .jp-tuplet-br{position:absolute;top:2px;left:2px;right:2px;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:3px 3px 0 0;pointer-events:none;}
 .jp-tuplet-num{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:8px;line-height:1;padding:0 3px;background:var(--bg);color:var(--ink);pointer-events:none;}
 
+/* ── 小节线 ── */
+.jp-bar{display:inline-flex;flex-direction:column;align-items:flex-start;vertical-align:bottom;}
+.jp-bar-top{height:12px;}.jp-bar-bot{height:16px;}
+.jp-bar-mid{display:inline-flex;align-items:stretch;height:26px;}
+.jb-thin{width:1.5px;background:currentColor;flex-shrink:0;}
+.jb-thick{width:3.5px;background:currentColor;flex-shrink:0;}
+.jb-dots{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:6px;flex-shrink:0;}
+.jb-dot{width:3px;height:3px;border-radius:50%;background:currentColor;}
+
 /* ── 批量填歌词 modal ── */
 .lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
 .lyfill-overlay.open{display:flex;}
@@ -1160,6 +1169,24 @@ function delSeg(si,li,gi){data[si].lines[li].segs.splice(gi,1);renderEditor();}
 /* ════════════════════════════════════════
    音符渲染
 ════════════════════════════════════════ */
+function makeBarline(tok){
+  var o=document.createElement('span');o.className='jp-bar';
+  var top=document.createElement('span');top.className='jp-bar-top';o.appendChild(top);
+  var mid=document.createElement('span');mid.className='jp-bar-mid';
+  function thin(){var l=document.createElement('span');l.className='jb-thin';return l;}
+  function thick(){var l=document.createElement('span');l.className='jb-thick';return l;}
+  function gap(px){var g=document.createElement('span');g.style.width=px+'px';g.style.flexShrink='0';return g;}
+  function dots(){var d=document.createElement('span');d.className='jb-dots';var d1=document.createElement('span');d1.className='jb-dot';var d2=document.createElement('span');d2.className='jb-dot';d.appendChild(d1);d.appendChild(d2);return d;}
+  if(tok==='|'){mid.appendChild(thin());}
+  else if(tok==='||'){mid.appendChild(thin());mid.appendChild(gap(2));mid.appendChild(thin());}
+  else if(tok==='||/'||tok==='|]'){mid.appendChild(thin());mid.appendChild(gap(2));mid.appendChild(thick());}
+  else if(tok==='|:'){mid.appendChild(thin());mid.appendChild(gap(1));mid.appendChild(thick());mid.appendChild(gap(3));mid.appendChild(dots());}
+  else if(tok===':|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thick());mid.appendChild(gap(1));mid.appendChild(thin());}
+  else if(tok==='|:|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thick());mid.appendChild(gap(1));mid.appendChild(thick());mid.appendChild(gap(3));mid.appendChild(dots());}
+  o.appendChild(mid);
+  var bot=document.createElement('span');bot.className='jp-bar-bot';o.appendChild(bot);
+  return o;
+}
 function makeJpPlain(sym){
   var pl=document.createElement('span');pl.className='jp-plain';
   var t=document.createElement('span');t.className='jp-plain-top';pl.appendChild(t);
@@ -1183,7 +1210,8 @@ function hasVoltaEnd(nStr){
   return !!(nStr&&nStr.indexOf(']v')>=0);
 }
 function parseJpToken(tok){
-  if(!tok||tok==='-'||tok==='|'||tok==='||'||tok==='||/'||tok==='|:'||tok===':|'||tok==='|:|'||tok===' ')return makeJpPlain(tok);
+  if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|')return makeBarline(tok);
+  if(!tok||tok==='-'||tok===' ')return makeJpPlain(tok);
   if(tok==='0')return makeJpPlain('0');
   if(tok==='sp'||tok==='sp_'||tok==='sp__'){
     var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
