@@ -477,6 +477,8 @@
       if(lw){const nr=lw.children[0];if(nr){const ns=nr.children[0];if(ns)ns.style.visibility='hidden';}}
       return e2;
     }
+    let hasFermata=false;
+    if(tok.slice(-1)==='^'){hasFermata=true;tok=tok.slice(0,-1);}
     let num=tok,isHigh=0,isLow=0,isDot=false,uline=0;
     if(num.slice(-2)==='__'){uline=2;num=num.slice(0,-2);} else if(num.slice(-1)==='_'){uline=1;num=num.slice(0,-1);}
     if(num.indexOf('\u00b7')>-1){isDot=true;num=num.replace(/\u00b7/g,'');}
@@ -497,7 +499,16 @@
     w.appendChild(lw2);
     const bot=document.createElement('span');bot.style.cssText='font-size:7px;line-height:1;height:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;';
     if(isLow>=2)bot.innerHTML='\u00b7<br>\u00b7';else if(isLow===1)bot.textContent='\u00b7';
-    w.appendChild(bot);return w;
+    w.appendChild(bot);
+    if(hasFermata){
+      const fw=document.createElement('span');
+      fw.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:22px;';
+      const arc=document.createElement('span');arc.style.cssText='position:absolute;top:2px;left:20%;right:20%;height:11px;border-top:1.5px solid currentColor;border-left:1.5px solid currentColor;border-right:1.5px solid currentColor;border-radius:50% 50% 0 0/100% 100% 0 0;pointer-events:none;';
+      const fdot=document.createElement('span');fdot.style.cssText='position:absolute;top:9px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:currentColor;pointer-events:none;';
+      fw.appendChild(arc);fw.appendChild(fdot);fw.appendChild(w);
+      return fw;
+    }
+    return w;
   }
 
   function makeTuplet(n){
