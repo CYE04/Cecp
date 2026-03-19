@@ -369,6 +369,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .prev-sec-name::after{content:'';flex:1;height:1px;background:var(--border);}
 .prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
+.seg-width-inp{width:54px;background:var(--bg);border:1px solid var(--border2);border-radius:5px;color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;padding:5px 6px;outline:none;}
+.seg-width-inp:focus{border-color:var(--accent);}
+.seg-width-hint{font-size:8px;color:var(--ink3);margin-top:3px;font-family:'Space Mono',monospace;letter-spacing:.6px;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
@@ -680,6 +683,18 @@ function getSelRange(){
 }
 function clearSel(){selA=-1;selB=-1;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
+function parseSegWidth(v){
+  if(v===undefined||v===null||v==='')return '';
+  var n=parseFloat(v);
+  if(!isFinite(n)||n<=0)return '';
+  return String(n);
+}
+function applySegWidthStyle(el, seg){
+  var w=parseSegWidth(seg&&seg.w);
+  if(!w)return;
+  el.style.minWidth=w+'em';
+  el.style.flex='0 0 auto';
+}
 
 /* ════════════════════════════════════════
    选择操作
@@ -980,7 +995,7 @@ function renderEditor(){
       rb.appendChild(rm);
 
       var tbl=document.createElement('table');tbl.className='seg-table';
-      tbl.innerHTML='<tr><th style="width:16px;"></th><th style="width:64px;">和弦</th><th>简谱</th><th style="width:76px;">歌词</th><th style="width:18px;"></th></tr>';
+      tbl.innerHTML='<tr><th style="width:16px;"></th><th style="width:64px;">和弦</th><th>简谱</th><th style="width:76px;">歌词</th><th style="width:62px;">宽度</th><th style="width:18px;"></th></tr>';
 
       line.segs.forEach(function(seg,gi){
         var key=si+'-'+li+'-'+gi;
@@ -1093,6 +1108,20 @@ function renderEditor(){
         inpL4.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric4=this.value;renderPreview();};})(si,li,gi);
         tdL.appendChild(inpL4);tr.appendChild(tdL);
 
+        // 宽度（可选，单位 em）
+        var tdW=document.createElement('td');tdW.style.verticalAlign='middle';
+        var inpW=document.createElement('input');inpW.className='seg-width-inp';inpW.type='number';inpW.min='0';inpW.step='0.25';
+        inpW.placeholder='auto';inpW.value=parseSegWidth(seg.w);
+        inpW.oninput=(function(si,li,gi){return function(){
+          var val=parseSegWidth(this.value);
+          if(val)data[si].lines[li].segs[gi].w=val;
+          else delete data[si].lines[li].segs[gi].w;
+          renderPreview();
+        };})(si,li,gi);
+        tdW.appendChild(inpW);
+        var hint=document.createElement('div');hint.className='seg-width-hint';hint.textContent='em';
+        tdW.appendChild(hint);tr.appendChild(tdW);
+
         // 删除
         var tdD=document.createElement('td');
         var btnD=document.createElement('button');btnD.className='btn-del-seg';btnD.textContent='✕';
@@ -1103,7 +1132,7 @@ function renderEditor(){
 
       // + 格子
       var trAdd=document.createElement('tr');
-      var tdAdd=document.createElement('td');tdAdd.colSpan=5;tdAdd.style.paddingTop='3px';
+      var tdAdd=document.createElement('td');tdAdd.colSpan=6;tdAdd.style.paddingTop='3px';
       var ab=document.createElement('button');ab.className='btn-add-seg';ab.textContent='+ 格子';
       ab.onclick=(function(si,li){return function(){saveUndo();addSeg(si,li);};})(si,li);
       tdAdd.appendChild(ab);trAdd.appendChild(tdAdd);tbl.appendChild(trAdd);
@@ -1270,6 +1299,7 @@ function renderPreview(){
       var voltaWrap=null;
       line.segs.forEach(function(seg){
         var s=document.createElement('div');s.className='prev-seg';
+        applySegWidthStyle(s, seg);
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
         if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
@@ -1322,6 +1352,7 @@ function renderCode(){
         var obj={chord:seg.chord||''};
         if(seg.n&&seg.n.trim())obj.n=seg.n;
         obj.lyric=seg.lyric||'';
+        if(parseSegWidth(seg.w))obj.w=parseFloat(parseSegWidth(seg.w));
         if(seg.lyric2)obj.lyric2=seg.lyric2;
         if(seg.lyric3)obj.lyric3=seg.lyric3;
         if(seg.lyric4)obj.lyric4=seg.lyric4;
