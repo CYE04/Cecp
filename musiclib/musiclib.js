@@ -503,8 +503,8 @@
     if(hasFermata){
       const fw=document.createElement('span');
       fw.style.cssText='display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:22px;';
-      const arc=document.createElement('span');arc.style.cssText='position:absolute;top:2px;left:20%;right:20%;height:11px;border-top:1.5px solid currentColor;border-left:1.5px solid currentColor;border-right:1.5px solid currentColor;border-radius:50% 50% 0 0/100% 100% 0 0;pointer-events:none;';
-      const fdot=document.createElement('span');fdot.style.cssText='position:absolute;top:9px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:currentColor;pointer-events:none;';
+      const arc=document.createElement('span');arc.style.cssText='position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box;';
+      const fdot=document.createElement('span');fdot.style.cssText='position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none;';
       fw.appendChild(arc);fw.appendChild(fdot);fw.appendChild(w);
       return fw;
     }
