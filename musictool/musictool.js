@@ -369,9 +369,6 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .prev-sec-name::after{content:'';flex:1;height:1px;background:var(--border);}
 .prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
-.seg-width-inp{width:54px;background:var(--bg);border:1px solid var(--border2);border-radius:5px;color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;padding:5px 6px;outline:none;}
-.seg-width-inp:focus{border-color:var(--accent);}
-.seg-width-hint{font-size:8px;color:var(--ink3);margin-top:3px;font-family:'Space Mono',monospace;letter-spacing:.6px;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
@@ -607,7 +604,6 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 /* ════════════════════════════════════════
    数据
 ════════════════════════════════════════ */
-var SongCore=window.CECPSongCore||{};
 var data=[
   {name:'前奏',lines:[
     {bold:false,segs:[
@@ -691,33 +687,6 @@ function getSelRange(){
 }
 function clearSel(){selA=-1;selB=-1;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
-function getVoltaStartLabel(nStr){
-  if(SongCore.getVoltaStartLabel)return SongCore.getVoltaStartLabel(nStr);
-  if(!nStr)return '';
-  var m=nStr.match(/\[v:([^\]\s]+)\]/);
-  if(m&&m[1])return m[1];
-  if(nStr.indexOf('[v1')>=0)return '1';
-  if(nStr.indexOf('[v2')>=0)return '2';
-  return '';
-}
-function hasVoltaEnd(nStr){
-  if(SongCore.hasVoltaEnd)return SongCore.hasVoltaEnd(nStr);
-  return !!(nStr&&nStr.indexOf(']v')>=0);
-}
-function parseSegWidth(v){
-  if(SongCore.parseSegWidth)return SongCore.parseSegWidth(v);
-  if(v===undefined||v===null||v==='')return '';
-  var n=parseFloat(v);
-  if(!isFinite(n)||n<=0)return '';
-  return String(n);
-}
-function applySegWidthStyle(el, seg){
-  if(SongCore.applySegWidth){SongCore.applySegWidth(el, seg);return;}
-  var w=parseSegWidth(seg&&seg.w);
-  if(!w)return;
-  el.style.minWidth=w+'em';
-  el.style.flex='0 0 auto';
-}
 
 /* ════════════════════════════════════════
    选择操作
@@ -1025,7 +994,7 @@ function renderEditor(){
       rb.appendChild(rm);
 
       var tbl=document.createElement('table');tbl.className='seg-table';
-      tbl.innerHTML='<tr><th style="width:16px;"></th><th style="width:64px;">和弦</th><th>简谱</th><th style="width:76px;">歌词</th><th style="width:62px;">宽度</th><th style="width:18px;"></th></tr>';
+      tbl.innerHTML='<tr><th style="width:16px;"></th><th style="width:64px;">和弦</th><th>简谱</th><th style="width:76px;">歌词</th><th style="width:18px;"></th></tr>';
 
       line.segs.forEach(function(seg,gi){
         var key=si+'-'+li+'-'+gi;
@@ -1138,20 +1107,6 @@ function renderEditor(){
         inpL4.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric4=this.value;renderPreview();};})(si,li,gi);
         tdL.appendChild(inpL4);tr.appendChild(tdL);
 
-        // 宽度（可选，单位 em）
-        var tdW=document.createElement('td');tdW.style.verticalAlign='middle';
-        var inpW=document.createElement('input');inpW.className='seg-width-inp';inpW.type='number';inpW.min='0';inpW.step='0.25';
-        inpW.placeholder='auto';inpW.value=parseSegWidth(seg.w);
-        inpW.oninput=(function(si,li,gi){return function(){
-          var val=parseSegWidth(this.value);
-          if(val)data[si].lines[li].segs[gi].w=val;
-          else delete data[si].lines[li].segs[gi].w;
-          renderPreview();
-        };})(si,li,gi);
-        tdW.appendChild(inpW);
-        var hint=document.createElement('div');hint.className='seg-width-hint';hint.textContent='em';
-        tdW.appendChild(hint);tr.appendChild(tdW);
-
         // 删除
         var tdD=document.createElement('td');
         var btnD=document.createElement('button');btnD.className='btn-del-seg';btnD.textContent='✕';
@@ -1162,7 +1117,7 @@ function renderEditor(){
 
       // + 格子
       var trAdd=document.createElement('tr');
-      var tdAdd=document.createElement('td');tdAdd.colSpan=6;tdAdd.style.paddingTop='3px';
+      var tdAdd=document.createElement('td');tdAdd.colSpan=5;tdAdd.style.paddingTop='3px';
       var ab=document.createElement('button');ab.className='btn-add-seg';ab.textContent='+ 格子';
       ab.onclick=(function(si,li){return function(){saveUndo();addSeg(si,li);};})(si,li);
       tdAdd.appendChild(ab);trAdd.appendChild(tdAdd);tbl.appendChild(trAdd);
@@ -1216,8 +1171,19 @@ function setDots(el,cnt){
   el.innerHTML='';
   for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
 }
+function getVoltaStartLabel(nStr){
+  if(!nStr)return '';
+  var m=nStr.match(/\[v:([^\]\s]+)\]/);
+  if(m&&m[1])return m[1];
+  if(nStr.indexOf('[v1')>=0)return '1';
+  if(nStr.indexOf('[v2')>=0)return '2';
+  return '';
+}
+function hasVoltaEnd(nStr){
+  return !!(nStr&&nStr.indexOf(']v')>=0);
+}
 function parseJpToken(tok){
-  if(!tok||tok==='-'||tok==='|'||tok==='||'||tok==='||/'||tok==='|:'||tok===':|'||tok==='|:|'||tok==='||:'||tok===':||'||tok===':||:'||tok===' ')return makeJpPlain(tok);
+  if(!tok||tok==='-'||tok==='|'||tok==='||'||tok==='||/'||tok==='|:'||tok===':|'||tok==='|:|'||tok===' ')return makeJpPlain(tok);
   if(tok==='0')return makeJpPlain('0');
   if(tok==='sp'||tok==='sp_'||tok==='sp__'){
     var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
@@ -1276,7 +1242,7 @@ function renderNStr(nStr){
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
     if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') so.appendChild(parseJpToken(toks[i++]));div.appendChild(so);i++;continue;}
     if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));div.appendChild(sc);continue;}
-    if(t===']v'||/^\[v:(.+)\]$/.test(t)||t==='[v1'||t==='[v2'){i++;continue;} // 跨格volta由renderPreview层处理
+    if(t==='[v1'||t==='[v2'||t===']v'||/^\[v:(.+)\]$/.test(t)){i++;continue;} // 跨格volta由renderPreview层处理
     var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));div.appendChild(tp);i++;continue;}
     if(t==='}'){i++;continue;}
     div.appendChild(parseJpToken(t));i++;
@@ -1329,7 +1295,6 @@ function renderPreview(){
       var voltaWrap=null;
       line.segs.forEach(function(seg){
         var s=document.createElement('div');s.className='prev-seg';
-        applySegWidthStyle(s, seg);
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
         if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
@@ -1382,7 +1347,6 @@ function renderCode(){
         var obj={chord:seg.chord||''};
         if(seg.n&&seg.n.trim())obj.n=seg.n;
         obj.lyric=seg.lyric||'';
-        if(parseSegWidth(seg.w))obj.w=parseFloat(parseSegWidth(seg.w));
         if(seg.lyric2)obj.lyric2=seg.lyric2;
         if(seg.lyric3)obj.lyric3=seg.lyric3;
         if(seg.lyric4)obj.lyric4=seg.lyric4;
@@ -1680,44 +1644,6 @@ function updateInputState(){
   var el=document.getElementById('meta-scoreimg');
   if(el)el.addEventListener('input',function(){renderPreview();});
 })();
-
-// 供内联 onclick 使用
-Object.assign(window, {
-  openImport: openImport,
-  closeImport: closeImport,
-  doImport: doImport,
-  openBulkLyric: openBulkLyric,
-  closeBulkLyric: closeBulkLyric,
-  applyBulkLyric: applyBulkLyric,
-  openCheck: openCheck,
-  closeCheck: closeCheck,
-  switchTop: switchTop,
-  copyCode: copyCode,
-  copyFullJson: copyFullJson,
-  addSection: addSection,
-  addLine: addLine,
-  delSection: delSection,
-  delLine: delLine,
-  moveLine: moveLine,
-  setOct: setOct,
-  setDur: setDur,
-  setInputMode: setInputMode,
-  inputNote: inputNote,
-  inputSpecial: inputSpecial,
-  appendTok: appendTok,
-  appendCustomVolta: appendCustomVolta,
-  toggleDot: toggleDot,
-  toggleSlur: toggleSlur,
-  toggleXSlur: toggleXSlur,
-  closeXSlur: closeXSlur,
-  toggleTuplet: toggleTuplet,
-  deleteSelected: deleteSelected,
-  undoAction: undoAction,
-  clearN: clearN,
-  copySeg: copySeg,
-  pasteSeg: pasteSeg,
-  pasteSegReplace: pasteSegReplace
-});
 
 /* 初始化 */
 refreshTupletBtns();
