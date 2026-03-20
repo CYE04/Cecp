@@ -461,6 +461,17 @@
     const bot=document.createElement('span');bot.style.height='16px';o.appendChild(bot);
     return o;
   }
+  function makeJpPlain(sym){
+    const pl=document.createElement('span');pl.className='jp-plain';
+    const t=document.createElement('span');t.className='jp-plain-top';pl.appendChild(t);
+    const s=document.createElement('span');s.className='jp-plain-sym';s.textContent=sym;pl.appendChild(s);
+    const b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
+    return pl;
+  }
+  function setDots(el,cnt){
+    el.innerHTML='';
+    for(var i=0;i<cnt;i++){const d=document.createElement('span');d.textContent='·';el.appendChild(d);}
+  }
   function parseJpToken(tok){
     if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|')return makeBarline(tok);
     if(!tok||tok==='-'||tok===' ')return makeJpPlain(tok);
