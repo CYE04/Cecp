@@ -571,7 +571,7 @@
     return trKeyName(bass,st);
   }
   function normLyricText(text){
-    return String(text||'').replace(/\u3164/g,'\u3000');
+    return String(text||'').replace(/\u3164/g,' ');
   }
   function trChord(ch,st){
     if(!ch)return ch;
