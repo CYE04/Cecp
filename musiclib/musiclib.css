@@ -291,7 +291,8 @@ body{overflow-x:hidden;}
 #music-library .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 #music-library .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 #music-library .jp-plain-top{height:12px;}
-#music-library .jp-plain-sym{font-size:15px;line-height:1;text-align:center;}
+#music-library .jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-block;}
+#music-library .jp-plain-sym.is-dash{position:relative;top:-0.06em;}
 #music-library .jp-plain-bot{height:16px;}
 #music-library .jp-dot-top,#music-library .jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--text);text-align:center;display:flex;flex-direction:column;align-items:center;}
 #music-library .jp-dot-top{height:12px;justify-content:flex-end;}
@@ -299,7 +300,7 @@ body{overflow-x:hidden;}
 #music-library .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
 #music-library .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;}
 #music-library .jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em;}
-#music-library .jp-aug{position:absolute;right:-0.42em;top:0.1em;font-size:10px;line-height:1;pointer-events:none;}
+#music-library .jp-aug{position:absolute;right:-0.42em;top:0.02em;font-size:10px;line-height:1;pointer-events:none;}
 #music-library .jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--text);}
 #music-library .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px;}
 #music-library .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box;}

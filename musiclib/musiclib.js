@@ -464,7 +464,7 @@
   function makeJpPlain(sym){
     const pl=document.createElement('span');pl.className='jp-plain';
     const t=document.createElement('span');t.className='jp-plain-top';pl.appendChild(t);
-    const s=document.createElement('span');s.className='jp-plain-sym';s.textContent=sym;pl.appendChild(s);
+    const s=document.createElement('span');s.className='jp-plain-sym'+(sym==='-'?' is-dash':'');s.textContent=sym;pl.appendChild(s);
     const b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
     return pl;
   }
