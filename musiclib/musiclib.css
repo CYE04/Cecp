@@ -283,7 +283,6 @@ body{overflow-x:hidden;}
 #music-library .p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--text2);}
 #music-library .p-lyric.bold{font-weight:700;color:var(--text);}
 #music-library .p-lyric2,#music-library .p-lyric3,#music-library .p-lyric4{opacity:0.65;margin-top:1px;}
-#music-library .lyric-gap{display:inline-block;width:.56em;min-width:.56em;vertical-align:baseline;pointer-events:none;flex-shrink:0;}
 #music-library .prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
 #music-library .prev-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--text);border-left:1.5px solid var(--text);pointer-events:none;box-sizing:border-box;opacity:0.5;}
 #music-library .prev-volta.closed::before{border-right:1.5px solid var(--text);}
