@@ -16,141 +16,78 @@
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/daiwojinrunidetongzai.jpg",
 "sections": [
   {
-    "name": "前奏",
+    "name": "带我进入你的同在",
     "lines": [
       [
-        {"chord":"","n":"1'_ 2'_ 3'_ ([ 3'_","lyric":""},
-        {"chord":"","lyric":"｜"},
-        {"chord":"F","n":"]) 3' ([ - - -","lyric":""},
-        {"chord":"","lyric":"｜"},
-        {"chord":"","n":"]) 3' - ","lyric":""},
-        {"chord":"","n":"1'_ 2'_ 3'_ ([ 4'_","lyric":""},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Bb/F","n":"]) 4' ([ - - -","lyric":""},
-        {"chord":"","lyric":"｜"},
-        {"chord":"","n":"]) 4' -","lyric":""},
-        {"chord":"","n":"1_ 2_ 3_ ([ 3_","lyric":""},
-        {"chord":"","lyric":"｜"},
-        {"chord":"F","n":"]) 3 ([ - - -","lyric":""},
-        {"chord":"","lyric":"｜"},
-        {"chord":"","n":"]) 3 -","lyric":""},
-        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":""},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Bb/F","n":"]) 4 ([ - - -","lyric":""},
-        {"chord":"","lyric":"｜"}
+        {"chord":"","n":"1'_ 2'_","lyric":""},
+        {"chord":"ㅤㅤㅤㅤF","n":"3'_ ( 3'_ | 3' ) ( - - - | 3' ) -","lyric":""},
+        {"chord":"","n":"1'_ 2'_","lyric":""},
+        {"chord":"ㅤㅤㅤBb/F","n":"3'_ ( 4'_ | 4' ) ( - - - | 4' ) - 1_ 2_","lyric":""},
+        {"chord":"ㅤㅤㅤ F","n":"3_ ( 3_ | 3 ) ( - - - | 3 ) - 1_ 2_","lyric":""},
+        {"chord":"ㅤㅤㅤBb/F","n":"3_ ( 4_ | 4 ) ( - - - | )","lyric":""}
       ],
       [
-        {"chord":"","n":"]) 4","lyric":""},
-        {"chord":"","n":"- - -","lyric":""},
-        {"chord":"","lyric":"\\\\"}
-      ]
-    ]
-  },
-  {
-    "name": "主歌",
-    "lines": [
+        {"chord":"","n":"( sp 4 ) - - - sp ||","lyric":"ㅤ"},
+        {"chord":"F","n":"5, sp 1 sp","lyric":"万ㅤ军"},
+        {"chord":"C/E","n":"2 sp 7, sp |","lyric":"耶ㅤ和"},
+        {"chord":"Bb","n":"1 - - - sp |","lyric":"华，"},
+        {"chord":"F","n":"5, sp 1 sp","lyric":"你ㅤ的"},
+        {"chord":"C/E","n":"2 sp 3 sp |","lyric":"居ㅤ所"},
+        {"chord":"Bb","n":"4·_ sp_ ( 3__ 3_ )","lyric":"何ㅤ等"},
+        {"chord":"","n":"2_ sp 1·","lyric":"可ㅤ爱，"},
+        {"chord":"","n":"3_ sp |","lyric":"我"}
+      ],
       [
-        {"chord":"F","n":"5, 1","lyric":"万军"},
-        {"chord":"C/E","n":"2 7,","lyric":"耶和"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Bb","n":"1 - - -","lyric":"华，"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"F","n":"5, 1","lyric":"你的"},
-        {"chord":"C/E","n":"2 3","lyric":"居所"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Bb","n":"4·_ ( 3__ 3_ )","lyric":"何等"},
-        {"chord":"","n":"2_ 1·","lyric":"可爱，"},
-        {"chord":"","n":"3_","lyric":"我"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Gm","n":"4·_ ( 4__ 4 )","lyric":"羡慕"},
-        {"chord":"","n":"4_ 3_ 2_ 1_","lyric":"渴想你的"},
-        {"chord":"","lyric":"｜"},
+        {"chord":"Gm","n":"4·_ sp_ ( 4__ 4 ) sp","lyric":"羡ㅤ慕"},
+        {"chord":"","n":"4_ 3_ 2_ 1_ sp |","lyric":"渴想你的"},
         {"chord":"F/A","n":"( 5,·_ 3,__ )","lyric":"院"},
-        {"chord":"","n":"( 3 3· )","lyric":"宇，"},
-        {"chord":"","n":"3_","lyric":"我"},
-        {"chord":"","lyric":"｜"}
+        {"chord":"","n":"( 3 sp 3· ) sp","lyric":"宇，"},
+        {"chord":"","n":"3_ sp |","lyric":"我"},
+        {"chord":"Bb","n":"4·_ ( 4__ sp 4 ) sp","lyric":"心肠"},
+        {"chord":"","n":"4_ 3_ sp 2_ 1_ sp |","lyric":"肉体ㅤ向你"},
+        {"chord":"C","n":"( 3·_ 2__ ) sp","lyric":"呼"},
+        {"chord":"","n":"2 sp - sp - sp ||","lyric":"吁。"}
       ],
-      [
-        {"chord":"Bb","n":"4·_ ( 4__ 4 )","lyric":"心肠"},
-        {"chord":"","n":"4_ 3_ 2_ 1_","lyric":"肉体向你"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"C","n":"( 3·_ 2__ )","lyric":"呼"},
-        {"chord":"","n":"2 - -","lyric":"吁。"},
-        {"chord":"","lyric":"｜"}
-      ]
-    ]
-  },
-  {
-    "name": "Pre-副歌",
-    "lines": [
-      [
-        {"chord":"","n":"0 0","lyric":"ㅤ"},
-        {"chord":"","n":"1_ 2_ 3_ ([ 3_","lyric":"带我进入"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"F","n":"]) 3 ","lyric":"ㅤ"},
-        {"chord":"","n":"-","lyric":"ㅤ"},
-        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":"你的同在"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Bb/F","n":"]) 4","lyric":"ㅤ"},
-        {"chord":"","n":"-","lyric":"ㅤ"},
-        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":"我不满足"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Gm","n":"]) 4·","lyric":"ㅤ"},
-        {"chord":"","n":"1_","lyric":"只"},
-        {"chord":"","n":"1_ 2_","lyric":"停留"},
-        {"chord":"","n":"3_ ([ 2_","lyric":"现在"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"C","n":"]) 2_","lyric":"ㅤ"},
-        {"chord":"","n":"-","lyric":"ㅤ"},
-        {"chord":"","n":"1_ 2_ 3_ ([ 3_","lyric":"带我进入"},
-        {"chord":"","lyric":"｜"}
-      ],
-      [
-        {"chord":"F","n":"]) 3","lyric":"ㅤ"},
-        {"chord":"","n":"-","lyric":"ㅤ"},
-        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":"你的同在"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Bb/F","n":"]) 4","lyric":"ㅤ"},
-        {"chord":"","n":"-","lyric":"ㅤ"},
-        {"chord":"","n":"1_ 2_ 3_ ([ 4_","lyric":"我心渴慕"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"","n":"]) 1_","lyric":"你"},
-        {"chord":"","n":"1_ 2_","lyric":"永恒"},
-        {"chord":"","n":"3_ ( 2_ sp sp 2 - - )","lyric":"的爱。｜"}
-      ]
-    ]
-  },
-  {
-    "name": "副歌",
-    "lines": [
       { "b": true, "line": [
-        {"chord":"","n":"1_ 1_","lyric":"愿你"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Bb","n":"5 ( 4_ 3_ )","lyric":"的荣"},
-        {"chord":"C/Bb","n":"2 1_ 2_","lyric":"耀从天"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"A","n":"3 2","lyric":"降下"},
-        {"chord":"Dm","n":"1 sp 2_ 3_","lyric":"来，燃烧"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Gm","n":"4 4","lyric":"每颗"},
-        {"chord":"","n":"4_ 3_ 2_ 1_","lyric":"爱慕你的"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"F","n":"3 - -","lyric":"心。"},
-        {"chord":"","n":"1_ 1_","lyric":"愿你"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Bb","n":"5 ( 4_ 3_ )","lyric":"的荣"},
-        {"chord":"C/Bb","n":"2 1_ 2_","lyric":"耀从天"},
-        {"chord":"","lyric":"｜"}
+        {"chord":"","n":"0 0","lyric":"ㅤ"},
+        {"chord":"【Pre-Chorus】 F","n":"1_ 2_ sp 3_ ( 3_ sp | sp 3 ) - sp","lyric":"带我ㅤ进入"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤBb/F","n":"1_ 2_ sp 3_ ( 4_ sp | sp 4 ) - sp","lyric":"你的ㅤ同在"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤGm","n":"1_ 2_ sp 3_ ( 4_ sp | sp 4· ) sp","lyric":"我不ㅤ满足"},
+        {"chord":"","n":"1_","lyric":"只"},
+        {"chord":"","n":"1_ 2_ sp","lyric":"停留"},
+        {"chord":"","n":"3_ ( 2_ sp | sp )","lyric":"现在"}
       ]},
       { "b": true, "line": [
+        {"chord":"ㅤㅤC","n":"( sp 2 ) -","lyric":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤF","n":"1_ 2_ sp 3_ ( 3_ sp | sp 3 ) - sp","lyric":"带我ㅤ进入"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤBb/F","n":"1_ 2_ sp 3_ ( 4_ sp | sp 4 ) - ( sp 2 )","lyric":"你的ㅤ同在"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤGm","n":"1_ 2_ sp 3_ ( 4_ sp | sp 4· )","lyric":"我心渴慕"},
+        {"chord":"","n":"1_","lyric":"你"},
+        {"chord":"","n":"1_ 2_","lyric":"永恒"},
+        {"chord":"","n":"3_ ( 2_ sp | sp )","lyric":"的爱。"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"ㅤㅤC","n":"( sp 2 ) - -","lyric":""},
+        {"chord":"【Chorus】","n":"1_ 1_ sp ||","lyric":"愿你"},
+        {"chord":"Bb","n":"5 sp ( 4_ 3_ )","lyric":"的ㅤ荣"},
+        {"chord":"C/Bb","n":"2 sp 1_ 2_ sp | sp","lyric":"耀ㅤ从天"},
         {"chord":"A","n":"3 2","lyric":"降下"},
+        {"chord":"Dm","n":"1 sp 2_ 3_ sp | sp","lyric":"来, 燃烧"},
+        {"chord":"Gm","n":"4 4","lyric":"每颗"},
+        {"chord":"","n":"4_ 3_ sp 2_ 1_ sp | sp","lyric":"爱慕ㅤ你的"},
+        {"chord":"F","n":"3 - -","lyric":"心。"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","n":"1_ 1_ sp |","lyric":"愿你"},
+        {"chord":"Bb","n":"5 sp ( 4_ 3_ )","lyric":"的ㅤ荣"},
+        {"chord":"C/Bb","n":"2 sp 1_ 2_ sp | sp","lyric":"耀ㅤ从天"},
+        {"chord":"A","n":"3 sp 2 sp","lyric":"降ㅤ下"},
         {"chord":"Dm","n":"1","lyric":"来，"},
-        {"chord":"","n":"2_ 3_","lyric":"充满"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"Gm","n":"4 4","lyric":"这地"},
-        {"chord":"C","n":"4_ 3_ 2_ 1_","lyric":"与我们相"},
-        {"chord":"","lyric":"｜"},
-        {"chord":"F","n":"1 - - -","lyric":"遇。"}
+        {"chord":"","n":"2_ 3_ sp | sp","lyric":"充满"},
+        {"chord":"Gm","n":"4 sp 4","lyric":"这ㅤ地"},
+        {"chord":"C","n":"4_ 3_","lyric":"与我"},
+        {"chord":"","n":"2_ 1_ sp | sp","lyric":"们相"},
+        {"chord":"F","n":"1 - - - sp ||/","lyric":"遇。"}
       ]}
     ]
   }
