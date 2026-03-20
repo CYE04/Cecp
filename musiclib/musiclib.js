@@ -1100,21 +1100,26 @@
       requestAnimationFrame(function(){
         lbDiv.style.transform='';lbDiv.style.transformOrigin='';
         lbDiv.style.width='';lbDiv.style.marginBottom='';
+        lbDiv.style.padding='8px 18px 16px 8px';
+        lbDiv.style.boxSizing='border-box';
         var avail=lbDiv.parentElement.clientWidth;
         if(!avail)return;
         var maxW=0;
+        var gutterX=24;
+        var gutterY=18;
         lbDiv.querySelectorAll('.sw-lrow').forEach(function(row){
           row.style.display='inline-flex';
           if(row.scrollWidth>maxW)maxW=row.scrollWidth;
           row.style.display='';
         });
         if(!maxW)return;
-        var scale=avail/maxW;
+        var measureW=maxW+gutterX;
+        var scale=avail/measureW;
         lbDiv.style.transform='scale('+scale+')';
         lbDiv.style.transformOrigin='left top';
-        lbDiv.style.width=maxW+'px';
+        lbDiv.style.width=measureW+'px';
         var naturalH=lbDiv.offsetHeight;
-        lbDiv.style.marginBottom=(scale>1 ? naturalH*(scale-1) : 0)+'px';
+        lbDiv.style.marginBottom=((scale>1 ? naturalH*(scale-1) : 0) + gutterY)+'px';
         lbDiv.parentElement.style.overflow='hidden';
       });
     }
