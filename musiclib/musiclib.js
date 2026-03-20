@@ -573,6 +573,9 @@
   function normChordText(text){
     return String(text||'').replace(/\u3164/g,'\u3000');
   }
+  function normLyricText(text){
+    return String(text||'');
+  }
   function trChord(ch,st){
     if(!ch)return ch;
     const m=ch.match(/^([A-G](?:#|b)?)(.*)$/);
@@ -1064,11 +1067,11 @@
             chord.textContent=(seg.chord?normChordText(trChord(seg.chord,st)):'\u00a0');
             segEl.appendChild(chord);
             if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
-            const lyric=document.createElement('div');lyric.className='p-lyric'+((!Array.isArray(line)&&line.b)?' bold':'');lyric.textContent=seg.lyric||'';
+            const lyric=document.createElement('div');lyric.className='p-lyric'+((!Array.isArray(line)&&line.b)?' bold':'');lyric.textContent=normLyricText(seg.lyric);
             segEl.appendChild(lyric);
-            if(seg.lyric2){const ly2=document.createElement('div');ly2.className='p-lyric p-lyric2'+((!Array.isArray(line)&&line.b)?' bold':'');ly2.textContent=seg.lyric2;segEl.appendChild(ly2);}
-            if(seg.lyric3){const ly3=document.createElement('div');ly3.className='p-lyric p-lyric3'+((!Array.isArray(line)&&line.b)?' bold':'');ly3.textContent=seg.lyric3;segEl.appendChild(ly3);}
-            if(seg.lyric4){const ly4=document.createElement('div');ly4.className='p-lyric p-lyric4'+((!Array.isArray(line)&&line.b)?' bold':'');ly4.textContent=seg.lyric4;segEl.appendChild(ly4);}
+            if(seg.lyric2){const ly2=document.createElement('div');ly2.className='p-lyric p-lyric2'+((!Array.isArray(line)&&line.b)?' bold':'');ly2.textContent=normLyricText(seg.lyric2);segEl.appendChild(ly2);}
+            if(seg.lyric3){const ly3=document.createElement('div');ly3.className='p-lyric p-lyric3'+((!Array.isArray(line)&&line.b)?' bold':'');ly3.textContent=normLyricText(seg.lyric3);segEl.appendChild(ly3);}
+            if(seg.lyric4){const ly4=document.createElement('div');ly4.className='p-lyric p-lyric4'+((!Array.isArray(line)&&line.b)?' bold':'');ly4.textContent=normLyricText(seg.lyric4);segEl.appendChild(ly4);}
             const _vn=getVoltaStartLabel(seg.n);
             if(_vn){voltaWrap=document.createElement('span');voltaWrap.className='prev-volta';voltaWrap.setAttribute('data-v',_vn+'.');}
             (voltaWrap||row).appendChild(segEl);
