@@ -1,6 +1,6 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library CSS */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Space+Mono:wght@400;700&display=swap');
 
 #music-library *{box-sizing:border-box;margin:0;padding:0;}
 
@@ -277,9 +277,9 @@ body{overflow-x:hidden;}
 #music-library .sw-lyric4{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
 #music-library .prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
 #music-library .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
-#music-library .p-chord{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);margin-bottom:2px;min-height:13px;white-space:pre;}
+#music-library .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 #music-library .p-chord.empty{visibility:hidden;}
-#music-library .p-n{font-family:'DM Mono',monospace;color:var(--text);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
+#music-library .p-n{font-family:'Space Mono',monospace;color:var(--text);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
 #music-library .p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--text2);}
 #music-library .p-lyric.bold{font-weight:700;color:var(--text);}
 #music-library .p-lyric2,#music-library .p-lyric3,#music-library .p-lyric4{opacity:0.65;margin-top:1px;}
