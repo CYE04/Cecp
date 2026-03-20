@@ -182,23 +182,23 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--ym-capo);margin-bottom:2px;min-height:13px;white-space:nowrap}
 .p-chord.empty{visibility:hidden}
 .p-n{font-family:'Space Mono',monospace;color:var(--ym-ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end}
-.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ym-ink2)}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ym-ink2);white-space:pre-wrap}
 .p-lyric.bold{font-weight:700;color:var(--ym-ink)}
 .p-lyric2,.p-lyric3,.p-lyric4{opacity:0.65;margin-top:1px}
-.lyric-gap{display:inline-block;width:.52em;vertical-align:baseline;pointer-events:none}
+.lyric-gap{display:inline-block;white-space:pre;visibility:hidden;pointer-events:none}
 .prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px}
 .prev-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--ym-ink2);border-left:1.5px solid var(--ym-ink2);pointer-events:none;box-sizing:border-box}
 .prev-volta.closed::before{border-right:1.5px solid var(--ym-ink2)}
 .prev-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;line-height:1;color:var(--ym-ink2);pointer-events:none;font-family:'DM Mono',monospace}
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
-.jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center}.jp-plain-bot{height:16px}
+.jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-block}.jp-plain-sym.is-dash{position:relative;top:-0.06em}.jp-plain-bot{height:16px}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
 .jp-dot-top{height:12px;justify-content:flex-end}.jp-dot-bot{height:12px;justify-content:flex-start}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative}
 .jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em}
-.jp-aug{position:absolute;right:-0.42em;top:0.1em;font-size:10px;line-height:1;pointer-events:none}
+.jp-aug{position:absolute;right:-0.42em;top:0.02em;font-size:10px;line-height:1;pointer-events:none}
 .jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--ym-ink)}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px}
 .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box}
@@ -544,7 +544,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function makeJpPlain(sym){
     var pl=document.createElement('span');pl.className='jp-plain';
     var t=document.createElement('span');t.className='jp-plain-top';pl.appendChild(t);
-    var s=document.createElement('span');s.className='jp-plain-sym';s.textContent=sym;pl.appendChild(s);
+    var s=document.createElement('span');s.className='jp-plain-sym'+(sym==='-'?' is-dash':'');s.textContent=sym;pl.appendChild(s);
     var b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
     return pl;
   }
@@ -628,15 +628,18 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function trS(c,st){var m=c.match(/^([A-G][b#]?)(.*)$/);if(!m)return c;return trNote(m[1],st)+m[2];}
   function normLyricText(text){return String(text||'');}
   function setLyricContent(el,text){
-    var parts=String(text||'').split('\u3164');
+    var raw=String(text||'');
     el.textContent='';
-    for(var i=0;i<parts.length;i++){
-      if(parts[i]) el.appendChild(document.createTextNode(parts[i]));
-      if(i<parts.length-1){
+    for(var i=0;i<raw.length;i++){
+      var ch=raw[i];
+      if(ch==='\u3164'){
         var gap=document.createElement('span');
         gap.className='lyric-gap';
         gap.setAttribute('aria-hidden','true');
+        gap.textContent=ch;
         el.appendChild(gap);
+      }else{
+        el.appendChild(document.createTextNode(ch));
       }
     }
   }
