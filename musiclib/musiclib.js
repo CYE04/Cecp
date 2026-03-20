@@ -641,6 +641,7 @@
   }
   function _mpRenderLrc(){
     const inner=$('ml-mp-lrc-inner');
+    const panel=$('ml-mp-lrc-panel');
     if(!inner) return;
     inner.innerHTML='';
     if(!_mpLrc.length){
@@ -657,6 +658,7 @@
       inner.appendChild(d);
     });
     _mpLrcIdx=0;
+    if(panel) panel.scrollTop=0;
   }
   function _mpSyncLrc(cur){
     if(!_mpLrc.length) return;
@@ -667,12 +669,13 @@
     if(idx===_mpLrcIdx) return;
     _mpLrcIdx=idx;
     const inner=$('ml-mp-lrc-inner');
-    if(!inner) return;
+    const panel=$('ml-mp-lrc-panel');
+    if(!inner || !panel) return;
     [...inner.children].forEach((el,i)=>el.classList.toggle('active', i===idx));
     const active=inner.children[idx];
     if(active){
-      const y=active.offsetTop - inner.clientHeight/2 + active.clientHeight/2;
-      inner.scrollTo({ top: Math.max(0,y), behavior:'smooth' });
+      const y=active.offsetTop - panel.clientHeight/2 + active.clientHeight/2;
+      panel.scrollTo({ top: Math.max(0,y), behavior:'smooth' });
     }
   }
   function _mpBind(){
