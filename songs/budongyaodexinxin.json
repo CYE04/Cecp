@@ -15,761 +15,91 @@
   "youtube": "https://youtu.be/H9OdfU5I9yQ?si=KN6hbcV_ggJDPM3O",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/budongyaodexinxinC.jpg",
   "sections": [
-    {
-      "name": "主歌",
-      "lines": [
-        [
-          {
-            "chord": "C",
-            "n": "3 - 2 1_ ([ 2_",
-            "lyric": "主，赐给我"
-          },
-          {
-            "chord": "G/B",
-            "n": "]) 2_ -",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "",
-            "n": "3 4",
-            "lyric": "不动"
-          },
-          {
-            "chord": "",
-            "lyric": "  "
-          },
-          {
-            "chord": "Em",
-            "n": "5 5 ( 5_ 3 ) ([ 1_",
-            "lyric": "摇的信ㅤ心，"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "Am",
-            "n": "]) 1",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "- -",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "1",
-            "lyric": "海"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "F",
-            "n": "6 6_ ( 6_ 6 ) 6",
-            "lyric": "浪之中ㅤㅤ你"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "C/E",
-            "n": "5 5_ ( 5_ 5 ) 1",
-            "lyric": "伸出大ㅤㅤ手"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          }
-        ],
-        [
-          {
-            "chord": "Dm",
-            "n": "4 - 3 -",
-            "lyric": "拉ㅤ 住"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "G",
-            "n": "2 - - -",
-            "lyric": "我。"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "C",
-            "n": "3 - 2 1_ ([ 2_",
-            "lyric": "求ㅤ 除去我"
-          },
-          {
-            "chord": "",
-            "n": "]) 2",
-            "lyric": " | "
-          },
-          {
-            "chord": "G/B",
-            "n": "- 3 4",
-            "lyric": "ㅤ心 中"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "Em",
-            "n": "5 5 6_ 7 ([ 1_",
-            "lyric": "所有的怀疑，"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "Am",
-            "n": "]) 1_",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "- {3 1 2 3 }",
-            "lyric": "ㅤ旷野之"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          }
-        ],
-        [
-          {
-            "chord": "Dm",
-            "n": "4 - {3 4 4 5 }",
-            "lyric": "中ㅤ 紧紧跟"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "F/C",
-            "n": "6 0_ 6_ 7 ( 6_ 5_ )",
-            "lyric": "随ㅤ云柱火"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "G",
-            "n": "([ 5 - - -",
-            "lyric": "柱。"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "",
-            "n": "]) 5",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "- - -",
-            "lyric": "ㅤ"
-          }
-        ]
-      ]
-    },
-    {
-      "name": "副歌 ×1",
-      "lines": [
-        {
-          "b": true,
-          "line": [
-            {
-              "chord": "C",
-              "n": "1 - 3 4_",
-              "lyric": "海ㅤ浪之"
-            },
-            {
-              "chord": "G/B",
-              "n": "([ 5_",
-              "lyric": "中，"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "]) 5·",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "5_ {3 5 6 7 }",
-              "lyric": "我必不沉"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "F/A",
-              "n": "([ 1' - - -",
-              "lyric": "落。"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "C/G",
-              "n": "]) 1' -",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "lyric": " "
-            },
-            {
-              "chord": "",
-              "n": "0 0",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "lyric": "｜"
-            }
-          ]
-        },
-        {
-          "b": true,
-          "line": [
-            {
-              "chord": "F",
-              "n": "1 - 6 3_",
-              "lyric": "旷ㅤ野之"
-            },
-            {
-              "chord": "C/E",
-              "n": "([ 5_",
-              "lyric": "中，"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "]) 5·",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "1_ {3 1 2 3 }",
-              "lyric": "我必不迷"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "Dm",
-              "n": "( 3_ 2_ )",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "2 - -",
-              "lyric": "路。"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "G",
-              "n": "0 0",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "3 2",
-              "lyric": "不退"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            }
-          ]
-        },
-        {
-          "b": true,
-          "line": [
-            {
-              "chord": "F",
-              "n": "1· sp 6,_ 1_ 1",
-              "lyric": "缩，也不害"
-            },
-            {
-              "chord": "C/E",
-              "n": "1_ -",
-              "lyric": "怕，"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "C/E",
-              "n": "3 2",
-              "lyric": "不动"
-            },
-            {
-              "chord": "F",
-              "n": "1· 6,_ 1_ 5",
-              "lyric": "摇也不放"
-            },
-            {
-              "chord": "C/E",
-              "n": "([ 3_",
-              "lyric": "弃，"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "]) 3 -",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "2 3",
-              "lyric": "因我"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            }
-          ]
-        },
-        {
-          "b": true,
-          "line": [
-            {
-              "chord": "Bb[2房子Dm]",
-              "n": "4 3_ ( 4_ 4 ) 5",
-              "lyric": "深信你的应"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "F",
-              "n": "6 - 7 ( 6_ 5_ )",
-              "lyric": "许ㅤ 不改"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "G",
-              "n": "([ 5 - - -",
-              "lyric": "变。"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "]) 5 - - -",
-              "lyric": "ㅤ"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "副歌 ×2",
-      "lines": [
-        {
-          "b": true,
-          "line": [
-            {
-              "chord": "C",
-              "n": "1 - 3 4_",
-              "lyric": "困ㅤ难之"
-            },
-            {
-              "chord": "G/B",
-              "n": "([ 5_",
-              "lyric": "中，"
-            },
-            {
-              "chord": "",
-              "n": "]) 5·",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "5_ {3 5 6 7 }",
-              "lyric": "我仍然赞"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "( 3_ 2_ )",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "F/A",
-              "n": "([ 1' - - -",
-              "lyric": "美。"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "C/G",
-              "n": "]) 1'",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "- - 0 0",
-              "lyric": "ㅤ"
-            }
-          ]
-        },
-        {
-          "b": true,
-          "line": [
-            {
-              "chord": "F",
-              "n": "1 - 3 2",
-              "lyric": "疑ㅤ惑之"
-            },
-            {
-              "chord": "C/E",
-              "n": "([ 5_",
-              "lyric": "中，"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "]) 5·",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "1_ {3 1 2 3 }",
-              "lyric": "我仍要祷"
-            },
-            {
-              "chord": "Dm",
-              "n": "( 3_ 2_ )",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "2 - -",
-              "lyric": "告"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "G",
-              "n": "0 0",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "3 2",
-              "lyric": "行在"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            }
-          ]
-        },
-        {
-          "b": true,
-          "line": [
-            {
-              "chord": "F",
-              "n": "1· 6,_ 1_ 1",
-              "lyric": "水  面的信"
-            },
-            {
-              "chord": "C/E",
-              "n": "([ 1_",
-              "lyric": "心，"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "]) 1 -",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "3 2",
-              "lyric": "刚强"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "F",
-              "n": "1· 6,_ 1_ 5",
-              "lyric": "壮胆地前"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "C/E",
-              "n": "([ 3_",
-              "lyric": "进，"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "",
-              "n": "]) 3 -",
-              "lyric": "ㅤ"
-            },
-            {
-              "chord": "",
-              "n": "2 3",
-              "lyric": "我的"
-            }
-          ]
-        },
-        {
-          "b": true,
-          "line": [
-            {
-              "chord": "Bb[2房子Dm]",
-              "n": "4 3_ ( 4_ 4 )",
-              "lyric": "神必在前"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "G",
-              "n": "6 5 3 ( 2_ 1_ )",
-              "lyric": "面为我争"
-            },
-            {
-              "chord": "",
-              "lyric": " | "
-            },
-            {
-              "chord": "C",
-              "n": "1 1",
-              "lyric": "战"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "桥段",
-      "lines": [
-        [
-          {
-            "chord": "Am",
-            "n": "6 6 7 ([ 1'",
-            "lyric": "我的祷告，"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "",
-            "n": "]) 1'",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "- 0 0",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "lyric": "｜"
-          },
-          {
-            "chord": "Em",
-            "n": "3 3 3_ 4 ([ 4_",
-            "lyric": "无论求什么，"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "",
-            "n": "]) 5",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "- 0",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "4_ 3_",
-            "lyric": "只要"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "先F后Dm",
-            "n": "4· ( 4_ 4 ) -",
-            "lyric": "相信，"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "",
-            "n": "6· ( 5_ 5 ) 4",
-            "lyric": "就必ㅤ 得"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "G",
-            "n": "5 - - -",
-            "lyric": "着。"
-          },
-          {
-            "chord": "",
-            "lyric": "｜"
-          }
-        ],
-        [
-          {
-            "chord": "",
-            "n": "3_ 4_",
-            "lyric": "只要"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "C/E",
-            "n": "5· ( 5_ 5 ) ([ -",
-            "lyric": "相信，"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "",
-            "n": "]) 5 -",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "0 4_ 5_",
-            "lyric": "ㅤ只要"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "F",
-            "n": "6· ( 6_ 6 ) -",
-            "lyric": "相信，"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "",
-            "n": "6· ( 7_ 7 ) 6",
-            "lyric": "就必ㅤ 得"
-          },
-          {
-            "chord": "",
-            "lyric": " | "
-          },
-          {
-            "chord": "G",
-            "n": "([ 5 - - -",
-            "lyric": "着"
-          },
-          {
-            "chord": "",
-            "n": "]) 5",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "n": "- - -",
-            "lyric": "ㅤ"
-          },
-          {
-            "chord": "",
-            "lyric": "｜｜"
-          }
-        ]
-      ]
-    }
-  ]
+  {
+    "name": "主歌",
+    "lines": [
+      [
+        {"chord":"CㅤㅤㅤㅤㅤㅤㅤㅤㅤG/B","n":"3 - 2 sp 1_ ( 2_ sp | 2_ ) -","lyric":"主，赐  给我"},
+        {"chord":"","lyric":""},
+        {"chord":"","n":"3 4 sp |","lyric":"不动"},
+        {"chord":"EmㅤㅤㅤㅤㅤㅤㅤAm","n":"5 5 ( 5_ 3 ) ( 1_ sp | 1 )","lyric":"摇的信ㅤ心，"},
+        {"chord":"","n":"- -","lyric":"ㅤ"},
+        {"chord":"","n":"1 sp |","lyric":"海"},
+        {"chord":"F","n":"6 6_ ( 6_ 6 )","lyric":"浪之中"},
+        {"chord":"","n":"6 sp |","lyric":"你"},
+        {"chord":"C/E","n":"5 5_ ( 5_ 5 )","lyric":"伸出大"},
+        {"chord":"","n":"1 sp |","lyric":"手"}
+      ],
+      [
+        {"chord":"Dm","n":"4 sp - sp 3 sp - sp |","lyric":"拉ㅤ ㅤ 住"},
+        {"chord":"G","n":"2 - - -","lyric":"我。"},
+        {"chord":"","lyric":" | "},
+        {"chord":"CㅤㅤㅤㅤㅤㅤㅤㅤG/B","n":"3 - 2 1_ ( 2_ sp | sp 2 ) -","lyric":"求ㅤ 除去我"},
+        {"chord":"","n":"3 4 sp |","lyric":"心中"},
+        {"chord":"EmㅤㅤㅤㅤㅤㅤㅤAm","n":"5 5 6_ 7 ( 1' sp | 1' ) -","lyric":"所有的怀疑，"},
+        {"chord":"","n":"{3 1 2 3 } sp |","lyric":"旷野之"}
+      ],
+      { "b": true, "line": [
+        {"chord":"Dm","n":"4 -","lyric":"中","lyric2":"ㅤ"},
+        {"chord":"","n":"{3 4 4 5 } sp |","lyric":"紧紧跟","lyric2":"ㅤ"},
+        {"chord":"F/C","n":"6","lyric":"随","lyric2":"ㅤ"},
+        {"chord":"","n":"0_ 6_","lyric":"ㅤ云","lyric2":"ㅤ"},
+        {"chord":"","n":"7 ( 6_ 5_ ) sp |","lyric":"柱火","lyric2":"ㅤ"},
+        {"chord":"Gㅤㅤㅤㅤㅤㅤ 【Chorus】","n":"( 5 - - - sp | 5 ) - - - |:","lyric":"柱。","lyric2":"ㅤ"},
+        {"chord":"C","n":"1 - 3 4_","lyric":"海ㅤ浪之","lyric2":"困ㅤ难之"},
+        {"chord":"G/B","n":"( 5_ sp | 5· )","lyric":"中，","lyric2":"中，"},
+        {"chord":"","n":"5_ {3 5 6 7 } sp |","lyric":"我必不沉","lyric2":"我仍然赞"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"F/Aㅤㅤ C/G","n":"( 1' - - - sp | sp 1' ) - 0 0 sp |","lyric":"落。","lyric2":"美。"},
+        {"chord":"Fㅤㅤㅤㅤ C/E","n":"1 - 6 3_ ( 5_ sp | sp 5· )","lyric":"旷ㅤ野之中，","lyric2":"疑ㅤ惑之中，"},
+        {"chord":"","n":"1_","lyric":"我","lyric2":"我"},
+        {"chord":"，","n":"{3 1 2 3 } sp |","lyric":"必不迷","lyric2":"仍然祷"},
+        {"chord":"Dm","n":"( 3_ 2_ )","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"2 - - sp |","lyric":"路。","lyric2":"告。"},
+        {"chord":"G","n":"0 0","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"3 2 sp |","lyric":"不退","lyric2":"行在"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"F","n":"1· sp 6,_ 1_ 1","lyric":"缩, 也不害","lyric2":"水, 面的信"},
+        {"chord":"C/E","n":"( 1_ sp | 1 ) -","lyric":"怕，","lyric2":"心，"},
+        {"chord":"C/E","n":"3 2 sp |","lyric":"不动","lyric2":"刚强"},
+        {"chord":"F","n":"1· 6,_ 1_ 5 sp","lyric":"摇也不放","lyric2":"壮胆地前"},
+        {"chord":"C/E","n":"( 3_ sp | 3 ) -","lyric":"弃，","lyric2":"进，"},
+        {"chord":"","n":"2 3 sp |","lyric":"因我","lyric2":"我的"},
+        {"chord":"Bb[2房子Dm]","n":"4 3_ ( 4_ 4 )","lyric":"深信你","lyric2":"神必在"},
+        {"chord":"","n":"5 sp |","lyric":"应","lyric2":"前"},
+        {"chord":"F","n":"[v1 6 -","lyric":"许","lyric2":"ㅤ"},
+        {"chord":"","n":"7 ( 6_ 5_ ) sp | ]v","lyric":"不改","lyric2":"ㅤ"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G","n":"[v1 ( 5 - - - sp | 5 ) - - - :| ]v","lyric":"变"},
+        {"chord":"G","n":"[v2 6 5 3 ( 2_ 1_ ) sp |","lyric":"面为我争"},
+        {"chord":"C","n":"1 1 7,_ 1_ ]v","lyric":"战。"},
+        {"chord":"","n":"0_ ( 1_ sp | 1 ) - 4_ 3_ 3 | 1 1 7,_ 1_","lyric":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤFine","n":"0_ ( 1_ sp | 1 ) - - - |","lyric":"ㅤ"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Amㅤ【Bridge】","n":"6 6 7 ( 1' sp | 1' ) - 0 0 sp |","lyric":"我的祷告，"},
+        {"chord":"Em","n":"3 3","lyric":"无论"},
+        {"chord":"","n":"3_ 4 ( 4_ sp | 5 ) - 0","lyric":"求什么，"},
+        {"chord":"","n":"4_ 3_ sp |","lyric":"只要"},
+        {"chord":"先F后Dm","n":"4· ( 4_ 4 ) - sp |","lyric":"相信，"},
+        {"chord":"","n":"[v1 6· ( 5_ 5 )","lyric":"就必"},
+        {"chord":"","n":"4 sp |","lyric":"得"},
+        {"chord":"G","n":"5 - - - sp :| ]v","lyric":"着。"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","n":"[v2 ( 4 ) - -","lyric":"ㅤ"},
+        {"chord":"","n":"3_ 4_ sp |","lyric":"只要"},
+        {"chord":"C/E","n":"5· ( 5_ 5 ) ( - sp | 5 ) - 0","lyric":"相信，"},
+        {"chord":"","n":"4_ 5_ ]v sp |","lyric":"只要"},
+        {"chord":"F","n":"6· ( 6_ 6 ) - sp |","lyric":"相信，"},
+        {"chord":"","n":"6· ( 7_ 7 )","lyric":"就必"},
+        {"chord":"","n":"6 sp |","lyric":"得"},
+        {"chord":"Gㅤㅤㅤㅤㅤ【To Chorus】","n":"( 5 - - - sp | 5 ) - - - sp ||","lyric":"着"}
+      ]}
+    ]
+  }
+]
 }
