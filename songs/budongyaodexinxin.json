@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/budongyaodexinxin.lrc",
   "youtube": "https://youtu.be/H9OdfU5I9yQ?si=KN6hbcV_ggJDPM3O",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/budongyaodexinxinC.jpg",
- "sections": [
+"sections": [
   {
     "name": "主歌",
     "lines": [
@@ -31,7 +31,7 @@
       ],
       [
         {"chord":"Dm","n":"4 sp - sp 3 sp - sp |","lyric":"拉ㅤ ㅤ 住"},
-        {"chord":"G","n":"2 - - -","lyric":"我。"},
+        {"chord":"G","n":"2 - - - sp |","lyric":"我。"},
         {"chord":"CㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤG/B","n":"3 - 2 1_ ( 2_ sp | sp 2 ) -","lyric":"求ㅤ 除去我"},
         {"chord":"","n":"3 4 sp |","lyric":"心中"},
         {"chord":"EmㅤㅤㅤㅤㅤㅤㅤㅤAm","n":"5 5 6_ 7 ( 1' sp | 1' ) -","lyric":"所有的怀疑，"},
@@ -52,7 +52,7 @@
         {"chord":"F/Aㅤㅤ C/G","n":"( 1' - - - sp | sp 1' ) - 0 0 sp |","lyric":"落。","lyric2":"美。"},
         {"chord":"Fㅤㅤㅤㅤ C/E","n":"1 - 6 3_ ( 5_ sp | sp 5· )","lyric":"旷ㅤ野之中，","lyric2":"疑ㅤ惑之中，"},
         {"chord":"","n":"1_","lyric":"我","lyric2":"我"},
-        {"chord":"，","n":"{3 1 2 3 } sp |","lyric":"必不迷","lyric2":"仍然祷"},
+        {"chord":"","n":"{3 1 2 3 } sp |","lyric":"必不迷","lyric2":"仍然祷"},
         {"chord":"Dm","n":"( 3_ 2_ )","lyric":"ㅤ","lyric2":"ㅤ"},
         {"chord":"","n":"2 - - sp |","lyric":"路。","lyric2":"告。"},
         {"chord":"G","n":"0 0","lyric":"ㅤ","lyric2":"ㅤ"},
