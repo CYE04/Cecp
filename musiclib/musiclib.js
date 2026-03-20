@@ -1114,7 +1114,7 @@
         lbDiv.style.transformOrigin='left top';
         lbDiv.style.width=maxW+'px';
         var naturalH=lbDiv.offsetHeight;
-        lbDiv.style.marginBottom=(naturalH*(scale-1))+'px';
+        lbDiv.style.marginBottom=(naturalH*(1-scale))+'px';
         lbDiv.parentElement.style.overflow='hidden';
       });
     }
