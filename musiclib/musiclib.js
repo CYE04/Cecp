@@ -559,6 +559,9 @@
   function trBass(bass,st){
     return trKeyName(bass,st);
   }
+  function normChordText(text){
+    return String(text||'').replace(/\u3164/g,'\u3000');
+  }
   function trChord(ch,st){
     if(!ch)return ch;
     const m=ch.match(/^([A-G](?:#|b)?)(.*)$/);
@@ -1047,7 +1050,7 @@
             const segEl=_div('prev-seg');
             const chord=document.createElement('div');
             chord.className='p-chord'+(seg.chord?'':' empty');
-            chord.textContent=(seg.chord?trChord(seg.chord,st):'\u00a0');
+            chord.textContent=(seg.chord?normChordText(trChord(seg.chord,st)):'\u00a0');
             segEl.appendChild(chord);
             if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
             const lyric=document.createElement('div');lyric.className='p-lyric'+((!Array.isArray(line)&&line.b)?' bold':'');lyric.textContent=seg.lyric||'';
