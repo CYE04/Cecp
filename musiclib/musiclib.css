@@ -267,7 +267,7 @@ body{overflow-x:hidden;}
 #music-library .sw-lline{margin-bottom:12px;}
 #music-library .sw-lline:last-child{margin-bottom:0;}
 #music-library .sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow:visible;}
-#music-library .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:1px;margin-bottom:5px;}
+#music-library .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;margin-bottom:5px;}
 #music-library .sw-chord{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);margin-bottom:3px;min-height:15px;white-space:nowrap;}
 #music-library .sw-chord.empty{visibility:hidden;}
 #music-library .sw-jianpu{font-family:'DM Mono',monospace;color:var(--text);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1;}
@@ -275,6 +275,34 @@ body{overflow-x:hidden;}
 #music-library .sw-lyric2{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
 #music-library .sw-lyric3{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
 #music-library .sw-lyric4{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
+#music-library .prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
+#music-library .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
+#music-library .p-chord{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);margin-bottom:2px;min-height:13px;white-space:nowrap;}
+#music-library .p-chord.empty{visibility:hidden;}
+#music-library .p-n{font-family:'DM Mono',monospace;color:var(--text);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
+#music-library .p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--text2);}
+#music-library .p-lyric.bold{font-weight:700;color:var(--text);}
+#music-library .p-lyric2,#music-library .p-lyric3,#music-library .p-lyric4{opacity:0.65;margin-top:1px;}
+#music-library .prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
+#music-library .prev-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--text);border-left:1.5px solid var(--text);pointer-events:none;box-sizing:border-box;opacity:0.5;}
+#music-library .prev-volta.closed::before{border-right:1.5px solid var(--text);}
+#music-library .prev-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;line-height:1;color:var(--text);opacity:0.65;pointer-events:none;font-family:'DM Mono',monospace;}
+#music-library .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
+#music-library .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
+#music-library .jp-plain-top{height:12px;}
+#music-library .jp-plain-sym{font-size:15px;line-height:1;text-align:center;}
+#music-library .jp-plain-bot{height:16px;}
+#music-library .jp-dot-top,#music-library .jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--text);text-align:center;display:flex;flex-direction:column;align-items:center;}
+#music-library .jp-dot-top{height:12px;justify-content:flex-end;}
+#music-library .jp-dot-bot{height:12px;justify-content:flex-start;}
+#music-library .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
+#music-library .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;}
+#music-library .jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em;}
+#music-library .jp-aug{position:absolute;right:-0.42em;top:0.1em;font-size:10px;line-height:1;pointer-events:none;}
+#music-library .jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--text);}
+#music-library .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px;}
+#music-library .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box;}
+#music-library .jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none;}
 
 /* metronome */
 #music-library .ml-met{margin:0 16px 14px;border:1px solid var(--border);background:var(--bg2);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;}
