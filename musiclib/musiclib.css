@@ -1,6 +1,6 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library CSS */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;700&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 #music-library *{box-sizing:border-box;margin:0;padding:0;}
 
@@ -267,14 +267,14 @@ body{overflow-x:hidden;}
 #music-library .sw-lline{margin-bottom:12px;}
 #music-library .sw-lline:last-child{margin-bottom:0;}
 #music-library .sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow:visible;}
-#music-library .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
-#music-library .sw-chord{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);margin-bottom:2px;min-height:13px;white-space:nowrap;}
+#music-library .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:1px;margin-bottom:5px;}
+#music-library .sw-chord{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);margin-bottom:3px;min-height:15px;white-space:nowrap;}
 #music-library .sw-chord.empty{visibility:hidden;}
-#music-library .sw-jianpu{font-family:'DM Mono',monospace;color:var(--text);margin-bottom:1px;display:flex;align-items:flex-end;line-height:1.2;}
-#music-library .sw-lyric{font-family:'Noto Serif SC','PingFang SC',serif;font-size:18px;color:var(--text2);white-space:pre;letter-spacing:0;}
-#music-library .sw-lyric2{display:block;font-size:18px;opacity:0.65;margin-top:1px;}
-#music-library .sw-lyric3{display:block;font-size:18px;opacity:0.65;margin-top:1px;}
-#music-library .sw-lyric4{display:block;font-size:18px;opacity:0.65;margin-top:1px;}
+#music-library .sw-jianpu{font-family:'DM Mono',monospace;color:var(--text);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1;}
+#music-library .sw-lyric{font-size:22px;color:var(--text2);white-space:pre;letter-spacing:.5px;}
+#music-library .sw-lyric2{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
+#music-library .sw-lyric3{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
+#music-library .sw-lyric4{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
 
 /* metronome */
 #music-library .ml-met{margin:0 16px 14px;border:1px solid var(--border);background:var(--bg2);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;}
@@ -301,7 +301,7 @@ body{overflow-x:hidden;}
   #music-library .sw-wrap{padding:14px 12px 4px;}
   #music-library .sw-hd{flex-direction:column;}
   #music-library .sw-tog{width:100%;justify-content:center;}
-  #music-library .sw-lyric{font-size:18px;}
+  #music-library .sw-lyric{font-size:20px;}
   #music-library .ml-met{margin:0 12px 12px;}
 }
 
