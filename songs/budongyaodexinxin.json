@@ -8,21 +8,20 @@
   "sub": "赞美之泉 (2022)  游智婷词/曾祥怡曲 (出13:21,申1:30,太21:22)",
   "origKey": "C",
   "timeSign": "4/4",
-  "bpm": 72,
+  "bpm": 156,
   "mp3": "/upload/budongyaodexinxin-Eovu.mp3",
   "cover": "https://cecpadua.github.io/resouces/covers/budongyaodexinxin.jpg",
   "lrc": "https://cecpadua.github.io/resouces/lyrics/budongyaodexinxin.lrc",
   "youtube": "https://youtu.be/H9OdfU5I9yQ?si=KN6hbcV_ggJDPM3O",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/budongyaodexinxinC.jpg",
-  "sections": [
+ "sections": [
   {
     "name": "主歌",
     "lines": [
       [
         {"chord":"CㅤㅤㅤㅤㅤㅤㅤㅤㅤG/B","n":"3 - 2 sp 1_ ( 2_ sp | 2_ ) -","lyric":"主，赐  给我"},
-        {"chord":"","lyric":""},
         {"chord":"","n":"3 4 sp |","lyric":"不动"},
-        {"chord":"EmㅤㅤㅤㅤㅤㅤㅤAm","n":"5 5 ( 5_ 3 ) ( 1_ sp | 1 )","lyric":"摇的信ㅤ心，"},
+        {"chord":"EmㅤㅤㅤㅤㅤㅤㅤㅤAm","n":"5 5 ( 5_ 3 ) ( 1_ sp | 1 )","lyric":"摇的信ㅤ心，"},
         {"chord":"","n":"- -","lyric":"ㅤ"},
         {"chord":"","n":"1 sp |","lyric":"海"},
         {"chord":"F","n":"6 6_ ( 6_ 6 )","lyric":"浪之中"},
@@ -33,10 +32,9 @@
       [
         {"chord":"Dm","n":"4 sp - sp 3 sp - sp |","lyric":"拉ㅤ ㅤ 住"},
         {"chord":"G","n":"2 - - -","lyric":"我。"},
-        {"chord":"","lyric":" | "},
-        {"chord":"CㅤㅤㅤㅤㅤㅤㅤㅤG/B","n":"3 - 2 1_ ( 2_ sp | sp 2 ) -","lyric":"求ㅤ 除去我"},
+        {"chord":"CㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤG/B","n":"3 - 2 1_ ( 2_ sp | sp 2 ) -","lyric":"求ㅤ 除去我"},
         {"chord":"","n":"3 4 sp |","lyric":"心中"},
-        {"chord":"EmㅤㅤㅤㅤㅤㅤㅤAm","n":"5 5 6_ 7 ( 1' sp | 1' ) -","lyric":"所有的怀疑，"},
+        {"chord":"EmㅤㅤㅤㅤㅤㅤㅤㅤAm","n":"5 5 6_ 7 ( 1' sp | 1' ) -","lyric":"所有的怀疑，"},
         {"chord":"","n":"{3 1 2 3 } sp |","lyric":"旷野之"}
       ],
       { "b": true, "line": [
@@ -97,7 +95,7 @@
         {"chord":"F","n":"6· ( 6_ 6 ) - sp |","lyric":"相信，"},
         {"chord":"","n":"6· ( 7_ 7 )","lyric":"就必"},
         {"chord":"","n":"6 sp |","lyric":"得"},
-        {"chord":"Gㅤㅤㅤㅤㅤ【To Chorus】","n":"( 5 - - - sp | 5 ) - - - sp ||","lyric":"着"}
+        {"chord":"Gㅤㅤㅤㅤㅤ ㅤ【To Chorus】","n":"( 5 - - - sp | 5 ) - - - sp ||","lyric":"着"}
       ]}
     ]
   }
