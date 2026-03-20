@@ -1,6 +1,6 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library CSS */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Space+Mono:wght@400;700&display=swap');
 
 #music-library *{box-sizing:border-box;margin:0;padding:0;}
 
@@ -268,9 +268,9 @@ body{overflow-x:hidden;}
 #music-library .sw-lline:last-child{margin-bottom:0;}
 #music-library .sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow:visible;}
 #music-library .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:1px;margin-bottom:5px;}
-#music-library .sw-chord{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);margin-bottom:3px;min-height:15px;white-space:nowrap;}
+#music-library .sw-chord{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);margin-bottom:3px;min-height:15px;white-space:pre;}
 #music-library .sw-chord.empty{visibility:hidden;}
-#music-library .sw-jianpu{font-family:'DM Mono',monospace;color:var(--text);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1;}
+#music-library .sw-jianpu{font-family:'Space Mono',monospace;color:var(--text);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1;}
 #music-library .sw-lyric{font-size:22px;color:var(--text2);white-space:pre;letter-spacing:.5px;}
 #music-library .sw-lyric2{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
 #music-library .sw-lyric3{display:block;font-size:22px;opacity:0.6;margin-top:1px;}
