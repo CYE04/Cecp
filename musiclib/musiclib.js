@@ -1108,17 +1108,14 @@
           if(row.scrollWidth>maxW)maxW=row.scrollWidth;
           row.style.display='';
         });
-        if(maxW>avail){
-          var scale=avail/maxW;
-          lbDiv.style.transform='scale('+scale+')';
-          lbDiv.style.transformOrigin='left top';
-          lbDiv.style.width=maxW+'px';
-          var naturalH=lbDiv.offsetHeight;
-          lbDiv.style.marginBottom=(naturalH*(scale-1))+'px';
-          lbDiv.parentElement.style.overflow='hidden';
-        } else {
-          lbDiv.parentElement.style.overflow='';
-        }
+        if(!maxW)return;
+        var scale=avail/maxW;
+        lbDiv.style.transform='scale('+scale+')';
+        lbDiv.style.transformOrigin='left top';
+        lbDiv.style.width=maxW+'px';
+        var naturalH=lbDiv.offsetHeight;
+        lbDiv.style.marginBottom=(naturalH*(scale-1))+'px';
+        lbDiv.parentElement.style.overflow='hidden';
       });
     }
     renderScore();
