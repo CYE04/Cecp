@@ -40,6 +40,11 @@ window.YouthEngine = {};
     if (_cssInjected) return;
     _cssInjected = true;
 
+    var fontLink = document.createElement('link');
+    fontLink.rel = 'stylesheet';
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap';
+    document.head.appendChild(fontLink);
+
     var style = document.createElement('style');
     style.textContent = `
 /* ── theme vars ── */
@@ -167,9 +172,9 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-lline{margin-bottom:12px}.sw-lline:last-child{margin-bottom:0}
 .sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow:visible}
 .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:1px;margin-bottom:5px}
-.sw-chord{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--ym-capo);margin-bottom:3px;min-height:15px;white-space:nowrap}
+.sw-chord{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--ym-capo);margin-bottom:3px;min-height:15px;white-space:pre}
 .sw-chord.empty{visibility:hidden}
-.sw-jianpu{font-family:'DM Mono',monospace;color:var(--ym-ink);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1}
+.sw-jianpu{font-family:'Space Mono',monospace;color:var(--ym-ink);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1}
 .sw-lyric{font-size:22px;color:var(--ym-ink2);white-space:pre;letter-spacing:.5px}
 .sw-lyric2{display:block;font-size:22px;opacity:0.6;margin-top:1px}.sw-lyric3{display:block;font-size:22px;opacity:0.6;margin-top:1px}.sw-lyric4{display:block;font-size:22px;opacity:0.6;margin-top:1px}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
