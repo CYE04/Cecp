@@ -596,9 +596,31 @@
     rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,(a,b)=>'/'+trBass(b,st,useFlat));
     return trKeyName(m[1],st,useFlat)+rest;
   }
+  function resizeChordGap(gap,len){
+    const chars=[...String(gap||'')];
+    if(!chars.length||len<=0)return '';
+    let out='';
+    for(let i=0;i<len;i++)out+=chars[i%chars.length];
+    return out;
+  }
   function trChord(ch,st,useFlat){
     if(!ch)return ch;
-    return String(ch).split(/([ \t\u3164]+)/).map(part=>/[^\s\u3164]/.test(part)?trChordToken(part,st,useFlat):part).join('');
+    const parts=String(ch).split(/([ \t\u3164]+)/);
+    let out='';
+    for(let i=0;i<parts.length;i++){
+      const part=parts[i];
+      if(!/[^\s\u3164]/.test(part)){out+=part;continue;}
+      const tr=trChordToken(part,st,useFlat);
+      out+=tr;
+      if(i+1<parts.length&&/[ \t\u3164]+/.test(parts[i+1])){
+        const gap=parts[i+1];
+        let nextLen=Math.max(0,[...gap].length + ([...part].length - [...tr].length));
+        if(nextLen===0 && i+2<parts.length && /[^\s\u3164]/.test(parts[i+2]))nextLen=1;
+        out+=resizeChordGap(gap,nextLen);
+        i++;
+      }
+    }
+    return out;
   }
   function calcCapo(target,orig){
     const {root:targetRoot,suf:targetSuf}=parseKeyName(target);
@@ -1080,25 +1102,25 @@
         const se=_div('sw-lsec');
         const sn=_div('sw-lsec-name');sn.textContent=sec.name||'';se.appendChild(sn);
         for(const line of sec.lines||[]){
-          const le=_div('sw-lline');const row=_div('sw-lrow'+((!Array.isArray(line)&&line.b)?' bold':''));
+          const le=_div('sw-lline');const row=_div('sw-lrow prev-row'+((!Array.isArray(line)&&line.b)?' bold':''));
           const segs=Array.isArray(line)?line:(line.line||[]);
           let voltaWrap=null;
           for(const seg of segs){
-            const segEl=_div('sw-seg');
+            const segEl=_div('prev-seg');
             const chord=document.createElement('div');
-            chord.className='sw-chord'+(seg.chord?'':' empty');
-            if(seg.chord)chord.textContent=trChord(seg.chord,st,useFlat);
+            chord.className='p-chord'+(seg.chord?'':' empty');
+            chord.textContent=(seg.chord?trChord(seg.chord,st,useFlat):'\u00a0');
             segEl.appendChild(chord);
             if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
-            const lyric=document.createElement('div');lyric.className='sw-lyric'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(lyric,normLyricText(seg.lyric));
+            const lyric=document.createElement('div');lyric.className='p-lyric'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(lyric,normLyricText(seg.lyric));
             segEl.appendChild(lyric);
-            if(seg.lyric2){const ly2=document.createElement('div');ly2.className='sw-lyric sw-lyric2'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly2,normLyricText(seg.lyric2));segEl.appendChild(ly2);}
-            if(seg.lyric3){const ly3=document.createElement('div');ly3.className='sw-lyric sw-lyric3'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly3,normLyricText(seg.lyric3));segEl.appendChild(ly3);}
-            if(seg.lyric4){const ly4=document.createElement('div');ly4.className='sw-lyric sw-lyric4'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly4,normLyricText(seg.lyric4));segEl.appendChild(ly4);}
+            if(seg.lyric2){const ly2=document.createElement('div');ly2.className='p-lyric p-lyric2'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly2,normLyricText(seg.lyric2));segEl.appendChild(ly2);}
+            if(seg.lyric3){const ly3=document.createElement('div');ly3.className='p-lyric p-lyric3'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly3,normLyricText(seg.lyric3));segEl.appendChild(ly3);}
+            if(seg.lyric4){const ly4=document.createElement('div');ly4.className='p-lyric p-lyric4'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly4,normLyricText(seg.lyric4));segEl.appendChild(ly4);}
             const _vn=getVoltaStartLabel(seg.n);
-            if(_vn){voltaWrap=document.createElement('span');voltaWrap.className='jp-volta';voltaWrap.setAttribute('data-v',_vn+'.');}
+            if(_vn){voltaWrap=document.createElement('span');voltaWrap.className='prev-volta';voltaWrap.setAttribute('data-v',_vn+'.');}
             (voltaWrap||row).appendChild(segEl);
-            if(voltaWrap&&hasVoltaEnd(seg.n)){voltaWrap.classList.add('v-close');row.appendChild(voltaWrap);voltaWrap=null;}
+            if(voltaWrap&&hasVoltaEnd(seg.n)){voltaWrap.classList.add('closed');row.appendChild(voltaWrap);voltaWrap=null;}
           }
           if(voltaWrap)row.appendChild(voltaWrap);
           le.appendChild(row);se.appendChild(le);
