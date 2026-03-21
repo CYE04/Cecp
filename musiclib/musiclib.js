@@ -1,5 +1,5 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
-/* CECP Music Library v3.2 */
+/* CECP Music Library v3.3 */
 (function(){
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
@@ -590,10 +590,10 @@
   }
   function trChord(ch,st){
     if(!ch)return ch;
-    const m=ch.match(/^([A-G](?:#|b)?)(.*)$/);
+    const m=String(ch).trim().match(/^([A-G](?:#|b)?)(.*)$/);
     if(!m)return ch;
     let rest=m[2]||'';
-    rest=rest.replace(/\/([A-G](?:#|b)?)/g,(a,b)=>'/'+trBass(b,st));
+    rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,(a,b)=>'/'+trBass(b,st));
     return trKeyName(m[1],st)+rest;
   }
   function calcCapo(target,orig){
