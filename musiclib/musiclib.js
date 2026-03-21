@@ -589,13 +589,16 @@
       }
     }
   }
-  function trChord(ch,st,useFlat){
-    if(!ch)return ch;
-    const m=String(ch).trim().match(/^([A-G](?:#|b)?)(.*)$/);
+  function trChordToken(ch,st,useFlat){
+    const m=String(ch||'').trim().match(/^([A-G](?:#|b)?)(.*)$/);
     if(!m)return ch;
     let rest=m[2]||'';
     rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,(a,b)=>'/'+trBass(b,st,useFlat));
     return trKeyName(m[1],st,useFlat)+rest;
+  }
+  function trChord(ch,st,useFlat){
+    if(!ch)return ch;
+    return String(ch).split(/([ \t\u3164]+)/).map(part=>/[^\s\u3164]/.test(part)?trChordToken(part,st,useFlat):part).join('');
   }
   function calcCapo(target,orig){
     const {root:targetRoot,suf:targetSuf}=parseKeyName(target);
