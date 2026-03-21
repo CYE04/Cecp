@@ -597,12 +597,16 @@
     return trKeyName(m[1],st)+rest;
   }
   function calcCapo(target,orig){
-    const t=NOTE_MAP[parseKeyName(target).root], o=NOTE_MAP[parseKeyName(orig).root];
-    let up=(o - t + 12)%12;
-    let down=(t - o + 12)%12;
-    let st = up<=6 ? up : -down;
-    let capo=(12-st)%12; if(capo===12) capo=0;
-    return {st, capo, playKey: target};
+    const {root:targetRoot,suf:targetSuf}=parseKeyName(target);
+    const {root:origRoot}=parseKeyName(orig);
+    const t=NOTE_MAP[targetRoot], o=NOTE_MAP[origRoot];
+    const st=(t-o+12)%12;
+    let best=null;
+    ['C','D','E','F','G','A','B'].forEach(function(pk){
+      const c=(t-NOTE_MAP[pk]+12)%12;
+      if(c<=7 && (!best || c<best.capo)) best={playKey:pk+targetSuf,capo:c};
+    });
+    return {st, capo:best?best.capo:0, playKey:best?best.playKey:target};
   }
 
   let _mpAudio=null,_mpSongs=[],_mpIdx=-1,_mpLoop=false,_mpLrc=[],_mpLrcIdx=-1,_mpCoverFallback='';
