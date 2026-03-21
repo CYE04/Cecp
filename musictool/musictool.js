@@ -406,6 +406,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
 .jb-dots{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:6px;flex-shrink:0;}
 .jb-dot{width:3px;height:3px;border-radius:50%;background:currentColor;}
 
+/* ── 延长号 ── */
+.jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px;}
+.jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box;}
+.jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none;}
+
 /* ── 批量填歌词 modal ── */
 .lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
 .lyfill-overlay.open{display:flex;}
@@ -512,6 +517,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
     <span class="kbd-istate-item">八度: <span id="is-oct">中</span></span>
     <span class="kbd-istate-item">时值: <span id="is-dur">4分</span></span>
     <span class="kbd-istate-item">附点: <span id="is-dot">关</span></span>
+    <span class="kbd-istate-item">延长号: <span id="is-fermata">关</span></span>
     <span class="kbd-istate-item hi">房子线: <span id="is-volta">无</span></span>
   </div>
   <div class="mid-bar-right">
@@ -580,6 +586,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Space Mono',monospace;he
         <div class="kbd-row">
           <button class="kbd-btn" onclick="inputSpecial('-')" style="padding:5px 6px;">— 延音<span class="shortcut">\\</span></button>
           <button class="kbd-btn" id="dot-btn" onclick="toggleDot()" style="padding:5px 6px;">· 附点<span class="shortcut">,</span></button>
+          <button class="kbd-btn" id="fermata-btn" onclick="toggleFermata()" style="padding:5px 6px;">𝄐 延长号</button>
           <button class="kbd-btn" onclick="appendTok(buildSpacerTok())" style="padding:5px 6px;">␣ 空格<span class="shortcut">Space</span></button>
           <button class="kbd-btn" onclick="appendTok('|')" style="padding:5px 6px;">| 小节线</button>
           <button class="kbd-btn" onclick="appendTok('||')" style="padding:5px 6px;">|| 双小节</button>
@@ -658,7 +665,7 @@ var curTok=-1;
 // 多选范围（含）：selA 是锚点，selB 是终点
 var selA=-1, selB=-1;
 
-var oct='mid', dur='quarter', dotOn=false, slurOn=false, xslurOn=false, tupletOn=0;
+var oct='mid', dur='quarter', dotOn=false, fermataOn=false, slurOn=false, xslurOn=false, tupletOn=0;
 var inputMode='insert';
 var tokClipboard=[]; // 存 token 数组
 var segClipboard=null; // 存整格子
@@ -942,6 +949,7 @@ function setDur(d){
   updateInputState();
 }
 function toggleDot(){dotOn=!dotOn;document.getElementById('dot-btn').classList.toggle('on',dotOn);updateInputState();}
+function toggleFermata(){fermataOn=!fermataOn;document.getElementById('fermata-btn').classList.toggle('on',fermataOn);updateInputState();}
 function toggleXSlur(){
   xslurOn=!xslurOn;
   document.getElementById('xslur-btn').classList.toggle('on',xslurOn);
@@ -970,6 +978,7 @@ function buildTok(n){
   }
   if(dotOn)s+='\\u00b7';
   if(dur==='eighth')s+='_';else if(dur==='16th')s+='__';
+  if(fermataOn)s+='^';
   return s;
 }
 function buildSpacerTok(){
@@ -1213,6 +1222,8 @@ function parseJpToken(tok){
   if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|')return makeBarline(tok);
   if(!tok||tok==='-'||tok===' ')return makeJpPlain(tok);
   if(tok==='0')return makeJpPlain('0');
+  var hasFermata=false;
+  if(tok.slice(-1)==='^'){hasFermata=true;tok=tok.slice(0,-1);}
   if(tok==='sp'||tok==='sp_'||tok==='sp__'){
     var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
     var el=parseJpToken(fk);
@@ -1253,6 +1264,7 @@ function parseJpToken(tok){
   if(ul===2){var ul2=document.createElement('span');ul2.className='jp-u2-line';lw.appendChild(ul2);}
   w.appendChild(lw);
   var bd=document.createElement('span');bd.className='jp-dot-bot';setDots(bd,isL>=2?2:isL);w.appendChild(bd);
+  if(hasFermata){var fw=document.createElement('span');fw.className='jp-fermata';fw.appendChild(w);return fw;}
   return w;
 }
 function makeTuplet(n){
@@ -1655,6 +1667,7 @@ function updateInputState(){
   var _so=document.getElementById('is-oct');if(_so)_so.textContent=_octLabel[oct]||oct;
   var _sd=document.getElementById('is-dur');if(_sd)_sd.textContent=_durLabel[dur]||dur;
   var _sp=document.getElementById('is-dot');if(_sp)_sp.textContent=dotOn?'开':'关';
+  var _sf=document.getElementById('is-fermata');if(_sf)_sf.textContent=fermataOn?'开':'关';
   var _ss=document.getElementById('is-sec');if(_ss)_ss.textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
   // 房子线：当前格子的 n 里是否含有 volta token
   var voltaStr='无';
