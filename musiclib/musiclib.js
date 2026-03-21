@@ -597,7 +597,7 @@
     return trKeyName(m[1],st,useFlat)+rest;
   }
   function resizeChordGap(gap,len){
-    const chars=[...String(gap||'')];
+    const chars=[...String(gap||'')].map(ch=>ch==='\u3164'?'\u3000':ch);
     if(!chars.length||len<=0)return '';
     let out='';
     for(let i=0;i<len;i++)out+=chars[i%chars.length];
