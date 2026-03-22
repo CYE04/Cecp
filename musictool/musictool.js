@@ -255,38 +255,41 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .add-sec-btn:hover{border-color:var(--accent);background:rgba(124,106,247,0.08);}
 
 /* ── 中间状态栏 ── */
-.mid-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 14px;padding:10px 16px;background:rgba(34,34,40,0.92);border-top:1px solid var(--border);border-bottom:1px solid var(--border2);flex-shrink:0;backdrop-filter:blur(12px);}
-.mid-bar-left{display:flex;align-items:center;flex-wrap:wrap;gap:8px;flex:1;min-width:0;}
-.mid-bar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:48%;}
+.mid-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:9px 16px;background:rgba(34,34,40,0.92);border-top:1px solid var(--border);border-bottom:1px solid var(--border2);flex-shrink:0;backdrop-filter:blur(12px);}
 .mid-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);font-size:10px;color:var(--ink3);line-height:1;}
 .mid-pill strong{color:var(--ink);font-size:10px;font-weight:700;}
 .mid-pill.accent strong{color:var(--accent2);}
 .mid-pill.warn strong{color:var(--sel);}
-.mid-loc{font-size:10px;color:var(--ink2);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mid-pill.active{background:rgba(106,242,168,0.12);border-color:rgba(106,242,168,0.35);color:rgba(255,255,255,0.72);}
+.mid-pill.active strong{color:var(--green);}
+.mid-pill.featured{background:rgba(124,106,247,0.12);border-color:rgba(124,106,247,0.28);}
+.mid-pill.featured strong{color:#d6cdfd;}
+.mid-loc{font-size:10px;color:var(--ink2);}
 .mid-sel{font-size:10px;color:var(--sel);}
-.mid-tip{font-size:9px;color:var(--ink3);max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mid-toolbtn{padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:rgba(255,255,255,0.03);color:var(--ink2);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .12s;}
-.mid-toolbtn:hover{border-color:var(--accent);color:var(--ink);background:rgba(124,106,247,0.08);}
+.mid-tip{font-size:9px;color:var(--ink3);}
 
 /* ── 右：键盘 ── */
-.kbd-pane{min-width:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015));box-shadow:0 18px 40px rgba(0,0,0,0.2);}
+.kbd-pane{min-width:0;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015));box-shadow:0 18px 40px rgba(0,0,0,0.2);}
 .kbd-pane::-webkit-scrollbar,.seg-pane-inner::-webkit-scrollbar,.top-panel::-webkit-scrollbar{width:8px;height:8px;}
 .kbd-pane::-webkit-scrollbar-thumb,.seg-pane-inner::-webkit-scrollbar-thumb,.top-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:999px;}
-.kbd-card{border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,0.025);padding:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);}
-.kbd-card.hero{background:linear-gradient(135deg,rgba(124,106,247,0.14),rgba(255,255,255,0.02));}
-.kbd-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
-.kbd-card-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);}
-.kbd-card-desc{font-size:9px;line-height:1.6;color:var(--ink3);margin-top:4px;}
-.kbd-card-badge{font-size:9px;color:var(--sel);border:1px solid rgba(240,192,64,0.22);background:rgba(240,192,64,0.08);border-radius:999px;padding:3px 8px;white-space:nowrap;}
-.kbd-stack{display:flex;flex-direction:column;gap:12px;}
-.kbd-split{display:grid;grid-template-columns:minmax(0,160px) minmax(0,1fr);gap:12px;align-items:start;}
-.kbd-mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-.kbd-tip-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-.kbd-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);font-size:10px;color:var(--ink2);}
-.kbd-chip kbd,.kbd-shortcut kbd{font-family:'Space Mono',monospace;font-size:10px;color:var(--ink);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-bottom-color:rgba(255,255,255,0.2);border-radius:6px;padding:3px 6px;min-width:24px;text-align:center;}
-.kbd-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-.kbd-shortcut{padding:9px 10px;border-radius:10px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.06);font-size:10px;color:var(--ink2);line-height:1.5;}
-.kbd-shortcut strong{display:block;font-size:10px;color:var(--ink);margin-bottom:5px;}
+.kbd-toolbar,.kbd-main,.kbd-actions,.kbd-hintline{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.025);}
+.kbd-toolbar{display:grid;grid-template-columns:1.2fr 1.5fr .9fr;gap:10px;padding:10px;}
+.kbd-main{display:grid;grid-template-columns:148px 1fr;gap:10px;padding:10px;}
+.kbd-note-panel,.kbd-func-panel{min-width:0;}
+.kbd-func-panel{display:flex;flex-direction:column;gap:10px;}
+.kbd-group{padding-bottom:2px;}
+.kbd-actions{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;padding:10px;}
+.kbd-hintline{display:flex;flex-wrap:wrap;gap:8px;padding:8px 10px;font-size:9px;color:var(--ink2);}
+.kbd-hintline span{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.04);}
+.kbd-hintline kbd{font-family:'Space Mono',monospace;font-size:9px;color:var(--ink);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:2px 6px;}
+.kbd-label{font-size:8px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
+.kbd-row{display:flex;gap:4px;flex-wrap:wrap;}
+.kbd-btn{font-family:'Space Mono',monospace;font-size:11px;padding:6px 8px;border-radius:5px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;transition:all .1s;min-width:28px;text-align:center;line-height:1;}
+.shortcut{font-size:7px;opacity:0.42;display:block;margin-top:2px;}
+.numpad{display:grid;grid-template-columns:repeat(3,40px);gap:4px;}
+.numpad .kbd-btn{font-size:15px;font-weight:700;padding:8px 0;width:40px;color:var(--ink);min-width:0;}
+.kbd-btn.zero{font-size:13px;font-weight:700;color:var(--ink);width:100%;margin-top:4px;padding:8px 0;}
+.kbd-func-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
 
 /* ── 跨格子房子线（preview 层） ── */
 .prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
@@ -471,7 +474,10 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 
 @media (max-width: 1100px){
   .bottom-area{grid-template-columns:1fr;grid-template-rows:minmax(320px,1fr) minmax(320px,1fr);}
-  .mid-bar-right{max-width:none;justify-content:flex-start;}
+  .kbd-toolbar{grid-template-columns:1fr;}
+  .kbd-main{grid-template-columns:1fr;}
+  .kbd-actions{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .kbd-func-grid{grid-template-columns:1fr;}
 }
 
 @media (max-width: 760px){
@@ -480,10 +486,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   .top-area{padding:12px 12px 8px;}
   .bottom-area{padding:0 12px 12px;gap:12px;}
   .top-panel,.seg-pane,.kbd-pane{border-radius:14px;}
-  .kbd-split,.kbd-mini-grid,.kbd-tip-grid,.kbd-shortcuts{grid-template-columns:1fr;}
   .mid-bar{padding:10px 12px;}
-  .mid-bar-right{gap:6px;}
-  .mid-toolbtn{padding:6px 8px;font-size:9px;}
+  .kbd-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 </style>
 </head>
@@ -558,23 +562,17 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 
 <!-- ── 中间状态 + 位置栏 ── -->
 <div class="mid-bar">
-  <div class="mid-bar-left" id="inputStateBar">
-    <span class="mid-pill accent">当前段落 <strong id="is-sec">无</strong></span>
-    <span class="mid-pill">音符 <strong id="is-total">0</strong></span>
-    <span class="mid-pill">八度 <strong id="is-oct">中</strong></span>
-    <span class="mid-pill">时值 <strong id="is-dur">4分</strong></span>
-    <span class="mid-pill">附点 <strong id="is-dot">关</strong></span>
-    <span class="mid-pill">延长号 <strong id="is-fermata">关</strong></span>
-    <span class="mid-pill accent">房子线 <strong id="is-volta">无</strong></span>
-    <span class="mid-pill warn">选区 <strong id="is-select">0</strong></span>
-    <span class="mid-pill">剪贴板 <strong id="is-clip">空</strong></span>
-  </div>
-  <div class="mid-bar-right">
-    <button class="mid-toolbtn" onclick="openBulkLyric()">填歌词</button>
-    <button class="mid-toolbtn" onclick="openCheck()">检查</button>
-    <button class="mid-toolbtn" onclick="copyFullJson()">复制 JSON</button>
-    <span class="mid-loc" id="statusLoc">点击左边格子开始编辑</span><span class="mid-sel" id="statusSel"></span><span class="mid-tip" id="statusTip"></span>
-  </div>
+  <span class="mid-pill accent"><strong id="statusLoc">点击左边格子开始编辑</strong></span>
+  <span class="mid-pill">音符 <strong id="is-total">0</strong></span>
+  <span class="mid-pill">八度 <strong id="is-oct">中</strong></span>
+  <span class="mid-pill">时值 <strong id="is-dur">4分</strong></span>
+  <span class="mid-pill">附点 <strong id="is-dot">关</strong></span>
+  <span class="mid-pill">延长号 <strong id="is-fermata">关</strong></span>
+  <span class="mid-pill accent">房子线 <strong id="is-volta">无</strong></span>
+  <span class="mid-pill warn">选区 <strong id="is-select">0</strong></span>
+  <span class="mid-pill">剪贴板 <strong id="is-clip">空</strong></span>
+  <span class="mid-sel" id="statusSel"></span>
+  <span class="mid-tip" id="statusTip"></span>
 </div>
 
 <div class="bottom-area">
@@ -585,15 +583,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   </div>
 
   <div class="kbd-pane">
-    <div class="kbd-card hero">
-      <div class="kbd-card-head">
-        <div>
-          <div class="kbd-card-title">输入工作台</div>
-          <div class="kbd-card-desc">右边不再堆满按钮，常用设置先放上面，输入动作按类型分开。</div>
-        </div>
-        <div class="kbd-card-badge">数字键直接输入</div>
-      </div>
-      <div class="kbd-mini-grid">
+    <div class="kbd-toolbar">
+      <div>
         <div>
           <div class="kbd-label">八度 <span style="color:var(--ink3);font-size:7px;">↑ ↓</span></div>
           <div class="kbd-row">
@@ -604,59 +595,53 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
             <button class="kbd-btn" id="oct-high2" onclick="setOct('high2')" style="padding:7px 8px;min-width:34px;font-size:11px;">高2</button>
           </div>
         </div>
-        <div>
+      </div>
+      <div>
+        <div class="kbd-label">音值 <span style="color:var(--ink3);font-size:7px;">Q W E R T</span></div>
+        <div class="kbd-row">
+          <button class="kbd-btn" id="dur-whole" onclick="setDur('whole')" style="padding:8px 10px;min-width:42px;font-size:11px;">全<span class="shortcut">Q</span></button>
+          <button class="kbd-btn" id="dur-half" onclick="setDur('half')" style="padding:8px 10px;min-width:42px;font-size:11px;">½<span class="shortcut">W</span></button>
+          <button class="kbd-btn on" id="dur-quarter" onclick="setDur('quarter')" style="padding:8px 10px;min-width:42px;font-size:11px;">¼<span class="shortcut">E</span></button>
+          <button class="kbd-btn" id="dur-eighth" onclick="setDur('eighth')" style="padding:8px 10px;min-width:42px;font-size:11px;">⅛<span class="shortcut">R</span></button>
+          <button class="kbd-btn" id="dur-16th" onclick="setDur('16th')" style="padding:8px 10px;min-width:42px;font-size:11px;">¹⁄₁₆<span class="shortcut">T</span></button>
+        </div>
+      </div>
+      <div>
           <div class="kbd-label">输入模式 <span style="color:var(--ink3);font-size:7px;">I / O</span></div>
           <div class="kbd-row">
             <button class="kbd-btn on" id="mode-insert" onclick="setInputMode('insert')" style="padding:7px 10px;font-size:10px;">插入 I</button>
             <button class="kbd-btn" id="mode-overwrite" onclick="setInputMode('overwrite')" style="padding:7px 10px;font-size:10px;">覆盖 O</button>
           </div>
         </div>
-        <div style="grid-column:1/-1;">
-          <div class="kbd-label">音值 <span style="color:var(--ink3);font-size:7px;">Q W E R T</span></div>
-          <div class="kbd-row">
-            <button class="kbd-btn" id="dur-whole" onclick="setDur('whole')" style="padding:8px 10px;min-width:42px;font-size:11px;">全<span class="shortcut">Q</span></button>
-            <button class="kbd-btn" id="dur-half" onclick="setDur('half')" style="padding:8px 10px;min-width:42px;font-size:11px;">½<span class="shortcut">W</span></button>
-            <button class="kbd-btn on" id="dur-quarter" onclick="setDur('quarter')" style="padding:8px 10px;min-width:42px;font-size:11px;">¼<span class="shortcut">E</span></button>
-            <button class="kbd-btn" id="dur-eighth" onclick="setDur('eighth')" style="padding:8px 10px;min-width:42px;font-size:11px;">⅛<span class="shortcut">R</span></button>
-            <button class="kbd-btn" id="dur-16th" onclick="setDur('16th')" style="padding:8px 10px;min-width:42px;font-size:11px;">¹⁄₁₆<span class="shortcut">T</span></button>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <div class="kbd-card">
-      <div class="kbd-card-head">
-        <div>
-          <div class="kbd-card-title">音符与符号</div>
-          <div class="kbd-card-desc">最常用的音符输入放左边，线条和结构符号放右边，找东西更快。</div>
+    <div class="kbd-main">
+      <div class="kbd-note-panel">
+        <div class="kbd-label">音符</div>
+        <div class="numpad">
+          <button class="kbd-btn" onclick="inputNote(1)">1</button>
+          <button class="kbd-btn" onclick="inputNote(2)">2</button>
+          <button class="kbd-btn" onclick="inputNote(3)">3</button>
+          <button class="kbd-btn" onclick="inputNote(4)">4</button>
+          <button class="kbd-btn" onclick="inputNote(5)">5</button>
+          <button class="kbd-btn" onclick="inputNote(6)">6</button>
+          <button class="kbd-btn" onclick="inputNote(7)" style="grid-column:span 3;max-width:44px;">7</button>
         </div>
+        <button class="kbd-btn zero" onclick="inputNote(0)">0 休止</button>
       </div>
-      <div class="kbd-split">
-        <div>
-          <div class="kbd-label">音符 <span style="color:var(--ink3);font-size:7px;">1 2 3 4 5 6 7</span></div>
-          <div class="numpad">
-            <button class="kbd-btn" onclick="inputNote(1)">1</button>
-            <button class="kbd-btn" onclick="inputNote(2)">2</button>
-            <button class="kbd-btn" onclick="inputNote(3)">3</button>
-            <button class="kbd-btn" onclick="inputNote(4)">4</button>
-            <button class="kbd-btn" onclick="inputNote(5)">5</button>
-            <button class="kbd-btn" onclick="inputNote(6)">6</button>
-            <button class="kbd-btn" onclick="inputNote(7)" style="grid-column:span 3;max-width:44px;">7</button>
-          </div>
-          <button class="kbd-btn zero" onclick="inputNote(0)">0 休止</button>
-        </div>
 
-        <div class="kbd-stack">
-          <div>
+      <div class="kbd-func-panel">
+        <div class="kbd-func-grid">
+          <div class="kbd-group">
             <div class="kbd-label">基础符号</div>
             <div class="kbd-row">
               <button class="kbd-btn" onclick="inputSpecial('-')" style="padding:6px 8px;">— 延音<span class="shortcut">\\</span></button>
-              <button class="kbd-btn" id="dot-btn" onclick="toggleDot()" style="padding:6px 8px;">· 附点<span class="shortcut">,</span></button>
-              <button class="kbd-btn" id="fermata-btn" onclick="toggleFermata()" style="padding:6px 8px;">𝄐 延长号<span class="shortcut">F</span></button>
+              <button class="kbd-btn" id="dot-btn" onclick="toggleDot()" style="padding:6px 8px;">· 附点 关<span class="shortcut">,</span></button>
+              <button class="kbd-btn" id="fermata-btn" onclick="toggleFermata()" style="padding:6px 8px;">𝄐 延长号 关<span class="shortcut">F</span></button>
               <button class="kbd-btn" onclick="appendTok(buildSpacerTok())" style="padding:6px 8px;">␣ 空格<span class="shortcut">Space</span></button>
             </div>
           </div>
-          <div>
+          <div class="kbd-group">
             <div class="kbd-label">线条与结构</div>
             <div class="kbd-row">
               <button class="kbd-btn" onclick="appendTok('|')" style="padding:6px 8px;">| 小节线<span class="shortcut">B</span></button>
@@ -672,49 +657,37 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
               <button class="kbd-btn slur-btn" id="t5-btn" onclick="toggleTuplet(5)" style="padding:6px 8px;">5连</button>
             </div>
           </div>
-          <div>
-            <div class="kbd-label">房子线</div>
-            <div class="kbd-row">
-              <button class="kbd-btn" onclick="appendTok('[v1')" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第1房子线开始">1. 房开</button>
-              <button class="kbd-btn" onclick="appendTok('[v2')" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第2房子线开始">2. 房开</button>
-              <button class="kbd-btn" onclick="appendCustomVolta()" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入自定义房子线开始">自定义房</button>
-              <button class="kbd-btn" onclick="appendTok(']v')" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入房子线结束">房结</button>
-            </div>
+        </div>
+        <div class="kbd-group">
+          <div class="kbd-label">房子线</div>
+          <div class="kbd-row">
+            <button class="kbd-btn" onclick="appendTok('[v1')" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第1房子线开始">1. 房开</button>
+            <button class="kbd-btn" onclick="appendTok('[v2')" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第2房子线开始">2. 房开</button>
+            <button class="kbd-btn" onclick="appendCustomVolta()" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入自定义房子线开始">自定义房</button>
+            <button class="kbd-btn" onclick="appendTok(']v')" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入房子线结束">房结</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="kbd-card">
-      <div class="kbd-card-head">
-        <div>
-          <div class="kbd-card-title">编辑操作</div>
-          <div class="kbd-card-desc">删除、撤销和格子复制集中在一起，避免混在音符按钮里。</div>
-        </div>
-      </div>
-      <div class="kbd-tip-grid">
-        <button class="kbd-btn action" onclick="deleteSelected()" style="padding:8px 10px;">⌫ 删除<span class="shortcut">Bksp</span></button>
-        <button class="kbd-btn action" onclick="undoAction()" style="padding:8px 10px;">↩ 撤销<span class="shortcut">⌘Z</span></button>
-        <button class="kbd-btn action" onclick="clearN()" style="padding:8px 10px;">✕ 清空</button>
-        <button class="kbd-btn" onclick="copySeg()" style="padding:8px 10px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="复制整格 (Alt+C)">⬡ 复制格<span class="shortcut">Alt+C</span></button>
-        <button class="kbd-btn" onclick="pasteSeg()" style="padding:8px 10px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="粘贴到后面 (Alt+V)">⬡ 粘贴格<span class="shortcut">Alt+V</span></button>
-        <button class="kbd-btn" onclick="pasteSegReplace()" style="padding:8px 10px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="覆盖当前格 (Alt+R)">⬡ 覆盖格<span class="shortcut">Alt+R</span></button>
-      </div>
+    <div class="kbd-actions">
+      <button class="kbd-btn action" onclick="deleteSelected()" style="padding:8px 10px;">⌫ 删除<span class="shortcut">Bksp</span></button>
+      <button class="kbd-btn action" onclick="undoAction()" style="padding:8px 10px;">↩ 撤销<span class="shortcut">⌘Z</span></button>
+      <button class="kbd-btn action" onclick="clearN()" style="padding:8px 10px;">✕ 清空</button>
+      <button class="kbd-btn" onclick="copySeg()" style="padding:8px 10px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="复制整格 (Alt+C)">⬡ 复制格<span class="shortcut">Alt+C</span></button>
+      <button class="kbd-btn" onclick="pasteSeg()" style="padding:8px 10px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="粘贴到后面 (Alt+V)">⬡ 粘贴格<span class="shortcut">Alt+V</span></button>
+      <button class="kbd-btn" onclick="pasteSegReplace()" style="padding:8px 10px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="覆盖当前格 (Alt+R)">⬡ 覆盖格<span class="shortcut">Alt+R</span></button>
     </div>
 
-    <div class="kbd-card">
-      <div class="kbd-card-head">
-        <div>
-          <div class="kbd-card-title">实用快捷键</div>
-          <div class="kbd-card-desc">我顺手补了几组更实用的键位，尽量让高频动作不用离开键盘。</div>
-        </div>
-      </div>
-      <div class="kbd-shortcuts">
-        <div class="kbd-shortcut"><strong>输入与切换</strong><kbd>1-7</kbd> 音符, <kbd>0</kbd> 休止, <kbd>Q/W/E/R/T</kbd> 音值, <kbd>I</kbd>/<kbd>O</kbd> 切换插入/覆盖</div>
-        <div class="kbd-shortcut"><strong>结构符号</strong><kbd>\</kbd> 延音, <kbd>,</kbd> 附点, <kbd>F</kbd> 延长号, <kbd>B</kbd> 小节线, <kbd>M</kbd> 双小节</div>
-        <div class="kbd-shortcut"><strong>编辑动作</strong><kbd>←</kbd>/<kbd>→</kbd> 游标移动, <kbd>Backspace</kbd> 删除, <kbd>Esc</kbd> 清选区, <kbd>Cmd/Ctrl+Z</kbd> 撤销</div>
-        <div class="kbd-shortcut"><strong>连音与格子</strong><kbd>[</kbd> 或 <kbd>S</kbd> 连音, <kbd>]</kbd> 跨线开, <kbd>X</kbd> 跨线结, <kbd>Alt+C/V/R</kbd> 复制/粘贴/覆盖格</div>
-      </div>
+    <div class="kbd-hintline">
+      <span><kbd>\</kbd> 延音</span>
+      <span><kbd>,</kbd> 附点</span>
+      <span><kbd>F</kbd> 延长号</span>
+      <span><kbd>B</kbd> 小节线</span>
+      <span><kbd>M</kbd> 双小节</span>
+      <span><kbd>I / O</kbd> 插入 / 覆盖</span>
+      <span><kbd>↑ / ↓</kbd> 八度</span>
+      <span><kbd>Alt+C/V/R</kbd> 格子复制 / 粘贴 / 覆盖</span>
     </div>
   </div>
 </div>
@@ -1798,7 +1771,21 @@ function updateInputState(){
     if(vl)voltaStr=vl+'房';
     else if(hasVoltaEnd(curN.n))voltaStr='房尾';
   }
-  document.getElementById('is-volta').textContent=voltaStr;
+  var voltaEl=document.getElementById('is-volta');
+  if(voltaEl)voltaEl.textContent=voltaStr;
+  var dotBtn=document.getElementById('dot-btn');
+  if(dotBtn)dotBtn.innerHTML='· 附点 '+(dotOn?'开':'关')+'<span class="shortcut">,</span>';
+  var fermataBtn=document.getElementById('fermata-btn');
+  if(fermataBtn)fermataBtn.innerHTML='𝄐 延长号 '+(fermataOn?'开':'关')+'<span class="shortcut">F</span>';
+  var dotPill=_sp&&_sp.parentElement;
+  if(dotPill)dotPill.classList.toggle('active',dotOn);
+  var fermataPill=_sf&&_sf.parentElement;
+  if(fermataPill)fermataPill.classList.toggle('active',fermataOn);
+  var voltaPill=voltaEl&&voltaEl.parentElement;
+  if(voltaPill){
+    voltaPill.classList.toggle('featured',voltaStr!=='无');
+    voltaPill.classList.toggle('accent',voltaStr==='无');
+  }
   var clip=document.getElementById('is-clip');
   if(clip)clip.textContent=segClipboard?'整格':(tokClipboard.length?tokClipboard.length+' 项':'空');
 }
