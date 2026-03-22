@@ -566,8 +566,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   <span class="mid-pill">音符 <strong id="is-total">0</strong></span>
   <span class="mid-pill">八度 <strong id="is-oct">中</strong></span>
   <span class="mid-pill">时值 <strong id="is-dur">4分</strong></span>
-  <span class="mid-pill">附点 <strong id="is-dot">关</strong></span>
-  <span class="mid-pill">延长号 <strong id="is-fermata">关</strong></span>
+  <span class="mid-pill" id="is-dot-pill">附点 <strong id="is-dot">关</strong></span>
+  <span class="mid-pill" id="is-fermata-pill">延长号 <strong id="is-fermata">关</strong></span>
   <span class="mid-pill accent">房子线 <strong id="is-volta">无</strong></span>
   <span class="mid-pill warn">选区 <strong id="is-select">0</strong></span>
   <span class="mid-pill">剪贴板 <strong id="is-clip">空</strong></span>
@@ -1064,7 +1064,7 @@ function buildTok(n){
     if(oct==='high1')s+="'";else if(oct==='high2')s+="''";
     else if(oct==='low1')s+=',';else if(oct==='low2')s+=',,';
   }
-  if(dotOn)s+='\\u00b7';
+  if(dotOn)s+='·';
   if(dur==='eighth')s+='_';else if(dur==='16th')s+='__';
   if(fermataOn)s+='^';
   return s;
@@ -1326,7 +1326,7 @@ function parseJpToken(tok){
     var lw=document.createElement('span');lw.className='jp-lines-wrap';
     var nr=document.createElement('span');nr.className='jp-num-row';
     var ns=document.createElement('span');ns.className='jp-num';ns.textContent='0';nr.appendChild(ns);
-    if(zm[1].indexOf('\\u00b7')>-1){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';nr.appendChild(ag);}
+    if(zm[1].indexOf('·')>-1){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';nr.appendChild(ag);}
     var ul=zm[2].length;
     if(ul>=1)nr.style.borderBottom='1.5px solid currentColor';
     lw.appendChild(nr);
@@ -1338,7 +1338,7 @@ function parseJpToken(tok){
   var num=tok,isH=0,isL=0,isDot=false,ul=0;
   if(num.slice(-2)==='__'){ul=2;num=num.slice(0,-2);}
   else if(num.slice(-1)==='_'){ul=1;num=num.slice(0,-1);}
-  if(num.indexOf('\\u00b7')>-1){isDot=true;num=num.replace(/\\u00b7/g,'');}
+  if(num.indexOf('·')>-1){isDot=true;num=num.replace(/·/g,'');}
   var hm=num.match(/^(.+?)('+)$/);if(hm){isH=hm[2].length;num=hm[1];}
   var lm=num.match(/^(.+?)(,+)$/);if(lm){isL=lm[2].length;num=lm[1];}
   var w=document.createElement('span');w.className='jp-wrap';
