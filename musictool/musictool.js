@@ -1036,8 +1036,30 @@ function setDur(d){
   ['whole','half','quarter','eighth','16th'].forEach(function(x){document.getElementById('dur-'+x).classList.toggle('on',x===d);});
   updateInputState();
 }
-function toggleDot(){dotOn=!dotOn;document.getElementById('dot-btn').classList.toggle('on',dotOn);updateInputState();}
-function toggleFermata(){fermataOn=!fermataOn;document.getElementById('fermata-btn').classList.toggle('on',fermataOn);updateInputState();}
+function syncToggleUI(){
+  var dotBtn=document.getElementById('dot-btn');
+  if(dotBtn){
+    dotBtn.classList.toggle('on',dotOn);
+    dotBtn.innerHTML='· 附点 '+(dotOn?'开':'关')+'<span class="shortcut">,</span>';
+  }
+  var fermataBtn=document.getElementById('fermata-btn');
+  if(fermataBtn){
+    fermataBtn.classList.toggle('on',fermataOn);
+    fermataBtn.innerHTML='𝄐 延长号 '+(fermataOn?'开':'关')+'<span class="shortcut">F</span>';
+  }
+  var dotPill=document.getElementById('is-dot-pill');
+  if(dotPill){
+    dotPill.classList.toggle('active',dotOn);
+    dotPill.innerHTML='附点 <strong id="is-dot">'+(dotOn?'开':'关')+'</strong>';
+  }
+  var fermataPill=document.getElementById('is-fermata-pill');
+  if(fermataPill){
+    fermataPill.classList.toggle('active',fermataOn);
+    fermataPill.innerHTML='延长号 <strong id="is-fermata">'+(fermataOn?'开':'关')+'</strong>';
+  }
+}
+function toggleDot(){dotOn=!dotOn;syncToggleUI();updateInputState();}
+function toggleFermata(){fermataOn=!fermataOn;syncToggleUI();updateInputState();}
 function toggleXSlur(){
   xslurOn=!xslurOn;
   document.getElementById('xslur-btn').classList.toggle('on',xslurOn);
@@ -1760,8 +1782,6 @@ function updateInputState(){
   var _si=document.getElementById('is-total');if(_si)_si.textContent=total;
   var _so=document.getElementById('is-oct');if(_so)_so.textContent=_octLabel[oct]||oct;
   var _sd=document.getElementById('is-dur');if(_sd)_sd.textContent=_durLabel[dur]||dur;
-  var _sp=document.getElementById('is-dot');if(_sp)_sp.textContent=dotOn?'开':'关';
-  var _sf=document.getElementById('is-fermata');if(_sf)_sf.textContent=fermataOn?'开':'关';
   var _ss=document.getElementById('is-sec');if(_ss)_ss.textContent=(curSi>=0&&data[curSi])?data[curSi].name:'无';
   // 房子线：当前格子的 n 里是否含有 volta token
   var voltaStr='无';
@@ -1773,14 +1793,7 @@ function updateInputState(){
   }
   var voltaEl=document.getElementById('is-volta');
   if(voltaEl)voltaEl.textContent=voltaStr;
-  var dotBtn=document.getElementById('dot-btn');
-  if(dotBtn)dotBtn.innerHTML='· 附点 '+(dotOn?'开':'关')+'<span class="shortcut">,</span>';
-  var fermataBtn=document.getElementById('fermata-btn');
-  if(fermataBtn)fermataBtn.innerHTML='𝄐 延长号 '+(fermataOn?'开':'关')+'<span class="shortcut">F</span>';
-  var dotPill=_sp&&_sp.parentElement;
-  if(dotPill)dotPill.classList.toggle('active',dotOn);
-  var fermataPill=_sf&&_sf.parentElement;
-  if(fermataPill)fermataPill.classList.toggle('active',fermataOn);
+  syncToggleUI();
   var voltaPill=voltaEl&&voltaEl.parentElement;
   if(voltaPill){
     voltaPill.classList.toggle('featured',voltaStr!=='无');
