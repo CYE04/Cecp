@@ -83,7 +83,7 @@
         {"chord":"ㅤㅤㅤㅤC","n":"5_ ( 3_ 3_ )","lyric":"能永"},
         {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤF","n":"2 sp ( 1_ sp | sp 1 ) sp - sp - sp - ||/ ]v","lyric":"不ㅤ变"}
       ]},
-      [
+      { "b": true, "line": [
         {"chord":"Am","n":"4 sp 5_ ( 2_ 2_ )","lyric":"大能永"},
         {"chord":"","n":"1","lyric":"不"},
         {"chord":"ㅤㅤㅤㅤㅤD","n":"( 3 sp | sp 3 ) - - - sp | sp","lyric":"变"},
@@ -91,7 +91,7 @@
         {"chord":"G/B","n":"( 3_ 3 )","lyric":"帝"},
         {"chord":"C","n":"( 4 sp | sp 4_ ) ( 5_ 5 ) sp | sp","lyric":"能ㅤㅤㅤ够。"},
         {"chord":"ㅤㅤㅤㅤTo Chorus","n":"0 sp 0 sp 3 sp 5 sp ||","lyric":"ㅤㅤㅤㅤ上ㅤ帝"}
-      ]
+      ]}
     ]
   }
 ]
