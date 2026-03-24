@@ -1441,12 +1441,13 @@
         });
         if(!maxW)return;
         var measureW=maxW+gutterX;
-        var scale=avail/measureW;
+        var rawScale=avail/measureW;
+        var scale=Math.min(1, rawScale);
         lbDiv.style.transform='scale('+scale+')';
         lbDiv.style.transformOrigin='left top';
         lbDiv.style.width=measureW+'px';
         var naturalH=lbDiv.offsetHeight;
-        lbDiv.style.marginBottom=((scale>1 ? naturalH*(scale-1) : 0) + gutterY)+'px';
+        lbDiv.style.marginBottom=(naturalH*(scale-1) + gutterY)+'px';
         lbDiv.parentElement.style.overflow='hidden';
       });
     }
