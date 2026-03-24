@@ -1366,17 +1366,23 @@ body{overflow-x:hidden;}
 }
 #ml-player-view.open{display:block;}
 #ml-player-view-top{
-  height:40px;
+  height:36px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:16px;
+  margin-bottom:10px;
 }
 #ml-player-view-close{
   width:30px;height:30px;border-radius:50%;
   border:1px solid rgba(255,255,255,.2);
   background:rgba(255,255,255,.05);
   color:#fff;cursor:pointer;font-size:16px;
+}
+#ml-player-view-menu{
+  width:30px;height:30px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.05);
+  color:#fff;cursor:pointer;font-size:13px;
 }
 #ml-player-view-now{
   color:#9ca5b8;
@@ -1386,17 +1392,50 @@ body{overflow-x:hidden;}
 }
 #ml-player-view-grid{
   display:grid;
-  grid-template-columns:360px 1fr;
-  gap:18px;
-  height:calc(100vh - 96px);
+  grid-template-columns:74px minmax(0,1fr) minmax(300px,29vw);
+  gap:10px;
+  height:calc(100vh - 152px);
+}
+#ml-player-rail{
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;
+  background:#0b0b0c;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  padding:10px 8px;
+}
+.ml-player-rail-btn{
+  width:40px;height:40px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.04);
+  color:#d7dbe7;cursor:pointer;font-size:18px;
+}
+.ml-player-rail-btn.active{
+  background:rgba(227,191,66,.18);
+  color:#f4d678;
+  border-color:rgba(227,191,66,.42);
+}
+.ml-player-rail-dot{
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.03);
 }
 #ml-player-side{
   border:1px solid rgba(255,255,255,.1);
   border-radius:18px;
   background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
-  padding:16px;
+  padding:14px;
   display:flex;
   flex-direction:column;
+  overflow:auto;
+}
+.ml-player-side-head{
+  font-size:13px;
+  color:#cfd5e3;
+  margin-bottom:10px;
+  font-weight:700;
 }
 #ml-player-cover{
   width:100%;
@@ -1425,45 +1464,142 @@ body{overflow-x:hidden;}
   background:rgba(255,255,255,.08);
   color:#c5cdde;font-size:10px;display:inline-flex;align-items:center;
 }
-#ml-player-controls{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding:8px 6px 2px;}
+#ml-player-lyrics{
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:18px;
+  background:linear-gradient(180deg,#2f367a,#2a3070);
+  padding:36px 28px;
+  overflow:auto;
+}
+#ml-player-lyrics-inner{display:flex;flex-direction:column;gap:28px;padding:10px 0 42vh;}
+.ml-player-lrc-line{
+  font-size:clamp(32px,4.1vw,66px);
+  line-height:1.22;
+  color:rgba(210,220,255,.44);
+  font-weight:700;
+  transition:color .2s ease,text-shadow .2s ease,transform .2s ease;
+}
+.ml-player-lrc-line.active{
+  color:#ffffff;
+  text-shadow:0 0 22px rgba(255,255,255,.22);
+  transform:translateX(2px);
+}
+
+#ml-player-dock{
+  margin-top:10px;
+  height:88px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  background:rgba(8,10,16,.84);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  display:grid;
+  grid-template-columns:minmax(220px,28vw) 1fr minmax(150px,18vw);
+  gap:14px;
+  align-items:center;
+  padding:10px 14px;
+}
+#ml-player-dock-song{display:flex;align-items:center;gap:10px;min-width:0;}
+#ml-player-dock-cover{
+  width:56px;height:56px;border-radius:8px;overflow:hidden;
+  background:#0f1320;border:1px solid rgba(255,255,255,.14);
+  display:flex;align-items:center;justify-content:center;
+}
+#ml-player-dock-cover img{width:100%;height:100%;object-fit:cover;}
+#ml-player-dock-meta{min-width:0;}
+#ml-player-dock-title{
+  font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#ml-player-dock-artist{
+  margin-top:3px;font-size:12px;color:#b3bccf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#ml-player-dock-center{min-width:0;}
+#ml-player-controls{
+  display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:8px;
+}
 .ml-player-ctl{
   width:38px;height:38px;border-radius:50%;
   border:1px solid rgba(255,255,255,.2);
   background:rgba(255,255,255,.05);color:#fff;font-size:15px;cursor:pointer;
 }
+.ml-player-ctl.is-ghost{opacity:.72;}
+.ml-player-ctl.on{
+  color:var(--accent);
+  border-color:rgba(227,191,66,.45);
+  background:rgba(227,191,66,.14);
+}
 .ml-player-ctl.is-main{
   width:54px;height:54px;border:none;background:var(--accent);color:#111;font-size:20px;font-weight:700;
 }
-#ml-player-lyrics{
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:18px;
-  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
-  padding:30px 22px;
-  overflow:auto;
+#ml-player-dock .ml-player-progress-wrap{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:10px;
 }
-#ml-player-lyrics-inner{display:flex;flex-direction:column;gap:18px;padding:10px 0 40vh;}
-.ml-player-lrc-line{
-  font-size:clamp(30px,4.2vw,64px);
-  line-height:1.15;
-  color:rgba(255,255,255,.30);
-  font-weight:700;
-  transition:color .2s ease,text-shadow .2s ease;
+#ml-player-cur,#ml-player-dur{
+  font-size:12px;color:#aab3c6;font-variant-numeric:tabular-nums;
 }
-.ml-player-lrc-line.active{
-  color:#fff;
-  text-shadow:0 0 22px rgba(255,255,255,.22);
+#ml-player-dock .ml-player-progress-bar{
+  height:6px;border-radius:999px;background:rgba(255,255,255,.16);cursor:pointer;
+}
+#ml-player-dock .ml-player-progress-fill{
+  height:100%;border-radius:999px;background:#fff;width:0%;
+}
+#ml-player-dock-right{
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;
+}
+.ml-player-vol-icon{font-size:13px;color:#c4cce0;}
+#ml-player-dock-vol{
+  width:120px;appearance:none;-webkit-appearance:none;height:4px;border-radius:999px;
+  background:rgba(255,255,255,.18);outline:none;
+}
+#ml-player-dock-vol::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;
+}
+#ml-player-dock-vol::-moz-range-thumb{
+  width:12px;height:12px;border-radius:50%;background:#fff;border:none;
 }
 
-@media (max-width:1050px){
-  #ml-player-view-grid{grid-template-columns:1fr;height:calc(100vh - 96px);}
-  #ml-player-side{max-width:560px;}
-  .ml-player-lrc-line{font-size:clamp(28px,5vw,48px);}
+@media (max-width:1200px){
+  #ml-player-view-grid{grid-template-columns:64px minmax(0,1fr) minmax(260px,32vw);}
+  .ml-player-lrc-line{font-size:clamp(28px,3.2vw,48px);}
+  #ml-player-dock{grid-template-columns:minmax(180px,30vw) 1fr minmax(120px,20vw);}
+}
+@media (max-width:980px){
+  #ml-player-view-grid{grid-template-columns:1fr minmax(260px,36vw);height:calc(100vh - 168px);}
+  #ml-player-rail{display:none;}
+  .ml-player-lrc-line{font-size:clamp(26px,4.8vw,42px);}
+}
+@media (max-width:980px) and (orientation:landscape){
+  #ml-player-view-grid{
+    grid-template-columns:1fr minmax(250px,34vw);
+    height:calc(100vh - 156px);
+  }
+  #ml-player-cover{max-height:40vh;}
+  .ml-player-lrc-line{font-size:clamp(22px,3.6vw,34px);}
 }
 @media (max-width:640px){
   #ml-player-view{padding:12px;}
-  #ml-player-view-grid{height:calc(100vh - 78px);}
-  #ml-player-side{padding:12px;}
-  .ml-player-lrc-line{font-size:clamp(24px,8vw,34px);}
+  #ml-player-view-grid{
+    grid-template-columns:1fr;
+    height:calc(100vh - 176px);
+    gap:10px;
+  }
+  #ml-player-side{display:none;}
+  #ml-player-lyrics{padding:18px 14px;border-radius:14px;}
+  #ml-player-lyrics-inner{gap:18px;padding-bottom:36vh;}
+  .ml-player-lrc-line{font-size:clamp(24px,7.8vw,34px);}
+  #ml-player-dock{
+    height:132px;
+    grid-template-columns:1fr;
+    gap:8px;
+    padding:10px;
+  }
+  #ml-player-dock-song{display:none;}
+  #ml-player-controls{margin-bottom:4px;}
+  #ml-player-dock-right{justify-content:center;}
+  #ml-player-dock-vol{width:46vw;}
 }
 
 @media (max-width:1200px){
@@ -1548,6 +1684,30 @@ body{overflow-x:hidden;}
     background:#fff;
     border-color:rgba(15,23,42,.12);
   }
+  #ml-player-rail{
+    background:#fff;
+    border-color:rgba(15,23,42,.12);
+  }
+  .ml-player-rail-btn,.ml-player-rail-dot{
+    border-color:rgba(15,23,42,.16);
+    background:#fff;
+    color:#1f2937;
+  }
+  #ml-player-dock{
+    background:rgba(255,255,255,.86);
+    border-color:rgba(15,23,42,.12);
+  }
+  #ml-player-dock-cover{
+    border-color:rgba(15,23,42,.14);
+    background:#f5f8ff;
+  }
+  #ml-player-dock-title{color:#111827;}
+  #ml-player-dock-artist,#ml-player-cur,#ml-player-dur,.ml-player-vol-icon{color:#59647d;}
+  #ml-player-dock .ml-player-progress-bar{background:rgba(15,23,42,.16);}
+  #ml-player-dock .ml-player-progress-fill{background:#111827;}
+  #ml-player-dock-vol{background:rgba(15,23,42,.18);}
+  #ml-player-dock-vol::-webkit-slider-thumb{background:#111827;}
+  #ml-player-dock-vol::-moz-range-thumb{background:#111827;}
   .ml-player-lrc-line{color:rgba(17,24,39,.38);}
   .ml-player-lrc-line.active{color:#111827;text-shadow:none;}
   .ml-player-icon-btn,.ml-player-ctl,#ml-player-view-close{
@@ -1555,4 +1715,74 @@ body{overflow-x:hidden;}
     background:#fff;
     color:#1f2937;
   }
+  #ml-player-view-menu{
+    border-color:rgba(15,23,42,.16);
+    background:#fff;
+    color:#1f2937;
+  }
+}
+
+/* ---- Density & Ratio Tuning (cards/chips/player) ---- */
+#music-library #ml-source-bar{
+  gap:14px;
+  margin-top:18px;
+  margin-bottom:8px;
+}
+#music-library .ml-source-chip{
+  min-height:54px;
+  padding:0 18px;
+  border-radius:999px;
+}
+#music-library .ml-source-name{
+  font-size:clamp(18px,1.4vw,30px);
+  font-weight:700;
+}
+#music-library .ml-source-chip strong{
+  min-width:34px;
+  height:34px;
+  padding:0 10px;
+  font-size:clamp(14px,1.1vw,20px);
+}
+
+#music-library #ml-list-stage{padding:28px 22px 34px;}
+#music-library .ml-group{
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:8px;
+}
+#music-library .ml-group-grid{
+  gap:20px;
+}
+#music-library .ml-song-card{
+  padding:12px;
+  border-radius:16px;
+}
+#music-library .ml-card-art{
+  width:100% !important;
+  aspect-ratio:1/1;
+  height:auto !important;
+  border-radius:14px;
+  margin-bottom:14px;
+}
+
+@media (max-width:900px){
+  #music-library #ml-source-bar{gap:10px;}
+  #music-library .ml-source-chip{
+    min-height:40px;
+    padding:0 12px;
+  }
+  #music-library .ml-source-name{
+    font-size:clamp(13px,3.8vw,18px);
+    font-weight:600;
+  }
+  #music-library .ml-source-chip strong{
+    min-width:24px;
+    height:24px;
+    padding:0 7px;
+    font-size:12px;
+  }
+  #music-library #ml-list-stage{padding:16px 12px 24px;}
+  #music-library .ml-group{padding:12px;}
+  #music-library .ml-group-grid{gap:12px;}
+  #music-library .ml-card-art{border-radius:12px;}
 }

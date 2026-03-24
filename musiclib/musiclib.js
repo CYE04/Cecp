@@ -128,9 +128,21 @@
       <div id="ml-player-view-top">
         <button id="ml-player-view-close" type="button">⌄</button>
         <div id="ml-player-view-now">正在播放</div>
+        <button id="ml-player-view-menu" type="button" aria-label="播放设置">☰</button>
       </div>
       <div id="ml-player-view-grid">
+        <aside id="ml-player-rail" aria-hidden="true">
+          <button class="ml-player-rail-btn active" type="button">▮▮</button>
+          <button class="ml-player-rail-btn" type="button">＋</button>
+          <div class="ml-player-rail-dot"></div>
+          <div class="ml-player-rail-dot"></div>
+          <div class="ml-player-rail-dot"></div>
+        </aside>
+        <section id="ml-player-lyrics">
+          <div id="ml-player-lyrics-inner"></div>
+        </section>
         <aside id="ml-player-side">
+          <div class="ml-player-side-head">歌曲</div>
           <div id="ml-player-cover"><span>♪</span></div>
           <div id="ml-player-title"></div>
           <div id="ml-player-artist"></div>
@@ -142,19 +154,34 @@
             <span id="ml-player-key" class="ml-player-pill"></span>
             <span id="ml-player-bpm" class="ml-player-pill"></span>
           </div>
-          <div class="ml-player-progress-wrap">
-            <div class="ml-player-progress-bar" id="ml-player-progress"><div class="ml-player-progress-fill" id="ml-player-fill"></div></div>
-            <div class="ml-player-times"><span id="ml-player-cur">0:00</span><span id="ml-player-dur">0:00</span></div>
+        </aside>
+      </div>
+      <div id="ml-player-dock">
+        <div id="ml-player-dock-song">
+          <div id="ml-player-dock-cover"><span>♪</span></div>
+          <div id="ml-player-dock-meta">
+            <div id="ml-player-dock-title"></div>
+            <div id="ml-player-dock-artist"></div>
           </div>
+        </div>
+        <div id="ml-player-dock-center">
           <div id="ml-player-controls">
+            <button class="ml-player-ctl is-ghost" id="ml-player-shuffle" type="button">⇄</button>
             <button class="ml-player-ctl" id="ml-player-prev" type="button">⏮</button>
             <button class="ml-player-ctl is-main" id="ml-player-playpause" type="button">▶</button>
             <button class="ml-player-ctl" id="ml-player-next" type="button">⏭</button>
+            <button class="ml-player-ctl is-ghost" id="ml-player-repeat-toggle" type="button">↻</button>
           </div>
-        </aside>
-        <section id="ml-player-lyrics">
-          <div id="ml-player-lyrics-inner"></div>
-        </section>
+          <div class="ml-player-progress-wrap">
+            <span id="ml-player-cur">0:00</span>
+            <div class="ml-player-progress-bar" id="ml-player-progress"><div class="ml-player-progress-fill" id="ml-player-fill"></div></div>
+            <span id="ml-player-dur">0:00</span>
+          </div>
+        </div>
+        <div id="ml-player-dock-right">
+          <span class="ml-player-vol-icon">🔉</span>
+          <input id="ml-player-dock-vol" type="range" min="0" max="1" step="0.02" value="1">
+        </div>
       </div>
     </div>
     <div id="ml-lightbox">
@@ -793,7 +820,7 @@
     return {st, capo:best?best.capo:0, playKey:best?best.playKey:target};
   }
 
-  let _mpAudio=null,_mpSongs=[],_mpIdx=-1,_mpLoop=false,_mpLrc=[],_mpLrcIdx=-1,_mpCoverFallback='',_mpExpanded=false;
+  let _mpAudio=null,_mpSongs=[],_mpIdx=-1,_mpLoop=false,_mpShuffle=false,_mpLrc=[],_mpLrcIdx=-1,_mpCoverFallback='',_mpExpanded=false;
 
   function _mpFmt(t){
     if(!isFinite(t)) return '0:00';
@@ -803,13 +830,16 @@
   function _mpSetCover(src){
     const el=$('ml-mp-cover');
     const xl=$('ml-player-cover');
+    const dl=$('ml-player-dock-cover');
     if(!el) return;
     if(src){
       el.innerHTML=`<img src="${src}" alt="">`;
       if(xl) xl.innerHTML=`<img src="${src}" alt="">`;
+      if(dl) dl.innerHTML=`<img src="${src}" alt="">`;
     }else{
       el.innerHTML='<span>♪</span>';
       if(xl) xl.innerHTML='<span>♪</span>';
+      if(dl) dl.innerHTML='<span>♪</span>';
     }
   }
   function _mpSetExpanded(open){
@@ -818,6 +848,26 @@
     _mpExpanded=!!open;
     pv.classList.toggle('open',_mpExpanded);
     document.body.style.overflow=_mpExpanded?'hidden':'';
+  }
+  function _mpSyncModeUI(){
+    const r1=$('ml-mp-repeat');
+    const r2=$('ml-player-repeat-toggle');
+    const s2=$('ml-player-shuffle');
+    if(r1) r1.classList.toggle('on',!!_mpLoop);
+    if(r2) r2.classList.toggle('on',!!_mpLoop);
+    if(s2) s2.classList.toggle('on',!!_mpShuffle);
+  }
+  function _mpNextIdxFrom(cur){
+    if(!_mpSongs.length) return 0;
+    if(_mpShuffle){
+      if(_mpSongs.length===1) return 0;
+      let n=cur;
+      while(n===cur) n=Math.floor(Math.random()*_mpSongs.length);
+      return n;
+    }
+    let n=cur+1;
+    if(n>=_mpSongs.length) n=0;
+    return n;
   }
   function _mpSetPlayUI(isPlaying){
     const btn=$('ml-mp-playpause');
@@ -891,6 +941,8 @@
     if(_mpAudio) return;
     _mpAudio=$('ml-mp-audio');
     if(!_mpAudio) return;
+    const mv=$('ml-mp-vol'); if(mv) mv.value=String(_mpAudio.volume||1);
+    const dv=$('ml-player-dock-vol'); if(dv) dv.value=String(_mpAudio.volume||1);
 
     _mpAudio.addEventListener('loadedmetadata',()=>{
       $('ml-mp-dur').textContent=_mpFmt(_mpAudio.duration);
@@ -911,7 +963,7 @@
         _mpAudio.currentTime=0;
         _mpAudio.play().catch(()=>{});
       }else{
-        _mpPlayIdx(_mpIdx+1,true);
+        _mpPlayIdx(_mpNextIdxFrom(_mpIdx),true);
       }
     });
 
@@ -926,9 +978,9 @@
       else _mpAudio.pause();
     });
     $('ml-mp-prev')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx-1,true));
-    $('ml-mp-next')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx+1,true));
+    $('ml-mp-next')?.addEventListener('click',()=>_mpPlayIdx(_mpNextIdxFrom(_mpIdx),true));
     $('ml-player-prev')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx-1,true));
-    $('ml-player-next')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx+1,true));
+    $('ml-player-next')?.addEventListener('click',()=>_mpPlayIdx(_mpNextIdxFrom(_mpIdx),true));
     $('ml-mp-seek-back')?.addEventListener('click',()=>{
       if(!_mpAudio.src) return;
       _mpAudio.currentTime=Math.max(0, (_mpAudio.currentTime||0)-15);
@@ -939,10 +991,25 @@
     });
     $('ml-mp-repeat')?.addEventListener('click',e=>{
       _mpLoop=!_mpLoop;
-      e.currentTarget.classList.toggle('on',_mpLoop);
+      _mpSyncModeUI();
+    });
+    $('ml-player-repeat-toggle')?.addEventListener('click',()=>{
+      _mpLoop=!_mpLoop;
+      _mpSyncModeUI();
+    });
+    $('ml-player-shuffle')?.addEventListener('click',()=>{
+      _mpShuffle=!_mpShuffle;
+      _mpSyncModeUI();
     });
     $('ml-mp-vol')?.addEventListener('input',e=>{
-      _mpAudio.volume=parseFloat(e.target.value||'1');
+      const v=parseFloat(e.target.value||'1');
+      _mpAudio.volume=v;
+      const dv=$('ml-player-dock-vol'); if(dv) dv.value=String(v);
+    });
+    $('ml-player-dock-vol')?.addEventListener('input',e=>{
+      const v=parseFloat(e.target.value||'1');
+      _mpAudio.volume=v;
+      const mv=$('ml-mp-vol'); if(mv) mv.value=String(v);
     });
     document.querySelector('.pl-progress-bar')?.addEventListener('click',e=>{
       if(!_mpAudio.src || !_mpAudio.duration) return;
@@ -964,6 +1031,7 @@
     $('ml-player-view-close')?.addEventListener('click',()=>_mpSetExpanded(false));
     $('ml-player-view')?.addEventListener('click',e=>{ if(e.target.id==='ml-player-view') _mpSetExpanded(false); });
     document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&_mpExpanded) _mpSetExpanded(false); });
+    _mpSyncModeUI();
   }
 
   function _mpPlayIdx(idx,autoplay){
@@ -980,8 +1048,11 @@
     $('ml-mp-artist').textContent=s.artist||'';
     const xt=$('ml-player-title'); if(xt) xt.textContent=s.title||'';
     const xa=$('ml-player-artist'); if(xa) xa.textContent=s.artist||'';
+    const dt=$('ml-player-dock-title'); if(dt) dt.textContent=s.title||'';
+    const da=$('ml-player-dock-artist'); if(da) da.textContent=s.artist||'';
     const xk=$('ml-player-key'); if(xk) xk.textContent='调: '+(s.origKey||'—');
     const xb=$('ml-player-bpm'); if(xb) xb.textContent='速度: '+(s.bpm||'—');
+    const xn=$('ml-player-view-now'); if(xn) xn.textContent=`正在播放 · ${(s.source||s.artist||'诗歌')}`;
     _mpSetCover(s.cover||'');
     _mpAudio.src=s.mp3||'';
     $('ml-mp-cur').textContent='0:00';
