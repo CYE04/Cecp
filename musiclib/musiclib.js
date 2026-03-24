@@ -11,11 +11,11 @@
     {name:'泥土音乐',patterns:['泥土音乐','soil music']},
     {name:'小羊诗歌',patterns:['小羊诗歌','lamb music']},
     {name:'生命河灵粮堂',patterns:['生命河','river of life']},
-    {name:'Hillsong',patterns:['hillsong']},
-    {name:'Bethel Music',patterns:['bethel music','bethel']},
-    {name:'Elevation Worship',patterns:['elevation worship','elevation']},
-    {name:'CityAlight',patterns:['cityalight']},
-    {name:'Planetshakers',patterns:['planetshakers']},
+    {name:'希尔颂',patterns:['hillsong']},
+    {name:'伯特利音乐',patterns:['bethel music','bethel']},
+    {name:'高地敬拜',patterns:['elevation worship','elevation']},
+    {name:'城市之光',patterns:['cityalight']},
+    {name:'激励者乐团',patterns:['planetshakers']},
     {name:'其他',patterns:[]}
   ];
 
@@ -48,23 +48,18 @@
           <span class="ml-brand-dot"></span>
           <span class="ml-brand-name">诗歌库</span>
         </div>
-        <div id="ml-nav-tabs">
-          <button class="ml-nav-tab">Discover</button>
-          <button class="ml-nav-tab active">Library</button>
-        </div>
       </div>
       <div id="ml-hero">
-        <div id="ml-hero-kicker">EDITOR'S PICK</div>
-        <h1 id="ml-title">诗歌库 · Library</h1>
+        <h1 id="ml-title">诗歌库</h1>
         <div id="ml-subtitle">精选敬拜诗歌集合，含歌词、简谱、移调与音频练习。</div>
       </div>
       <div id="ml-search-row">
         <div id="ml-search-wrap">
           <span id="ml-search-icon">⌕</span>
-          <input id="ml-search" type="text" placeholder="Search by title, artist, lyric..." autocomplete="off" autocorrect="off"/>
+          <input id="ml-search" type="text" placeholder="搜索歌名、歌手或歌词..." autocomplete="off" autocorrect="off"/>
         </div>
         <div id="ml-count-wrap">
-          <span class="ml-count-label">Songs</span>
+          <span class="ml-count-label">总数</span>
           <strong id="ml-count"></strong>
         </div>
       </div>
@@ -73,7 +68,7 @@
     <div id="ml-loading"><div id="ml-spinner"></div>正在载入诗歌…</div>
     <div id="ml-list-stage">
       <div id="ml-list-head">
-        <div class="ml-section-label">Song Collection</div>
+        <div class="ml-section-label">全部诗歌</div>
         <div id="ml-result-count">全部诗歌</div>
       </div>
       <div id="ml-list"></div>
@@ -132,7 +127,7 @@
     <div id="ml-player-view">
       <div id="ml-player-view-top">
         <button id="ml-player-view-close" type="button">⌄</button>
-        <div id="ml-player-view-now">NOW PLAYING</div>
+        <div id="ml-player-view-now">正在播放</div>
       </div>
       <div id="ml-player-view-grid">
         <aside id="ml-player-side">
@@ -479,7 +474,7 @@
     if(sourceFilter!=='全部' && !counts[sourceFilter]) sourceFilter='全部';
     bar.innerHTML=items.map(item=>`
       <button class="ml-source-chip${item.name===sourceFilter?' active':''}" data-source="${item.name}" type="button">
-        <span>${item.name}</span>
+        <span class="ml-source-name">${item.name}</span>
         <strong>${item.count}</strong>
       </button>
     `).join('');
@@ -529,7 +524,7 @@
             <section class="ml-group">
               <div class="ml-group-head">
                 <div>
-                  <div class="ml-group-kicker">Artist / Ministry</div>
+                  <div class="ml-group-kicker">歌手 / 团体</div>
                   <div class="ml-group-title">${name}</div>
                 </div>
                 <div class="ml-group-count">${items.length} 首</div>
@@ -574,17 +569,17 @@
   function cardHTML(s,q){
     const cover=s.cover
       ?`<img class="ml-cover" src="${s.cover}" loading="lazy" onerror="this.outerHTML='<div class=\\'ml-cover-placeholder\\'>♪</div>'">`
-      :`<div class="ml-cover-placeholder">No Cover</div>`;
+      :`<div class="ml-cover-placeholder">封面</div>`;
     const meta=[s.displayArtist,s.sub].filter(Boolean).join(' · ');
     const tags=[
       s.origKey?`<span class="ml-song-tag is-key">${s.origKey}</span>`:'',
       s.timeSign?`<span class="ml-song-tag">${s.timeSign}</span>`:'',
-      s.mp3?`<span class="ml-song-tag">Audio</span>`:''
+      s.mp3?`<span class="ml-song-tag">音频</span>`:''
     ].filter(Boolean).join('');
     return`<div class="ml-song-card" data-id="${s.id}">
       <div class="ml-card-art">${cover}</div>
       <div class="ml-card-body">
-        <div class="ml-song-overline">${hi(s.source||s.displayArtist||'Worship Song',q)}</div>
+        <div class="ml-song-overline">${hi(s.source||s.displayArtist||'诗歌',q)}</div>
         <div class="ml-song-title">${hi(s.title,q)}</div>
         <div class="ml-song-meta">${hi(meta||'收录歌词、简谱与练习资料',q)}</div>
         <div class="ml-song-tags">${tags}</div>
@@ -961,6 +956,10 @@
       const p=Math.max(0, Math.min(1, (e.clientX-r.left)/r.width));
       _mpAudio.currentTime=_mpAudio.duration*p;
     });
+    $('ml-miniplayer')?.addEventListener('click',e=>{
+      if(e.target.closest('.pl-btn, .pl-progress-wrap, .pl-vol-wrap, #ml-mp-expand, .pl-vol')) return;
+      _mpSetExpanded(true);
+    });
     $('ml-mp-expand')?.addEventListener('click',()=>_mpSetExpanded(true));
     $('ml-player-view-close')?.addEventListener('click',()=>_mpSetExpanded(false));
     $('ml-player-view')?.addEventListener('click',e=>{ if(e.target.id==='ml-player-view') _mpSetExpanded(false); });
@@ -981,8 +980,8 @@
     $('ml-mp-artist').textContent=s.artist||'';
     const xt=$('ml-player-title'); if(xt) xt.textContent=s.title||'';
     const xa=$('ml-player-artist'); if(xa) xa.textContent=s.artist||'';
-    const xk=$('ml-player-key'); if(xk) xk.textContent='KEY: '+(s.origKey||'—');
-    const xb=$('ml-player-bpm'); if(xb) xb.textContent='BPM: '+(s.bpm||'—');
+    const xk=$('ml-player-key'); if(xk) xk.textContent='调: '+(s.origKey||'—');
+    const xb=$('ml-player-bpm'); if(xb) xb.textContent='速度: '+(s.bpm||'—');
     _mpSetCover(s.cover||'');
     _mpAudio.src=s.mp3||'';
     $('ml-mp-cur').textContent='0:00';
@@ -1044,7 +1043,7 @@
     const top=document.createElement('div');top.className='ml-met-top';
     const leftDiv=document.createElement('div');
     const titleEl=document.createElement('div');titleEl.className='ml-met-title';titleEl.textContent='节拍器';
-    const subEl=document.createElement('div');subEl.className='ml-met-sub';subEl.textContent='跟随这首歌的 BPM，也可以手动调整';
+    const subEl=document.createElement('div');subEl.className='ml-met-sub';subEl.textContent='跟随这首歌的节奏，也可以手动调整';
     leftDiv.appendChild(titleEl);leftDiv.appendChild(subEl);
     const toggle=document.createElement('button');
     toggle.className='ml-met-toggle off';toggle.type='button';toggle.textContent='开始';
@@ -1052,7 +1051,7 @@
     const body=document.createElement('div');body.className='ml-met-body';
     const bpmEl=document.createElement('div');bpmEl.className='ml-met-bpm';
     const bpmNum=document.createElement('span');bpmNum.className='ml-met-bpm-num';bpmNum.textContent=String(defaultBpm||72);
-    const bpmSmall=document.createElement('small');bpmSmall.textContent=' BPM';
+    const bpmSmall=document.createElement('small');bpmSmall.textContent=' 速度';
     bpmEl.appendChild(bpmNum);bpmEl.appendChild(bpmSmall);
     const minusBtn=document.createElement('button');minusBtn.className='ml-met-btn';minusBtn.type='button';minusBtn.textContent='−';
     const plusBtn=document.createElement('button');plusBtn.className='ml-met-btn';plusBtn.type='button';plusBtn.textContent='+';
@@ -1166,8 +1165,8 @@
       const xb=document.getElementById('ml-player-bpm');
       if(xt) xt.textContent=s.title||'';
       if(xa) xa.textContent=s.artist||'';
-      if(xk) xk.textContent='KEY: '+(s.origKey||'—');
-      if(xb) xb.textContent='BPM: '+(s.bpm||'—');
+      if(xk) xk.textContent='调: '+(s.origKey||'—');
+      if(xb) xb.textContent='速度: '+(s.bpm||'—');
       _mpSetCover(s.cover||null);
       const stage=document.getElementById('ml-mp-stage');
       if(stage) stage.classList.toggle('playing', !_mpAudio.paused);
@@ -1206,7 +1205,7 @@
     else{coverThumb.textContent='♪';}
 
     const infoDiv=document.createElement('div');infoDiv.className='sw-info';
-    infoDiv.innerHTML=`<div class="sw-eyebrow">Worship Archive</div>
+    infoDiv.innerHTML=`<div class="sw-eyebrow">诗歌库</div>
       <div class="sw-title">${s.title||''}</div>
       <div class="sw-sub">${s.sub||s.artist||'用于练习、学习与敬拜辅助'}</div>`;
     const pillsDiv=document.createElement('div');pillsDiv.className='sw-pills';

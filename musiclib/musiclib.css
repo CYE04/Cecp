@@ -1156,7 +1156,7 @@ body{overflow-x:hidden;}
   box-shadow:0 0 24px rgba(227,191,66,.28);
 }
 .ml-brand-name{font-size:24px;font-weight:700;letter-spacing:-.2px;}
-#ml-nav-tabs{display:flex;justify-content:center;gap:18px;}
+#ml-nav-tabs{display:none!important;}
 .ml-nav-tab{
   border:none;background:transparent;color:var(--text3);font-size:14px;
   padding:7px 2px;position:relative;cursor:pointer;
@@ -1185,6 +1185,7 @@ body{overflow-x:hidden;}
   letter-spacing:.14em;
   margin-bottom:12px;
 }
+#ml-hero-kicker{display:none!important;}
 #ml-title{
   font-size:62px;
   line-height:.96;
@@ -1218,10 +1219,27 @@ body{overflow-x:hidden;}
   color:var(--text2);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:8px;
   box-shadow:none;
   line-height:1;
+  white-space:nowrap;
 }
-.ml-source-chip strong{font-size:11px;color:var(--text3);}
+.ml-source-name{
+  font-size:clamp(13px,1.2vw,16px);
+  letter-spacing:0;
+}
+.ml-source-chip strong{
+  min-width:24px;
+  height:24px;
+  padding:0 7px;
+  border-radius:999px;
+  font-size:12px;
+  line-height:1;
+  color:var(--text2);
+  background:rgba(255,255,255,.06);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
 .ml-source-chip.active{background:var(--accent);color:#101010;border-color:transparent;}
-.ml-source-chip.active strong{color:#1a1a1a;}
+.ml-source-chip.active strong{color:#1a1a1a;background:rgba(0,0,0,.14);}
 
 #ml-list-stage{padding:22px;}
 #ml-list-head{padding:0 2px 14px;}
@@ -1454,7 +1472,7 @@ body{overflow-x:hidden;}
 }
 @media (max-width:900px){
   #ml-nav{grid-template-columns:1fr;gap:10px;height:auto;padding:12px 0;}
-  #ml-nav-tabs{justify-content:flex-start;}
+  #ml-nav-tabs{display:none!important;}
   #ml-title{font-size:44px;}
   #ml-subtitle{font-size:17px;}
   #ml-search-row{grid-template-columns:1fr;}
@@ -1497,6 +1515,7 @@ body{overflow-x:hidden;}
   }
   #ml-header{border-bottom-color:rgba(15,23,42,.08);}
   #ml-nav{border-bottom-color:rgba(15,23,42,.08);}
+  .ml-source-chip strong{background:rgba(15,23,42,.08);}
   #ml-hero{
     background:
       linear-gradient(90deg,rgba(250,252,255,.96) 0%,rgba(245,248,255,.9) 48%,rgba(245,247,253,.95) 100%),
