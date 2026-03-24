@@ -127,7 +127,10 @@
     <div id="ml-player-view">
       <div id="ml-player-view-top">
         <button id="ml-player-view-close" type="button">⌄</button>
-        <div id="ml-player-view-now">正在播放</div>
+        <div id="ml-player-view-now">
+          <div id="ml-player-now-title">正在播放</div>
+          <div id="ml-player-now-sub"></div>
+        </div>
         <button id="ml-player-view-menu" type="button" aria-label="播放设置">☰</button>
       </div>
       <div id="ml-player-view-grid">
@@ -1052,7 +1055,8 @@
     const da=$('ml-player-dock-artist'); if(da) da.textContent=s.artist||'';
     const xk=$('ml-player-key'); if(xk) xk.textContent='调: '+(s.origKey||'—');
     const xb=$('ml-player-bpm'); if(xb) xb.textContent='速度: '+(s.bpm||'—');
-    const xn=$('ml-player-view-now'); if(xn) xn.textContent=`正在播放 · ${(s.source||s.artist||'诗歌')}`;
+    const xnt=$('ml-player-now-title'); if(xnt) xnt.textContent=s.title||'正在播放';
+    const xns=$('ml-player-now-sub'); if(xns) xns.textContent=s.artist||s.source||'诗歌';
     _mpSetCover(s.cover||'');
     _mpAudio.src=s.mp3||'';
     $('ml-mp-cur').textContent='0:00';
@@ -1234,10 +1238,14 @@
       const xa=document.getElementById('ml-player-artist');
       const xk=document.getElementById('ml-player-key');
       const xb=document.getElementById('ml-player-bpm');
+      const xnt=document.getElementById('ml-player-now-title');
+      const xns=document.getElementById('ml-player-now-sub');
       if(xt) xt.textContent=s.title||'';
       if(xa) xa.textContent=s.artist||'';
       if(xk) xk.textContent='调: '+(s.origKey||'—');
       if(xb) xb.textContent='速度: '+(s.bpm||'—');
+      if(xnt) xnt.textContent=s.title||'正在播放';
+      if(xns) xns.textContent=s.artist||s.source||'诗歌';
       _mpSetCover(s.cover||null);
       const stage=document.getElementById('ml-mp-stage');
       if(stage) stage.classList.toggle('playing', !_mpAudio.paused);

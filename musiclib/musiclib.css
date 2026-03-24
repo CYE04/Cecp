@@ -1392,11 +1392,14 @@ body{overflow-x:hidden;}
 }
 #ml-player-view-grid{
   display:grid;
-  grid-template-columns:74px minmax(0,1fr) minmax(300px,29vw);
+  grid-template-areas:"rail lyrics side";
+  grid-template-columns:74px minmax(0,1fr) clamp(300px,28vw,430px);
   gap:10px;
   height:calc(100vh - 152px);
+  min-height:0;
 }
 #ml-player-rail{
+  grid-area:rail;
   border:1px solid rgba(255,255,255,.1);
   border-radius:12px;
   background:#0b0b0c;
@@ -1423,6 +1426,7 @@ body{overflow-x:hidden;}
   background:rgba(255,255,255,.03);
 }
 #ml-player-side{
+  grid-area:side;
   border:1px solid rgba(255,255,255,.1);
   border-radius:18px;
   background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
@@ -1465,11 +1469,13 @@ body{overflow-x:hidden;}
   color:#c5cdde;font-size:10px;display:inline-flex;align-items:center;
 }
 #ml-player-lyrics{
+  grid-area:lyrics;
   border:1px solid rgba(255,255,255,.1);
   border-radius:18px;
   background:linear-gradient(180deg,#2f367a,#2a3070);
   padding:36px 28px;
   overflow:auto;
+  min-width:0;
 }
 #ml-player-lyrics-inner{display:flex;flex-direction:column;gap:28px;padding:10px 0 42vh;}
 .ml-player-lrc-line{
@@ -1478,6 +1484,9 @@ body{overflow-x:hidden;}
   color:rgba(210,220,255,.44);
   font-weight:700;
   transition:color .2s ease,text-shadow .2s ease,transform .2s ease;
+  white-space:pre-wrap;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
 }
 .ml-player-lrc-line.active{
   color:#ffffff;
@@ -1562,18 +1571,25 @@ body{overflow-x:hidden;}
 }
 
 @media (max-width:1200px){
-  #ml-player-view-grid{grid-template-columns:64px minmax(0,1fr) minmax(260px,32vw);}
+  #ml-player-view-grid{
+    grid-template-columns:64px minmax(0,1fr) clamp(260px,32vw,360px);
+  }
   .ml-player-lrc-line{font-size:clamp(28px,3.2vw,48px);}
   #ml-player-dock{grid-template-columns:minmax(180px,30vw) 1fr minmax(120px,20vw);}
 }
 @media (max-width:980px){
-  #ml-player-view-grid{grid-template-columns:1fr minmax(260px,36vw);height:calc(100vh - 168px);}
+  #ml-player-view-grid{
+    grid-template-areas:"lyrics side";
+    grid-template-columns:minmax(0,1fr) clamp(250px,34vw,340px);
+    height:calc(100vh - 168px);
+  }
   #ml-player-rail{display:none;}
   .ml-player-lrc-line{font-size:clamp(26px,4.8vw,42px);}
 }
 @media (max-width:980px) and (orientation:landscape){
   #ml-player-view-grid{
-    grid-template-columns:1fr minmax(250px,34vw);
+    grid-template-areas:"lyrics side";
+    grid-template-columns:minmax(0,1fr) clamp(230px,34vw,300px);
     height:calc(100vh - 156px);
   }
   #ml-player-cover{max-height:40vh;}
@@ -1582,6 +1598,7 @@ body{overflow-x:hidden;}
 @media (max-width:640px){
   #ml-player-view{padding:12px;}
   #ml-player-view-grid{
+    grid-template-areas:"lyrics";
     grid-template-columns:1fr;
     height:calc(100vh - 176px);
     gap:10px;
@@ -1726,32 +1743,32 @@ body{overflow-x:hidden;}
 #music-library #ml-source-bar{
   gap:14px;
   margin-top:18px;
-  margin-bottom:8px;
+  margin-bottom:14px;
 }
 #music-library .ml-source-chip{
-  min-height:54px;
-  padding:0 18px;
+  min-height:48px;
+  padding:0 16px;
   border-radius:999px;
 }
 #music-library .ml-source-name{
-  font-size:clamp(18px,1.4vw,30px);
+  font-size:clamp(16px,1.2vw,24px);
   font-weight:700;
 }
 #music-library .ml-source-chip strong{
-  min-width:34px;
-  height:34px;
-  padding:0 10px;
-  font-size:clamp(14px,1.1vw,20px);
+  min-width:30px;
+  height:30px;
+  padding:0 9px;
+  font-size:clamp(13px,1vw,17px);
 }
 
 #music-library #ml-list-stage{padding:28px 22px 34px;}
 #music-library .ml-group{
   border-radius:20px;
   padding:18px;
-  margin-bottom:8px;
+  margin-bottom:14px;
 }
 #music-library .ml-group-grid{
-  gap:20px;
+  gap:22px;
 }
 #music-library .ml-song-card{
   padding:12px;
@@ -1768,7 +1785,7 @@ body{overflow-x:hidden;}
 @media (max-width:900px){
   #music-library #ml-source-bar{gap:10px;}
   #music-library .ml-source-chip{
-    min-height:40px;
+    min-height:42px;
     padding:0 12px;
   }
   #music-library .ml-source-name{
@@ -1785,4 +1802,110 @@ body{overflow-x:hidden;}
   #music-library .ml-group{padding:12px;}
   #music-library .ml-group-grid{gap:12px;}
   #music-library .ml-card-art{border-radius:12px;}
+}
+
+/* ---- Final Spotify-like Player Layout Lock ---- */
+#music-library #ml-player-view{
+  display:none;
+  flex-direction:column;
+}
+#music-library #ml-player-view.open{display:flex;}
+#music-library #ml-player-view-top{
+  min-height:40px;
+  padding:0 2px;
+}
+#music-library #ml-player-view-now{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+}
+#music-library #ml-player-now-title{
+  font-size:clamp(15px,1.5vw,20px);
+  font-weight:700;
+  color:#f7f9ff;
+  line-height:1.15;
+}
+#music-library #ml-player-now-sub{
+  font-size:12px;
+  color:#aeb7cc;
+  line-height:1.1;
+}
+
+#music-library #ml-player-view-grid{
+  flex:1;
+  min-height:0;
+  display:grid !important;
+  grid-template-areas:"rail lyrics side";
+  grid-template-columns:68px minmax(0,1fr) clamp(320px,26vw,430px);
+  gap:12px;
+  height:auto;
+}
+#music-library #ml-player-rail{grid-area:rail;}
+#music-library #ml-player-lyrics{
+  grid-area:lyrics;
+  min-width:0;
+  min-height:0;
+  overflow:auto;
+}
+#music-library #ml-player-side{
+  grid-area:side;
+  min-height:0;
+  overflow:auto;
+}
+#music-library .ml-player-lrc-line{
+  writing-mode:horizontal-tb;
+  text-orientation:mixed;
+  white-space:normal;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  font-size:clamp(30px,3.8vw,64px);
+  line-height:1.2;
+}
+
+#music-library #ml-player-dock{
+  flex-shrink:0;
+  min-height:92px;
+}
+
+@media (max-width:1180px){
+  #music-library #ml-player-view-grid{
+    grid-template-areas:"lyrics side";
+    grid-template-columns:minmax(0,1fr) clamp(270px,30vw,360px);
+  }
+  #music-library #ml-player-rail{display:none;}
+  #music-library .ml-player-lrc-line{font-size:clamp(28px,3.4vw,46px);}
+}
+
+@media (max-width:860px){
+  #music-library #ml-player-view-grid{
+    grid-template-areas:"lyrics";
+    grid-template-columns:1fr;
+  }
+  #music-library #ml-player-side{display:none;}
+  #music-library #ml-player-lyrics{
+    border-radius:14px;
+    padding:20px 16px;
+  }
+  #music-library .ml-player-lrc-line{
+    font-size:clamp(24px,7vw,36px);
+    line-height:1.26;
+  }
+  #music-library #ml-player-dock{
+    min-height:126px;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+  #music-library #ml-player-dock-song{display:none;}
+  #music-library #ml-player-dock-right{justify-content:center;}
+}
+
+@media (max-width:860px) and (orientation:landscape){
+  #music-library #ml-player-view-grid{
+    grid-template-areas:"lyrics side";
+    grid-template-columns:minmax(0,1fr) clamp(220px,34vw,300px);
+  }
+  #music-library #ml-player-side{display:flex;}
+  #music-library #ml-player-cover{max-height:42vh;}
 }
