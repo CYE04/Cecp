@@ -4,6 +4,20 @@
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
+  const SOURCE_RULES=[
+    {name:'赞美之泉',patterns:['赞美之泉','stream of praise']},
+    {name:'约书亚乐团',patterns:['约书亚乐团','joshua band','约书亚']},
+    {name:'火把音乐',patterns:['火把音乐','torch music','torch worship']},
+    {name:'泥土音乐',patterns:['泥土音乐','soil music']},
+    {name:'小羊诗歌',patterns:['小羊诗歌','lamb music']},
+    {name:'生命河灵粮堂',patterns:['生命河','river of life']},
+    {name:'Hillsong',patterns:['hillsong']},
+    {name:'Bethel Music',patterns:['bethel music','bethel']},
+    {name:'Elevation Worship',patterns:['elevation worship','elevation']},
+    {name:'CityAlight',patterns:['cityalight']},
+    {name:'Planetshakers',patterns:['planetshakers']},
+    {name:'其他',patterns:[]}
+  ];
 
   if(!document.getElementById('ml-style')){
     const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
@@ -21,30 +35,50 @@
   const root=document.getElementById('music-library');
   if(!root)return;
 
-  let songs=[],query='';
+  let songs=[],query='',sourceFilter='全部';
   let _apLoaded=false,_ap=null;
   let _audioCtx=null,_metroTimer=null,_metroNext=0,_metroRunning=false,_metroBpm=72;
   let _themeObserver=null;
   let _detailStatePushed=false;
 
   root.innerHTML=`
-
     <div id="ml-header">
+      <div id="ml-header-kicker">CECP WORSHIP ARCHIVE</div>
       <div id="ml-header-top">
-        <div id="ml-title">🎵 诗歌库</div>
-        <div id="ml-count"></div>
+        <div class="ml-title-stack">
+          <div id="ml-title">诗歌库</div>
+          <div id="ml-subtitle">把歌名、歌词、简谱和播放器放进同一个安静又好找的空间。</div>
+        </div>
+        <div id="ml-hero-meta">
+          <div class="ml-hero-chip">
+            <span class="ml-hero-chip-label">Songs</span>
+            <strong id="ml-count"></strong>
+          </div>
+          <div class="ml-hero-chip">
+            <span class="ml-hero-chip-label">Includes</span>
+            <strong id="ml-hero-note">歌词 / 简谱 / 音频</strong>
+          </div>
+        </div>
       </div>
       <div id="ml-search-wrap">
         <span id="ml-search-icon">🔍</span>
         <input id="ml-search" type="text" placeholder="搜索歌名或歌词…" autocomplete="off" autocorrect="off"/>
       </div>
+      <div id="ml-search-hint">试试歌名、作者、或一句歌词。</div>
+      <div id="ml-source-bar"></div>
     </div>
     <div id="ml-loading"><div id="ml-spinner"></div>正在载入诗歌…</div>
-    <div id="ml-list"></div>
+    <div id="ml-list-stage">
+      <div id="ml-list-head">
+        <div class="ml-section-label">Song Collection</div>
+        <div id="ml-result-count">全部诗歌</div>
+      </div>
+      <div id="ml-list"></div>
+    </div>
     <div id="ml-empty">
       <div id="ml-empty-icon">🎵</div>
       <div id="ml-empty-msg">找不到「<span id="ml-query-text"></span>」</div>
-      <div id="ml-empty-sub">还没有这首歌，可以微信联系 YuEn 申请添加</div>
+      <div id="ml-empty-sub">库里暂时还没有这首歌，你可以联系 YuEn 申请添加。</div>
       <button id="ml-contact">💬 复制微信号 YuEn</button>
     </div>
     <div id="ml-detail">
@@ -352,7 +386,7 @@
       const files=await res.json();
       const jsons=files.filter(f=>f.name.endsWith('.json')&&f.name!=='test.json');
       const all=await Promise.all(jsons.map(f=>fetch(RAW_BASE+f.name,{cache:'no-store'}).then(r=>r.json()).catch(()=>null)));
-      songs=all.filter(Boolean);
+      songs=all.filter(Boolean).map(enrichSong);
       $('ml-loading').style.display='none';
       $('ml-count').textContent=songs.length+' 首';
       render();
@@ -368,21 +402,106 @@
       for(const c of arr)if((c.lyric||'').toLowerCase().includes(q)||(c.lyric2||'').toLowerCase().includes(q)||(c.lyric3||'').toLowerCase().includes(q)||(c.lyric4||'').toLowerCase().includes(q))return true;
     }return false;
   }
+  function lower(v){ return String(v||'').trim().toLowerCase(); }
+  function detectSongSource(song){
+    const artist=(song.artist||'').trim();
+    const haystack=lower([song.artist,song.sub,song.title].filter(Boolean).join(' '));
+    if(artist){
+      const direct=SOURCE_RULES.find(rule=>rule.name!=='其他' && (lower(rule.name)===lower(artist) || rule.patterns.some(p=>lower(artist).includes(lower(p)))));
+      if(direct) return direct.name;
+      return artist;
+    }
+    const matched=SOURCE_RULES.find(rule=>rule.name!=='其他' && rule.patterns.some(p=>haystack.includes(lower(p))));
+    return matched ? matched.name : '其他';
+  }
+  function enrichSong(song){
+    const source=detectSongSource(song);
+    return Object.assign({},song,{
+      source,
+      displayArtist:(song.artist||source||'未知来源').trim()
+    });
+  }
   function hi(t,q){
     if(!q||!t)return t||'';
     return t.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'),'<mark class="ml-highlight">$1</mark>');
   }
+  function renderSourceBar(){
+    const bar=$('ml-source-bar');
+    if(!bar) return;
+    const counts=songs.reduce((acc,s)=>{
+      const key=s.source||'其他';
+      acc[key]=(acc[key]||0)+1;
+      return acc;
+    },{});
+    const items=[{name:'全部',count:songs.length}].concat(
+      Object.keys(counts)
+        .sort((a,b)=>counts[b]-counts[a]||a.localeCompare(b,'zh-Hans-CN'))
+        .map(name=>({name,count:counts[name]}))
+    );
+    if(sourceFilter!=='全部' && !counts[sourceFilter]) sourceFilter='全部';
+    bar.innerHTML=items.map(item=>`
+      <button class="ml-source-chip${item.name===sourceFilter?' active':''}" data-source="${item.name}" type="button">
+        <span>${item.name}</span>
+        <strong>${item.count}</strong>
+      </button>
+    `).join('');
+    bar.querySelectorAll('.ml-source-chip').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        sourceFilter=btn.dataset.source||'全部';
+        render();
+      });
+    });
+  }
 
   function render(){
     const list=$('ml-list'),empty=$('ml-empty'),q=query.toLowerCase();
-    const filtered=q
-      ?songs.filter(s=>(s.title||'').toLowerCase().includes(q)||(s.artist||'').toLowerCase().includes(q)||hasLyricMatch(s,q))
-      :[...songs];
+    renderSourceBar();
+    const filtered=songs.filter(s=>{
+      const sourceOk=sourceFilter==='全部'||(s.source||'其他')===sourceFilter;
+      if(!sourceOk) return false;
+      if(!q) return true;
+      return (s.title||'').toLowerCase().includes(q)||(s.artist||'').toLowerCase().includes(q)||(s.source||'').toLowerCase().includes(q)||hasLyricMatch(s,q);
+    });
+    $('ml-result-count').textContent=q
+      ? `找到 ${filtered.length} 首相关诗歌`
+      : sourceFilter==='全部'
+        ? `全部 ${songs.length} 首诗歌`
+        : `${sourceFilter} · ${filtered.length} 首`;
     if(!filtered.length){
       list.innerHTML='';$('ml-query-text').textContent=query;empty.style.display='block';
+      list.classList.remove('is-grouped');
+      $('ml-list-stage').style.display='none';
     }else{
       empty.style.display='none';
-      list.innerHTML=filtered.map(s=>cardHTML(s,q)).join('')+'<div id="ml-list-end"></div>';
+      $('ml-list-stage').style.display='';
+      if(q||sourceFilter!=='全部'){
+        list.classList.remove('is-grouped');
+        list.innerHTML=filtered.map(s=>cardHTML(s,q)).join('')+'<div id="ml-list-end"></div>';
+      }else{
+        list.classList.add('is-grouped');
+        const grouped=new Map();
+        filtered.forEach(song=>{
+          const key=song.source||'其他';
+          if(!grouped.has(key)) grouped.set(key,[]);
+          grouped.get(key).push(song);
+        });
+        list.innerHTML=Array.from(grouped.entries())
+          .sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0],'zh-Hans-CN'))
+          .map(([name,items])=>`
+            <section class="ml-group">
+              <div class="ml-group-head">
+                <div>
+                  <div class="ml-group-kicker">Artist / Ministry</div>
+                  <div class="ml-group-title">${name}</div>
+                </div>
+                <div class="ml-group-count">${items.length} 首</div>
+              </div>
+              <div class="ml-group-grid">
+                ${items.map(s=>cardHTML(s,q)).join('')}
+              </div>
+            </section>
+          `).join('')+'<div id="ml-list-end"></div>';
+      }
       _mpSongs = songs.filter(s=>s.mp3);
       list.querySelectorAll('.ml-song-card').forEach(el=>{
         el.addEventListener('click',()=>{const s=songs.find(x=>x.id===el.dataset.id);if(s)openDetail(s);});
@@ -418,14 +537,24 @@
     const cover=s.cover
       ?`<img class="ml-cover" src="${s.cover}" loading="lazy" onerror="this.outerHTML='<div class=\\'ml-cover-placeholder\\'>♪</div>'">`
       :`<div class="ml-cover-placeholder">♪</div>`;
+    const meta=[s.displayArtist,s.sub].filter(Boolean).join(' · ');
+    const tags=[
+      s.origKey?`<span class="ml-song-tag is-key">${s.origKey}</span>`:'',
+      s.timeSign?`<span class="ml-song-tag">${s.timeSign}</span>`:'',
+      s.mp3?`<span class="ml-song-tag">Audio</span>`:''
+    ].filter(Boolean).join('');
     return`<div class="ml-song-card" data-id="${s.id}">
-      ${cover}
+      <div class="ml-card-art">${cover}</div>
       <div class="ml-info">
+        <div class="ml-song-overline">${hi(s.source||s.displayArtist||'Worship Song',q)}</div>
         <div class="ml-song-title">${hi(s.title,q)}</div>
-        <div class="ml-song-meta">${hi([s.artist,s.sub].filter(Boolean).join(' · '),q)}</div>
+        <div class="ml-song-meta">${hi(meta||'收录歌词、简谱与练习资料',q)}</div>
+        <div class="ml-song-tags">${tags}</div>
       </div>
-      ${s.origKey?`<span class="ml-song-key">${s.origKey}</span>`:''}
-      <span class="ml-chevron">›</span>
+      <div class="ml-song-side">
+        <span class="ml-song-index">${String((songs.findIndex(x=>x.id===s.id)+1)).padStart(2,'0')}</span>
+        <span class="ml-chevron">›</span>
+      </div>
     </div>`;
   }
 
@@ -989,9 +1118,9 @@
     else{coverThumb.textContent='♪';}
 
     const infoDiv=document.createElement('div');infoDiv.className='sw-info';
-    infoDiv.innerHTML=`<div class="sw-eyebrow">Worship Song</div>
+    infoDiv.innerHTML=`<div class="sw-eyebrow">Worship Archive</div>
       <div class="sw-title">${s.title||''}</div>
-      <div class="sw-sub">${s.sub||''}</div>`;
+      <div class="sw-sub">${s.sub||s.artist||'用于练习、学习与敬拜辅助'}</div>`;
     const pillsDiv=document.createElement('div');pillsDiv.className='sw-pills';
     pillsDiv.appendChild(kPill);
     if(s.timeSign){const p=document.createElement('span');p.className='sw-pill';p.textContent=s.timeSign;pillsDiv.appendChild(p);}
