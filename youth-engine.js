@@ -1,5 +1,5 @@
 /**
- * youth-engine.js v3.0
+ * youth-engine.js v3.1
  * 橄榄树团契 · 青年聚会渲染引擎
  * 托管于 GitHub Pages，所有帖子共用
  *
@@ -179,13 +179,13 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-lyric2{display:block;font-size:22px;opacity:0.6;margin-top:1px}.sw-lyric3{display:block;font-size:22px;opacity:0.6;margin-top:1px}.sw-lyric4{display:block;font-size:22px;opacity:0.6;margin-top:1px}
 .prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow:visible;padding-bottom:2px}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0}
-.p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--ym-capo);margin-bottom:2px;min-height:13px;white-space:nowrap}
+.p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--ym-capo);margin-bottom:2px;min-height:13px;white-space:pre}
 .p-chord.empty{visibility:hidden}
 .p-n{font-family:'Space Mono',monospace;color:var(--ym-ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end}
 .p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ym-ink2);white-space:pre-wrap}
 .p-lyric.bold{font-weight:700;color:var(--ym-ink)}
 .p-lyric2,.p-lyric3,.p-lyric4{opacity:0.65;margin-top:1px}
-.lyric-gap{display:inline-block;white-space:pre;visibility:hidden;pointer-events:none}
+.lyric-gap{display:inline-block;white-space:pre;visibility:hidden;pointer-events:none;font:inherit;line-height:inherit}
 .prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px}
 .prev-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--ym-ink2);border-left:1.5px solid var(--ym-ink2);pointer-events:none;box-sizing:border-box}
 .prev-volta.closed::before{border-right:1.5px solid var(--ym-ink2)}
@@ -623,9 +623,29 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   var CHR=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
   var ENH={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
   var FLT={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb'};
+  var FLAT_KEYS={F:1,Bb:1,Eb:1,Ab:1,Db:1,Gb:1,Cb:1};
+  var USE_FLAT_MINOR_ROOTS={D:1,G:1,C:1,F:1,Bb:1,Eb:1};
   function nIdx(n){return CHR.indexOf(ENH[n]||n);}
-  function trNote(n,st){var i=nIdx(n);if(i<0)return n;var r=CHR[(i+st+12)%12];return FLT[r]||r;}
-  function trS(c,st){var m=c.match(/^([A-G][b#]?)(.*)$/);if(!m)return c;return trNote(m[1],st)+m[2];}
+  function parseKeyName(key){
+    var k=(key||'').trim();
+    if(!k)return{root:'C',suf:''};
+    var m=k.match(/^([A-G](?:#|b)?)(.*)$/);
+    if(!m)return{root:k,suf:''};
+    return{root:m[1],suf:m[2]||''};
+  }
+  function needFlat(root,suf){
+    var minor=/m(?!aj)/i.test(suf||'');
+    if(minor)return !!USE_FLAT_MINOR_ROOTS[root];
+    return !!FLAT_KEYS[root];
+  }
+  function trKeyName(key,st,useFlat){
+    var parsed=parseKeyName(key),i=nIdx(parsed.root);
+    if(i<0)return key;
+    var r=CHR[(i+st+12)%12];
+    var flat=(useFlat!==undefined)?useFlat:needFlat(parsed.root,parsed.suf);
+    return (flat?(FLT[r]||r):r)+parsed.suf;
+  }
+  function trBass(bass,st,useFlat){return trKeyName(bass,st,useFlat);}
   function normLyricText(text){return String(text||'');}
   function setLyricContent(el,text){
     var raw=String(text||'');
@@ -643,10 +663,45 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       }
     }
   }
-  function trChord(c,st){if(!st)return c;var s=c.indexOf('/');if(s>-1)return trS(c.slice(0,s),st)+'/'+trS(c.slice(s+1),st);return trS(c,st);}
+  function trChordToken(token,st,useFlat){
+    var m=String(token||'').trim().match(/^([A-G](?:#|b)?)(.*)$/);
+    if(!m)return token;
+    var rest=m[2]||'';
+    rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,function(_,bass){return '/'+trBass(bass,st,useFlat);});
+    return trKeyName(m[1],st,useFlat)+rest;
+  }
+  function resizeChordGap(gap,len){
+    var chars=[...String(gap||'')].map(function(ch){return ch==='\u3164'?'\u3000':ch;});
+    if(!chars.length||len<=0)return '';
+    var out='';
+    for(var i=0;i<len;i++)out+=chars[i%chars.length];
+    return out;
+  }
+  function trChord(c,st,useFlat){
+    if(!c)return c;
+    var parts=String(c).split(/([ \t\u3164]+)/),out='';
+    for(var i=0;i<parts.length;i++){
+      var part=parts[i];
+      if(!/[^\s\u3164]/.test(part)){out+=part;continue;}
+      var tr=trChordToken(part,st,useFlat);
+      out+=tr;
+      if(i+1<parts.length&&/[ \t\u3164]+/.test(parts[i+1])){
+        var gap=parts[i+1];
+        var nextLen=Math.max(0,[...gap].length + ([...part].length - [...tr].length));
+        if(nextLen===0 && i+2<parts.length && /[^\s\u3164]/.test(parts[i+2]))nextLen=1;
+        out+=resizeChordGap(gap,nextLen);
+        i++;
+      }
+    }
+    return out;
+  }
   function calcCapo(t,o){
-    var st=(nIdx(t)-nIdx(o)+12)%12,best=null;
-    ['C','D','E','F','G','A','B'].forEach(function(pk){var c=(nIdx(t)-nIdx(pk)+12)%12;if(c<=7&&(!best||c<best.capo))best={playKey:pk,capo:c};});
+    var target=parseKeyName(t),orig=parseKeyName(o);
+    var st=(nIdx(target.root)-nIdx(orig.root)+12)%12,best=null;
+    ['C','D','E','F','G','A','B'].forEach(function(pk){
+      var c=(nIdx(target.root)-nIdx(pk)+12)%12;
+      if(c<=7&&(!best||c<best.capo))best={playKey:pk+target.suf,capo:c};
+    });
     return{st:st,capo:best?best.capo:0,playKey:best?best.playKey:t};
   }
 
@@ -731,7 +786,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
     /* jianpu render */
     function renderScore(){
-      var info = calcCapo(curKey, song.origKey), st = info.st;
+      var info = calcCapo(curKey, song.origKey), st = info.st, useFlat = !!FLAT_KEYS[curKey];
       kPill.textContent = '1 = ' + curKey;
       scoreKeyBadge.textContent = '1 = ' + curKey;
 
@@ -764,10 +819,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
           segs.forEach(function(seg){
             var s=div('prev-seg');
             var c=div('p-chord'+(seg.chord?'':' empty'));
-            c.textContent=seg.chord?trChord(seg.chord,st):'\u00a0';
+            c.textContent=seg.chord?trChord(seg.chord,st,useFlat):'\u00a0';
             s.appendChild(c);
-            if(seg.n && seg.n.trim()) s.appendChild(renderNStr(seg.n));
-            var l=div('p-lyric'+((!Array.isArray(line)&&line.b)?' bold':'')); setLyricContent(l,normLyricText(seg.lyric)); s.appendChild(l);
+            if(seg.n && seg.n.trim())s.appendChild(renderNStr(seg.n));
+            var l=div('p-lyric'+((!Array.isArray(line)&&line.b)?' bold':''));setLyricContent(l,normLyricText(seg.lyric));s.appendChild(l);
             if(seg.lyric2){var l2=div('p-lyric p-lyric2'+((!Array.isArray(line)&&line.b)?' bold':''));setLyricContent(l2,normLyricText(seg.lyric2));s.appendChild(l2);}
             if(seg.lyric3){var l3=div('p-lyric p-lyric3'+((!Array.isArray(line)&&line.b)?' bold':''));setLyricContent(l3,normLyricText(seg.lyric3));s.appendChild(l3);}
             if(seg.lyric4){var l4=div('p-lyric p-lyric4'+((!Array.isArray(line)&&line.b)?' bold':''));setLyricContent(l4,normLyricText(seg.lyric4));s.appendChild(l4);}
@@ -801,13 +856,14 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         });
         if(!maxW)return;
         var measureW=maxW+gutterX;
-        var scale=avail/measureW;
-        lbDiv.style.transform='scale('+scale+')';
-        lbDiv.style.transformOrigin='left top';
+        var rawScale=avail/measureW;
+        var scale=Math.min(1, rawScale);
+          lbDiv.style.transform='scale('+scale+')';
+          lbDiv.style.transformOrigin='left top';
         lbDiv.style.width=measureW+'px';
-        var naturalH=lbDiv.offsetHeight;
-        lbDiv.style.marginBottom=((scale>1 ? naturalH*(scale-1) : 0) + gutterY)+'px';
-        lbDiv.parentElement.style.overflow='hidden';
+          var naturalH=lbDiv.offsetHeight;
+        lbDiv.style.marginBottom=(naturalH*(scale-1) + gutterY)+'px';
+          lbDiv.parentElement.style.overflow='hidden';
       });
     }
     renderScore();
