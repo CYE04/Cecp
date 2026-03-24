@@ -1144,7 +1144,7 @@ body{overflow-x:hidden;}
 #ml-nav{
   height:68px;
   display:grid;
-  grid-template-columns:auto 1fr auto;
+  grid-template-columns:auto 1fr;
   align-items:center;
   gap:20px;
   border-bottom:1px solid rgba(255,255,255,.06);
@@ -1166,18 +1166,6 @@ body{overflow-x:hidden;}
   content:'';position:absolute;left:0;right:0;bottom:-11px;margin:auto;
   width:24px;height:3px;border-radius:999px;background:var(--accent);
 }
-#ml-nav-search-wrap{position:relative;width:min(320px,44vw);}
-#ml-nav-search{
-  width:100%;height:40px;border-radius:999px;border:1px solid var(--border);
-  background:rgba(255,255,255,.04);color:var(--text);padding:0 14px 0 34px;
-  font-size:13px;outline:none;
-}
-#ml-nav-search:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-light);}
-#ml-nav-search-icon{
-  position:absolute;left:12px;top:50%;transform:translateY(-50%);
-  color:var(--text3);font-size:14px;pointer-events:none;
-}
-
 #ml-hero{
   margin:18px 0 14px;
   min-height:236px;
@@ -1203,16 +1191,7 @@ body{overflow-x:hidden;}
   font-family:'Noto Sans SC',sans-serif;
   margin-bottom:14px;
 }
-#ml-subtitle{max-width:580px;color:var(--text2);font-size:21px;line-height:1.6;margin-bottom:22px;}
-#ml-hero-actions{display:flex;gap:12px;}
-.ml-hero-btn{
-  border-radius:999px;border:1px solid var(--border);height:42px;padding:0 22px;
-  background:rgba(255,255,255,.08);color:var(--text);font-weight:600;cursor:pointer;
-}
-.ml-hero-btn.is-primary{
-  background:var(--accent);color:#121212;border-color:transparent;
-  box-shadow:0 10px 28px rgba(227,191,66,.3);
-}
+#ml-subtitle{max-width:580px;color:var(--text2);font-size:21px;line-height:1.6;margin-bottom:0;}
 
 #ml-search-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;}
 #ml-search-wrap{max-width:none;position:relative;}
@@ -1234,10 +1213,11 @@ body{overflow-x:hidden;}
 
 #ml-source-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
 .ml-source-chip{
-  height:34px;border-radius:999px;padding:0 12px;
+  height:36px;border-radius:999px;padding:0 14px;
   border:1px solid var(--border);background:rgba(255,255,255,.03);
-  color:var(--text2);font-size:12px;display:inline-flex;align-items:center;gap:8px;
+  color:var(--text2);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:8px;
   box-shadow:none;
+  line-height:1;
 }
 .ml-source-chip strong{font-size:11px;color:var(--text3);}
 .ml-source-chip.active{background:var(--accent);color:#101010;border-color:transparent;}
@@ -1414,6 +1394,13 @@ body{overflow-x:hidden;}
 #ml-player-cover img{width:100%;height:100%;object-fit:cover;}
 #ml-player-title{margin-top:14px;font-size:18px;font-weight:700;line-height:1.2;}
 #ml-player-artist{margin-top:6px;font-size:14px;color:#b1b9ca;}
+#ml-player-actions{margin-top:10px;display:flex;gap:8px;}
+.ml-player-icon-btn{
+  width:32px;height:32px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.22);
+  background:rgba(255,255,255,.05);
+  color:#fff;cursor:pointer;
+}
 #ml-player-pills{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
 .ml-player-pill{
   height:20px;padding:0 8px;border-radius:5px;
@@ -1436,9 +1423,9 @@ body{overflow-x:hidden;}
   padding:30px 22px;
   overflow:auto;
 }
-#ml-player-lyrics-inner{display:flex;flex-direction:column;gap:18px;padding:10px 0 34vh;}
+#ml-player-lyrics-inner{display:flex;flex-direction:column;gap:18px;padding:10px 0 40vh;}
 .ml-player-lrc-line{
-  font-size:48px;
+  font-size:clamp(30px,4.2vw,64px);
   line-height:1.15;
   color:rgba(255,255,255,.30);
   font-weight:700;
@@ -1452,13 +1439,13 @@ body{overflow-x:hidden;}
 @media (max-width:1050px){
   #ml-player-view-grid{grid-template-columns:1fr;height:calc(100vh - 96px);}
   #ml-player-side{max-width:560px;}
-  .ml-player-lrc-line{font-size:34px;}
+  .ml-player-lrc-line{font-size:clamp(28px,5vw,48px);}
 }
 @media (max-width:640px){
   #ml-player-view{padding:12px;}
   #ml-player-view-grid{height:calc(100vh - 78px);}
   #ml-player-side{padding:12px;}
-  .ml-player-lrc-line{font-size:28px;}
+  .ml-player-lrc-line{font-size:clamp(24px,8vw,34px);}
 }
 
 @media (max-width:1200px){
@@ -1468,7 +1455,6 @@ body{overflow-x:hidden;}
 @media (max-width:900px){
   #ml-nav{grid-template-columns:1fr;gap:10px;height:auto;padding:12px 0;}
   #ml-nav-tabs{justify-content:flex-start;}
-  #ml-nav-search-wrap{width:100%;}
   #ml-title{font-size:44px;}
   #ml-subtitle{font-size:17px;}
   #ml-search-row{grid-template-columns:1fr;}
@@ -1490,4 +1476,64 @@ body{overflow-x:hidden;}
   #music-library .sw-wrap{padding:16px;}
   #music-library .sw-title{font-size:30px;}
   #music-library .sw-sub{font-size:18px;}
+}
+
+@media (prefers-color-scheme: light){
+  #music-library{
+    --bg:#f3f5fb;
+    --bg2:#ffffff;
+    --bg3:#eef2fb;
+    --text:#111827;
+    --text2:#4b5569;
+    --text3:#7f8aa3;
+    --accent:#c58e18;
+    --accent-light:rgba(197,142,24,.16);
+    --border:rgba(15,23,42,.12);
+    --border-md:rgba(15,23,42,.18);
+    background:
+      radial-gradient(circle at 0% 0%, rgba(129,93,255,.10), transparent 26%),
+      radial-gradient(circle at 100% 120%, rgba(255,178,66,.08), transparent 38%),
+      linear-gradient(180deg,#f8f9fe 0%,#eff3fb 56%,#e9eef9 100%);
+  }
+  #ml-header{border-bottom-color:rgba(15,23,42,.08);}
+  #ml-nav{border-bottom-color:rgba(15,23,42,.08);}
+  #ml-hero{
+    background:
+      linear-gradient(90deg,rgba(250,252,255,.96) 0%,rgba(245,248,255,.9) 48%,rgba(245,247,253,.95) 100%),
+      radial-gradient(circle at 0% 0%,rgba(197,142,24,.15),transparent 28%),
+      radial-gradient(circle at 80% 20%,rgba(110,89,255,.10),transparent 42%);
+  }
+  #ml-search,#ml-count-wrap,.ml-source-chip,.ml-song-card,.ml-group{
+    background:rgba(255,255,255,.8);
+    border-color:rgba(15,23,42,.12);
+    color:var(--text2);
+  }
+  #ml-detail{background:#edf2fb;}
+  #ml-detail-header{background:rgba(245,248,255,.88);border-bottom-color:rgba(15,23,42,.1);}
+  #ml-back{background:#fff;border-color:rgba(15,23,42,.16);color:var(--text);}
+  #music-library .sw-wrap,
+  #music-library .sw-panel-inner,
+  #music-library .sw-score,
+  #music-library .ml-met,
+  #ml-miniplayer{
+    background:#fff;
+    border-color:rgba(15,23,42,.12);
+  }
+  #ml-player-view{
+    background:
+      radial-gradient(circle at 0% 0%, rgba(129,93,255,.10), transparent 25%),
+      radial-gradient(circle at 80% 0%, rgba(197,142,24,.10), transparent 40%),
+      #eff3fb;
+  }
+  #ml-player-side,#ml-player-lyrics{
+    background:#fff;
+    border-color:rgba(15,23,42,.12);
+  }
+  .ml-player-lrc-line{color:rgba(17,24,39,.38);}
+  .ml-player-lrc-line.active{color:#111827;text-shadow:none;}
+  .ml-player-icon-btn,.ml-player-ctl,#ml-player-view-close{
+    border-color:rgba(15,23,42,.16);
+    background:#fff;
+    color:#1f2937;
+  }
 }

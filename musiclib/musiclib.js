@@ -46,25 +46,17 @@
       <div id="ml-nav">
         <div id="ml-brand">
           <span class="ml-brand-dot"></span>
-          <span class="ml-brand-name">Sanctuary</span>
+          <span class="ml-brand-name">诗歌库</span>
         </div>
         <div id="ml-nav-tabs">
           <button class="ml-nav-tab">Discover</button>
           <button class="ml-nav-tab active">Library</button>
-        </div>
-        <div id="ml-nav-search-wrap">
-          <span id="ml-nav-search-icon">⌕</span>
-          <input id="ml-nav-search" type="text" placeholder="Search worship songs, artists..." autocomplete="off" />
         </div>
       </div>
       <div id="ml-hero">
         <div id="ml-hero-kicker">EDITOR'S PICK</div>
         <h1 id="ml-title">诗歌库 · Library</h1>
         <div id="ml-subtitle">精选敬拜诗歌集合，含歌词、简谱、移调与音频练习。</div>
-        <div id="ml-hero-actions">
-          <button class="ml-hero-btn is-primary" type="button">Listen Now</button>
-          <button class="ml-hero-btn" type="button">Explore Collection</button>
-        </div>
       </div>
       <div id="ml-search-row">
         <div id="ml-search-wrap">
@@ -147,6 +139,10 @@
           <div id="ml-player-cover"><span>♪</span></div>
           <div id="ml-player-title"></div>
           <div id="ml-player-artist"></div>
+          <div id="ml-player-actions">
+            <button class="ml-player-icon-btn" type="button" aria-label="收藏">♡</button>
+            <button class="ml-player-icon-btn" type="button" aria-label="分享">⤴</button>
+          </div>
           <div id="ml-player-pills">
             <span id="ml-player-key" class="ml-player-pill"></span>
             <span id="ml-player-bpm" class="ml-player-pill"></span>
@@ -234,11 +230,6 @@
   observeThemeChanges();
 
   $('ml-search').addEventListener('input',e=>{query=e.target.value.trim();render();});
-  $('ml-nav-search')?.addEventListener('input',e=>{
-    query=e.target.value.trim();
-    $('ml-search').value=query;
-    render();
-  });
   $('ml-back').addEventListener('click',closeDetail);
 
   function showToast(text){
@@ -502,7 +493,6 @@
 
   function render(){
     const list=$('ml-list'),empty=$('ml-empty'),q=query.toLowerCase();
-    if($('ml-nav-search') && $('ml-nav-search').value!==query) $('ml-nav-search').value=query;
     renderSourceBar();
     const filtered=songs.filter(s=>{
       const sourceOk=sourceFilter==='全部'||(s.source||'其他')===sourceFilter;
