@@ -1441,8 +1441,7 @@
         });
         if(!maxW)return;
         var measureW=maxW+gutterX;
-        var rawScale=avail/measureW;
-        var scale=Math.min(1, rawScale);
+        var scale=avail/measureW;
         lbDiv.style.transform='scale('+scale+')';
         lbDiv.style.transformOrigin='left top';
         lbDiv.style.width=measureW+'px';
