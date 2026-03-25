@@ -48,6 +48,10 @@
           <span class="ml-brand-dot"></span>
           <span class="ml-brand-name">诗歌库</span>
         </div>
+        <div id="ml-nav-actions">
+          <button class="ml-nav-icon-btn" id="ml-nav-search" type="button" aria-label="聚焦搜索">⌕</button>
+          <button class="ml-nav-icon-btn" id="ml-nav-theme" type="button" aria-label="切换深浅主题">◐</button>
+        </div>
       </div>
       <div id="ml-hero">
         <h1 id="ml-title">诗歌库</h1>
@@ -145,17 +149,26 @@
           <div id="ml-player-lyrics-inner"></div>
         </section>
         <aside id="ml-player-side">
-          <div class="ml-player-side-head">歌曲</div>
-          <div id="ml-player-cover"><span>♪</span></div>
-          <div id="ml-player-title"></div>
-          <div id="ml-player-artist"></div>
-          <div id="ml-player-actions">
-            <button class="ml-player-icon-btn" type="button" aria-label="收藏">♡</button>
-            <button class="ml-player-icon-btn" type="button" aria-label="分享">⤴</button>
+          <div id="ml-player-side-tabs">
+            <button class="ml-player-side-tab active" id="ml-player-tab-song" type="button">歌曲</button>
+            <button class="ml-player-side-tab" id="ml-player-tab-queue" type="button">队列</button>
           </div>
-          <div id="ml-player-pills">
-            <span id="ml-player-key" class="ml-player-pill"></span>
-            <span id="ml-player-bpm" class="ml-player-pill"></span>
+          <div id="ml-player-side-song">
+            <div id="ml-player-cover"><span>♪</span></div>
+            <div id="ml-player-title"></div>
+            <div id="ml-player-artist"></div>
+            <div id="ml-player-actions">
+              <button class="ml-player-icon-btn" type="button" aria-label="收藏">♡</button>
+              <button class="ml-player-icon-btn" type="button" aria-label="分享">⤴</button>
+            </div>
+            <div id="ml-player-pills">
+              <span id="ml-player-key" class="ml-player-pill"></span>
+              <span id="ml-player-bpm" class="ml-player-pill"></span>
+            </div>
+          </div>
+          <div id="ml-player-side-queue" hidden>
+            <div id="ml-player-queue-empty">当前还没有可播放队列</div>
+            <div id="ml-player-queue-list"></div>
           </div>
         </aside>
       </div>
@@ -256,6 +269,13 @@
 
   $('ml-search').addEventListener('input',e=>{query=e.target.value.trim();render();});
   $('ml-back').addEventListener('click',closeDetail);
+  $('ml-nav-search')?.addEventListener('click',()=>{$('ml-search')?.focus();});
+  $('ml-nav-theme')?.addEventListener('click',()=>{
+    const rootEl=document.documentElement;
+    if(!rootEl) return;
+    rootEl.classList.toggle('dark');
+    syncHaloTheme();
+  });
 
   function showToast(text){
     const t=$('ml-toast');
@@ -566,6 +586,7 @@
           `).join('')+'<div id="ml-list-end"></div>';
       }
       _mpSongs = songs.filter(s=>s.mp3);
+      _mpRenderQueue();
       list.querySelectorAll('.ml-song-card').forEach(el=>{
         el.addEventListener('click',()=>{const s=songs.find(x=>x.id===el.dataset.id);if(s)openDetail(s);});
 
@@ -589,7 +610,7 @@
           const s=songs.find(x=>x.id===el.dataset.id);
           if(!s||!s.mp3) return;
           const idx=_mpSongs.findIndex(x=>x.id===s.id);
-          if(idx>=0) _mpPlayIdx(idx);
+          if(idx>=0) _mpPlayIdx(idx,true);
         };
         el.appendChild(playBtn);
       });
@@ -823,7 +844,7 @@
     return {st, capo:best?best.capo:0, playKey:best?best.playKey:target};
   }
 
-  let _mpAudio=null,_mpSongs=[],_mpIdx=-1,_mpLoop=false,_mpShuffle=false,_mpLrc=[],_mpLrcIdx=-1,_mpCoverFallback='',_mpExpanded=false;
+  let _mpAudio=null,_mpSongs=[],_mpIdx=-1,_mpLoop=false,_mpShuffle=false,_mpLrc=[],_mpLrcIdx=-1,_mpCoverFallback='',_mpExpanded=false,_mpSideMode='song',_mpSideCollapsed=false;
 
   function _mpFmt(t){
     if(!isFinite(t)) return '0:00';
@@ -850,7 +871,44 @@
     if(!pv) return;
     _mpExpanded=!!open;
     pv.classList.toggle('open',_mpExpanded);
+    pv.classList.toggle('side-collapsed',!!_mpSideCollapsed);
     document.body.style.overflow=_mpExpanded?'hidden':'';
+  }
+  function _mpSetSideMode(mode){
+    _mpSideMode=(mode==='queue')?'queue':'song';
+    const tabSong=$('ml-player-tab-song');
+    const tabQueue=$('ml-player-tab-queue');
+    const panelSong=$('ml-player-side-song');
+    const panelQueue=$('ml-player-side-queue');
+    if(tabSong) tabSong.classList.toggle('active',_mpSideMode==='song');
+    if(tabQueue) tabQueue.classList.toggle('active',_mpSideMode==='queue');
+    if(panelSong) panelSong.hidden=_mpSideMode!=='song';
+    if(panelQueue) panelQueue.hidden=_mpSideMode!=='queue';
+  }
+  function _mpRenderQueue(){
+    const box=$('ml-player-queue-list');
+    const empty=$('ml-player-queue-empty');
+    if(!box) return;
+    box.innerHTML='';
+    if(!_mpSongs.length){
+      if(empty) empty.hidden=false;
+      return;
+    }
+    if(empty) empty.hidden=true;
+    _mpSongs.forEach((song,i)=>{
+      const row=document.createElement('button');
+      row.type='button';
+      row.className='ml-player-queue-item'+(i===_mpIdx?' is-active':'');
+      row.innerHTML=`
+        <span class="ml-player-queue-index">${i+1}</span>
+        <span class="ml-player-queue-main">
+          <span class="ml-player-queue-title">${song.title||'未命名歌曲'}</span>
+          <span class="ml-player-queue-artist">${song.artist||song.source||'诗歌'}</span>
+        </span>
+      `;
+      row.addEventListener('click',()=>_mpPlayIdx(i,true));
+      box.appendChild(row);
+    });
   }
   function _mpSyncModeUI(){
     const r1=$('ml-mp-repeat');
@@ -1033,7 +1091,64 @@
     $('ml-mp-expand')?.addEventListener('click',()=>_mpSetExpanded(true));
     $('ml-player-view-close')?.addEventListener('click',()=>_mpSetExpanded(false));
     $('ml-player-view')?.addEventListener('click',e=>{ if(e.target.id==='ml-player-view') _mpSetExpanded(false); });
-    document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&_mpExpanded) _mpSetExpanded(false); });
+    $('ml-player-tab-song')?.addEventListener('click',()=>{_mpSideCollapsed=false;_mpSetSideMode('song');_mpSetExpanded(true);});
+    $('ml-player-tab-queue')?.addEventListener('click',()=>{_mpSideCollapsed=false;_mpSetSideMode('queue');_mpSetExpanded(true);});
+    $('ml-player-view-menu')?.addEventListener('click',()=>{
+      _mpSideCollapsed=!_mpSideCollapsed;
+      _mpSetExpanded(true);
+    });
+    const railBtns=document.querySelectorAll('#ml-player-rail .ml-player-rail-btn');
+    if(railBtns[0]){
+      railBtns[0].addEventListener('click',()=>{
+        _mpSideCollapsed=false;
+        _mpSetSideMode('song');
+        _mpSetExpanded(true);
+      });
+    }
+    if(railBtns[1]){
+      railBtns[1].addEventListener('click',()=>{
+        _mpSideCollapsed=false;
+        _mpSetSideMode('queue');
+        _mpSetExpanded(true);
+      });
+    }
+    document.addEventListener('keydown',e=>{
+      const t=e.target;
+      const typing=t&&((t.tagName==='INPUT')||(t.tagName==='TEXTAREA')||t.isContentEditable);
+      if(e.key==='Escape'&&_mpExpanded){
+        _mpSetExpanded(false);
+        return;
+      }
+      if(typing || !_mpAudio) return;
+      if(e.code==='Space'){
+        e.preventDefault();
+        if(!_mpAudio.src) return;
+        if(_mpAudio.paused) _mpAudio.play().catch(()=>{});
+        else _mpAudio.pause();
+      }else if(e.key==='ArrowRight'){
+        if(!_mpAudio.src) return;
+        _mpAudio.currentTime=Math.min(_mpAudio.duration||1e9, (_mpAudio.currentTime||0)+5);
+      }else if(e.key==='ArrowLeft'){
+        if(!_mpAudio.src) return;
+        _mpAudio.currentTime=Math.max(0, (_mpAudio.currentTime||0)-5);
+      }else if((e.key==='ArrowUp' || e.key==='ArrowDown') && _mpExpanded){
+        const delta=e.key==='ArrowUp'?0.05:-0.05;
+        const v=Math.max(0,Math.min(1,(_mpAudio.volume||0)+delta));
+        _mpAudio.volume=v;
+        const mv=$('ml-mp-vol'); if(mv) mv.value=String(v);
+        const dv=$('ml-player-dock-vol'); if(dv) dv.value=String(v);
+      }else if((e.key==='q'||e.key==='Q') && _mpExpanded){
+        _mpSideCollapsed=false;
+        _mpSetSideMode('queue');
+        _mpSetExpanded(true);
+      }else if((e.key==='s'||e.key==='S') && _mpExpanded){
+        _mpSideCollapsed=false;
+        _mpSetSideMode('song');
+        _mpSetExpanded(true);
+      }
+    });
+    _mpSetSideMode(_mpSideMode);
+    _mpRenderQueue();
     _mpSyncModeUI();
   }
 
@@ -1066,6 +1181,7 @@
     const xdur=$('ml-player-dur'); if(xdur) xdur.textContent='0:00';
     const xfill=$('ml-player-fill'); if(xfill) xfill.style.width='0%';
     _mpLrc=[]; _mpLrcIdx=-1; _mpRenderLrc();
+    _mpRenderQueue();
     if(s.lrc){
       fetch(s.lrc).then(r=>r.text()).then(text=>{
         _mpLrc=_mpParseLrc(text); _mpRenderLrc();
@@ -1226,6 +1342,7 @@
       const isSameSong = (idx>=0 && idx===_mpIdx);
       if(!isSameSong){
         if(idx>=0) _mpIdx=idx; else { _mpSongs=[s]; _mpIdx=0; }
+        _mpRenderQueue();
         _mpLrc=[]; _mpLrcIdx=-1;
         _mpAudio.src=s.mp3||'';
         if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});

@@ -2049,3 +2049,152 @@ html,body,#music-library{
     word-break:break-word;
   }
 }
+
+/* ---- Template-Match Navigation + Player Side Functions ---- */
+#music-library #ml-nav{
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+}
+#music-library #ml-nav-actions{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+#music-library .ml-nav-icon-btn{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.04);
+  color:var(--text2);
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  transition:all .18s ease;
+}
+#music-library .ml-nav-icon-btn:hover{
+  color:var(--text);
+  background:rgba(255,255,255,.09);
+}
+
+#music-library #ml-player-side-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-bottom:10px;
+}
+#music-library .ml-player-side-tab{
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);
+  color:#b8c0d1;
+  border-radius:999px;
+  height:34px;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.02em;
+  cursor:pointer;
+}
+#music-library .ml-player-side-tab.active{
+  background:#e6edf9;
+  color:#0b1020;
+  border-color:transparent;
+}
+#music-library #ml-player-side-song,
+#music-library #ml-player-side-queue{
+  min-height:0;
+}
+#music-library #ml-player-side-queue{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+#music-library #ml-player-queue-empty{
+  font-size:12px;
+  color:#93a1bc;
+  padding:8px 2px;
+}
+#music-library #ml-player-queue-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-height:0;
+  overflow:auto;
+  padding-right:2px;
+}
+#music-library #ml-player-queue-list::-webkit-scrollbar{
+  width:0;
+  height:0;
+}
+#music-library .ml-player-queue-item{
+  width:100%;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:#d9e1f3;
+  border-radius:11px;
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+  padding:8px 9px;
+  text-align:left;
+  cursor:pointer;
+}
+#music-library .ml-player-queue-item:hover{
+  background:rgba(255,255,255,.08);
+}
+#music-library .ml-player-queue-item.is-active{
+  border-color:rgba(227,191,66,.48);
+  background:rgba(227,191,66,.14);
+}
+#music-library .ml-player-queue-index{
+  font-family:'DM Mono',monospace;
+  color:#98a6c4;
+  font-size:11px;
+}
+#music-library .ml-player-queue-main{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+#music-library .ml-player-queue-title{
+  font-size:13px;
+  line-height:1.2;
+  color:#f7f9ff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#music-library .ml-player-queue-artist{
+  font-size:11px;
+  color:#97a6c4;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+#music-library #ml-player-view.side-collapsed #ml-player-view-grid{
+  grid-template-columns:68px minmax(0,1fr);
+  grid-template-areas:"rail lyrics";
+}
+#music-library #ml-player-view.side-collapsed #ml-player-side{
+  display:none !important;
+}
+
+@media (max-width:860px){
+  #music-library #ml-nav{
+    grid-template-columns:1fr auto;
+    height:auto;
+    min-height:58px;
+  }
+  #music-library .ml-nav-icon-btn{
+    width:32px;
+    height:32px;
+  }
+  #music-library #ml-player-view.side-collapsed #ml-player-view-grid{
+    grid-template-columns:1fr;
+    grid-template-areas:"lyrics";
+  }
+}
