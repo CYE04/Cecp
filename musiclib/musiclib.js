@@ -1,6 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
+  const ML_VER='2026.03.25.1';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -23,17 +24,21 @@
     const s=document.createElement('link');s.id='ml-style';s.rel='stylesheet';
     try{
       const cur=document.currentScript && document.currentScript.src ? new URL(document.currentScript.src, location.href) : null;
-      s.href=cur ? new URL('musiclib.css', cur.href).href : 'musiclib.css';
-      s.onerror=()=>{ if(!/cye04\.github\.io\/Cecp\/musiclib\.css$/.test(s.href)) s.href='https://cye04.github.io/Cecp/musiclib.css'; };
+      const cssUrl=cur ? new URL('musiclib.css', cur.href) : new URL('musiclib.css', location.href);
+      cssUrl.searchParams.set('v',ML_VER);
+      s.href=cssUrl.href;
+      s.onerror=()=>{ if(!/cye04\.github\.io\/Cecp\/musiclib\.css/.test(s.href)) s.href='https://cye04.github.io/Cecp/musiclib.css?v='+encodeURIComponent(ML_VER); };
     }catch(_){
-      s.href='musiclib.css';
-      s.onerror=()=>{ s.href='https://cye04.github.io/Cecp/musiclib.css'; };
+      s.href='musiclib.css?v='+encodeURIComponent(ML_VER);
+      s.onerror=()=>{ s.href='https://cye04.github.io/Cecp/musiclib.css?v='+encodeURIComponent(ML_VER); };
     }
     document.head.appendChild(s);
   }
 
   const root=document.getElementById('music-library');
   if(!root)return;
+  root.setAttribute('data-ml-version',ML_VER);
+  try{console.info('[musiclib] loaded version',ML_VER);}catch(_){}
 
   let songs=[],query='',sourceFilter='全部';
   let _apLoaded=false,_ap=null;
