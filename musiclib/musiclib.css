@@ -2204,3 +2204,36 @@ html,body,#music-library{
     grid-template-areas:"lyrics";
   }
 }
+
+/* ---- Final Topbar Alignment Lock ---- */
+#music-library #ml-player-view-top{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:0 56px;
+}
+#music-library #ml-player-view-close,
+#music-library #ml-player-view-menu{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:38px;
+  height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  line-height:0;
+}
+#music-library #ml-player-view-close{left:0;}
+#music-library #ml-player-view-menu{right:0;}
+#music-library #ml-player-view-close svg,
+#music-library #ml-player-view-menu svg{
+  display:block;
+}
+#music-library #ml-player-view-now{
+  margin:0 auto;
+  text-align:center;
+}
