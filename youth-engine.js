@@ -740,8 +740,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       d.style.display='inline-flex';
       d.style.alignItems='center';
       d.style.justifyContent='center';
-      d.style.lineHeight='0';
-      d.style.fontSize='0';
+      d.style.lineHeight='1';
+      d.style.fontSize='19px';
       d.style.transform='none';
       d.style.overflow='visible';
       var dashLine=d.querySelector('.jp-dash-line');
@@ -1039,8 +1039,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     if(sym==='-'){
       s.style.position='relative';
       s.style.top='-0.12em';
-      s.style.lineHeight='0';
-      s.style.fontSize='0';
+      s.style.lineHeight='1';
       s.style.overflow='visible';
       s.textContent='';
       var dashLine=document.createElement('span');
