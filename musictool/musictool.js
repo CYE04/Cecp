@@ -442,6 +442,11 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px;}
 .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box;}
 .jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none;}
+.jp-dual{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;line-height:1;margin:0 .04em;}
+.jp-dual-top,.jp-dual-bot{display:inline-flex;align-items:flex-end;}
+.jp-dual-top{margin-bottom:-2px;}
+.jp-dual-top .jp-dot-bot{height:7px;}
+.jp-dual-bot .jp-dot-top{height:7px;}
 
 /* ── 批量填歌词 modal ── */
 .lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
@@ -665,6 +670,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
             <button class="kbd-btn" onclick="appendTok('[v2')" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入第2房子线开始">2. 房开</button>
             <button class="kbd-btn" onclick="appendCustomVolta()" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入自定义房子线开始">自定义房</button>
             <button class="kbd-btn" onclick="appendTok(']v')" style="padding:6px 8px;color:var(--accent2);border-color:rgba(124,106,247,0.3);" title="插入房子线结束">房结</button>
+            <button class="kbd-btn" onclick="appendCustomToken()" style="padding:6px 8px;color:var(--green);border-color:rgba(106,242,168,0.25);" title="插入自定义 token（可输入双行 1/5）">自定义Tok</button>
           </div>
         </div>
       </div>
@@ -685,6 +691,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
       <span><kbd>F</kbd> 延长号</span>
       <span><kbd>B</kbd> 小节线</span>
       <span><kbd>M</kbd> 双小节</span>
+      <span><kbd>/</kbd> 自定义 token</span>
       <span><kbd>I / O</kbd> 插入 / 覆盖</span>
       <span><kbd>↑ / ↓</kbd> 八度</span>
       <span><kbd>Alt+C/V/R</kbd> 格子复制 / 粘贴 / 覆盖</span>
@@ -820,6 +827,14 @@ function appendCustomVolta(){
   label=String(label).trim();
   if(!label)return;
   appendTok('[v:'+label+']');
+}
+function appendCustomToken(){
+  if(curSi<0){alert('请先点选一个简谱格子');return;}
+  var raw=prompt('输入 token（可一次输入多个，用空格分隔）\\n双行简谱示例：1/5 2/5 3/6');
+  if(raw===null)return;
+  var toks=String(raw).trim().split(/\\s+/).filter(Boolean);
+  if(!toks.length)return;
+  insertToks(toks);
 }
 
 function insertToks(tokArr){
@@ -1317,6 +1332,21 @@ function setDots(el,cnt){
   el.innerHTML='';
   for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
 }
+function parseDualJpToken(tok){
+  var raw=String(tok||'').replace(/\uFF0F/g,'/');
+  var idx=raw.indexOf('/');
+  if(idx<0||idx!==raw.lastIndexOf('/'))return null;
+  var top=raw.slice(0,idx).trim();
+  var bot=raw.slice(idx+1).trim();
+  if(!top&&!bot)return null;
+  return {top:top||'sp',bot:bot||'sp'};
+}
+function makeDualJpToken(pair){
+  var w=document.createElement('span');w.className='jp-dual';
+  var t=document.createElement('span');t.className='jp-dual-top';t.appendChild(parseJpToken(pair.top,{inDual:true}));w.appendChild(t);
+  var b=document.createElement('span');b.className='jp-dual-bot';b.appendChild(parseJpToken(pair.bot,{inDual:true}));w.appendChild(b);
+  return w;
+}
 function getVoltaStartLabel(nStr){
   if(!nStr)return '';
   var m=nStr.match(/\\[v:([^\\]\\s]+)\\]/);
@@ -1328,8 +1358,12 @@ function getVoltaStartLabel(nStr){
 function hasVoltaEnd(nStr){
   return !!(nStr&&nStr.indexOf(']v')>=0);
 }
-function parseJpToken(tok){
+function parseJpToken(tok,opts){
+  opts=opts||{};
+  tok=String(tok||'');
   if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|')return makeBarline(tok);
+  var dual=!opts.inDual?parseDualJpToken(tok):null;
+  if(dual)return makeDualJpToken(dual);
   if(!tok||tok==='-'||tok===' ')return makeJpPlain(tok);
   var hasFermata=false;
   if(tok.slice(-1)==='^'){hasFermata=true;tok=tok.slice(0,-1);}
@@ -1607,6 +1641,7 @@ document.addEventListener('keydown',function(e){
   if(/^[0-7]$/.test(k)){e.preventDefault();inputNote(parseInt(k));return;}
   if(k===' '){e.preventDefault();appendTok(buildSpacerTok());return;}
   if(k==='\\\\' || k==='-'){e.preventDefault();inputSpecial('-');return;}
+  if(k==='/' || k==='／'){e.preventDefault();appendCustomToken();return;}
   if(k==='Backspace'){e.preventDefault();deleteSelected();return;}
   if(k==='Escape'){e.preventDefault();clearSel();renderEditor();reactivate();updateStatus();return;}
   if(k==='ArrowLeft'){e.preventDefault();moveCursor('left');return;}
@@ -2289,6 +2324,7 @@ const tutStepsJF = [
     items: [
       '数字 1-7 对应 Do-Si 七个音',
       '0 表示休止符，点击音符可加上下点（高低八度）',
+      '双行简谱写法：上行/下行，例如 1/5',
       '左边面板选择调号、拍号与速度'
     ]
   },
