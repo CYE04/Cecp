@@ -197,11 +197,11 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
 .jp-dot-top{height:12px;justify-content:flex-end}.jp-dot-bot{height:12px;justify-content:flex-start}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative}
-.jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px}
+.jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:8px}
 .jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em}
 .jp-aug{position:absolute;right:-0.42em;top:0.02em;font-size:10px;line-height:1;pointer-events:none}
-.jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ym-ink);pointer-events:none}
-.jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ym-ink);pointer-events:none}
+.jp-u1-line{display:block;position:static;left:auto;right:auto;bottom:auto;height:1.5px;background:var(--ym-ink);margin-top:3px;align-self:stretch;pointer-events:none}
+.jp-u2-line{display:block;position:static;left:auto;right:auto;bottom:auto;height:1.5px;background:var(--ym-ink);margin-top:2.5px;align-self:stretch;pointer-events:none}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px}
 .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box}
 .jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none}
@@ -580,7 +580,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       setStyle(line,'bottom','auto');
       setStyle(line,'height','1.5px');
       setStyle(line,'background','currentColor');
-      setStyle(line,'margin-top',isU2?'1.5px':'1px');
+      setStyle(line,'margin-top',isU2?'2.5px':'3px');
       setStyle(line,'align-self','stretch');
       setStyle(line,'pointer-events','none');
     }
@@ -613,7 +613,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
     var rows=scope.querySelectorAll('.jp-num-row');
     Array.prototype.forEach.call(rows,function(row){
-      setStyle(row,'padding-bottom','3px');
+      setStyle(row,'padding-bottom','8px');
       setStyle(row,'border-bottom','none');
     });
 
@@ -904,6 +904,16 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function makeJpUnderlineLine(level){
     var ln=document.createElement('span');
     ln.className=level===2?'jp-u2-line':'jp-u1-line';
+    ln.style.display='block';
+    ln.style.position='static';
+    ln.style.left='auto';
+    ln.style.right='auto';
+    ln.style.bottom='auto';
+    ln.style.height='1.5px';
+    ln.style.background='currentColor';
+    ln.style.marginTop=(level===2?'2.5px':'3px');
+    ln.style.alignSelf='stretch';
+    ln.style.pointerEvents='none';
     return ln;
   }
   function parseDualJpToken(tok){
