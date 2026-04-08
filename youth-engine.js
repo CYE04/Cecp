@@ -1037,6 +1037,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     s.style.width='1em';
     s.style.height='1em';
     if(sym==='-'){
+      s.style.fontSize='19px';
       s.style.position='relative';
       s.style.top='-0.12em';
       s.style.lineHeight='1';
