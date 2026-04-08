@@ -828,6 +828,21 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     el.innerHTML='';
     for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
   }
+  function makeJpUnderlineLine(level){
+    var ln=document.createElement('span');
+    ln.className=level===2?'jp-u2-line':'jp-u1-line';
+    ln.style.display='block';
+    ln.style.position='static';
+    ln.style.left='auto';
+    ln.style.right='auto';
+    ln.style.bottom='auto';
+    ln.style.height='1.5px';
+    ln.style.background='currentColor';
+    ln.style.marginTop=(level===2?'1.5px':'1px');
+    ln.style.alignSelf='stretch';
+    ln.style.pointerEvents='none';
+    return ln;
+  }
   function parseDualJpToken(tok){
     var raw=String(tok||'').replace(/\uFF0F/g,'/');
     var idx=raw.indexOf('/');
@@ -869,8 +884,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       if(zm[1].indexOf('\u00b7')>-1){var agz=document.createElement('span');agz.className='jp-aug';agz.textContent='·';nrz.appendChild(agz);}
       var ulz=zm[2].length;
       lwz.appendChild(nrz);
-      if(ulz>=1){var ul1z=document.createElement('span');ul1z.className='jp-u1-line';lwz.appendChild(ul1z);}
-      if(ulz===2){var ul2z=document.createElement('span');ul2z.className='jp-u2-line';lwz.appendChild(ul2z);}
+      if(ulz>=1)lwz.appendChild(makeJpUnderlineLine(1));
+      if(ulz===2)lwz.appendChild(makeJpUnderlineLine(2));
       wz.appendChild(lwz);
       var bdz=document.createElement('span');bdz.className='jp-dot-bot';wz.appendChild(bdz);
       return wz;
@@ -888,8 +903,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;numRow.appendChild(ns2);
     if(isDot){var dt=document.createElement('span');dt.className='jp-aug';dt.textContent='·';numRow.appendChild(dt);}
     lw2.appendChild(numRow);
-    if(uline>=1){var u1=document.createElement('span');u1.className='jp-u1-line';lw2.appendChild(u1);}
-    if(uline===2){var u2=document.createElement('span');u2.className='jp-u2-line';lw2.appendChild(u2);}
+    if(uline>=1)lw2.appendChild(makeJpUnderlineLine(1));
+    if(uline===2)lw2.appendChild(makeJpUnderlineLine(2));
     w.appendChild(lw2);
     var botDot=document.createElement('span');botDot.className='jp-dot-bot';setDots(botDot,isLow>=2?2:isLow);w.appendChild(botDot);
     if(hasFermata){var fw=document.createElement('span');fw.className='jp-fermata';fw.appendChild(w);return fw;}
