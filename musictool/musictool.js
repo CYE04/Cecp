@@ -1733,7 +1733,25 @@ function makeTuplet(n){
 function renderNStr(nStr){
   var div=document.createElement('div');div.className='p-n';
   if(!nStr||!nStr.trim())return div;
-  var toks=nStr.trim().split(/\\s+/),i=0;
+  function isDualAtom(tk){
+    if(!tk||tk==='/'||tk==='／')return false;
+    if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
+    if(tk==='|'||tk==='||'||tk==='||/'||tk==='|]'||tk==='|:'||tk===':|'||tk==='|:|')return false;
+    if(/^\\{(3|5)$/.test(tk))return false;
+    if(/^\\[v:(.+)\\]$/.test(tk))return false;
+    return true;
+  }
+  var rawToks=nStr.trim().split(/\\s+/),toks=[],ti=0;
+  while(ti<rawToks.length){
+    if(ti+2<rawToks.length && (rawToks[ti+1]==='/'||rawToks[ti+1]==='／') && isDualAtom(rawToks[ti]) && isDualAtom(rawToks[ti+2])){
+      toks.push(rawToks[ti]+'/'+rawToks[ti+2]);
+      ti+=3;
+      continue;
+    }
+    toks.push(rawToks[ti]);
+    ti++;
+  }
+  var i=0;
   while(i<toks.length){
     var t=toks[i];
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
