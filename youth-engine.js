@@ -200,8 +200,8 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px}
 .jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em}
 .jp-aug{position:absolute;right:-0.42em;top:0.02em;font-size:10px;line-height:1;pointer-events:none}
-.jp-u1-line{display:block;position:static;left:auto;right:auto;bottom:auto;height:1.5px;background:var(--ym-ink);margin-top:1px;align-self:stretch;pointer-events:none}
-.jp-u2-line{display:block;position:static;left:auto;right:auto;bottom:auto;height:1.5px;background:var(--ym-ink);margin-top:1.5px;align-self:stretch;pointer-events:none}
+.jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ym-ink);pointer-events:none}
+.jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ym-ink);pointer-events:none}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px}
 .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box}
 .jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none}
@@ -831,16 +831,6 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function makeJpUnderlineLine(level){
     var ln=document.createElement('span');
     ln.className=level===2?'jp-u2-line':'jp-u1-line';
-    ln.style.display='block';
-    ln.style.position='static';
-    ln.style.left='auto';
-    ln.style.right='auto';
-    ln.style.bottom='auto';
-    ln.style.height='1.5px';
-    ln.style.background='currentColor';
-    ln.style.marginTop=(level===2?'1.5px':'1px');
-    ln.style.alignSelf='stretch';
-    ln.style.pointerEvents='none';
     return ln;
   }
   function parseDualJpToken(tok){
