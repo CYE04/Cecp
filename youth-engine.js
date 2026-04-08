@@ -614,8 +614,35 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
     var rows=scope.querySelectorAll('.jp-num-row');
     Array.prototype.forEach.call(rows,function(row){
-      setStyle(row,'padding-bottom','3px');
+      setStyle(row,'padding-bottom','8px');
       setStyle(row,'border-bottom','none');
+      setStyle(row,'min-height','1.15em');
+      setStyle(row,'display','inline-flex');
+      setStyle(row,'align-items','center');
+      setStyle(row,'justify-content','center');
+    });
+
+    var nums=scope.querySelectorAll('.jp-num');
+    Array.prototype.forEach.call(nums,function(num){
+      setStyle(num,'line-height','1');
+      setStyle(num,'display','inline-block');
+      setStyle(num,'vertical-align','baseline');
+    });
+    var dashes=scope.querySelectorAll('.jp-plain-sym.is-dash');
+    Array.prototype.forEach.call(dashes,function(d){
+      setStyle(d,'top','0');
+      setStyle(d,'height','1em');
+      setStyle(d,'display','inline-flex');
+      setStyle(d,'align-items','center');
+      setStyle(d,'justify-content','center');
+      setStyle(d,'line-height','1');
+    });
+    var augs=scope.querySelectorAll('.jp-aug');
+    Array.prototype.forEach.call(augs,function(a){
+      setStyle(a,'top','50%');
+      setStyle(a,'transform','translateY(-50%)');
+      setStyle(a,'right','-0.38em');
+      setStyle(a,'line-height','1');
     });
 
     var lines=scope.querySelectorAll('.jp-u1-line,.jp-u2-line');
