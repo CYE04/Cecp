@@ -895,6 +895,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var pl=document.createElement('span');pl.className='jp-plain';
     var t=document.createElement('span');t.className='jp-plain-top';pl.appendChild(t);
     var s=document.createElement('span');s.className='jp-plain-sym'+(sym==='-'?' is-dash':'');s.textContent=sym;pl.appendChild(s);
+    s.style.display='inline-flex';
+    s.style.alignItems='center';
+    s.style.justifyContent='center';
+    s.style.width='1em';
+    s.style.height='1em';
+    if(sym==='-'){
+      s.style.position='relative';
+      s.style.top='-0.2em';
+    }
     var b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
     return pl;
   }
@@ -902,19 +911,39 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     el.innerHTML='';
     for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
   }
+  function styleJpNumEl(el){
+    if(!el)return;
+    el.style.display='inline-flex';
+    el.style.alignItems='center';
+    el.style.justifyContent='center';
+    el.style.textAlign='center';
+    el.style.width='1em';
+    el.style.height='1em';
+    el.style.position='relative';
+    el.style.top='-0.12em';
+  }
+  function styleJpAugEl(el){
+    if(!el)return;
+    el.style.position='absolute';
+    el.style.right='-0.42em';
+    el.style.top='50%';
+    el.style.transform='translateY(-50%)';
+    el.style.pointerEvents='none';
+  }
   function makeJpUnderlineLine(level){
     var ln=document.createElement('span');
     ln.className=level===2?'jp-u2-line':'jp-u1-line';
     ln.style.display='block';
-    ln.style.position='static';
-    ln.style.left='auto';
-    ln.style.right='auto';
-    ln.style.bottom='auto';
+    ln.style.position='absolute';
+    ln.style.left='0';
+    ln.style.right='0';
+    ln.style.bottom=level===2?'0':'3px';
     ln.style.height='1.5px';
     ln.style.background='currentColor';
-    ln.style.marginTop=(level===2?'2.5px':'3px');
-    ln.style.alignSelf='stretch';
+    ln.style.marginTop='0';
+    ln.style.alignSelf='auto';
     ln.style.pointerEvents='none';
+    ln.style.zIndex='1';
     return ln;
   }
   function parseDualJpToken(tok){
@@ -954,8 +983,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       var tdz=document.createElement('span');tdz.className='jp-dot-top';wz.appendChild(tdz);
       var lwz=document.createElement('span');lwz.className='jp-lines-wrap';
       var nrz=document.createElement('span');nrz.className='jp-num-row';
-      var nsz=document.createElement('span');nsz.className='jp-num';nsz.textContent='0';nrz.appendChild(nsz);
-      if(zm[1].indexOf('\u00b7')>-1){var agz=document.createElement('span');agz.className='jp-aug';agz.textContent='·';nrz.appendChild(agz);}
+      var nsz=document.createElement('span');nsz.className='jp-num';nsz.textContent='0';styleJpNumEl(nsz);nrz.appendChild(nsz);
+      if(zm[1].indexOf('\u00b7')>-1){var agz=document.createElement('span');agz.className='jp-aug';agz.textContent='·';styleJpAugEl(agz);nrz.appendChild(agz);}
       var ulz=zm[2].length;
       lwz.appendChild(nrz);
       if(ulz>=1)lwz.appendChild(makeJpUnderlineLine(1));
@@ -974,8 +1003,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isHigh>=2?2:isHigh);w.appendChild(td);
     var lw2=document.createElement('span');lw2.className='jp-lines-wrap';
     var numRow=document.createElement('span');numRow.className='jp-num-row';
-    var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;numRow.appendChild(ns2);
-    if(isDot){var dt=document.createElement('span');dt.className='jp-aug';dt.textContent='·';numRow.appendChild(dt);}
+    var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;styleJpNumEl(ns2);numRow.appendChild(ns2);
+    if(isDot){var dt=document.createElement('span');dt.className='jp-aug';dt.textContent='·';styleJpAugEl(dt);numRow.appendChild(dt);}
     lw2.appendChild(numRow);
     if(uline>=1)lw2.appendChild(makeJpUnderlineLine(1));
     if(uline===2)lw2.appendChild(makeJpUnderlineLine(2));
