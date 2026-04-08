@@ -320,6 +320,66 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       .slice(0,80) || 'song';
   }
 
+  var _h2cPromise=null;
+  function loadHtml2Canvas(){
+    if(window.html2canvas) return Promise.resolve(window.html2canvas);
+    if(_h2cPromise) return _h2cPromise;
+    _h2cPromise=new Promise(function(resolve,reject){
+      function inject(src,next){
+        var s=document.createElement('script');
+        s.src=src;
+        s.async=true;
+        s.onload=function(){
+          if(window.html2canvas) resolve(window.html2canvas);
+          else if(next) inject(next,null);
+          else reject(new Error('html2canvas unavailable'));
+        };
+        s.onerror=function(){
+          s.remove();
+          if(next) inject(next,null);
+          else reject(new Error('html2canvas load failed'));
+        };
+        document.head.appendChild(s);
+      }
+      inject(
+        'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+        'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js'
+      );
+    });
+    return _h2cPromise;
+  }
+
+  function canvasToPngBlob(canvas){
+    return new Promise(function(resolve,reject){
+      if(canvas.toBlob){
+        canvas.toBlob(function(blob){
+          if(blob) resolve(blob);
+          else reject(new Error('png conversion failed'));
+        },'image/png');
+      }else{
+        try{
+          var dataUrl=canvas.toDataURL('image/png');
+          var bin=atob(dataUrl.split(',')[1]||'');
+          var arr=new Uint8Array(bin.length);
+          for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+          resolve(new Blob([arr],{type:'image/png'}));
+        }catch(err){ reject(err); }
+      }
+    });
+  }
+
+  function nodeToPngBlobByHtml2Canvas(node,bgColor){
+    return loadHtml2Canvas().then(function(html2canvas){
+      var dpr=Math.max(1,window.devicePixelRatio||1);
+      return html2canvas(node,{
+        backgroundColor:bgColor||null,
+        scale:Math.min(2,dpr),
+        useCORS:true,
+        logging:false
+      });
+    }).then(canvasToPngBlob);
+  }
+
   function collectCssText(){
     var css=[];
     Array.prototype.forEach.call(document.styleSheets||[],function(sheet){
@@ -371,26 +431,95 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         if(bg!=='transparent'){ ctx.fillStyle=bg; ctx.fillRect(0,0,canvas.width,canvas.height); }
         ctx.setTransform(scale,0,0,scale,0,0);
         ctx.drawImage(img,0,0,width,height);
-        if(canvas.toBlob){
-          canvas.toBlob(function(blob){
-            if(blob) resolve(blob);
-            else reject(new Error('png conversion failed'));
-          },'image/png');
-        }else{
-          try{
-            var dataUrl=canvas.toDataURL('image/png');
-            var bin=atob(dataUrl.split(',')[1]||'');
-            var arr=new Uint8Array(bin.length);
-            for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
-            resolve(new Blob([arr],{type:'image/png'}));
-          }catch(err){ reject(err); }
-        }
+        canvasToPngBlob(canvas).then(resolve).catch(reject);
       };
       img.onerror=function(){
         URL.revokeObjectURL(svgUrl);
         reject(new Error('svg render failed'));
       };
       img.src=svgUrl;
+    });
+  }
+
+  function nodeToPngBlobByTextFallback(node,bgColor){
+    return new Promise(function(resolve,reject){
+      try{
+        var entries=[];
+        var secs=node.querySelectorAll('.sw-lsec');
+        Array.prototype.forEach.call(secs,function(sec){
+          var secName=(sec.querySelector('.sw-lsec-name')||{}).textContent||'';
+          secName=secName.replace(/\s+/g,' ').trim();
+          if(secName) entries.push({type:'sec',text:'['+secName+']'});
+          Array.prototype.forEach.call(sec.querySelectorAll('.sw-lrow'),function(row){
+            var chordLine='';
+            var lyricLine='';
+            Array.prototype.forEach.call(row.querySelectorAll('.prev-seg'),function(seg){
+              var chord=((seg.querySelector('.p-chord')||{}).textContent||'').replace(/\u00a0/g,' ');
+              var lyric=((seg.querySelector('.p-lyric')||{}).textContent||'').replace(/\u00a0/g,' ');
+              chordLine+= (chord||' ') + '  ';
+              lyricLine+= (lyric||' ') + '  ';
+            });
+            if(chordLine.trim()) entries.push({type:'chord',text:chordLine.trimEnd()});
+            if(lyricLine.trim()) entries.push({type:'lyric',text:lyricLine.trimEnd()});
+          });
+          entries.push({type:'gap',text:''});
+        });
+        if(!entries.length) entries=[{type:'sec',text:'[Transpose]'}];
+
+        function fontFor(type){
+          if(type==='sec') return '700 18px "Noto Serif SC","PingFang SC",serif';
+          if(type==='lyric') return '500 19px "Noto Serif SC","PingFang SC",serif';
+          return '700 14px "Space Mono","DM Mono",monospace';
+        }
+        function lhFor(type){
+          if(type==='sec') return 30;
+          if(type==='lyric') return 28;
+          if(type==='gap') return 14;
+          return 24;
+        }
+        function colorFor(type){
+          if(type==='sec') return '#8a5a3b';
+          if(type==='lyric') return '#2d2a26';
+          return '#c2410c';
+        }
+
+        var pad=26;
+        var measure=document.createElement('canvas').getContext('2d');
+        var maxW=0,totalH=pad*2;
+        entries.forEach(function(e){
+          measure.font=fontFor(e.type);
+          var w=measure.measureText(e.text||' ').width;
+          if(w>maxW) maxW=w;
+          totalH+=lhFor(e.type);
+        });
+
+        var canvas=document.createElement('canvas');
+        canvas.width=Math.max(720,Math.ceil(maxW+pad*2));
+        canvas.height=Math.max(480,Math.ceil(totalH));
+        var ctx=canvas.getContext('2d');
+        if(!ctx){ reject(new Error('canvas unavailable')); return; }
+        ctx.fillStyle=bgColor||'#ffffff';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        var y=pad;
+        entries.forEach(function(e){
+          ctx.font=fontFor(e.type);
+          ctx.fillStyle=colorFor(e.type);
+          ctx.textBaseline='top';
+          ctx.fillText(e.text||'',pad,y);
+          y+=lhFor(e.type);
+        });
+        canvasToPngBlob(canvas).then(resolve).catch(reject);
+      }catch(err){ reject(err); }
+    });
+  }
+
+  function nodeToPngBlobRobust(node,bgColor){
+    return nodeToPngBlobByHtml2Canvas(node,bgColor).catch(function(primaryErr){
+      try{ console.warn('[YouthEngine] html2canvas export failed, fallback to svg',primaryErr); }catch(_){}
+      return nodeToPngBlob(node,bgColor).catch(function(secondErr){
+        try{ console.warn('[YouthEngine] svg export failed, fallback to text canvas',secondErr); }catch(_){}
+        return nodeToPngBlobByTextFallback(node,bgColor);
+      });
     });
   }
 
@@ -420,7 +549,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var bg=(opt.bgColor||'#ffffff');
     var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
-      .then(function(){ return nodeToPngBlob(clone,bg); })
+      .then(function(){ return nodeToPngBlobRobust(clone,bg); })
       .then(function(blob){
         var base=safeFileName(opt.title||'transpose');
         var key=safeFileName(opt.key||'');
