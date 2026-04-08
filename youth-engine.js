@@ -688,8 +688,37 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   }
   function trBass(bass,st,useFlat){return trKeyName(bass,st,useFlat);}
   function normLyricText(text){return String(text||'');}
+  var GAP_CANDIDATES=['\u3164','\u3000','\u2003','\u00a0'];
+  var GAP_CHAR_CACHE=new Map();
+  function pickRenderableGapChar(el){
+    if(!el||!document.body)return '\u3000';
+    var cs=getComputedStyle(el);
+    var key=[cs.font,cs.letterSpacing,cs.wordSpacing,cs.lineHeight].join('|');
+    if(GAP_CHAR_CACHE.has(key))return GAP_CHAR_CACHE.get(key);
+    var probe=document.createElement('span');
+    probe.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;white-space:pre;pointer-events:none;';
+    probe.style.font=cs.font;
+    probe.style.letterSpacing=cs.letterSpacing;
+    probe.style.wordSpacing=cs.wordSpacing;
+    probe.style.lineHeight=cs.lineHeight;
+    document.body.appendChild(probe);
+    var pick='\u3000';
+    GAP_CANDIDATES.forEach(function(ch){
+      if(pick!=='\u3000')return;
+      probe.textContent=ch;
+      if(probe.getBoundingClientRect().width>0.2)pick=ch;
+    });
+    probe.remove();
+    GAP_CHAR_CACHE.set(key,pick);
+    return pick;
+  }
+  function normalizeRenderableGapText(el,text){
+    return String(text||'').replace(/\u3164/g,pickRenderableGapChar(el));
+  }
+  function setChordContent(el,text){el.textContent=normalizeRenderableGapText(el,text);}
   function setLyricContent(el,text){
     var raw=String(text||'');
+    var gapChar=pickRenderableGapChar(el);
     el.textContent='';
     for(var i=0;i<raw.length;i++){
       var ch=raw[i];
@@ -697,7 +726,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         var gap=document.createElement('span');
         gap.className='lyric-gap';
         gap.setAttribute('aria-hidden','true');
-        gap.textContent=ch;
+        gap.textContent=gapChar;
         el.appendChild(gap);
       }else{
         el.appendChild(document.createTextNode(ch));
@@ -860,7 +889,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
           segs.forEach(function(seg){
             var s=div('prev-seg');
             var c=div('p-chord'+(seg.chord?'':' empty'));
-            c.textContent=seg.chord?trChord(seg.chord,st,useFlat):'\u00a0';
+            setChordContent(c,seg.chord?trChord(seg.chord,st,useFlat):'\u00a0');
             s.appendChild(c);
             if(seg.n && seg.n.trim())s.appendChild(renderNStr(seg.n));
             var l=div('p-lyric'+((!Array.isArray(line)&&line.b)?' bold':''));setLyricContent(l,normLyricText(seg.lyric));s.appendChild(l);
