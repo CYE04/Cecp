@@ -380,17 +380,25 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     }).then(canvasToPngBlob);
   }
 
-  function collectCssText(){
-    var css=[];
-    Array.prototype.forEach.call(document.styleSheets||[],function(sheet){
-      var rules;
-      try{ rules=sheet.cssRules; }catch(_){ return; }
-      if(!rules) return;
-      Array.prototype.forEach.call(rules,function(rule){
-        if(rule&&rule.cssText) css.push(rule.cssText);
-      });
-    });
-    return css.join('\n').replace(/<\/style/gi,'<\\/style');
+  function cloneWithComputedStyle(node){
+    var cloned=node.cloneNode(true);
+    function sync(src,dst){
+      if(!src||!dst) return;
+      if(src.nodeType===1&&dst.nodeType===1){
+        var cs=getComputedStyle(src);
+        for(var i=0;i<cs.length;i++){
+          var prop=cs[i];
+          dst.style.setProperty(prop,cs.getPropertyValue(prop),cs.getPropertyPriority(prop));
+        }
+      }
+      var sKids=src.childNodes||[];
+      var dKids=dst.childNodes||[];
+      for(var k=0;k<sKids.length;k++){
+        if(dKids[k]) sync(sKids[k],dKids[k]);
+      }
+    }
+    sync(node,cloned);
+    return cloned;
   }
 
   function nodeToPngBlob(node,bgColor){
@@ -399,12 +407,14 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       var rect=node.getBoundingClientRect();
       var width=Math.max(1,Math.ceil(rect.width));
       var height=Math.max(1,Math.ceil(rect.height));
-      var cssText=collectCssText();
-      var html=new XMLSerializer().serializeToString(node);
+      var snap=cloneWithComputedStyle(node);
+      snap.style.width=width+'px';
+      snap.style.maxWidth='none';
+      snap.style.transform='none';
+      var html=new XMLSerializer().serializeToString(snap);
       var bg=bgColor||'transparent';
       var foreign=[
         '<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+width+'px;height:'+height+'px;background:'+bg+';">',
-        '<style>',cssText,'</style>',
         html,
         '</div>'
       ].join('');
