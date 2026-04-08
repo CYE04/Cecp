@@ -200,6 +200,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative}
 .jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em}
 .jp-aug{position:absolute;right:-0.42em;top:0.02em;font-size:10px;line-height:1;pointer-events:none}
+.jp-u1-line{position:absolute;bottom:3px;left:0;right:0;height:1.5px;background:var(--ym-ink)}
 .jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--ym-ink)}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px}
 .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box}
@@ -374,6 +375,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       return html2canvas(node,{
         backgroundColor:bgColor||null,
         scale:Math.min(2,dpr),
+        foreignObjectRendering:true,
         useCORS:true,
         logging:false
       });
@@ -523,10 +525,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   }
 
   function nodeToPngBlobRobust(node,bgColor){
-    return nodeToPngBlobByHtml2Canvas(node,bgColor).catch(function(primaryErr){
-      try{ console.warn('[YouthEngine] html2canvas export failed, fallback to svg',primaryErr); }catch(_){}
-      return nodeToPngBlob(node,bgColor).catch(function(secondErr){
-        try{ console.warn('[YouthEngine] svg export failed, fallback to text canvas',secondErr); }catch(_){}
+    return nodeToPngBlob(node,bgColor).catch(function(primaryErr){
+      try{ console.warn('[YouthEngine] svg export failed, fallback to html2canvas',primaryErr); }catch(_){}
+      return nodeToPngBlobByHtml2Canvas(node,bgColor).catch(function(secondErr){
+        try{ console.warn('[YouthEngine] html2canvas export failed, fallback to text canvas',secondErr); }catch(_){}
         return nodeToPngBlobByTextFallback(node,bgColor);
       });
     });
@@ -845,8 +847,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       var nsz=document.createElement('span');nsz.className='jp-num';nsz.textContent='0';nrz.appendChild(nsz);
       if(zm[1].indexOf('\u00b7')>-1){var agz=document.createElement('span');agz.className='jp-aug';agz.textContent='·';nrz.appendChild(agz);}
       var ulz=zm[2].length;
-      if(ulz>=1)nrz.style.borderBottom='1.5px solid currentColor';
       lwz.appendChild(nrz);
+      if(ulz>=1){var ul1z=document.createElement('span');ul1z.className='jp-u1-line';lwz.appendChild(ul1z);}
       if(ulz===2){var ul2z=document.createElement('span');ul2z.className='jp-u2-line';lwz.appendChild(ul2z);}
       wz.appendChild(lwz);
       var bdz=document.createElement('span');bdz.className='jp-dot-bot';wz.appendChild(bdz);
@@ -864,8 +866,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var numRow=document.createElement('span');numRow.className='jp-num-row';
     var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;numRow.appendChild(ns2);
     if(isDot){var dt=document.createElement('span');dt.className='jp-aug';dt.textContent='·';numRow.appendChild(dt);}
-    if(uline>=1)numRow.style.borderBottom='1.5px solid currentColor';
     lw2.appendChild(numRow);
+    if(uline>=1){var u1=document.createElement('span');u1.className='jp-u1-line';lw2.appendChild(u1);}
     if(uline===2){var u2=document.createElement('span');u2.className='jp-u2-line';lw2.appendChild(u2);}
     w.appendChild(lw2);
     var botDot=document.createElement('span');botDot.className='jp-dot-bot';setDots(botDot,isLow>=2?2:isLow);w.appendChild(botDot);
