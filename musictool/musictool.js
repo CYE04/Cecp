@@ -1034,6 +1034,18 @@ function buildInlineDualToken(topRaw,botRaw){
   if(!top&&!bot)return '';
   return applyInlineDualStyle(top||'sp')+'/'+applyInlineDualStyle(bot||'sp');
 }
+function inlineShiftOct(step){
+  var os=['low2','low1','mid','high1','high2'];
+  var i=os.indexOf(oct);
+  var ni=i+step;
+  if(ni>=0&&ni<os.length)setOct(os[ni]);
+}
+function inlineApplyBasicToken(inp,key){
+  if(/^[0-7]$/.test(key)){inp.value=buildTok(parseInt(key,10));return true;}
+  if(key===' '){inp.value=buildSpacerTok();return true;}
+  if(key==='\\\\' || key==='-'){inp.value='-';return true;}
+  return false;
+}
 function insertInlineDualToken(si,li,gi,topRaw,botRaw){
   var tok=buildInlineDualToken(topRaw,botRaw);
   if(!tok){alert('请先输入上行或下行音符');return;}
@@ -1494,10 +1506,27 @@ function renderEditor(){
             inlineDualBot=dinBot.value;
           });
           el.addEventListener('keydown',function(e){
-            if(e.key==='Enter'){
+            var k=e.key;
+            if(k==='Enter'){
               e.preventDefault();e.stopPropagation();
               insertInlineDualToken(si,li,gi,dinTop.value,dinBot.value);
+              return;
             }
+            if(e.metaKey||e.ctrlKey||e.altKey)return;
+            if(inlineApplyBasicToken(el,k)){
+              e.preventDefault();e.stopPropagation();
+              inlineDualTop=dinTop.value;inlineDualBot=dinBot.value;
+              return;
+            }
+            if(k==='ArrowUp'){e.preventDefault();e.stopPropagation();inlineShiftOct(1);return;}
+            if(k==='ArrowDown'){e.preventDefault();e.stopPropagation();inlineShiftOct(-1);return;}
+            if(k==='q'||k==='Q'){e.preventDefault();e.stopPropagation();setDur('whole');return;}
+            if(k==='w'||k==='W'){e.preventDefault();e.stopPropagation();setDur('half');return;}
+            if(k==='e'||k==='E'){e.preventDefault();e.stopPropagation();setDur('quarter');return;}
+            if(k==='r'||k==='R'){e.preventDefault();e.stopPropagation();setDur('eighth');return;}
+            if(k==='t'||k==='T'){e.preventDefault();e.stopPropagation();setDur('16th');return;}
+            if(k===','){e.preventDefault();e.stopPropagation();toggleDot();return;}
+            if(k==='f'||k==='F'){e.preventDefault();e.stopPropagation();toggleFermata();return;}
           });
         });
         dqbtn.onclick=(function(si,li,gi){return function(e){
