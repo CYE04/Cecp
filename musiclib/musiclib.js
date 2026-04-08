@@ -826,8 +826,10 @@
   function normLyricText(text){
     return String(text||'');
   }
+  const IS_APPLE_DEVICE=/Mac|iPad|iPhone|iPod/.test(navigator.platform||'')||/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent||'');
   const GAP_CANDIDATES=['\u3164','\u3000','\u2003','\u00a0'];
   const GAP_CHAR_CACHE=new Map();
+  const GAP_WIDTH_CACHE=new Map();
   function pickRenderableGapChar(el){
     if(!el||!document.body)return '\u3000';
     const cs=getComputedStyle(el);
@@ -849,23 +851,61 @@
     GAP_CHAR_CACHE.set(key,pick);
     return pick;
   }
+  function measureGapWidth(el,sample){
+    if(!el||!document.body)return 0;
+    const cs=getComputedStyle(el);
+    const key=[sample,cs.font,cs.letterSpacing,cs.wordSpacing,cs.lineHeight].join('|');
+    if(GAP_WIDTH_CACHE.has(key))return GAP_WIDTH_CACHE.get(key);
+    const probe=document.createElement('span');
+    probe.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;white-space:pre;pointer-events:none;';
+    probe.style.font=cs.font;
+    probe.style.letterSpacing=cs.letterSpacing;
+    probe.style.wordSpacing=cs.wordSpacing;
+    probe.style.lineHeight=cs.lineHeight;
+    probe.textContent=sample;
+    document.body.appendChild(probe);
+    const w=probe.getBoundingClientRect().width;
+    probe.remove();
+    GAP_WIDTH_CACHE.set(key,w);
+    return w;
+  }
+  function appendGapNode(el,cls,width,ch){
+    const gap=document.createElement('span');
+    gap.className=cls;
+    gap.setAttribute('aria-hidden','true');
+    if(width>0){
+      gap.style.display='inline-block';
+      gap.style.width=width+'px';
+      gap.textContent=' ';
+    }else{
+      gap.textContent=ch;
+    }
+    el.appendChild(gap);
+  }
   function normalizeRenderableGapText(el,text){
     return String(text||'').replace(/\u3164/g,pickRenderableGapChar(el));
   }
   function setChordContent(el,text){
-    el.textContent=normalizeRenderableGapText(el,text);
+    const raw=String(text||'');
+    if(!IS_APPLE_DEVICE){
+      el.textContent=normalizeRenderableGapText(el,raw);
+      return;
+    }
+    const gapWidth=measureGapWidth(el,'0');
+    el.textContent='';
+    for(const ch of raw){
+      if(ch==='\u3164') appendGapNode(el,'chord-gap',gapWidth,ch);
+      else el.appendChild(document.createTextNode(ch));
+    }
   }
   function setLyricContent(el,text){
     const raw=String(text||'');
     const gapChar=pickRenderableGapChar(el);
+    const gapWidth=IS_APPLE_DEVICE?measureGapWidth(el,'我'):0;
     el.textContent='';
     for(const ch of raw){
       if(ch==='\u3164'){
-        const gap=document.createElement('span');
-        gap.className='lyric-gap';
-        gap.setAttribute('aria-hidden','true');
-        gap.textContent=gapChar;
-        el.appendChild(gap);
+        appendGapNode(el,'lyric-gap',gapWidth,gapChar);
       }else{
         el.appendChild(document.createTextNode(ch));
       }
