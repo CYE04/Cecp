@@ -666,6 +666,100 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       });
   }
 
+  function buildExportClone(panelInner){
+    var rect=panelInner.getBoundingClientRect();
+    var mount=(panelInner&&panelInner.closest&&panelInner.closest('#music-library')) || document.body;
+    var host=document.createElement('div');
+    host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
+    var clone=panelInner.cloneNode(true);
+    clone.style.width=Math.max(1,Math.ceil(rect.width))+'px';
+    clone.style.maxWidth='none';
+    clone.style.margin='0';
+    clone.style.transform='none';
+    host.appendChild(clone);
+    mount.appendChild(host);
+    return {
+      node:clone,
+      cleanup:function(){ host.remove(); }
+    };
+  }
+
+  function normalizeExportNotation(scope){
+    if(!scope||!scope.querySelectorAll) return;
+    var wraps=scope.querySelectorAll('.jp-lines-wrap');
+    Array.prototype.forEach.call(wraps,function(wrap){
+      wrap.style.position='relative';
+      wrap.style.paddingBottom='12px';
+      wrap.style.overflow='visible';
+
+      var row=wrap.querySelector('.jp-num-row');
+      if(!row) return;
+      var cs=getComputedStyle(row);
+      var hadBorder=(parseFloat(cs.borderBottomWidth||'0')>0)&&(cs.borderBottomStyle!=='none');
+      row.style.borderBottom='none';
+      row.style.paddingBottom='0';
+      row.style.minHeight='1.15em';
+      row.style.display='inline-flex';
+      row.style.alignItems='center';
+      row.style.justifyContent='center';
+
+      if(hadBorder && !wrap.querySelector('.jp-u1-line')){
+        var ul=document.createElement('span');
+        ul.className='jp-u1-line';
+        wrap.appendChild(ul);
+      }
+
+      var lines=wrap.querySelectorAll('.jp-u1-line,.jp-u2-line');
+      Array.prototype.forEach.call(lines,function(line){
+        line.style.display='block';
+        line.style.position='absolute';
+        line.style.left='0';
+        line.style.right='0';
+        line.style.bottom=line.classList.contains('jp-u2-line')?'0':'4px';
+        line.style.height='1.5px';
+        line.style.background='currentColor';
+        line.style.margin='0';
+        line.style.pointerEvents='none';
+      });
+    });
+
+    var nums=scope.querySelectorAll('.jp-num');
+    Array.prototype.forEach.call(nums,function(num){
+      num.style.lineHeight='1';
+      num.style.display='inline-block';
+      num.style.verticalAlign='baseline';
+      num.style.height='1em';
+      num.style.position='relative';
+      num.style.top='-0.12em';
+    });
+    var dashes=scope.querySelectorAll('.jp-plain-sym.is-dash');
+    Array.prototype.forEach.call(dashes,function(d){
+      d.style.top='-0.12em';
+      d.style.height='1em';
+      d.style.display='inline-flex';
+      d.style.alignItems='center';
+      d.style.justifyContent='center';
+      d.style.lineHeight='1';
+      d.style.fontSize='19px';
+      d.style.transform='none';
+    });
+    var augs=scope.querySelectorAll('.jp-aug');
+    Array.prototype.forEach.call(augs,function(a){
+      a.style.position='absolute';
+      a.style.top='50%';
+      a.style.right='-0.42em';
+      a.style.transform='translateY(-50%)';
+      a.style.lineHeight='1';
+      a.style.display='inline-block';
+    });
+  }
+
+  function waitPaint2(){
+    return new Promise(function(resolve){
+      requestAnimationFrame(function(){requestAnimationFrame(resolve);});
+    });
+  }
+
   function exportTransposePanel(panelInner,opt){
     opt=opt||{};
     if(!panelInner) return Promise.reject(new Error('panel missing'));
@@ -673,9 +767,11 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
       .then(function(){
-        return withExportJpFix(panelInner,function(){
-          return nodeToPngBlobRobust(panelInner,bg);
-        });
+        var snap=buildExportClone(panelInner);
+        normalizeExportNotation(snap.node);
+        return waitPaint2()
+          .then(function(){ return nodeToPngBlobRobust(snap.node,bg); })
+          .finally(function(){ snap.cleanup(); });
       })
       .then(function(blob){
         var base=safeFileName(opt.title||'transpose');
