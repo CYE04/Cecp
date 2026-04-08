@@ -410,7 +410,6 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       var snap=cloneWithComputedStyle(node);
       snap.style.width=width+'px';
       snap.style.maxWidth='none';
-      snap.style.transform='none';
       var html=new XMLSerializer().serializeToString(snap);
       var bg=bgColor||'transparent';
       var foreign=[
@@ -546,27 +545,17 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   function exportTransposePanel(panelInner,opt){
     opt=opt||{};
-    var width=Math.max(560,Math.ceil((opt.width||panelInner.getBoundingClientRect().width||900)));
-    var host=document.createElement('div');
-    host.style.cssText='position:fixed;left:-99999px;top:0;z-index:-1;pointer-events:none;opacity:0;';
-    var clone=panelInner.cloneNode(true);
-    clone.style.width=width+'px';
-    clone.style.maxWidth='none';
-    clone.style.margin='0';
-    host.appendChild(clone);
-    document.body.appendChild(host);
-
-    var bg=(opt.bgColor||'#ffffff');
+    if(!panelInner) return Promise.reject(new Error('panel missing'));
+    var bg=(typeof opt.bgColor!=='undefined')?opt.bgColor:getComputedStyle(panelInner).backgroundColor;
     var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
-      .then(function(){ return nodeToPngBlobRobust(clone,bg); })
+      .then(function(){ return nodeToPngBlobRobust(panelInner,bg); })
       .then(function(blob){
         var base=safeFileName(opt.title||'transpose');
         var key=safeFileName(opt.key||'');
         var filename=base+(key?('_'+key):'')+'.png';
         saveBlobAs(blob,filename);
-      })
-      .finally(function(){ host.remove(); });
+      });
   }
 
   /* ══════════════ Welcome Modal ══════════════ */
