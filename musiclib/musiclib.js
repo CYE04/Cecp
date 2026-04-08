@@ -723,12 +723,117 @@
       });
   }
 
+  function buildExportClone(panelInner){
+    const rect=panelInner.getBoundingClientRect();
+    const mount=(panelInner&&panelInner.closest&&panelInner.closest('#music-library')) || document.body;
+    const host=document.createElement('div');
+    host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
+    const clone=panelInner.cloneNode(true);
+    clone.style.width=Math.max(1,Math.ceil(rect.width))+'px';
+    clone.style.maxWidth='none';
+    clone.style.margin='0';
+    clone.style.transform='none';
+    host.appendChild(clone);
+    mount.appendChild(host);
+    return {
+      node:clone,
+      cleanup:()=>host.remove()
+    };
+  }
+
+  function normalizeExportNotation(scope){
+    if(!scope||!scope.querySelectorAll) return;
+    scope.querySelectorAll('.jp-lines-wrap').forEach(wrap=>{
+      wrap.style.position='relative';
+      wrap.style.paddingBottom='12px';
+      wrap.style.overflow='visible';
+
+      const row=wrap.querySelector('.jp-num-row');
+      if(!row) return;
+      const cs=getComputedStyle(row);
+      const hadBorder=(parseFloat(cs.borderBottomWidth||'0')>0)&&(cs.borderBottomStyle!=='none');
+      row.style.borderBottom='none';
+      row.style.paddingBottom='0';
+      row.style.minHeight='1.15em';
+      row.style.display='inline-flex';
+      row.style.alignItems='center';
+      row.style.justifyContent='center';
+
+      if(hadBorder && !wrap.querySelector('.jp-u1-line')){
+        const ul=document.createElement('span');
+        ul.className='jp-u1-line';
+        wrap.appendChild(ul);
+      }
+
+      wrap.querySelectorAll('.jp-u1-line,.jp-u2-line').forEach(line=>{
+        line.style.display='block';
+        line.style.position='absolute';
+        line.style.left='0';
+        line.style.right='0';
+        line.style.bottom=line.classList.contains('jp-u2-line')?'0':'4px';
+        line.style.height='1.5px';
+        line.style.background='currentColor';
+        line.style.margin='0';
+        line.style.pointerEvents='none';
+      });
+    });
+
+    scope.querySelectorAll('.jp-num').forEach(num=>{
+      num.style.lineHeight='1';
+      num.style.display='inline-block';
+      num.style.verticalAlign='baseline';
+      num.style.height='1em';
+      num.style.position='relative';
+      num.style.top='-0.12em';
+    });
+    scope.querySelectorAll('.jp-plain-sym.is-dash').forEach(d=>{
+      d.style.position='relative';
+      d.style.top='-0.12em';
+      d.style.height='1em';
+      d.style.display='inline-flex';
+      d.style.alignItems='center';
+      d.style.justifyContent='center';
+      d.style.lineHeight='1';
+      d.style.fontSize='19px';
+      d.style.transform='none';
+      d.style.overflow='visible';
+      let dashLine=d.querySelector('.jp-dash-line');
+      if(!dashLine){
+        dashLine=document.createElement('span');
+        dashLine.className='jp-dash-line';
+        d.textContent='';
+        d.appendChild(dashLine);
+      }
+      styleJpDashLineEl(dashLine);
+    });
+    scope.querySelectorAll('.jp-aug').forEach(a=>{
+      a.style.position='absolute';
+      a.style.top='50%';
+      a.style.right='-0.42em';
+      a.style.transform='translateY(-50%)';
+      a.style.lineHeight='1';
+      a.style.display='inline-block';
+    });
+  }
+
+  function waitPaint2(){
+    return new Promise(resolve=>{
+      requestAnimationFrame(()=>requestAnimationFrame(resolve));
+    });
+  }
+
   function exportTransposePanel(panelInner,opt={}){
     if(!panelInner) return Promise.reject(new Error('panel missing'));
     const bg=resolveExportBackground(panelInner,opt.bgColor);
     const waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
-      .then(()=>withExportJpFix(panelInner,()=>nodeToPngBlobRobust(panelInner,bg)))
+      .then(()=>{
+        const snap=buildExportClone(panelInner);
+        normalizeExportNotation(snap.node);
+        return waitPaint2()
+          .then(()=>nodeToPngBlobRobust(snap.node,bg))
+          .finally(()=>snap.cleanup());
+      })
       .then(blob=>{
         const base=safeFileName(opt.title||'transpose');
         const key=safeFileName(opt.key||'');
@@ -1041,8 +1146,16 @@
     s.style.width='1em';
     s.style.height='1em';
     if(sym==='-'){
+      s.style.fontSize='19px';
       s.style.position='relative';
       s.style.top='-0.12em';
+      s.style.lineHeight='1';
+      s.style.overflow='visible';
+      s.textContent='';
+      const dashLine=document.createElement('span');
+      dashLine.className='jp-dash-line';
+      styleJpDashLineEl(dashLine);
+      s.appendChild(dashLine);
     }
     const b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
     return pl;
@@ -1068,6 +1181,18 @@
     el.style.right='-0.42em';
     el.style.top='50%';
     el.style.transform='translateY(-50%)';
+    el.style.pointerEvents='none';
+  }
+  function styleJpDashLineEl(el){
+    if(!el)return;
+    el.style.position='absolute';
+    el.style.left='0.08em';
+    el.style.right='0.08em';
+    el.style.top='50%';
+    el.style.height='2px';
+    el.style.transform='translateY(-50%)';
+    el.style.background='currentColor';
+    el.style.borderRadius='2px';
     el.style.pointerEvents='none';
   }
   function makeJpUnderlineLine(level){
