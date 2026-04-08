@@ -764,7 +764,25 @@
   function renderNStr(nStr){
     var d=document.createElement('div');d.className='p-n';
     if(!nStr||!nStr.trim())return d;
-    var toks=nStr.trim().split(/\s+/),i=0;
+    function isDualAtom(tk){
+      if(!tk||tk==='/'||tk==='／')return false;
+      if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
+      if(tk==='|'||tk==='||'||tk==='||/'||tk==='|]'||tk==='|:'||tk===':|'||tk==='|:|')return false;
+      if(/^\{(3|5)$/.test(tk))return false;
+      if(/^\[v:(.+)\]$/.test(tk))return false;
+      return true;
+    }
+    var rawToks=nStr.trim().split(/\s+/),toks=[],ti=0;
+    while(ti<rawToks.length){
+      if(ti+2<rawToks.length && (rawToks[ti+1]==='/'||rawToks[ti+1]==='／') && isDualAtom(rawToks[ti]) && isDualAtom(rawToks[ti+2])){
+        toks.push(rawToks[ti]+'/'+rawToks[ti+2]);
+        ti+=3;
+        continue;
+      }
+      toks.push(rawToks[ti]);
+      ti++;
+    }
+    var i=0;
     while(i<toks.length){
       var t=toks[i];
       if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
@@ -808,15 +826,45 @@
   function normLyricText(text){
     return String(text||'');
   }
+  const GAP_CANDIDATES=['\u3164','\u3000','\u2003','\u00a0'];
+  const GAP_CHAR_CACHE=new Map();
+  function pickRenderableGapChar(el){
+    if(!el||!document.body)return '\u3000';
+    const cs=getComputedStyle(el);
+    const key=[cs.font,cs.letterSpacing,cs.wordSpacing,cs.lineHeight].join('|');
+    if(GAP_CHAR_CACHE.has(key))return GAP_CHAR_CACHE.get(key);
+    const probe=document.createElement('span');
+    probe.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;white-space:pre;pointer-events:none;';
+    probe.style.font=cs.font;
+    probe.style.letterSpacing=cs.letterSpacing;
+    probe.style.wordSpacing=cs.wordSpacing;
+    probe.style.lineHeight=cs.lineHeight;
+    document.body.appendChild(probe);
+    let pick='\u3000';
+    for(const ch of GAP_CANDIDATES){
+      probe.textContent=ch;
+      if(probe.getBoundingClientRect().width>0.2){pick=ch;break;}
+    }
+    probe.remove();
+    GAP_CHAR_CACHE.set(key,pick);
+    return pick;
+  }
+  function normalizeRenderableGapText(el,text){
+    return String(text||'').replace(/\u3164/g,pickRenderableGapChar(el));
+  }
+  function setChordContent(el,text){
+    el.textContent=normalizeRenderableGapText(el,text);
+  }
   function setLyricContent(el,text){
     const raw=String(text||'');
+    const gapChar=pickRenderableGapChar(el);
     el.textContent='';
     for(const ch of raw){
       if(ch==='\u3164'){
         const gap=document.createElement('span');
         gap.className='lyric-gap';
         gap.setAttribute('aria-hidden','true');
-        gap.textContent=ch;
+        gap.textContent=gapChar;
         el.appendChild(gap);
       }else{
         el.appendChild(document.createTextNode(ch));
@@ -1550,7 +1598,7 @@
             const segEl=_div('prev-seg');
             const chord=document.createElement('div');
             chord.className='p-chord'+(seg.chord?'':' empty');
-            chord.textContent=(seg.chord?trChord(seg.chord,st,useFlat):'\u00a0');
+            setChordContent(chord,seg.chord?trChord(seg.chord,st,useFlat):'\u00a0');
             segEl.appendChild(chord);
             if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
             const lyric=document.createElement('div');lyric.className='p-lyric'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(lyric,normLyricText(seg.lyric));
