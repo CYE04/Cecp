@@ -1,7 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
-  const ML_VER='2026.03.25.1';
+  const ML_VER='2026.04.08.1';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -37,6 +37,8 @@
 
   const root=document.getElementById('music-library');
   if(!root)return;
+  document.documentElement.classList.add('ml-fullscreen');
+  if(document.body) document.body.classList.add('ml-fullscreen');
   root.setAttribute('data-ml-version',ML_VER);
   try{console.info('[musiclib] loaded version',ML_VER);}catch(_){}
 
@@ -686,8 +688,27 @@
     el.innerHTML='';
     for(var i=0;i<cnt;i++){const d=document.createElement('span');d.textContent='·';el.appendChild(d);}
   }
-  function parseJpToken(tok){
+  function parseDualJpToken(tok){
+    var raw=String(tok||'').replace(/\uFF0F/g,'/');
+    var idx=raw.indexOf('/');
+    if(idx<0||idx!==raw.lastIndexOf('/'))return null;
+    var top=raw.slice(0,idx).trim();
+    var bot=raw.slice(idx+1).trim();
+    if(!top&&!bot)return null;
+    return {top:top||'sp',bot:bot||'sp'};
+  }
+  function makeDualJpToken(pair){
+    const w=document.createElement('span');w.className='jp-dual';
+    const t=document.createElement('span');t.className='jp-dual-top';t.appendChild(parseJpToken(pair.top,{inDual:true}));w.appendChild(t);
+    const b=document.createElement('span');b.className='jp-dual-bot';b.appendChild(parseJpToken(pair.bot,{inDual:true}));w.appendChild(b);
+    return w;
+  }
+  function parseJpToken(tok,opts){
+    opts=opts||{};
+    tok=String(tok||'');
     if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|')return makeBarline(tok);
+    const dual=!opts.inDual?parseDualJpToken(tok):null;
+    if(dual)return makeDualJpToken(dual);
     if(!tok||tok==='-'||tok===' ')return makeJpPlain(tok);
     var hasFermata=false;
     if(tok.slice(-1)==='^'){hasFermata=true;tok=tok.slice(0,-1);}
