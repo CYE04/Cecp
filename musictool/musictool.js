@@ -290,6 +290,30 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .numpad .kbd-btn{font-size:15px;font-weight:700;padding:8px 0;width:40px;color:var(--ink);min-width:0;}
 .kbd-btn.zero{font-size:13px;font-weight:700;color:var(--ink);width:100%;margin-top:4px;padding:8px 0;}
 .kbd-func-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.dual-builder{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.025);padding:10px;display:flex;flex-direction:column;gap:8px;}
+.dual-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:9px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink3);}
+.dual-head strong{color:var(--ink2);font-weight:700;font-size:10px;letter-spacing:0;text-transform:none;}
+.dual-row{display:flex;flex-direction:column;gap:5px;}
+.dual-row-top{display:flex;align-items:center;gap:6px;}
+.dual-row-tag{width:30px;font-size:9px;color:var(--ink3);font-family:'Space Mono',monospace;flex-shrink:0;}
+.dual-inp{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--ink);font-family:'Space Mono',monospace;font-size:12px;padding:6px 8px;outline:none;}
+.dual-inp:focus{border-color:var(--accent);}
+.dual-clear{padding:6px 8px;border-radius:6px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;font-size:10px;font-family:'Space Mono',monospace;}
+.dual-clear:hover{color:var(--ink);border-color:var(--accent2);}
+.dual-picks{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;}
+.dual-pick{padding:5px 0;border-radius:5px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;font-family:'Space Mono',monospace;font-size:10px;line-height:1;}
+.dual-pick:hover{border-color:var(--accent);color:var(--ink);}
+.dual-pick.wide{grid-column:span 2;}
+.dual-tools{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding-top:2px;}
+.dual-tool{padding:6px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;font-family:'Space Mono',monospace;font-size:10px;line-height:1;}
+.dual-tool.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.dual-tool:hover{color:var(--ink);}
+.dual-preview{font-size:10px;color:var(--ink2);font-family:'Space Mono',monospace;display:flex;align-items:center;gap:6px;}
+.dual-preview code{font-size:12px;color:var(--ink);background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:3px 6px;}
+.dual-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.dual-action{padding:8px;border-radius:6px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.4px;}
+.dual-action.main{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+.dual-action:hover{opacity:.9;}
 
 /* ── 跨格子房子线（preview 层） ── */
 .prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
@@ -483,6 +507,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   .kbd-main{grid-template-columns:1fr;}
   .kbd-actions{grid-template-columns:repeat(3,minmax(0,1fr));}
   .kbd-func-grid{grid-template-columns:1fr;}
+  .dual-picks{grid-template-columns:repeat(6,minmax(0,1fr));}
 }
 
 @media (max-width: 760px){
@@ -493,6 +518,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   .top-panel,.seg-pane,.kbd-pane{border-radius:14px;}
   .mid-bar{padding:10px 12px;}
   .kbd-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .dual-actions{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -676,6 +702,68 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
       </div>
     </div>
 
+    <div class="dual-builder">
+      <div class="dual-head">
+        <span>双行简谱可视化输入</span>
+        <strong id="dual-mode-stat">4分</strong>
+      </div>
+
+      <div class="dual-row">
+        <div class="dual-row-top">
+          <span class="dual-row-tag">上行</span>
+          <input id="dual-top" class="dual-inp" placeholder="例如 1 或 1' 或 sp">
+          <button class="dual-clear" onclick="clearDualRow('top')">清</button>
+        </div>
+        <div class="dual-picks">
+          <button class="dual-pick" onclick="dualPick('top','1')">1</button>
+          <button class="dual-pick" onclick="dualPick('top','2')">2</button>
+          <button class="dual-pick" onclick="dualPick('top','3')">3</button>
+          <button class="dual-pick" onclick="dualPick('top','4')">4</button>
+          <button class="dual-pick" onclick="dualPick('top','5')">5</button>
+          <button class="dual-pick" onclick="dualPick('top','6')">6</button>
+          <button class="dual-pick" onclick="dualPick('top','7')">7</button>
+          <button class="dual-pick" onclick="dualPick('top','0')">0</button>
+          <button class="dual-pick wide" onclick="dualPick('top','sp')">sp</button>
+          <button class="dual-pick wide" onclick="dualPick('top','-')">-</button>
+        </div>
+      </div>
+
+      <div class="dual-row">
+        <div class="dual-row-top">
+          <span class="dual-row-tag">下行</span>
+          <input id="dual-bot" class="dual-inp" placeholder="例如 5 或 5, 或 sp">
+          <button class="dual-clear" onclick="clearDualRow('bot')">清</button>
+        </div>
+        <div class="dual-picks">
+          <button class="dual-pick" onclick="dualPick('bot','1')">1</button>
+          <button class="dual-pick" onclick="dualPick('bot','2')">2</button>
+          <button class="dual-pick" onclick="dualPick('bot','3')">3</button>
+          <button class="dual-pick" onclick="dualPick('bot','4')">4</button>
+          <button class="dual-pick" onclick="dualPick('bot','5')">5</button>
+          <button class="dual-pick" onclick="dualPick('bot','6')">6</button>
+          <button class="dual-pick" onclick="dualPick('bot','7')">7</button>
+          <button class="dual-pick" onclick="dualPick('bot','0')">0</button>
+          <button class="dual-pick wide" onclick="dualPick('bot','sp')">sp</button>
+          <button class="dual-pick wide" onclick="dualPick('bot','-')">-</button>
+        </div>
+      </div>
+
+      <div class="dual-tools">
+        <button class="dual-tool on" id="dual-dur-quarter" onclick="setDualDur('quarter')">4分</button>
+        <button class="dual-tool" id="dual-dur-eighth" onclick="setDualDur('eighth')">8分</button>
+        <button class="dual-tool" id="dual-dur-16th" onclick="setDualDur('16th')">16分</button>
+        <button class="dual-tool" id="dual-dot-btn" onclick="toggleDualDot()">附点</button>
+        <button class="dual-tool" id="dual-fermata-btn" onclick="toggleDualFermata()">延长号</button>
+      </div>
+
+      <div class="dual-preview">预览 token: <code id="dual-preview">1/5</code></div>
+
+      <div class="dual-actions">
+        <button class="dual-action main" onclick="insertDualToken()">插入双行</button>
+        <button class="dual-action" onclick="clearDualBuilder()">重置面板</button>
+      </div>
+    </div>
+
     <div class="kbd-actions">
       <button class="kbd-btn action" onclick="deleteSelected()" style="padding:8px 10px;">⌫ 删除<span class="shortcut">Bksp</span></button>
       <button class="kbd-btn action" onclick="undoAction()" style="padding:8px 10px;">↩ 撤销<span class="shortcut">⌘Z</span></button>
@@ -691,7 +779,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
       <span><kbd>F</kbd> 延长号</span>
       <span><kbd>B</kbd> 小节线</span>
       <span><kbd>M</kbd> 双小节</span>
-      <span><kbd>/</kbd> 自定义 token</span>
+      <span><kbd>/</kbd> 双行面板</span>
       <span><kbd>I / O</kbd> 插入 / 覆盖</span>
       <span><kbd>↑ / ↓</kbd> 八度</span>
       <span><kbd>Alt+C/V/R</kbd> 格子复制 / 粘贴 / 覆盖</span>
@@ -749,6 +837,7 @@ var curTok=-1;
 var selA=-1, selB=-1;
 
 var oct='mid', dur='quarter', dotOn=false, fermataOn=false, slurOn=false, xslurOn=false, tupletOn=0;
+var dualDur='quarter', dualDot=false, dualFermata=false;
 var inputMode='insert';
 var tokClipboard=[]; // 存 token 数组
 var segClipboard=null; // 存整格子
@@ -835,6 +924,124 @@ function appendCustomToken(){
   var toks=String(raw).trim().split(/\\s+/).filter(Boolean);
   if(!toks.length)return;
   insertToks(toks);
+}
+function dualInput(which){
+  return document.getElementById(which==='bot'?'dual-bot':'dual-top');
+}
+function dualDurLabel(v){
+  return v==='eighth'?'8分':(v==='16th'?'16分':'4分');
+}
+function updateDualToolUI(){
+  ['quarter','eighth','16th'].forEach(function(k){
+    var btn=document.getElementById('dual-dur-'+k);
+    if(btn)btn.classList.toggle('on',dualDur===k);
+  });
+  var dotBtn=document.getElementById('dual-dot-btn');
+  if(dotBtn)dotBtn.classList.toggle('on',dualDot);
+  var fmBtn=document.getElementById('dual-fermata-btn');
+  if(fmBtn)fmBtn.classList.toggle('on',dualFermata);
+  var stat=document.getElementById('dual-mode-stat');
+  if(stat){
+    var txt=dualDurLabel(dualDur);
+    if(dualDot)txt+=' +附点';
+    if(dualFermata)txt+=' +延长';
+    stat.textContent=txt;
+  }
+}
+function setDualDur(v){
+  dualDur=v;
+  updateDualToolUI();
+  refreshDualPreview();
+}
+function toggleDualDot(){
+  dualDot=!dualDot;
+  updateDualToolUI();
+  refreshDualPreview();
+}
+function toggleDualFermata(){
+  dualFermata=!dualFermata;
+  updateDualToolUI();
+  refreshDualPreview();
+}
+function dualPick(which,val){
+  var el=dualInput(which);
+  if(!el)return;
+  el.value=val;
+  refreshDualPreview();
+}
+function clearDualRow(which){
+  var el=dualInput(which);
+  if(!el)return;
+  el.value='';
+  refreshDualPreview();
+}
+function applyDualStyle(base){
+  var tok=String(base||'').trim().replace(/\s+/g,'');
+  if(!tok)return '';
+  if(tok==='-'||tok.indexOf('|')>=0)return tok;
+  var isSpace=/^sp/.test(tok);
+  var hasDur=/_{1,2}$/.test(tok);
+  var hasDot=tok.indexOf('·')>=0;
+  var hasFermata=/\^$/.test(tok);
+  var out=tok;
+  if(!hasDot && dualDot && !isSpace)out+='·';
+  if(!hasDur){
+    if(dualDur==='eighth')out+='_';
+    else if(dualDur==='16th')out+='__';
+  }
+  if(!hasFermata && dualFermata && !isSpace && out!=='-')out+='^';
+  return out;
+}
+function buildDualToken(){
+  var topEl=dualInput('top');
+  var botEl=dualInput('bot');
+  var topRaw=topEl?String(topEl.value||'').trim():'';
+  var botRaw=botEl?String(botEl.value||'').trim():'';
+  if(!topRaw&&!botRaw)return '';
+  var topTok=applyDualStyle(topRaw||'sp');
+  var botTok=applyDualStyle(botRaw||'sp');
+  return topTok+'/'+botTok;
+}
+function refreshDualPreview(){
+  var pv=document.getElementById('dual-preview');
+  if(!pv)return;
+  var tok=buildDualToken();
+  pv.textContent=tok||'（待输入）';
+}
+function insertDualToken(){
+  if(curSi<0){alert('请先点选一个简谱格子');return;}
+  var tok=buildDualToken();
+  if(!tok){alert('请先输入上行或下行音符');return;}
+  insertToks([tok]);
+}
+function clearDualBuilder(){
+  var topEl=dualInput('top');
+  var botEl=dualInput('bot');
+  if(topEl)topEl.value='1';
+  if(botEl)botEl.value='5';
+  dualDur='quarter';
+  dualDot=false;
+  dualFermata=false;
+  updateDualToolUI();
+  refreshDualPreview();
+}
+function initDualBuilder(){
+  var topEl=dualInput('top');
+  var botEl=dualInput('bot');
+  if(topEl&&!topEl.value)topEl.value='1';
+  if(botEl&&!botEl.value)botEl.value='5';
+  [topEl,botEl].forEach(function(el){
+    if(!el)return;
+    el.addEventListener('input',refreshDualPreview);
+    el.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){
+        e.preventDefault();
+        insertDualToken();
+      }
+    });
+  });
+  updateDualToolUI();
+  refreshDualPreview();
 }
 
 function insertToks(tokArr){
@@ -1637,11 +1844,17 @@ document.addEventListener('keydown',function(e){
     if(code==='KeyX'){e.preventDefault();cutSeg();return;}
     return;
   }
+  if(k==='/' || k==='／'){
+    e.preventDefault();
+    var dualTop=document.getElementById('dual-top');
+    if(dualTop){dualTop.focus();dualTop.select();}
+    else appendCustomToken();
+    return;
+  }
   if(curSi<0)return;
   if(/^[0-7]$/.test(k)){e.preventDefault();inputNote(parseInt(k));return;}
   if(k===' '){e.preventDefault();appendTok(buildSpacerTok());return;}
   if(k==='\\\\' || k==='-'){e.preventDefault();inputSpecial('-');return;}
-  if(k==='/' || k==='／'){e.preventDefault();appendCustomToken();return;}
   if(k==='Backspace'){e.preventDefault();deleteSelected();return;}
   if(k==='Escape'){e.preventDefault();clearSel();renderEditor();reactivate();updateStatus();return;}
   if(k==='ArrowLeft'){e.preventDefault();moveCursor('left');return;}
@@ -1868,6 +2081,14 @@ Object.assign(window, {
   inputSpecial: inputSpecial,
   appendTok: appendTok,
   appendCustomVolta: appendCustomVolta,
+  appendCustomToken: appendCustomToken,
+  setDualDur: setDualDur,
+  toggleDualDot: toggleDualDot,
+  toggleDualFermata: toggleDualFermata,
+  dualPick: dualPick,
+  clearDualRow: clearDualRow,
+  insertDualToken: insertDualToken,
+  clearDualBuilder: clearDualBuilder,
   toggleDot: toggleDot,
   toggleSlur: toggleSlur,
   toggleXSlur: toggleXSlur,
@@ -1885,6 +2106,7 @@ Object.assign(window, {
 refreshTupletBtns();
 renderEditor();
 updateInputState();
+initDualBuilder();
 </script>
 <!-- ── 批量填歌词 modal ── -->
 <div class="lyfill-overlay" id="lyfillOverlay">
