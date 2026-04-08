@@ -311,6 +311,125 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   }
   function div(cls, children){ return el('div',{class:cls},children); }
 
+  function safeFileName(name){
+    return String(name||'song')
+      .trim()
+      .replace(/[\\/:*?"<>|]+/g,'-')
+      .replace(/\s+/g,'_')
+      .replace(/\.+$/,'')
+      .slice(0,80) || 'song';
+  }
+
+  function collectCssText(){
+    var css=[];
+    Array.prototype.forEach.call(document.styleSheets||[],function(sheet){
+      var rules;
+      try{ rules=sheet.cssRules; }catch(_){ return; }
+      if(!rules) return;
+      Array.prototype.forEach.call(rules,function(rule){
+        if(rule&&rule.cssText) css.push(rule.cssText);
+      });
+    });
+    return css.join('\n').replace(/<\/style/gi,'<\\/style');
+  }
+
+  function nodeToPngBlob(node,bgColor){
+    return new Promise(function(resolve,reject){
+      if(!node){ reject(new Error('empty node')); return; }
+      var rect=node.getBoundingClientRect();
+      var width=Math.max(1,Math.ceil(rect.width));
+      var height=Math.max(1,Math.ceil(rect.height));
+      var cssText=collectCssText();
+      var html=new XMLSerializer().serializeToString(node);
+      var bg=bgColor||'transparent';
+      var foreign=[
+        '<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+width+'px;height:'+height+'px;background:'+bg+';">',
+        '<style>',cssText,'</style>',
+        html,
+        '</div>'
+      ].join('');
+      var svg=[
+        '<svg xmlns="http://www.w3.org/2000/svg" width="',width,'" height="',height,'" viewBox="0 0 ',width,' ',height,'">',
+        '<foreignObject width="100%" height="100%">',foreign,'</foreignObject>',
+        '</svg>'
+      ].join('');
+
+      var svgBlob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
+      var svgUrl=URL.createObjectURL(svgBlob);
+      var img=new Image();
+
+      img.onload=function(){
+        URL.revokeObjectURL(svgUrl);
+        var maxSide=4096;
+        var scale=Math.min(2,maxSide/width,maxSide/height);
+        if(!isFinite(scale)||scale<=0) scale=1;
+        var canvas=document.createElement('canvas');
+        canvas.width=Math.max(1,Math.round(width*scale));
+        canvas.height=Math.max(1,Math.round(height*scale));
+        var ctx=canvas.getContext('2d');
+        if(!ctx){ reject(new Error('canvas unavailable')); return; }
+        if(bg!=='transparent'){ ctx.fillStyle=bg; ctx.fillRect(0,0,canvas.width,canvas.height); }
+        ctx.setTransform(scale,0,0,scale,0,0);
+        ctx.drawImage(img,0,0,width,height);
+        if(canvas.toBlob){
+          canvas.toBlob(function(blob){
+            if(blob) resolve(blob);
+            else reject(new Error('png conversion failed'));
+          },'image/png');
+        }else{
+          try{
+            var dataUrl=canvas.toDataURL('image/png');
+            var bin=atob(dataUrl.split(',')[1]||'');
+            var arr=new Uint8Array(bin.length);
+            for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+            resolve(new Blob([arr],{type:'image/png'}));
+          }catch(err){ reject(err); }
+        }
+      };
+      img.onerror=function(){
+        URL.revokeObjectURL(svgUrl);
+        reject(new Error('svg render failed'));
+      };
+      img.src=svgUrl;
+    });
+  }
+
+  function saveBlobAs(blob,filename){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); },800);
+  }
+
+  function exportTransposePanel(panelInner,opt){
+    opt=opt||{};
+    var width=Math.max(560,Math.ceil((opt.width||panelInner.getBoundingClientRect().width||900)));
+    var host=document.createElement('div');
+    host.style.cssText='position:fixed;left:-99999px;top:0;z-index:-1;pointer-events:none;opacity:0;';
+    var clone=panelInner.cloneNode(true);
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.margin='0';
+    host.appendChild(clone);
+    document.body.appendChild(host);
+
+    var bg=(opt.bgColor||'#ffffff');
+    var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+    return waitFonts
+      .then(function(){ return nodeToPngBlob(clone,bg); })
+      .then(function(blob){
+        var base=safeFileName(opt.title||'transpose');
+        var key=safeFileName(opt.key||'');
+        var filename=base+(key?('_'+key):'')+'.png';
+        saveBlobAs(blob,filename);
+      })
+      .finally(function(){ host.remove(); });
+  }
+
   /* ══════════════ Welcome Modal ══════════════ */
   function buildModal() {
     var key = 'ym_hide__' + (location.pathname || '');
@@ -876,12 +995,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     });
 
     /* tools row */
+    var exportBtn = el('button',{class:'sw-pill',type:'button',text:'🖼 下载图片'});
+    exportBtn.style.cssText='font-size:12px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border:none;';
+
     var ytBtn = el('a',{class:'yt-btn',href:song.youtube||'#',target:'_blank',title:'YouTube',
       html:'<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"></path></svg>'
     });
 
     var metroDiv = buildMetro(song.bpm || 80);
-    var toolsRow = div('sw-tools-row',[ytBtn, metroDiv]);
+    var toolsRow = div('sw-tools-row',[exportBtn, ytBtn, metroDiv]);
     wrap.appendChild(div('sw-tools',[toolsRow]));
 
     /* score image */
@@ -973,9 +1095,34 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         lbDiv.style.width=measureW+'px';
           var naturalH=lbDiv.offsetHeight;
         lbDiv.style.marginBottom=(naturalH*(scale-1) + gutterY)+'px';
-          lbDiv.parentElement.style.overflow='hidden';
+        lbDiv.parentElement.style.overflow='hidden';
       });
     }
+
+    exportBtn.addEventListener('click',function(){
+      if(exportBtn.disabled) return;
+      var old=exportBtn.textContent;
+      exportBtn.disabled=true;
+      exportBtn.style.opacity='.65';
+      exportBtn.textContent='生成中...';
+      exportTransposePanel(panelInner,{
+        title:song.title||'transpose',
+        key:'1='+curKey,
+        width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
+      }).then(function(){
+        exportBtn.textContent='已下载';
+      }).catch(function(err){
+        exportBtn.textContent='下载失败';
+        try{ console.error('[YouthEngine] export transpose image failed',err); }catch(_){}
+      }).finally(function(){
+        setTimeout(function(){
+          exportBtn.disabled=false;
+          exportBtn.style.opacity='';
+          exportBtn.textContent=old;
+        },1200);
+      });
+    });
+
     renderScore();
     fitRows();
     var fitObs=new ResizeObserver(fitRows);
