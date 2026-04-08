@@ -1496,20 +1496,24 @@ function renderEditor(){
         var dql=document.createElement('span');dql.className='lbl';dql.textContent='上下';
         dq.appendChild(dql);
         var dinTop=document.createElement('input');dinTop.className='in';dinTop.placeholder='上';dinTop.value=inlineDualTop;
+        dinTop.readOnly=true;
         var slash=document.createElement('span');slash.className='slash';slash.textContent='/';
         var dinBot=document.createElement('input');dinBot.className='in';dinBot.placeholder='下';dinBot.value=inlineDualBot;
+        dinBot.readOnly=true;
         var dqbtn=document.createElement('button');dqbtn.className='btn';dqbtn.textContent='+双行';
         [dinTop,dinBot].forEach(function(el){
           el.addEventListener('click',function(e){e.stopPropagation();if(!isActive)focusSeg(si,li,gi,true);});
-          el.addEventListener('input',function(){
-            inlineDualTop=dinTop.value;
-            inlineDualBot=dinBot.value;
-          });
           el.addEventListener('keydown',function(e){
             var k=e.key;
             if(k==='Enter'){
               e.preventDefault();e.stopPropagation();
               insertInlineDualToken(si,li,gi,dinTop.value,dinBot.value);
+              return;
+            }
+            if(k==='Backspace' || k==='Delete'){
+              e.preventDefault();e.stopPropagation();
+              el.value='';
+              inlineDualTop=dinTop.value;inlineDualBot=dinBot.value;
               return;
             }
             if(e.metaKey||e.ctrlKey||e.altKey)return;
@@ -1527,6 +1531,10 @@ function renderEditor(){
             if(k==='t'||k==='T'){e.preventDefault();e.stopPropagation();setDur('16th');return;}
             if(k===','){e.preventDefault();e.stopPropagation();toggleDot();return;}
             if(k==='f'||k==='F'){e.preventDefault();e.stopPropagation();toggleFermata();return;}
+            if(k.length===1){
+              e.preventDefault();e.stopPropagation();
+              return;
+            }
           });
         });
         dqbtn.onclick=(function(si,li,gi){return function(e){
