@@ -193,7 +193,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .prev-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;line-height:1;color:var(--ym-ink2);pointer-events:none;font-family:'DM Mono',monospace}
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
-.jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em}.jp-plain-sym.is-dash{position:relative;top:-0.2em}.jp-plain-bot{height:16px}
+.jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em}.jp-plain-sym.is-dash{position:relative;top:-0.12em}.jp-plain-bot{height:16px}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
 .jp-dot-top{height:12px;justify-content:flex-end}.jp-dot-bot{height:12px;justify-content:flex-start}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative}
@@ -902,7 +902,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     s.style.height='1em';
     if(sym==='-'){
       s.style.position='relative';
-      s.style.top='-0.2em';
+      s.style.top='-0.12em';
     }
     var b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
     return pl;
@@ -984,7 +984,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       var lwz=document.createElement('span');lwz.className='jp-lines-wrap';
       var nrz=document.createElement('span');nrz.className='jp-num-row';
       var nsz=document.createElement('span');nsz.className='jp-num';nsz.textContent='0';styleJpNumEl(nsz);nrz.appendChild(nsz);
-      if(zm[1].indexOf('\u00b7')>-1){var agz=document.createElement('span');agz.className='jp-aug';agz.textContent='·';styleJpAugEl(agz);nrz.appendChild(agz);}
+      if(zm[1].indexOf('\u00b7')>-1){var agz=document.createElement('span');agz.className='jp-aug';agz.textContent='·';styleJpAugEl(agz);nsz.appendChild(agz);}
       var ulz=zm[2].length;
       lwz.appendChild(nrz);
       if(ulz>=1)lwz.appendChild(makeJpUnderlineLine(1));
@@ -1004,7 +1004,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var lw2=document.createElement('span');lw2.className='jp-lines-wrap';
     var numRow=document.createElement('span');numRow.className='jp-num-row';
     var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;styleJpNumEl(ns2);numRow.appendChild(ns2);
-    if(isDot){var dt=document.createElement('span');dt.className='jp-aug';dt.textContent='·';styleJpAugEl(dt);numRow.appendChild(dt);}
+    if(isDot){var dt=document.createElement('span');dt.className='jp-aug';dt.textContent='·';styleJpAugEl(dt);ns2.appendChild(dt);}
     lw2.appendChild(numRow);
     if(uline>=1)lw2.appendChild(makeJpUnderlineLine(1));
     if(uline===2)lw2.appendChild(makeJpUnderlineLine(2));
