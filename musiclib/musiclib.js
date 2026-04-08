@@ -1,7 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
-  const ML_VER='2026.04.08.1';
+  const ML_VER='2026.04.08.5';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -383,6 +383,360 @@
     }
   }
 
+  function safeFileName(name){
+    return String(name||'song')
+      .trim()
+      .replace(/[\\/:*?"<>|]+/g,'-')
+      .replace(/\s+/g,'_')
+      .replace(/\.+$/,'')
+      .slice(0,80) || 'song';
+  }
+
+  let _h2cPromise=null;
+  function loadHtml2Canvas(){
+    if(window.html2canvas) return Promise.resolve(window.html2canvas);
+    if(_h2cPromise) return _h2cPromise;
+    _h2cPromise=new Promise((resolve,reject)=>{
+      const inject=(src,next)=>{
+        const s=document.createElement('script');
+        s.src=src;
+        s.async=true;
+        s.onload=()=>{
+          if(window.html2canvas) resolve(window.html2canvas);
+          else if(next) inject(next,null);
+          else reject(new Error('html2canvas unavailable'));
+        };
+        s.onerror=()=>{
+          s.remove();
+          if(next) inject(next,null);
+          else reject(new Error('html2canvas load failed'));
+        };
+        document.head.appendChild(s);
+      };
+      inject(
+        'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+        'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js'
+      );
+    });
+    return _h2cPromise;
+  }
+
+  function canvasToPngBlob(canvas){
+    return new Promise((resolve,reject)=>{
+      if(canvas.toBlob){
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('png conversion failed')),'image/png');
+      }else{
+        try{
+          const dataUrl=canvas.toDataURL('image/png');
+          const bin=atob(dataUrl.split(',')[1]||'');
+          const arr=new Uint8Array(bin.length);
+          for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+          resolve(new Blob([arr],{type:'image/png'}));
+        }catch(err){ reject(err); }
+      }
+    });
+  }
+
+  function parseRgba(str){
+    const m=String(str||'').match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/i);
+    if(!m) return null;
+    return {r:+m[1],g:+m[2],b:+m[3],a:(m[4]===undefined?1:+m[4])};
+  }
+
+  function resolveExportBackground(node,preferred){
+    if(preferred) return preferred;
+    let cur=node;
+    while(cur&&cur.nodeType===1){
+      const c=getComputedStyle(cur).backgroundColor;
+      const p=parseRgba(c);
+      if(p&&p.a>0.98) return c;
+      cur=cur.parentElement;
+    }
+    const bodyBg=getComputedStyle(document.body||document.documentElement).backgroundColor;
+    const bp=parseRgba(bodyBg);
+    if(bp&&bp.a>0.2) return bodyBg;
+    return '#ffffff';
+  }
+
+  function nodeToPngBlobByHtml2Canvas(node,bgColor){
+    return loadHtml2Canvas()
+      .then(html2canvas=>{
+        const dpr=Math.max(1,window.devicePixelRatio||1);
+        return html2canvas(node,{
+          backgroundColor:bgColor||'#ffffff',
+          scale:Math.min(2,dpr),
+          foreignObjectRendering:false,
+          useCORS:true,
+          logging:false
+        });
+      })
+      .then(canvasToPngBlob);
+  }
+
+  function cloneWithComputedStyle(node){
+    const cloned=node.cloneNode(true);
+    const sync=(src,dst)=>{
+      if(!src||!dst) return;
+      if(src.nodeType===1&&dst.nodeType===1){
+        const cs=getComputedStyle(src);
+        for(let i=0;i<cs.length;i++){
+          const prop=cs[i];
+          dst.style.setProperty(prop,cs.getPropertyValue(prop),cs.getPropertyPriority(prop));
+        }
+      }
+      const sKids=src.childNodes||[];
+      const dKids=dst.childNodes||[];
+      for(let k=0;k<sKids.length;k++){
+        if(dKids[k]) sync(sKids[k],dKids[k]);
+      }
+    };
+    sync(node,cloned);
+    return cloned;
+  }
+
+  function nodeToPngBlob(node,bgColor){
+    return new Promise((resolve,reject)=>{
+      if(!node){ reject(new Error('empty node')); return; }
+      const rect=node.getBoundingClientRect();
+      const width=Math.max(1,Math.ceil(rect.width));
+      const height=Math.max(1,Math.ceil(rect.height));
+      const snap=cloneWithComputedStyle(node);
+      snap.style.width=width+'px';
+      snap.style.maxWidth='none';
+      const html=new XMLSerializer().serializeToString(snap);
+      const bg=bgColor||'transparent';
+      const foreign=[
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;background:${bg};">`,
+        html,
+        '</div>'
+      ].join('');
+      const svg=[
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`,
+        `<foreignObject width="100%" height="100%">${foreign}</foreignObject>`,
+        '</svg>'
+      ].join('');
+      const svgBlob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
+      const svgUrl=URL.createObjectURL(svgBlob);
+      const img=new Image();
+      img.onload=()=>{
+        URL.revokeObjectURL(svgUrl);
+        const maxSide=4096;
+        let scale=Math.min(2,maxSide/width,maxSide/height);
+        if(!isFinite(scale)||scale<=0) scale=1;
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.max(1,Math.round(width*scale));
+        canvas.height=Math.max(1,Math.round(height*scale));
+        const ctx=canvas.getContext('2d');
+        if(!ctx){ reject(new Error('canvas unavailable')); return; }
+        if(bg!=='transparent'){ ctx.fillStyle=bg; ctx.fillRect(0,0,canvas.width,canvas.height); }
+        ctx.setTransform(scale,0,0,scale,0,0);
+        ctx.drawImage(img,0,0,width,height);
+        canvasToPngBlob(canvas).then(resolve).catch(reject);
+      };
+      img.onerror=()=>{
+        URL.revokeObjectURL(svgUrl);
+        reject(new Error('svg render failed'));
+      };
+      img.src=svgUrl;
+    });
+  }
+
+  function nodeToPngBlobByTextFallback(node,bgColor){
+    return new Promise((resolve,reject)=>{
+      try{
+        const entries=[];
+        const secs=node.querySelectorAll('.sw-lsec');
+        secs.forEach(sec=>{
+          let secName=(sec.querySelector('.sw-lsec-name')||{}).textContent||'';
+          secName=secName.replace(/\s+/g,' ').trim();
+          if(secName) entries.push({type:'sec',text:`[${secName}]`});
+          sec.querySelectorAll('.sw-lrow').forEach(row=>{
+            let chordLine='';
+            let lyricLine='';
+            row.querySelectorAll('.prev-seg').forEach(seg=>{
+              const chord=((seg.querySelector('.p-chord')||{}).textContent||'').replace(/\u00a0/g,' ');
+              const lyric=((seg.querySelector('.p-lyric')||{}).textContent||'').replace(/\u00a0/g,' ');
+              chordLine+=(chord||' ')+'  ';
+              lyricLine+=(lyric||' ')+'  ';
+            });
+            if(chordLine.trim()) entries.push({type:'chord',text:chordLine.trimEnd()});
+            if(lyricLine.trim()) entries.push({type:'lyric',text:lyricLine.trimEnd()});
+          });
+          entries.push({type:'gap',text:''});
+        });
+        if(!entries.length) entries.push({type:'sec',text:'[Transpose]'});
+
+        const fontFor=type=>{
+          if(type==='sec') return '700 18px "Noto Serif SC","PingFang SC",serif';
+          if(type==='lyric') return '500 19px "Noto Serif SC","PingFang SC",serif';
+          return '700 14px "Space Mono","DM Mono",monospace';
+        };
+        const lhFor=type=>{
+          if(type==='sec') return 30;
+          if(type==='lyric') return 28;
+          if(type==='gap') return 14;
+          return 24;
+        };
+        const colorFor=type=>{
+          if(type==='sec') return '#8a5a3b';
+          if(type==='lyric') return '#2d2a26';
+          return '#c2410c';
+        };
+
+        const pad=26;
+        const measure=document.createElement('canvas').getContext('2d');
+        let maxW=0,totalH=pad*2;
+        entries.forEach(e=>{
+          measure.font=fontFor(e.type);
+          const w=measure.measureText(e.text||' ').width;
+          if(w>maxW) maxW=w;
+          totalH+=lhFor(e.type);
+        });
+
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.max(720,Math.ceil(maxW+pad*2));
+        canvas.height=Math.max(480,Math.ceil(totalH));
+        const ctx=canvas.getContext('2d');
+        if(!ctx){ reject(new Error('canvas unavailable')); return; }
+        ctx.fillStyle=bgColor||'#ffffff';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        let y=pad;
+        entries.forEach(e=>{
+          ctx.font=fontFor(e.type);
+          ctx.fillStyle=colorFor(e.type);
+          ctx.textBaseline='top';
+          ctx.fillText(e.text||'',pad,y);
+          y+=lhFor(e.type);
+        });
+        canvasToPngBlob(canvas).then(resolve).catch(reject);
+      }catch(err){ reject(err); }
+    });
+  }
+
+  function nodeToPngBlobRobust(node,bgColor){
+    return nodeToPngBlobByHtml2Canvas(node,bgColor).catch(primaryErr=>{
+      try{ console.warn('[musiclib] html2canvas export failed, fallback to svg',primaryErr); }catch(_){}
+      return nodeToPngBlob(node,bgColor).catch(secondErr=>{
+        try{ console.warn('[musiclib] svg export failed, fallback to text canvas',secondErr); }catch(_){}
+        return nodeToPngBlobByTextFallback(node,bgColor);
+      });
+    });
+  }
+
+  function saveBlobAs(blob,filename){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),800);
+  }
+
+  function withExportJpFix(scope,work){
+    const touched=[];
+    const setStyle=(el,prop,val,pri='')=>{
+      touched.push([el,prop,el.style.getPropertyValue(prop),el.style.getPropertyPriority(prop)]);
+      el.style.setProperty(prop,val,pri);
+    };
+    const styleUnderlineLine=(line,isU2)=>{
+      setStyle(line,'display','block');
+      setStyle(line,'position','absolute');
+      setStyle(line,'left','0');
+      setStyle(line,'right','0');
+      setStyle(line,'bottom',isU2?'0':'3px');
+      setStyle(line,'height','1.5px');
+      setStyle(line,'background','currentColor');
+      setStyle(line,'margin-top','0');
+      setStyle(line,'align-self','auto');
+      setStyle(line,'pointer-events','none');
+      setStyle(line,'z-index','1');
+    };
+    const addTempLine=(wrap,isU2,beforeNode)=>{
+      const ln=document.createElement('span');
+      ln.className=isU2?'jp-u2-line':'jp-u1-line';
+      ln.setAttribute('data-export-temp-line','1');
+      wrap.insertBefore(ln,beforeNode||null);
+      return ln;
+    };
+    const nextPaint=()=>new Promise(resolve=>{
+      requestAnimationFrame(()=>requestAnimationFrame(resolve));
+    });
+
+    // If legacy renderer left border-bottom on number row, convert it to underline element for export.
+    scope.querySelectorAll('.jp-lines-wrap').forEach(wrap=>{
+      const row=wrap.querySelector('.jp-num-row');
+      if(!row) return;
+      const cs=getComputedStyle(row);
+      const hadBorder=(parseFloat(cs.borderBottomWidth||'0')>0)&&(cs.borderBottomStyle!=='none');
+      const hasU1=!!wrap.querySelector('.jp-u1-line');
+      if(hadBorder && !hasU1){
+        const beforeU2=wrap.querySelector('.jp-u2-line');
+        addTempLine(wrap,false,beforeU2||null);
+      }
+    });
+
+    scope.querySelectorAll('.jp-num-row').forEach(row=>{
+      setStyle(row,'padding-bottom','8px');
+      setStyle(row,'border-bottom','none');
+      setStyle(row,'min-height','1.15em');
+      setStyle(row,'display','inline-flex');
+      setStyle(row,'align-items','center');
+      setStyle(row,'justify-content','center');
+    });
+    scope.querySelectorAll('.jp-num').forEach(num=>{
+      setStyle(num,'line-height','1');
+      setStyle(num,'display','inline-block');
+      setStyle(num,'vertical-align','baseline');
+    });
+    scope.querySelectorAll('.jp-plain-sym.is-dash').forEach(d=>{
+      setStyle(d,'top','-0.08em');
+      setStyle(d,'height','1em');
+      setStyle(d,'display','inline-flex');
+      setStyle(d,'align-items','center');
+      setStyle(d,'justify-content','center');
+      setStyle(d,'line-height','1');
+      setStyle(d,'font-size','19px');
+      setStyle(d,'transform','none');
+    });
+    scope.querySelectorAll('.jp-aug').forEach(a=>{
+      setStyle(a,'top','-0.16em');
+      setStyle(a,'transform','none');
+      setStyle(a,'right','-0.35em');
+      setStyle(a,'line-height','1');
+      setStyle(a,'display','inline-block');
+    });
+    scope.querySelectorAll('.jp-u1-line,.jp-u2-line').forEach(line=>{
+      styleUnderlineLine(line,line.classList.contains('jp-u2-line'));
+    });
+
+    return nextPaint()
+      .then(work)
+      .finally(()=>{
+        for(let i=touched.length-1;i>=0;i--){
+          const [el,prop,old,pri]=touched[i];
+          if(old) el.style.setProperty(prop,old,pri||'');
+          else el.style.removeProperty(prop);
+        }
+        scope.querySelectorAll('[data-export-temp-line="1"]').forEach(n=>n.remove());
+      });
+  }
+
+  function exportTransposePanel(panelInner,opt={}){
+    if(!panelInner) return Promise.reject(new Error('panel missing'));
+    const bg=resolveExportBackground(panelInner,opt.bgColor);
+    const waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+    return waitFonts
+      .then(()=>withExportJpFix(panelInner,()=>nodeToPngBlobRobust(panelInner,bg)))
+      .then(blob=>{
+        const base=safeFileName(opt.title||'transpose');
+        const key=safeFileName(opt.key||'');
+        const filename=base+(key?('_'+key):'')+'.png';
+        saveBlobAs(blob,filename);
+      });
+  }
+
   function openSongFromUrl(){
     const songId=getSongIdFromUrl();
     if(!songId||!songs.length) return;
@@ -681,12 +1035,56 @@
     const pl=document.createElement('span');pl.className='jp-plain';
     const t=document.createElement('span');t.className='jp-plain-top';pl.appendChild(t);
     const s=document.createElement('span');s.className='jp-plain-sym'+(sym==='-'?' is-dash':'');s.textContent=sym;pl.appendChild(s);
+    s.style.display='inline-flex';
+    s.style.alignItems='center';
+    s.style.justifyContent='center';
+    s.style.width='1em';
+    s.style.height='1em';
+    if(sym==='-'){
+      s.style.position='relative';
+      s.style.top='-0.12em';
+    }
     const b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
     return pl;
   }
   function setDots(el,cnt){
     el.innerHTML='';
     for(var i=0;i<cnt;i++){const d=document.createElement('span');d.textContent='·';el.appendChild(d);}
+  }
+  function styleJpNumEl(el){
+    if(!el)return;
+    el.style.display='inline-flex';
+    el.style.alignItems='center';
+    el.style.justifyContent='center';
+    el.style.textAlign='center';
+    el.style.width='1em';
+    el.style.height='1em';
+    el.style.position='relative';
+    el.style.top='-0.12em';
+  }
+  function styleJpAugEl(el){
+    if(!el)return;
+    el.style.position='absolute';
+    el.style.right='-0.42em';
+    el.style.top='50%';
+    el.style.transform='translateY(-50%)';
+    el.style.pointerEvents='none';
+  }
+  function makeJpUnderlineLine(level){
+    const ln=document.createElement('span');
+    ln.className=level===2?'jp-u2-line':'jp-u1-line';
+    ln.style.display='block';
+    ln.style.position='absolute';
+    ln.style.left='0';
+    ln.style.right='0';
+    ln.style.bottom=level===2?'0':'3px';
+    ln.style.height='1.5px';
+    ln.style.background='currentColor';
+    ln.style.marginTop='0';
+    ln.style.alignSelf='auto';
+    ln.style.pointerEvents='none';
+    ln.style.zIndex='1';
+    return ln;
   }
   function parseDualJpToken(tok){
     var raw=String(tok||'').replace(/\uFF0F/g,'/');
@@ -725,12 +1123,12 @@
       var tdz=document.createElement('span');tdz.className='jp-dot-top';wz.appendChild(tdz);
       var lwz=document.createElement('span');lwz.className='jp-lines-wrap';
       var nrz=document.createElement('span');nrz.className='jp-num-row';
-      var nsz=document.createElement('span');nsz.className='jp-num';nsz.textContent='0';nrz.appendChild(nsz);
-      if(zm[1].indexOf('\u00b7')>-1){var agz=document.createElement('span');agz.className='jp-aug';agz.textContent='·';nrz.appendChild(agz);}
+      var nsz=document.createElement('span');nsz.className='jp-num';nsz.textContent='0';styleJpNumEl(nsz);nrz.appendChild(nsz);
+      if(zm[1].indexOf('\u00b7')>-1){var agz=document.createElement('span');agz.className='jp-aug';agz.textContent='·';styleJpAugEl(agz);nsz.appendChild(agz);}
       var ulz=zm[2].length;
-      if(ulz>=1)nrz.style.borderBottom='1.5px solid currentColor';
       lwz.appendChild(nrz);
-      if(ulz===2){var ul2z=document.createElement('span');ul2z.className='jp-u2-line';lwz.appendChild(ul2z);}
+      if(ulz>=1)lwz.appendChild(makeJpUnderlineLine(1));
+      if(ulz===2)lwz.appendChild(makeJpUnderlineLine(2));
       wz.appendChild(lwz);
       var bdz=document.createElement('span');bdz.className='jp-dot-bot';wz.appendChild(bdz);
       return wz;
@@ -744,11 +1142,11 @@
     var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isHigh>=2?2:isHigh);w.appendChild(td);
     var lw2=document.createElement('span');lw2.className='jp-lines-wrap';
     var numRow=document.createElement('span');numRow.className='jp-num-row';
-    var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;numRow.appendChild(ns2);
-    if(isDot){var dot=document.createElement('span');dot.className='jp-aug';dot.textContent='·';numRow.appendChild(dot);}
-    if(uline>=1)numRow.style.borderBottom='1.5px solid currentColor';
+    var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;styleJpNumEl(ns2);numRow.appendChild(ns2);
+    if(isDot){var dot=document.createElement('span');dot.className='jp-aug';dot.textContent='·';styleJpAugEl(dot);ns2.appendChild(dot);}
     lw2.appendChild(numRow);
-    if(uline===2){var l2=document.createElement('span');l2.className='jp-u2-line';lw2.appendChild(l2);}
+    if(uline>=1)lw2.appendChild(makeJpUnderlineLine(1));
+    if(uline===2)lw2.appendChild(makeJpUnderlineLine(2));
     w.appendChild(lw2);
     var bot=document.createElement('span');bot.className='jp-dot-bot';setDots(bot,isLow>=2?2:isLow);w.appendChild(bot);
     if(hasFermata){var fw=document.createElement('span');fw.className='jp-fermata';fw.appendChild(w);return fw;}
@@ -1577,6 +1975,38 @@
     shareBtn.textContent='🔗 分享';
     shareBtn.addEventListener('click',()=>shareSong(s));
     toolsRow.appendChild(shareBtn);
+
+    const exportBtn=document.createElement('button');
+    exportBtn.className='sw-pill';
+    exportBtn.type='button';
+    exportBtn.style.cssText='font-size:12px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border:none;';
+    exportBtn.textContent='🖼 下载图片';
+    exportBtn.addEventListener('click',()=>{
+      if(exportBtn.disabled) return;
+      const old=exportBtn.textContent;
+      exportBtn.disabled=true;
+      exportBtn.style.opacity='.65';
+      exportBtn.textContent='生成中...';
+      exportTransposePanel(panelInner,{
+        title:s.title||'transpose',
+        key:'1='+curKey,
+        width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
+      }).then(()=>{
+        showToast('图片已下载');
+        exportBtn.textContent='已下载';
+      }).catch(err=>{
+        showToast('导出失败，请重试');
+        exportBtn.textContent='下载失败';
+        try{ console.error('[musiclib] export transpose image failed',err); }catch(_){}
+      }).finally(()=>{
+        setTimeout(()=>{
+          exportBtn.disabled=false;
+          exportBtn.style.opacity='';
+          exportBtn.textContent=old;
+        },1200);
+      });
+    });
+    toolsRow.appendChild(exportBtn);
 
     if(s.youtube){
       const yt=document.createElement('a');yt.className='yt-btn';yt.href=s.youtube;yt.target='_blank';yt.title='YouTube';
