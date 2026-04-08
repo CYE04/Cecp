@@ -744,22 +744,14 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       d.style.fontSize='0';
       d.style.transform='none';
       d.style.overflow='visible';
-      var dashLine=d.querySelector('.jp-export-dash-line');
+      var dashLine=d.querySelector('.jp-dash-line');
       if(!dashLine){
         dashLine=document.createElement('span');
-        dashLine.className='jp-export-dash-line';
+        dashLine.className='jp-dash-line';
         d.textContent='';
         d.appendChild(dashLine);
       }
-      dashLine.style.position='absolute';
-      dashLine.style.left='0.08em';
-      dashLine.style.right='0.08em';
-      dashLine.style.top='50%';
-      dashLine.style.height='2px';
-      dashLine.style.transform='translateY(-50%)';
-      dashLine.style.background='currentColor';
-      dashLine.style.borderRadius='2px';
-      dashLine.style.pointerEvents='none';
+      styleJpDashLineEl(dashLine);
     });
     var augs=scope.querySelectorAll('.jp-aug');
     Array.prototype.forEach.call(augs,function(a){
@@ -1047,6 +1039,14 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     if(sym==='-'){
       s.style.position='relative';
       s.style.top='-0.12em';
+      s.style.lineHeight='0';
+      s.style.fontSize='0';
+      s.style.overflow='visible';
+      s.textContent='';
+      var dashLine=document.createElement('span');
+      dashLine.className='jp-dash-line';
+      styleJpDashLineEl(dashLine);
+      s.appendChild(dashLine);
     }
     var b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
     return pl;
@@ -1072,6 +1072,18 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     el.style.right='-0.42em';
     el.style.top='50%';
     el.style.transform='translateY(-50%)';
+    el.style.pointerEvents='none';
+  }
+  function styleJpDashLineEl(el){
+    if(!el)return;
+    el.style.position='absolute';
+    el.style.left='0.08em';
+    el.style.right='0.08em';
+    el.style.top='50%';
+    el.style.height='2px';
+    el.style.transform='translateY(-50%)';
+    el.style.background='currentColor';
+    el.style.borderRadius='2px';
     el.style.pointerEvents='none';
   }
   function makeJpUnderlineLine(level){
