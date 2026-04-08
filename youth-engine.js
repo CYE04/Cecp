@@ -566,13 +566,86 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     setTimeout(function(){ URL.revokeObjectURL(url); },800);
   }
 
+  function withExportJpFix(scope,work){
+    var touched=[];
+    function setStyle(el,prop,val,pri){
+      touched.push([el,prop,el.style.getPropertyValue(prop),el.style.getPropertyPriority(prop)]);
+      el.style.setProperty(prop,val,pri||'');
+    }
+    function styleUnderlineLine(line,isU2){
+      setStyle(line,'display','block');
+      setStyle(line,'position','static');
+      setStyle(line,'left','auto');
+      setStyle(line,'right','auto');
+      setStyle(line,'bottom','auto');
+      setStyle(line,'height','1.5px');
+      setStyle(line,'background','currentColor');
+      setStyle(line,'margin-top',isU2?'1.5px':'1px');
+      setStyle(line,'align-self','stretch');
+      setStyle(line,'pointer-events','none');
+    }
+    function addTempLine(wrap,isU2,beforeNode){
+      var ln=document.createElement('span');
+      ln.className=isU2?'jp-u2-line':'jp-u1-line';
+      ln.setAttribute('data-export-temp-line','1');
+      wrap.insertBefore(ln,beforeNode||null);
+      return ln;
+    }
+    function nextPaint(){
+      return new Promise(function(resolve){
+        requestAnimationFrame(function(){requestAnimationFrame(resolve);});
+      });
+    }
+
+    // If legacy renderer left border-bottom on number row, convert it to underline element for export.
+    var wraps=scope.querySelectorAll('.jp-lines-wrap');
+    Array.prototype.forEach.call(wraps,function(wrap){
+      var row=wrap.querySelector('.jp-num-row');
+      if(!row) return;
+      var cs=getComputedStyle(row);
+      var hadBorder=(parseFloat(cs.borderBottomWidth||'0')>0)&&(cs.borderBottomStyle!=='none');
+      var hasU1=!!wrap.querySelector('.jp-u1-line');
+      if(hadBorder && !hasU1){
+        var beforeU2=wrap.querySelector('.jp-u2-line');
+        addTempLine(wrap,false,beforeU2||null);
+      }
+    });
+
+    var rows=scope.querySelectorAll('.jp-num-row');
+    Array.prototype.forEach.call(rows,function(row){
+      setStyle(row,'padding-bottom','3px');
+      setStyle(row,'border-bottom','none');
+    });
+
+    var lines=scope.querySelectorAll('.jp-u1-line,.jp-u2-line');
+    Array.prototype.forEach.call(lines,function(line){
+      styleUnderlineLine(line,line.classList.contains('jp-u2-line'));
+    });
+
+    return nextPaint()
+      .then(work)
+      .finally(function(){
+        for(var i=touched.length-1;i>=0;i--){
+          var t=touched[i],el=t[0],prop=t[1],old=t[2],pri=t[3];
+          if(old) el.style.setProperty(prop,old,pri||'');
+          else el.style.removeProperty(prop);
+        }
+        var temps=scope.querySelectorAll('[data-export-temp-line="1"]');
+        Array.prototype.forEach.call(temps,function(n){n.remove();});
+      });
+  }
+
   function exportTransposePanel(panelInner,opt){
     opt=opt||{};
     if(!panelInner) return Promise.reject(new Error('panel missing'));
     var bg=resolveExportBackground(panelInner,opt.bgColor);
     var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
-      .then(function(){ return nodeToPngBlobRobust(panelInner,bg); })
+      .then(function(){
+        return withExportJpFix(panelInner,function(){
+          return nodeToPngBlobRobust(panelInner,bg);
+        });
+      })
       .then(function(blob){
         var base=safeFileName(opt.title||'transpose');
         var key=safeFileName(opt.key||'');
