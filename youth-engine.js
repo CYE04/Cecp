@@ -369,13 +369,34 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     });
   }
 
+  function parseRgba(str){
+    var m=String(str||'').match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/i);
+    if(!m) return null;
+    return {r:+m[1],g:+m[2],b:+m[3],a:(m[4]===undefined?1:+m[4])};
+  }
+
+  function resolveExportBackground(node,preferred){
+    if(preferred) return preferred;
+    var cur=node;
+    while(cur&&cur.nodeType===1){
+      var c=getComputedStyle(cur).backgroundColor;
+      var p=parseRgba(c);
+      if(p&&p.a>0.98) return c;
+      cur=cur.parentElement;
+    }
+    var bodyBg=getComputedStyle(document.body||document.documentElement).backgroundColor;
+    var bp=parseRgba(bodyBg);
+    if(bp&&bp.a>0.2) return bodyBg;
+    return '#ffffff';
+  }
+
   function nodeToPngBlobByHtml2Canvas(node,bgColor){
     return loadHtml2Canvas().then(function(html2canvas){
       var dpr=Math.max(1,window.devicePixelRatio||1);
       return html2canvas(node,{
-        backgroundColor:bgColor||null,
+        backgroundColor:bgColor||'#ffffff',
         scale:Math.min(2,dpr),
-        foreignObjectRendering:true,
+        foreignObjectRendering:false,
         useCORS:true,
         logging:false
       });
@@ -525,10 +546,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   }
 
   function nodeToPngBlobRobust(node,bgColor){
-    return nodeToPngBlob(node,bgColor).catch(function(primaryErr){
-      try{ console.warn('[YouthEngine] svg export failed, fallback to html2canvas',primaryErr); }catch(_){}
-      return nodeToPngBlobByHtml2Canvas(node,bgColor).catch(function(secondErr){
-        try{ console.warn('[YouthEngine] html2canvas export failed, fallback to text canvas',secondErr); }catch(_){}
+    return nodeToPngBlobByHtml2Canvas(node,bgColor).catch(function(primaryErr){
+      try{ console.warn('[YouthEngine] html2canvas export failed, fallback to svg',primaryErr); }catch(_){}
+      return nodeToPngBlob(node,bgColor).catch(function(secondErr){
+        try{ console.warn('[YouthEngine] svg export failed, fallback to text canvas',secondErr); }catch(_){}
         return nodeToPngBlobByTextFallback(node,bgColor);
       });
     });
@@ -548,7 +569,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function exportTransposePanel(panelInner,opt){
     opt=opt||{};
     if(!panelInner) return Promise.reject(new Error('panel missing'));
-    var bg=(typeof opt.bgColor!=='undefined')?opt.bgColor:getComputedStyle(panelInner).backgroundColor;
+    var bg=resolveExportBackground(panelInner,opt.bgColor);
     var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
       .then(function(){ return nodeToPngBlobRobust(panelInner,bg); })
