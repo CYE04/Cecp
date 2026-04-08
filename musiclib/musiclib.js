@@ -689,7 +689,6 @@
   function parseJpToken(tok){
     if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|')return makeBarline(tok);
     if(!tok||tok==='-'||tok===' ')return makeJpPlain(tok);
-    if(tok==='0')return makeJpPlain('0');
     var hasFermata=false;
     if(tok.slice(-1)==='^'){hasFermata=true;tok=tok.slice(0,-1);}
     if(tok==='sp'||tok==='sp_'||tok==='sp__'){
