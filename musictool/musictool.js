@@ -370,6 +370,14 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 /* 末尾游标 */
 .tok-end{color:var(--ink3);cursor:pointer;font-size:8px;padding:1px 3px;user-select:none;}
 .tok-end.cursor{color:var(--green);}
+.tok-dual-inline{display:none;align-items:center;gap:4px;margin-top:3px;}
+.tok-dual-inline.on{display:flex;}
+.tok-dual-inline .lbl{font-size:8px;color:var(--ink3);font-family:'Space Mono',monospace;white-space:nowrap;}
+.tok-dual-inline .slash{font-size:10px;color:var(--ink3);}
+.tok-dual-inline .in{width:36px;background:var(--panel2);border:1px solid var(--border);border-radius:4px;color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;padding:3px 4px;outline:none;}
+.tok-dual-inline .in:focus{border-color:var(--accent);}
+.tok-dual-inline .btn{padding:4px 6px;border-radius:4px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);font-family:'Space Mono',monospace;font-size:9px;cursor:pointer;line-height:1;}
+.tok-dual-inline .btn:hover{border-color:var(--accent2);color:var(--ink);}
 
 /* ── 导入弹窗 ── */
 .import-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
@@ -838,6 +846,7 @@ var selA=-1, selB=-1;
 
 var oct='mid', dur='quarter', dotOn=false, fermataOn=false, slurOn=false, xslurOn=false, tupletOn=0;
 var dualDur='quarter', dualDot=false, dualFermata=false;
+var inlineDualTop='1', inlineDualBot='5';
 var inputMode='insert';
 var tokClipboard=[]; // 存 token 数组
 var segClipboard=null; // 存整格子
@@ -1001,6 +1010,39 @@ function buildDualToken(){
   var topTok=applyDualStyle(topRaw||'sp');
   var botTok=applyDualStyle(botRaw||'sp');
   return topTok+'/'+botTok;
+}
+function applyInlineDualStyle(base){
+  var tok=String(base||'').trim().replace(/\s+/g,'');
+  if(!tok)return '';
+  if(tok==='-'||tok.indexOf('|')>=0)return tok;
+  var isSpace=/^sp/.test(tok);
+  var hasDur=/_{1,2}$/.test(tok);
+  var hasDot=tok.indexOf('·')>=0;
+  var hasFermata=/\^$/.test(tok);
+  var out=tok;
+  if(!hasDot && dotOn && !isSpace)out+='·';
+  if(!hasDur){
+    if(dur==='eighth')out+='_';
+    else if(dur==='16th')out+='__';
+  }
+  if(!hasFermata && fermataOn && !isSpace && out!=='-')out+='^';
+  return out;
+}
+function buildInlineDualToken(topRaw,botRaw){
+  var top=String(topRaw||'').trim();
+  var bot=String(botRaw||'').trim();
+  if(!top&&!bot)return '';
+  return applyInlineDualStyle(top||'sp')+'/'+applyInlineDualStyle(bot||'sp');
+}
+function insertInlineDualToken(si,li,gi,topRaw,botRaw){
+  var tok=buildInlineDualToken(topRaw,botRaw);
+  if(!tok){alert('请先输入上行或下行音符');return;}
+  inlineDualTop=String(topRaw||'').trim()||inlineDualTop;
+  inlineDualBot=String(botRaw||'').trim()||inlineDualBot;
+  if(curSi!==si||curLi!==li||curGi!==gi){
+    curSi=si;curLi=li;curGi=gi;curTok=-1;clearSel();
+  }
+  insertToks([tok]);
 }
 function refreshDualPreview(){
   var pv=document.getElementById('dual-preview');
@@ -1436,7 +1478,35 @@ function renderEditor(){
           else focusSeg(si,li,gi,true);
         };})(si,li,gi);
         tf.appendChild(endSpan);
-        tdN.appendChild(tf);tr.appendChild(tdN);
+        tdN.appendChild(tf);
+        var dq=document.createElement('div');
+        dq.className='tok-dual-inline'+(isActive?' on':'');
+        var dql=document.createElement('span');dql.className='lbl';dql.textContent='上下';
+        dq.appendChild(dql);
+        var dinTop=document.createElement('input');dinTop.className='in';dinTop.placeholder='上';dinTop.value=inlineDualTop;
+        var slash=document.createElement('span');slash.className='slash';slash.textContent='/';
+        var dinBot=document.createElement('input');dinBot.className='in';dinBot.placeholder='下';dinBot.value=inlineDualBot;
+        var dqbtn=document.createElement('button');dqbtn.className='btn';dqbtn.textContent='+双行';
+        [dinTop,dinBot].forEach(function(el){
+          el.addEventListener('click',function(e){e.stopPropagation();if(!isActive)focusSeg(si,li,gi,true);});
+          el.addEventListener('input',function(){
+            inlineDualTop=dinTop.value;
+            inlineDualBot=dinBot.value;
+          });
+          el.addEventListener('keydown',function(e){
+            if(e.key==='Enter'){
+              e.preventDefault();e.stopPropagation();
+              insertInlineDualToken(si,li,gi,dinTop.value,dinBot.value);
+            }
+          });
+        });
+        dqbtn.onclick=(function(si,li,gi){return function(e){
+          e.preventDefault();e.stopPropagation();
+          insertInlineDualToken(si,li,gi,dinTop.value,dinBot.value);
+        };})(si,li,gi);
+        dq.appendChild(dinTop);dq.appendChild(slash);dq.appendChild(dinBot);dq.appendChild(dqbtn);
+        tdN.appendChild(dq);
+        tr.appendChild(tdN);
 
         // 歌词（上行 + 可选下行）
         var tdL=document.createElement('td');tdL.style.cssText='vertical-align:middle;';
