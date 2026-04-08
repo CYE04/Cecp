@@ -734,14 +734,32 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     });
     var dashes=scope.querySelectorAll('.jp-plain-sym.is-dash');
     Array.prototype.forEach.call(dashes,function(d){
+      d.style.position='relative';
       d.style.top='-0.12em';
       d.style.height='1em';
       d.style.display='inline-flex';
       d.style.alignItems='center';
       d.style.justifyContent='center';
-      d.style.lineHeight='1';
-      d.style.fontSize='19px';
+      d.style.lineHeight='0';
+      d.style.fontSize='0';
       d.style.transform='none';
+      d.style.overflow='visible';
+      var dashLine=d.querySelector('.jp-export-dash-line');
+      if(!dashLine){
+        dashLine=document.createElement('span');
+        dashLine.className='jp-export-dash-line';
+        d.textContent='';
+        d.appendChild(dashLine);
+      }
+      dashLine.style.position='absolute';
+      dashLine.style.left='0.08em';
+      dashLine.style.right='0.08em';
+      dashLine.style.top='50%';
+      dashLine.style.height='2px';
+      dashLine.style.transform='translateY(-50%)';
+      dashLine.style.background='currentColor';
+      dashLine.style.borderRadius='2px';
+      dashLine.style.pointerEvents='none';
     });
     var augs=scope.querySelectorAll('.jp-aug');
     Array.prototype.forEach.call(augs,function(a){
