@@ -630,19 +630,22 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     });
     var dashes=scope.querySelectorAll('.jp-plain-sym.is-dash');
     Array.prototype.forEach.call(dashes,function(d){
-      setStyle(d,'top','0');
+      setStyle(d,'top','-0.08em');
       setStyle(d,'height','1em');
       setStyle(d,'display','inline-flex');
       setStyle(d,'align-items','center');
       setStyle(d,'justify-content','center');
       setStyle(d,'line-height','1');
+      setStyle(d,'font-size','19px');
+      setStyle(d,'transform','none');
     });
     var augs=scope.querySelectorAll('.jp-aug');
     Array.prototype.forEach.call(augs,function(a){
-      setStyle(a,'top','50%');
-      setStyle(a,'transform','translateY(-50%)');
-      setStyle(a,'right','-0.38em');
+      setStyle(a,'top','-0.16em');
+      setStyle(a,'transform','none');
+      setStyle(a,'right','-0.35em');
       setStyle(a,'line-height','1');
+      setStyle(a,'display','inline-block');
     });
 
     var lines=scope.querySelectorAll('.jp-u1-line,.jp-u2-line');
