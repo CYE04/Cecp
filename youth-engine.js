@@ -203,6 +203,11 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px}
 .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box}
 .jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none}
+.jp-dual{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;line-height:1;margin:0 .04em}
+.jp-dual-top,.jp-dual-bot{display:inline-flex;align-items:flex-end}
+.jp-dual-top{margin-bottom:-2px}
+.jp-dual-top .jp-dot-bot{height:7px}
+.jp-dual-bot .jp-dot-top{height:7px}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
 .jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
@@ -552,8 +557,27 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     el.innerHTML='';
     for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
   }
-  function parseJpToken(tok) {
+  function parseDualJpToken(tok){
+    var raw=String(tok||'').replace(/\uFF0F/g,'/');
+    var idx=raw.indexOf('/');
+    if(idx<0||idx!==raw.lastIndexOf('/'))return null;
+    var top=raw.slice(0,idx).trim();
+    var bot=raw.slice(idx+1).trim();
+    if(!top&&!bot)return null;
+    return {top:top||'sp',bot:bot||'sp'};
+  }
+  function makeDualJpToken(pair){
+    var w=document.createElement('span');w.className='jp-dual';
+    var t=document.createElement('span');t.className='jp-dual-top';t.appendChild(parseJpToken(pair.top,{inDual:true}));w.appendChild(t);
+    var b=document.createElement('span');b.className='jp-dual-bot';b.appendChild(parseJpToken(pair.bot,{inDual:true}));w.appendChild(b);
+    return w;
+  }
+  function parseJpToken(tok,opts) {
+    opts=opts||{};
+    tok=String(tok||'');
     if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|')return makeBarline(tok);
+    var dual=!opts.inDual?parseDualJpToken(tok):null;
+    if(dual)return makeDualJpToken(dual);
     if(!tok||tok==='-'||tok===' ')return makeJpPlain(tok);
     var hasFermata=false;
     if(tok.slice(-1)==='^'){hasFermata=true;tok=tok.slice(0,-1);}
@@ -604,7 +628,25 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function renderNStr(nStr){
     var d=document.createElement('div');d.className='p-n';
     if(!nStr||!nStr.trim())return d;
-    var toks=nStr.trim().split(/\s+/),i=0;
+    function isDualAtom(tk){
+      if(!tk||tk==='/'||tk==='／')return false;
+      if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
+      if(tk==='|'||tk==='||'||tk==='||/'||tk==='|]'||tk==='|:'||tk===':|'||tk==='|:|')return false;
+      if(/^\{(3|5)$/.test(tk))return false;
+      if(/^\[v:(.+)\]$/.test(tk))return false;
+      return true;
+    }
+    var rawToks=nStr.trim().split(/\s+/),toks=[],ti=0;
+    while(ti<rawToks.length){
+      if(ti+2<rawToks.length && (rawToks[ti+1]==='/'||rawToks[ti+1]==='／') && isDualAtom(rawToks[ti]) && isDualAtom(rawToks[ti+2])){
+        toks.push(rawToks[ti]+'/'+rawToks[ti+2]);
+        ti+=3;
+        continue;
+      }
+      toks.push(rawToks[ti]);
+      ti++;
+    }
+    var i=0;
     while(i<toks.length){
       var t=toks[i];
       if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
