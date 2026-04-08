@@ -193,15 +193,15 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .prev-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;line-height:1;color:var(--ym-ink2);pointer-events:none;font-family:'DM Mono',monospace}
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
-.jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-block}.jp-plain-sym.is-dash{position:relative;top:-0.06em}.jp-plain-bot{height:16px}
+.jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em}.jp-plain-sym.is-dash{position:relative;top:-0.12em}.jp-plain-bot{height:16px}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
 .jp-dot-top{height:12px;justify-content:flex-end}.jp-dot-bot{height:12px;justify-content:flex-start}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative}
-.jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:8px}
-.jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em}
-.jp-aug{position:absolute;right:-0.42em;top:0.02em;font-size:10px;line-height:1;pointer-events:none}
-.jp-u1-line{display:block;position:static;left:auto;right:auto;bottom:auto;height:1.5px;background:var(--ym-ink);margin-top:3px;align-self:stretch;pointer-events:none}
-.jp-u2-line{display:block;position:static;left:auto;right:auto;bottom:auto;height:1.5px;background:var(--ym-ink);margin-top:2.5px;align-self:stretch;pointer-events:none}
+.jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px}
+.jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.05em}
+.jp-aug{position:absolute;right:-0.42em;top:-0.08em;font-size:10px;line-height:1;pointer-events:none}
+.jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ym-ink);pointer-events:none;z-index:1}
+.jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ym-ink);pointer-events:none;z-index:1}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px}
 .jp-fermata::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:20px;height:10px;border-top:2px solid currentColor;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:10px 10px 0 0/10px 10px 0 0;pointer-events:none;box-sizing:border-box}
 .jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none}
@@ -574,15 +574,16 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     }
     function styleUnderlineLine(line,isU2){
       setStyle(line,'display','block');
-      setStyle(line,'position','static');
-      setStyle(line,'left','auto');
-      setStyle(line,'right','auto');
-      setStyle(line,'bottom','auto');
+      setStyle(line,'position','absolute');
+      setStyle(line,'left','0');
+      setStyle(line,'right','0');
+      setStyle(line,'bottom',isU2?'0':'3px');
       setStyle(line,'height','1.5px');
       setStyle(line,'background','currentColor');
-      setStyle(line,'margin-top',isU2?'2.5px':'3px');
-      setStyle(line,'align-self','stretch');
+      setStyle(line,'margin-top','0');
+      setStyle(line,'align-self','auto');
       setStyle(line,'pointer-events','none');
+      setStyle(line,'z-index','1');
     }
     function addTempLine(wrap,isU2,beforeNode){
       var ln=document.createElement('span');
@@ -613,7 +614,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
     var rows=scope.querySelectorAll('.jp-num-row');
     Array.prototype.forEach.call(rows,function(row){
-      setStyle(row,'padding-bottom','8px');
+      setStyle(row,'padding-bottom','3px');
       setStyle(row,'border-bottom','none');
     });
 
