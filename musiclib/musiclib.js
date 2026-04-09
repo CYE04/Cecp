@@ -2092,6 +2092,19 @@
         offsetTop:0
       };
     };
+    const shouldUseScreenHeightFit=()=>{
+      const coarse=window.matchMedia?window.matchMedia('(pointer: coarse)').matches:false;
+      const noHover=window.matchMedia?window.matchMedia('(hover: none)').matches:false;
+      const touchPoints=navigator.maxTouchPoints||0;
+      return coarse||(noHover&&touchPoints>0);
+    };
+    const getAvailableScoreHeight=()=>{
+      const viewport=getViewportBox();
+      const header=document.getElementById('ml-detail-header');
+      const headerHeight=header?header.getBoundingClientRect().height:0;
+      const chromeHeight=Math.max(0,panelInner.scrollHeight-lbDiv.scrollHeight);
+      return Math.max(0,viewport.height-headerHeight-chromeHeight);
+    };
     const resetScoreFit=()=>{
       lbDiv.style.transform='';
       lbDiv.style.transformOrigin='';
@@ -2272,23 +2285,19 @@
       const natural=measureNaturalScore();
       if(!natural)return;
 
-      const viewport=getViewportBox();
       const availableWidth=parent.clientWidth||natural.width;
       if(!availableWidth)return;
-
-      const rect=lbDiv.getBoundingClientRect();
-      const topInViewport=rect.top-viewport.offsetTop;
-      const availableHeight=(!isFinite(topInViewport)||topInViewport>=viewport.height)
-        ? viewport.height
-        : Math.max(0,viewport.height-Math.max(topInViewport,0));
 
       let scaleX=availableWidth/natural.width;
       if(!isFinite(scaleX)||scaleX<=0)scaleX=1;
       let scaleY=scaleX;
-      if(availableHeight>0){
-        const fittedHeight=natural.height*scaleX;
-        if(fittedHeight>availableHeight){
-          scaleY=scaleX*(availableHeight/fittedHeight);
+      if(shouldUseScreenHeightFit()){
+        const availableHeight=getAvailableScoreHeight();
+        if(availableHeight>0){
+          const fittedHeight=natural.height*scaleX;
+          if(fittedHeight>availableHeight){
+            scaleY=scaleX*(availableHeight/fittedHeight);
+          }
         }
       }
       if(!isFinite(scaleY)||scaleY<=0)scaleY=scaleX;
