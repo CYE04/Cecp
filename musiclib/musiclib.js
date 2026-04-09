@@ -2282,16 +2282,21 @@
         ? viewport.height
         : Math.max(0,viewport.height-Math.max(topInViewport,0));
 
-      let scale=availableWidth/natural.width;
+      let scaleX=availableWidth/natural.width;
+      if(!isFinite(scaleX)||scaleX<=0)scaleX=1;
+      let scaleY=scaleX;
       if(availableHeight>0){
-        scale=Math.min(scale,availableHeight/natural.height);
+        const fittedHeight=natural.height*scaleX;
+        if(fittedHeight>availableHeight){
+          scaleY=scaleX*(availableHeight/fittedHeight);
+        }
       }
-      if(!isFinite(scale)||scale<=0)scale=1;
+      if(!isFinite(scaleY)||scaleY<=0)scaleY=scaleX;
 
-      lbDiv.style.transform='scale('+scale+')';
+      lbDiv.style.transform='scale('+scaleX+','+scaleY+')';
       lbDiv.style.transformOrigin='left top';
       lbDiv.style.width=natural.width+'px';
-      lbDiv.style.marginBottom=(natural.height*(scale-1)+18)+'px';
+      lbDiv.style.marginBottom=(natural.height*(scaleY-1)+18)+'px';
     }
     renderScore();
     scheduleFitRows();
