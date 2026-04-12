@@ -1,7 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
-  const ML_VER='2026.04.12.4';
+  const ML_VER='2026.04.12.5';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -1027,6 +1027,56 @@
     if(year) return {album:year,albumYear:year};
     return {album:'',albumYear:''};
   }
+  function getAlbumBase(song){
+    const album=cleanText(song.album);
+    const year=cleanText(song.albumYear);
+    if(!album) return '';
+    if(!year) return album;
+    return cleanText(album.replace(new RegExp(`[（(]?${escapeRegExp(year)}[）)]?$`),''));
+  }
+  function getSongSubDetails(song){
+    let details=cleanText(song.sub);
+    if(!details) return '';
+    const source=cleanText(song.displayArtist||song.artist||song.source);
+    const albumBase=getAlbumBase(song);
+    const year=cleanText(song.albumYear);
+
+    if(source) details=details.replace(new RegExp(`^${escapeRegExp(source)}\\s*`),'').trim();
+    if(albumBase && year){
+      details=details
+        .replace(new RegExp(`^[【《]?${escapeRegExp(albumBase)}[】》]?\\s*[（(【《]?${escapeRegExp(year)}[）)】》]?\\s*`),'')
+        .replace(new RegExp(`^(?:儿童)?专辑\\s+${escapeRegExp(albumBase)}\\s+${escapeRegExp(year)}\\s*`,'i'),'')
+        .trim();
+    }
+    if(albumBase){
+      details=details.replace(new RegExp(`^[【《]?${escapeRegExp(albumBase)}[】》]?\\s*`),'').trim();
+    }
+    if(year){
+      details=details.replace(new RegExp(`^[（(【《]?${escapeRegExp(year)}[）)】》]?\\s*`),'').trim();
+    }
+    return details.replace(/^[·•｜|/，、,:：;\-\s]+/,'').trim();
+  }
+  function getSongCardOverline(song){
+    return song.album || song.source || song.displayArtist || '诗歌';
+  }
+  function getSongCardMeta(song){
+    const meta=[];
+    if(song.displayArtist) meta.push(song.displayArtist);
+    const details=getSongSubDetails(song);
+    if(details) meta.push(details);
+    return meta.join(' · ');
+  }
+  function getSongDetailSub(song){
+    return song.album || song.sub || song.displayArtist || '用于练习、学习与敬拜辅助';
+  }
+  function getSongDetailNote(song){
+    if(!song.album) return '';
+    const meta=[];
+    if(song.displayArtist) meta.push(song.displayArtist);
+    const details=getSongSubDetails(song);
+    if(details) meta.push(details);
+    return meta.join(' · ');
+  }
   function enrichSong(song){
     const source=detectSongSource(song);
     const {album,albumYear}=parseAlbumInfo(Object.assign({},song,{source}));
@@ -1194,7 +1244,8 @@
     const cover=s.cover
       ?`<img class="ml-cover" src="${s.cover}" loading="lazy" onerror="this.outerHTML='<div class=\\'ml-cover-placeholder\\'>♪</div>'">`
       :`<div class="ml-cover-placeholder">封面</div>`;
-    const meta=[s.displayArtist,s.sub].filter(Boolean).join(' · ');
+    const overline=getSongCardOverline(s);
+    const meta=getSongCardMeta(s);
     const tags=[
       s.origKey?`<span class="ml-song-tag is-key">${s.origKey}</span>`:'',
       s.timeSign?`<span class="ml-song-tag">${s.timeSign}</span>`:'',
@@ -1203,7 +1254,7 @@
     return`<div class="ml-song-card" data-id="${s.id}">
       <div class="ml-card-art">${cover}</div>
       <div class="ml-card-body">
-        <div class="ml-song-overline">${hi(s.source||s.displayArtist||'诗歌',q)}</div>
+        <div class="ml-song-overline">${hi(overline,q)}</div>
         <div class="ml-song-title">${hi(s.title,q)}</div>
         <div class="ml-song-meta">${hi(meta||'收录歌词、简谱与练习资料',q)}</div>
         <div class="ml-song-tags">${tags}</div>
@@ -2148,9 +2199,11 @@
     else{coverThumb.textContent='♪';}
 
     const infoDiv=document.createElement('div');infoDiv.className='sw-info';
-    infoDiv.innerHTML=`<div class="sw-eyebrow">诗歌库</div>
+    const detailNote=getSongDetailNote(s);
+    infoDiv.innerHTML=`<div class="sw-eyebrow">${s.displayArtist||s.source||'诗歌库'}</div>
       <div class="sw-title">${s.title||''}</div>
-      <div class="sw-sub">${s.sub||s.artist||'用于练习、学习与敬拜辅助'}</div>`;
+      <div class="sw-sub">${getSongDetailSub(s)}</div>
+      ${detailNote?`<div class="sw-note">${detailNote}</div>`:''}`;
     const pillsDiv=document.createElement('div');pillsDiv.className='sw-pills';
     pillsDiv.appendChild(kPill);
     if(s.timeSign){const p=document.createElement('span');p.className='sw-pill';p.textContent=s.timeSign;pillsDiv.appendChild(p);}
