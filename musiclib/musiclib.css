@@ -2264,3 +2264,63 @@ html,body,#music-library{
   margin:0 auto;
   text-align:center;
 }
+
+/* ---- Light Mode Readability Fixes ---- */
+@media (prefers-color-scheme: light){
+  #music-library .ml-nav-icon-btn{
+    border-color:rgba(15,23,42,.14);
+    background:rgba(255,255,255,.92);
+    color:var(--text2);
+    box-shadow:0 1px 2px rgba(15,23,42,.05);
+  }
+  #music-library .ml-nav-icon-btn:hover{
+    background:#fff;
+  }
+  #music-library #ml-player-now-title{
+    color:var(--text);
+  }
+  #music-library #ml-player-now-sub,
+  #music-library .ml-player-side-head,
+  #music-library #ml-player-artist,
+  #music-library #ml-player-queue-empty,
+  #music-library .ml-player-queue-artist{
+    color:var(--text2);
+  }
+  #music-library #ml-player-cover{
+    background:#f5f8ff;
+    border-color:rgba(15,23,42,.12);
+  }
+  #music-library .ml-player-icon-btn{
+    border-color:rgba(15,23,42,.14);
+    background:rgba(255,255,255,.92);
+    color:var(--text);
+  }
+  #music-library .ml-player-pill,
+  #music-library .ml-player-side-tab,
+  #music-library .ml-player-queue-item{
+    border-color:rgba(15,23,42,.12);
+    background:rgba(15,23,42,.04);
+  }
+  #music-library .ml-player-pill,
+  #music-library .ml-player-side-tab,
+  #music-library .ml-player-queue-index{
+    color:var(--text3);
+  }
+  #music-library .ml-player-side-tab.active{
+    background:var(--text);
+    color:var(--bg2);
+  }
+  #music-library .ml-player-queue-item{
+    color:var(--text);
+  }
+  #music-library .ml-player-queue-item:hover{
+    background:rgba(15,23,42,.07);
+  }
+  #music-library .ml-player-queue-item.is-active{
+    border-color:color-mix(in srgb,var(--accent) 32%, rgba(15,23,42,.12));
+    background:var(--accent-light);
+  }
+  #music-library .ml-player-queue-title{
+    color:var(--text);
+  }
+}
