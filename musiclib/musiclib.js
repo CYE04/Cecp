@@ -1,7 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
-  const ML_VER='2026.04.12.3';
+  const ML_VER='2026.04.12.4';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -957,6 +957,8 @@
     }return false;
   }
   function lower(v){ return String(v||'').trim().toLowerCase(); }
+  function escapeRegExp(v){ return String(v||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+  function cleanText(v){ return String(v||'').replace(/\s+/g,' ').trim(); }
   function detectSongSource(song){
     const artist=(song.artist||'').trim();
     const haystack=lower([song.artist,song.sub,song.title].filter(Boolean).join(' '));
@@ -968,16 +970,76 @@
     const matched=SOURCE_RULES.find(rule=>rule.name!=='其他' && rule.patterns.some(p=>haystack.includes(lower(p))));
     return matched ? matched.name : '其他';
   }
+  function parseAlbumInfo(song){
+    const sub=cleanText(song.sub);
+    const source=cleanText(song.artist||song.source);
+    const explicitAlbum=cleanText(song.album);
+    const explicitYear=cleanText(song.albumYear);
+    if(explicitAlbum){
+      return {
+        album:explicitYear && !explicitAlbum.includes(explicitYear) ? `${explicitAlbum} (${explicitYear})` : explicitAlbum,
+        albumYear:explicitYear
+      };
+    }
+    if(!sub) return {album:'',albumYear:''};
+
+    let album='';
+    let year='';
+    let m=sub.match(/[【《]([^】》]+)[】》]\s*[（(]?(\d{4})?[）)]?/);
+    if(m){
+      album=cleanText(m[1]);
+      year=m[2]||'';
+    }
+
+    if(!album){
+      m=sub.match(/专辑\s+(.+?)\s+(20\d{2})(?=\s|$)/i);
+      if(m){
+        album=cleanText(m[1]);
+        year=m[2]||'';
+      }
+    }
+
+    if(!album){
+      m=sub.match(/^([^【《（(]+?)\s*[【《（(](20\d{2})[】》）)]/);
+      if(m){
+        const raw=cleanText(m[1])
+          .replace(new RegExp(`^${escapeRegExp(source)}`),'')
+          .replace(/^(?:儿童)?专辑\s*/,'')
+          .trim();
+        if(raw && raw!==source){
+          album=raw;
+          year=m[2]||'';
+        }else{
+          year=m[2]||'';
+        }
+      }
+    }
+
+    if(!year){
+      m=sub.match(/[（(【《]?(20\d{2})[）)】》]?/);
+      if(m) year=m[1]||'';
+    }
+
+    if(album){
+      if(year && !album.includes(year)) album=`${album} (${year})`;
+      return {album,albumYear:year};
+    }
+    if(year) return {album:year,albumYear:year};
+    return {album:'',albumYear:''};
+  }
   function enrichSong(song){
     const source=detectSongSource(song);
+    const {album,albumYear}=parseAlbumInfo(Object.assign({},song,{source}));
     return Object.assign({},song,{
       source,
+      album,
+      albumYear,
       displayArtist:(song.artist||source||'未知来源').trim()
     });
   }
   function hi(t,q){
     if(!q||!t)return t||'';
-    return t.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'),'<mark class="ml-highlight">$1</mark>');
+    return t.replace(new RegExp(`(${escapeRegExp(q)})`,'gi'),'<mark class="ml-highlight">$1</mark>');
   }
   function renderSourceBar(){
     const bar=$('ml-source-bar');
@@ -1014,24 +1076,64 @@
       const sourceOk=sourceFilter==='全部'||(s.source||'其他')===sourceFilter;
       if(!sourceOk) return false;
       if(!q) return true;
-      return (s.title||'').toLowerCase().includes(q)||(s.artist||'').toLowerCase().includes(q)||(s.source||'').toLowerCase().includes(q)||hasLyricMatch(s,q);
+      return (s.title||'').toLowerCase().includes(q)
+        || (s.artist||'').toLowerCase().includes(q)
+        || (s.source||'').toLowerCase().includes(q)
+        || (s.album||'').toLowerCase().includes(q)
+        || (s.sub||'').toLowerCase().includes(q)
+        || hasLyricMatch(s,q);
     });
-    $('ml-result-count').textContent=q
-      ? `找到 ${filtered.length} 首相关诗歌`
-      : sourceFilter==='全部'
-        ? `全部 ${songs.length} 首诗歌`
-        : `${sourceFilter} · ${filtered.length} 首`;
     if(!filtered.length){
+      $('ml-result-count').textContent=q
+        ? `找到 0 首相关诗歌`
+        : sourceFilter==='全部'
+          ? `全部 ${songs.length} 首诗歌`
+          : `${sourceFilter} · 0 首`;
       list.innerHTML='';$('ml-query-text').textContent=query;empty.style.display='block';
       list.classList.remove('is-grouped');
       $('ml-list-stage').style.display='none';
     }else{
       empty.style.display='none';
       $('ml-list-stage').style.display='';
-      if(q||sourceFilter!=='全部'){
+      if(q){
+        $('ml-result-count').textContent=`找到 ${filtered.length} 首相关诗歌`;
         list.classList.remove('is-grouped');
         list.innerHTML=filtered.map(s=>cardHTML(s,q)).join('')+'<div id="ml-list-end"></div>';
+      }else if(sourceFilter!=='全部'){
+        const grouped=new Map();
+        filtered.forEach(song=>{
+          const key=song.album||'未标注专辑';
+          if(!grouped.has(key)) grouped.set(key,[]);
+          grouped.get(key).push(song);
+        });
+        $('ml-result-count').textContent=`${sourceFilter} · ${grouped.size} 组专辑 · ${filtered.length} 首`;
+        list.classList.add('is-grouped');
+        list.innerHTML=Array.from(grouped.entries())
+          .sort((a,b)=>{
+            const ay=Math.max(...a[1].map(item=>+(item.albumYear||0)),0);
+            const by=Math.max(...b[1].map(item=>+(item.albumYear||0)),0);
+            const aUnknown=a[0]==='未标注专辑';
+            const bUnknown=b[0]==='未标注专辑';
+            if(aUnknown!==bUnknown) return aUnknown?1:-1;
+            if(ay!==by) return by-ay;
+            return a[0].localeCompare(b[0],'zh-Hans-CN');
+          })
+          .map(([name,items])=>`
+            <section class="ml-group">
+              <div class="ml-group-head">
+                <div>
+                  <div class="ml-group-kicker">专辑 / 年份</div>
+                  <div class="ml-group-title">${name}</div>
+                </div>
+                <div class="ml-group-count">${items.length} 首</div>
+              </div>
+              <div class="ml-group-grid">
+                ${items.map(s=>cardHTML(s,q)).join('')}
+              </div>
+            </section>
+          `).join('')+'<div id="ml-list-end"></div>';
       }else{
+        $('ml-result-count').textContent=`全部 ${songs.length} 首诗歌`;
         list.classList.add('is-grouped');
         const grouped=new Map();
         filtered.forEach(song=>{
