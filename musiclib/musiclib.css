@@ -2060,7 +2060,8 @@ html,body,#music-library{
   }
   #music-library #ml-list,
   #music-library .ml-group-grid{
-    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px;
   }
   #music-library .ml-group{
     padding:10px;
@@ -2068,29 +2069,56 @@ html,body,#music-library{
     border-radius:14px;
   }
   #music-library .ml-group-grid{
-    gap:10px;
+    gap:8px;
   }
   #music-library .ml-song-card{
-    padding:10px;
+    padding:8px;
     border-radius:12px;
   }
   #music-library .ml-card-art{
     border-radius:10px;
-    margin-bottom:10px;
+    margin-bottom:8px;
   }
   #music-library .ml-song-overline{
-    font-size:clamp(11px,3vw,13px);
+    font-size:clamp(10px,2.8vw,12px);
     line-height:1.2;
+    margin-bottom:4px;
   }
   #music-library .ml-song-title{
-    font-size:clamp(26px,8.2vw,38px);
-    line-height:1.08;
+    font-size:clamp(17px,5.2vw,22px);
+    line-height:1.14;
+    margin-bottom:5px;
   }
   #music-library .ml-song-meta{
-    font-size:clamp(12px,3.3vw,14px);
-    line-height:1.36;
+    font-size:clamp(11px,3vw,13px);
+    line-height:1.32;
     overflow-wrap:anywhere;
     word-break:break-word;
+  }
+  #music-library .ml-song-tags{
+    margin-top:7px;
+    gap:4px;
+  }
+  #music-library .ml-song-tag{
+    height:20px;
+    padding:0 6px;
+    font-size:9px;
+  }
+}
+
+@media (min-width:560px) and (max-width:640px){
+  #music-library #ml-list,
+  #music-library .ml-group-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+  #music-library .ml-song-card{
+    padding:7px;
+  }
+  #music-library .ml-song-title{
+    font-size:clamp(15px,3.2vw,18px);
+  }
+  #music-library .ml-song-meta{
+    font-size:11px;
   }
 }
 
