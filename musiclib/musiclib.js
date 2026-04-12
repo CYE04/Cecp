@@ -1,7 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
-  const ML_VER='2026.04.12.1';
+  const ML_VER='2026.04.12.2';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -2160,7 +2160,7 @@
     const shareBtn=document.createElement('button');
     shareBtn.className='sw-pill';
     shareBtn.type='button';
-    shareBtn.style.cssText='font-size:12px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border:none;';
+    shareBtn.style.cssText='font-size:12px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;';
     shareBtn.textContent='🔗 分享';
     shareBtn.addEventListener('click',()=>shareSong(s));
     toolsRow.appendChild(shareBtn);
@@ -2168,7 +2168,7 @@
     const exportBtn=document.createElement('button');
     exportBtn.className='sw-pill';
     exportBtn.type='button';
-    exportBtn.style.cssText='font-size:12px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border:none;';
+    exportBtn.style.cssText='font-size:12px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;';
     exportBtn.textContent='🖼 下载图片';
     exportBtn.addEventListener('click',()=>{
       if(exportBtn.disabled) return;
