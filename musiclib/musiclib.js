@@ -2331,7 +2331,7 @@
       exportBtn.disabled=true;
       exportBtn.style.opacity='.65';
       exportBtn.textContent='生成中...';
-      exportTransposePanel(panelInner,{
+      exportTransposePanel(lbDiv,{
         title:s.title||'transpose',
         key:'1='+curKey,
         width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
