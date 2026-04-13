@@ -2319,6 +2319,16 @@
       lbDiv.style.boxSizing='border-box';
       if(lbDiv.parentElement)lbDiv.parentElement.style.overflow='hidden';
     };
+    const normalizePreviewRowHeights=()=>{
+      lbDiv.querySelectorAll('.prev-row').forEach(row=>{
+        row.style.setProperty('--row-note-height','0px');
+        let maxH=0;
+        row.querySelectorAll('.p-n').forEach(noteLane=>{
+          maxH=Math.max(maxH,Math.ceil(noteLane.getBoundingClientRect().height||0));
+        });
+        if(maxH)row.style.setProperty('--row-note-height',maxH+'px');
+      });
+    };
     const measureNaturalScore=()=>{
       let maxW=0;
       lbDiv.querySelectorAll('.sw-lrow').forEach(row=>{
@@ -2465,7 +2475,7 @@
             chord.className='p-chord'+(seg.chord?'':' empty');
             setChordContent(chord,seg.chord?trChord(seg.chord,st,useFlat):'\u00a0');
             segEl.appendChild(chord);
-            if(seg.n&&seg.n.trim())segEl.appendChild(renderNStr(seg.n));
+            segEl.appendChild(renderNStr(seg.n||''));
             const lyric=document.createElement('div');lyric.className='p-lyric'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(lyric,normLyricText(seg.lyric));
             segEl.appendChild(lyric);
             if(seg.lyric2){const ly2=document.createElement('div');ly2.className='p-lyric p-lyric2'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly2,normLyricText(seg.lyric2));segEl.appendChild(ly2);}
@@ -2490,6 +2500,7 @@
     }
     function fitRows(){
       resetScoreFit();
+      normalizePreviewRowHeights();
       const parent=lbDiv.parentElement;
       if(!parent||!lbDiv.isConnected)return;
 
