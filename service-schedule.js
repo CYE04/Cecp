@@ -999,16 +999,19 @@
 
   function fitExportFrame(card, scaleWrap, viewport) {
     var naturalW = Math.max(1, Math.ceil(card.scrollWidth));
+    var naturalH = Math.max(1, Math.ceil(card.scrollHeight));
     var viewportW = Math.max(1, Math.ceil(viewport.clientWidth));
     var viewportH = Math.max(1, Math.ceil(viewport.clientHeight));
-    // Fill width, align to top — empty space below shows frame gradient
-    var scale = viewportW / naturalW;
+    // Contain: show all content; align top to eliminate top whitespace
+    var scale = Math.min(viewportW / naturalW, viewportH / naturalH);
     if (!isFinite(scale) || scale <= 0) scale = 1;
+
+    var left = Math.max(0, Math.round((viewportW - naturalW * scale) / 2));
 
     scaleWrap.style.width = viewportW + 'px';
     scaleWrap.style.height = viewportH + 'px';
     card.style.position = 'absolute';
-    card.style.left = '0px';
+    card.style.left = left + 'px';
     card.style.top = '0px';
     card.style.transformOrigin = 'left top';
     card.style.transform = 'scale(' + scale + ')';
