@@ -2472,7 +2472,12 @@
             if(seg.lyric3){const ly3=document.createElement('div');ly3.className='p-lyric p-lyric3'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly3,normLyricText(seg.lyric3));segEl.appendChild(ly3);}
             if(seg.lyric4){const ly4=document.createElement('div');ly4.className='p-lyric p-lyric4'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly4,normLyricText(seg.lyric4));segEl.appendChild(ly4);}
             const _vn=getVoltaStartLabel(seg.n);
-            if(_vn){voltaWrap=document.createElement('span');voltaWrap.className='prev-volta';voltaWrap.setAttribute('data-v',_vn+'.');}
+            if(_vn){
+              row.classList.add('has-volta');
+              voltaWrap=document.createElement('span');
+              voltaWrap.className='prev-volta';
+              voltaWrap.setAttribute('data-v',_vn+'.');
+            }
             (voltaWrap||row).appendChild(segEl);
             if(voltaWrap&&hasVoltaEnd(seg.n)){voltaWrap.classList.add('closed');row.appendChild(voltaWrap);voltaWrap=null;}
           }
