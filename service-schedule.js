@@ -997,21 +997,28 @@
     return EXPORT_RATIO_PRESETS[ratioKey] || EXPORT_RATIO_PRESETS['4:3'];
   }
 
-  function fitExportFrame(card, scaleWrap, viewport) {
+  function fitExportFrame(card, scaleWrap, viewport, frame) {
     var naturalW = Math.max(1, Math.ceil(card.scrollWidth));
     var naturalH = Math.max(1, Math.ceil(card.scrollHeight));
     var viewportW = Math.max(1, Math.ceil(viewport.clientWidth));
-    var viewportH = Math.max(1, Math.ceil(viewport.clientHeight));
-    // Contain: show all content; align top to eliminate top whitespace
-    var scale = Math.min(viewportW / naturalW, viewportH / naturalH);
+
+    // Fill width exactly, then grow frame height to show all content — no white borders, no clipping
+    var scale = viewportW / naturalW;
     if (!isFinite(scale) || scale <= 0) scale = 1;
 
-    var left = Math.max(0, Math.round((viewportW - naturalW * scale) / 2));
+    var scaledH = Math.max(1, Math.ceil(naturalH * scale));
 
+    // overhead = stage insets + padding (stays constant, derived from initial frame/viewport sizes)
+    if (frame) {
+      var overhead = Math.max(0, frame.offsetHeight - viewport.offsetHeight);
+      frame.style.height = (scaledH + overhead) + 'px';
+    }
+
+    viewport.style.height = scaledH + 'px';
     scaleWrap.style.width = viewportW + 'px';
-    scaleWrap.style.height = viewportH + 'px';
+    scaleWrap.style.height = scaledH + 'px';
     card.style.position = 'absolute';
-    card.style.left = left + 'px';
+    card.style.left = '0px';
     card.style.top = '0px';
     card.style.transformOrigin = 'left top';
     card.style.transform = 'scale(' + scale + ')';
@@ -1153,11 +1160,11 @@
     document.body.appendChild(host);
 
     replaceExportBadgesWithSvg(card);
-    fitExportFrame(card, scaleWrap, viewport);
+    fitExportFrame(card, scaleWrap, viewport, frame);
 
     return {
       node: frame,
-      fit: function () { fitExportFrame(card, scaleWrap, viewport); },
+      fit: function () { fitExportFrame(card, scaleWrap, viewport, frame); },
       cleanup: function () { host.remove(); }
     };
   }
