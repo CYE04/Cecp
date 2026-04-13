@@ -19,6 +19,14 @@
     { key: '主日晚上', label: '晚上' },
     { key: '祷告会', label: '祷告会' }
   ];
+  var EXPORT_RATIOS = [
+    { key: '4:3', label: '4:3' },
+    { key: '16:9', label: '16:9' }
+  ];
+  var EXPORT_RATIO_PRESETS = {
+    '4:3': { width: 1800, height: 1350, fileTag: '4x3', frameClass: 'is-r4x3' },
+    '16:9': { width: 1920, height: 1080, fileTag: '16x9', frameClass: 'is-r16x9' }
+  };
 
   var TYPE_C = {
     '主日下午': { accent:'#fbff00', bg:'#b9a50d', tx:'#fffa9f'},
@@ -135,6 +143,21 @@
 .cec-menu-title{
   padding:6px 8px 10px;color:var(--cec-ink3);font-size:12px;font-weight:700;letter-spacing:.02em;
 }
+.cec-menu-divider{
+  margin:8px 4px;border-top:1px solid var(--cec-border);
+}
+.cec-ratio-bar{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 4px 4px;
+}
+.cec-ratio-item{
+  min-height:36px;border-radius:10px;border:1px solid var(--cec-border);
+  background:var(--cec-bg3);color:var(--cec-ink2);font-weight:800;
+}
+.cec-ratio-item:hover{background:var(--cec-hover);color:var(--cec-ink)}
+.cec-ratio-item.on{
+  background:#111827;color:#f8fbff;border-color:#2f3a50;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+}
 .cec-menu-item{
   width:100%;min-height:40px;padding:0 12px;border-radius:10px;border:1px solid transparent;
   background:transparent;color:var(--cec-ink);justify-content:flex-start;font-weight:700;
@@ -206,6 +229,25 @@
 .cec-export-shot{
   position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;padding:0;
 }
+.cec-export-frame{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at top left, rgba(83,130,255,.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(51,180,109,.12), transparent 24%),
+    linear-gradient(180deg,#eef4ff 0%,#f6f8fc 100%);
+}
+.cec-export-stage{
+  position:absolute;inset:22px;padding:18px;border-radius:28px;overflow:hidden;
+  background:rgba(255,255,255,.86);border:1px solid #d9e2f0;
+  box-shadow:0 18px 48px rgba(32,45,70,.10);
+}
+.cec-export-frame.is-r16x9 .cec-export-stage{inset:18px;padding:14px}
+.cec-export-viewport{
+  position:relative;width:100%;height:100%;overflow:hidden;
+}
+.cec-export-scale{
+  position:relative;width:100%;height:100%;
+}
 .cec-export-card{
   --cec-bg:#f4f6f9;
   --cec-bg2:#ffffff;
@@ -220,17 +262,34 @@
   --cec-ref:#1a7a3c;
   --cec-npfx:#7a5500;
   width:max-content;max-width:none;min-width:0;padding:0;
-  border-radius:0;border:1px solid #d6dde8;
-  background:#f7f9fc;
-  box-shadow:none;
+  border-radius:22px;border:1px solid #d8e1ee;
+  background:#ffffff;
+  box-shadow:0 10px 28px rgba(29,41,57,.08);
   color:var(--cec-ink);
   font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
 }
 .cec-export-head{
   display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;
-  margin:0;padding:14px 16px;background:var(--cec-bg2);border-bottom:1px solid var(--cec-border2);
+  margin:0;padding:18px 22px 16px;
+  background:linear-gradient(135deg,#fbfdff 0%,#f2f6ff 100%);
+  border-bottom:1px solid #dde5f2;
 }
-.cec-export-month{font-size:24px;font-weight:900;letter-spacing:.02em;line-height:1.1}
+.cec-export-head-left{display:flex;flex-direction:column;gap:8px}
+.cec-export-eyebrow{
+  font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#7b879c;
+}
+.cec-export-month{font-size:38px;font-weight:900;letter-spacing:.02em;line-height:1.04;color:#1b2433}
+.cec-export-meta{
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;
+}
+.cec-export-chip{
+  display:inline-flex;align-items:center;justify-content:center;min-height:30px;
+  padding:0 12px;border-radius:999px;border:1px solid #d8e1ee;
+  background:#ffffff;color:#4b5a73;font-size:11px;font-weight:900;letter-spacing:.06em;
+}
+.cec-export-chip.is-ratio{
+  border-color:#c8d4ea;background:#eef4ff;color:#2c4f96;
+}
 .cec-export-sub{
   font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cec-ink3);
 }
@@ -239,26 +298,74 @@
   margin-top:0;border:none;border-radius:0;overflow:hidden;background:var(--cec-bg2);
 }
 .cec-export-label{
-  display:flex;align-items:center;gap:10px;padding:12px 16px;
-  border-bottom:1px solid var(--cec-border2);background:var(--cec-bg2);
-  font-size:16px;font-weight:900;color:var(--cec-ink);
+  display:flex;align-items:center;gap:10px;padding:11px 14px 10px;
+  border-bottom:1px solid #e2e8f3;background:#fcfdff;
+  font-size:15px;font-weight:900;color:var(--cec-ink);
 }
 .cec-export-empty{
-  padding:18px 16px;color:var(--cec-ink2);font-size:14px;font-weight:700;
+  padding:18px 16px;color:var(--cec-ink2);font-size:13px;font-weight:700;
 }
 .cec-export-card .cec-wrap{overflow:visible}
 .cec-export-card .cec-tbl{min-width:0;width:max-content}
 .cec-export-card .cec-corner,
-.cec-export-card .cec-h{position:static}
-.cec-export-card .cec-cell:hover{background:var(--cec-bg)}
+.cec-export-card .cec-h{
+  position:static;padding:10px 10px;background:#f6f8fc;color:#6a778e;
+  font-size:14px;font-weight:900;
+}
+.cec-export-card .cec-rowlbl{
+  padding:10px 12px;background:#fbfcfe;font-size:13px;font-weight:900;line-height:1.14;
+}
+.cec-export-card .cec-cell{
+  min-width:132px;height:auto;padding:8px 8px;background:#ffffff;
+}
+.cec-export-card tbody tr:nth-child(2n) .cec-rowlbl,
+.cec-export-card tbody tr:nth-child(2n) .cec-cell{background:#fcfdff}
+.cec-export-card .cec-cell:hover{background:#ffffff}
+.cec-export-card .cec-badges{
+  min-height:0;gap:6px;
+}
+.cec-export-card .cec-badge{
+  min-height:26px;padding:5px 10px;border-radius:999px;
+  font-size:11px;line-height:1.15;letter-spacing:-.01em;
+}
+.cec-export-card .cec-note,
+.cec-export-card .cec-reading{
+  min-height:0;gap:4px;
+}
+.cec-export-card .cec-ref{font-size:12px}
+.cec-export-card .cec-npfx{font-size:11px}
+.cec-export-card .cec-empty{font-size:12px}
 .cec-tbl-all .cec-typecell{
-  background:var(--cec-bg2);padding:12px 10px;vertical-align:top;text-align:center;
+  background:#f8fafc;padding:10px 10px;vertical-align:top;text-align:center;
 }
 .cec-type-pill{
-  display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 12px;
-  border-radius:999px;font-size:12px;font-weight:900;line-height:1.2;text-align:center;
+  display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:6px 12px;
+  border-radius:999px;font-size:11px;font-weight:900;line-height:1.2;text-align:center;
 }
-.cec-tbl-all .cec-rowlbl{min-width:144px}
+.cec-tbl-all .cec-rowlbl{min-width:138px}
+.cec-export-frame.is-r16x9 .cec-export-head{
+  padding:14px 18px 13px;
+}
+.cec-export-frame.is-r16x9 .cec-export-month{font-size:32px}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-corner,
+.cec-export-frame.is-r16x9 .cec-export-card .cec-h{
+  padding:8px 8px;font-size:12px;
+}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-rowlbl{
+  padding:8px 10px;font-size:12px;
+}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-cell{
+  min-width:124px;padding:6px 6px;
+}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-badges{gap:4px}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-badge{
+  min-height:22px;padding:4px 8px;font-size:10px;
+}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-note,
+.cec-export-frame.is-r16x9 .cec-export-card .cec-reading{gap:3px}
+.cec-export-frame.is-r16x9 .cec-type-pill{
+  min-height:26px;padding:5px 10px;font-size:10px;
+}
 .cec-spin{
   width:18px;height:18px;border:2px solid var(--cec-spin1);border-top-color:var(--cec-spin2);border-radius:50%;
   animation:cecspin .7s linear infinite;
@@ -272,6 +379,7 @@
   .cec-export-wrap,.cec-btn-tool{width:100%}
   .cec-menu{left:0;right:auto;min-width:min(100%,280px)}
   .cec-btn-tool{justify-content:flex-start}
+  .cec-ratio-bar{grid-template-columns:repeat(2,minmax(0,1fr))}
   .cec-cell{min-width:120px;height:74px;padding:8px}
   .cec-corner,.cec-h,.cec-rowlbl{padding:10px 8px}
   .cec-badges{gap:6px}
@@ -320,6 +428,7 @@
     var activeType = '青年团契';
     var exportMenuOpen = false;
     var exportBusy = false;
+    var activeRatio = '4:3';
 
     function onDocClick(e) {
       if (!exportMenuOpen) return;
@@ -357,6 +466,13 @@
         '<div class="cec-export-wrap' + (exportMenuOpen ? ' open' : '') + '">' +
         '<button class="cec-btn cec-btn-tool" id="exportToggle" type="button"' + (exportBusy ? ' disabled' : '') + '>' + toolBtnIcon + '<span class="cec-btn-tool-label">' + toolBtnText + '</span></button>' +
         '<div class="cec-menu">' +
+        '<div class="cec-menu-title">画面比例</div>' +
+        '<div class="cec-ratio-bar">' +
+        EXPORT_RATIOS.map(function (item) {
+          return '<button class="cec-btn cec-ratio-item' + (item.key === activeRatio ? ' on' : '') + '" type="button" data-export-ratio="' + esc(item.key) + '">' + esc(item.label) + '</button>';
+        }).join('') +
+        '</div>' +
+        '<div class="cec-menu-divider"></div>' +
         '<div class="cec-menu-title">选择要下载的内容</div>' +
         EXPORT_ITEMS.map(function (item) {
           return '<button class="cec-btn cec-menu-item" type="button" data-export-target="' + esc(item.key) + '">' + esc(item.label) + '</button>';
@@ -410,6 +526,14 @@
         });
       });
 
+      EL.querySelectorAll('[data-export-ratio]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          activeRatio = this.getAttribute('data-export-ratio') || activeRatio;
+          render();
+        });
+      });
+
       EL.querySelectorAll('[data-export-target]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -439,7 +563,7 @@
       exportMenuOpen = false;
       render();
 
-      exportScheduleAsImage(month, monthRows, types)
+      exportScheduleAsImage(month, monthRows, types, activeRatio)
         .catch(function (err) {
           try { console.error('[service-schedule] export image failed', err); } catch (_) {}
           window.alert('下载失败，请稍后再试');
@@ -451,7 +575,8 @@
     }
   }
 
-  function renderServiceMatrix(rows, type) {
+  function renderServiceMatrix(rows, type, opt) {
+    opt = opt || {};
     var filtered = rows.filter(function (r) { return tv(r.type) === type; });
     var weekMap = {};
     filtered.forEach(function (r) { weekMap[tv(r.week)] = true; });
@@ -460,9 +585,11 @@
     if (!weeks.length) weeks = WEEK_ORDER.slice();
 
     var rowDefs = serviceRowsForType(type);
+    var labelCol = opt.compact ? 118 : 132;
+    var weekCol = opt.compact ? 126 : 150;
 
-    var cg = '<colgroup><col style="width:132px">' +
-      weeks.map(function () { return '<col style="width:150px">'; }).join('') +
+    var cg = '<colgroup><col style="width:' + labelCol + 'px">' +
+      weeks.map(function () { return '<col style="width:' + weekCol + 'px">'; }).join('') +
       '</colgroup>';
 
     var thead = '<thead><tr><th class="cec-corner">服事安排</th>' +
@@ -499,8 +626,10 @@
       { subtype: '周三祷告会', label: '周三祷告会' },
       { subtype: '周六祷告会', label: '周六祷告会' }
     ];
+    var rowCol = opt.compact ? 118 : 132;
+    var prayerCol = opt.compact ? 152 : 190;
 
-    var cg = '<colgroup><col style="width:132px"><col style="width:190px"><col style="width:190px"></colgroup>';
+    var cg = '<colgroup><col style="width:' + rowCol + 'px"><col style="width:' + prayerCol + 'px"><col style="width:' + prayerCol + 'px"></colgroup>';
     var thead = '<thead><tr><th class="cec-corner">第几周</th>' +
       cols.map(function (c) { return '<th class="cec-h">' + esc(c.label) + '</th>'; }).join('') +
       '</tr></thead>';
@@ -512,7 +641,7 @@
         var item = filtered.find(function (r) {
           return tv(r.week) === w && tv(r.subtype) === c.subtype;
         });
-        tbody += renderPrayerCell(item);
+        tbody += renderPrayerCell(item, opt);
       });
       tbody += '</tr>';
     });
@@ -521,7 +650,8 @@
     return '<div class="cec-wrap"><table class="cec-tbl">' + cg + thead + tbody + '</table></div>';
   }
 
-  function renderPrayerCell(item) {
+  function renderPrayerCell(item, opt) {
+    opt = opt || {};
     if (!item) return '<td class="cec-cell"><span class="cec-empty">—</span></td>';
 
     var name = tv(item.leader);
@@ -531,7 +661,7 @@
     var html = '<td class="cec-cell"><div class="cec-note">';
     if (name) html += mkBadge(name);
     if (time) html += '<span class="cec-npfx">' + esc(time) + '</span>';
-    if (note) html += '<span style="font-size:11px;color:#aeb6c3;line-height:1.3">' + esc(note) + '</span>';
+    if (note && !opt.compact) html += '<span style="font-size:11px;color:#aeb6c3;line-height:1.3">' + esc(note) + '</span>';
     html += '</div></td>';
     return html;
   }
@@ -693,8 +823,8 @@
     var weeks = WEEK_ORDER.filter(function (w) { return weekMap[w]; });
     if (!weeks.length) weeks = WEEK_ORDER.slice(0, 1);
 
-    var cg = '<colgroup><col style="width:132px"><col style="width:160px">' +
-      weeks.map(function () { return '<col style="width:150px">'; }).join('') +
+    var cg = '<colgroup><col style="width:112px"><col style="width:138px">' +
+      weeks.map(function () { return '<col style="width:132px">'; }).join('') +
       '</colgroup>';
 
     var thead = '<thead><tr><th class="cec-corner">聚会</th><th class="cec-h">项目</th>' +
@@ -722,7 +852,7 @@
             var prayerItem = rows.find(function (r) {
               return tv(r.type) === '祷告会' && tv(r.week) === w && tv(r.subtype) === rowDef.subtype;
             });
-            tbody += renderPrayerCell(prayerItem);
+            tbody += renderPrayerCell(prayerItem, { compact: true });
             return;
           }
 
@@ -741,9 +871,52 @@
     return '<div class="cec-wrap"><table class="cec-tbl cec-tbl-all">' + cg + thead + tbody + '</table></div>';
   }
 
-  function buildScheduleExportNode(month, rows, types) {
+  function getExportLabel(types) {
+    return types.length > 1 ? '全部服事安排' : types[0] + '服事安排';
+  }
+
+  function getExportRatioPreset(ratioKey) {
+    return EXPORT_RATIO_PRESETS[ratioKey] || EXPORT_RATIO_PRESETS['4:3'];
+  }
+
+  function fitExportFrame(card, scaleWrap, viewport) {
+    var naturalW = Math.max(1, Math.ceil(card.scrollWidth));
+    var naturalH = Math.max(1, Math.ceil(card.scrollHeight));
+    var viewportW = Math.max(1, Math.ceil(viewport.clientWidth));
+    var viewportH = Math.max(1, Math.ceil(viewport.clientHeight));
+    var scale = Math.min(viewportW / naturalW, viewportH / naturalH);
+    if (!isFinite(scale) || scale <= 0) scale = 1;
+
+    var left = Math.max(0, Math.round((viewportW - naturalW * scale) / 2));
+    var top = Math.max(0, Math.round((viewportH - naturalH * scale) / 2));
+
+    scaleWrap.style.width = viewportW + 'px';
+    scaleWrap.style.height = viewportH + 'px';
+    card.style.position = 'absolute';
+    card.style.left = left + 'px';
+    card.style.top = top + 'px';
+    card.style.transformOrigin = 'left top';
+    card.style.transform = 'scale(' + scale + ')';
+  }
+
+  function buildScheduleExportNode(month, rows, types, ratioKey) {
+    var preset = getExportRatioPreset(ratioKey);
     var host = document.createElement('div');
     host.className = 'cec-export-shot';
+
+    var frame = document.createElement('div');
+    frame.className = 'cec-export-frame ' + preset.frameClass;
+    frame.style.width = preset.width + 'px';
+    frame.style.height = preset.height + 'px';
+
+    var stage = document.createElement('div');
+    stage.className = 'cec-export-stage';
+
+    var viewport = document.createElement('div');
+    viewport.className = 'cec-export-viewport';
+
+    var scaleWrap = document.createElement('div');
+    scaleWrap.className = 'cec-export-scale';
 
     var card = document.createElement('div');
     card.className = 'cec-export-card';
@@ -751,9 +924,16 @@
 
     var head = document.createElement('div');
     head.className = 'cec-export-head';
+    var exportLabel = getExportLabel(types);
     head.innerHTML =
+      '<div class="cec-export-head-left">' +
+      '<div class="cec-export-eyebrow">橄榄树团契 · Service Schedule</div>' +
       '<div class="cec-export-month">' + esc(month) + '</div>' +
-      '<div class="cec-export-sub">' + esc(types.length > 1 ? '服事安排总览' : types[0] + ' 服事安排') + '</div>';
+      '</div>' +
+      '<div class="cec-export-meta">' +
+      '<span class="cec-export-chip">' + esc(exportLabel) + '</span>' +
+      '<span class="cec-export-chip is-ratio">' + esc(ratioKey) + '</span>' +
+      '</div>';
     card.appendChild(head);
 
     var bodyWrap = document.createElement('div');
@@ -766,10 +946,10 @@
       var section = document.createElement('section');
       section.className = 'cec-export-section';
 
-      var label = document.createElement('div');
-      label.className = 'cec-export-label';
-      label.innerHTML = '<span class="cec-dot" style="background:' + esc(TYPE_C[type].accent) + '"></span>' + esc(type);
-      section.appendChild(label);
+      var sectionLabel = document.createElement('div');
+      sectionLabel.className = 'cec-export-label';
+      sectionLabel.innerHTML = '<span class="cec-dot" style="background:' + esc(TYPE_C[type].accent) + '"></span>' + esc(type);
+      section.appendChild(sectionLabel);
 
       if (!hasTypeRows(rows, type)) {
         var empty = document.createElement('div');
@@ -780,7 +960,7 @@
         var body = document.createElement('div');
         body.innerHTML = type === '祷告会'
           ? renderPrayerMatrix(rows, { compact: true })
-          : renderServiceMatrix(rows, type);
+          : renderServiceMatrix(rows, type, { compact: true });
         while (body.firstChild) section.appendChild(body.firstChild);
       }
 
@@ -788,12 +968,18 @@
     }
 
     card.appendChild(bodyWrap);
-
-    host.appendChild(card);
+    scaleWrap.appendChild(card);
+    viewport.appendChild(scaleWrap);
+    stage.appendChild(viewport);
+    frame.appendChild(stage);
+    host.appendChild(frame);
     document.body.appendChild(host);
 
+    fitExportFrame(card, scaleWrap, viewport);
+
     return {
-      node: card,
+      node: frame,
+      fit: function () { fitExportFrame(card, scaleWrap, viewport); },
       cleanup: function () { host.remove(); }
     };
   }
@@ -985,19 +1171,24 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 800);
   }
 
-  function exportScheduleAsImage(month, rows, types) {
+  function exportScheduleAsImage(month, rows, types, ratioKey) {
     if (!types || !types.length) return Promise.reject(new Error('no export types'));
 
-    var bg = '#eef3f8';
+    var preset = getExportRatioPreset(ratioKey);
+    var bg = '#eef4ff';
     var waitFonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
 
     return waitFonts.then(function () {
-      var snap = buildScheduleExportNode(month, rows, types);
+      var snap = buildScheduleExportNode(month, rows, types, ratioKey);
       return waitPaint2()
+        .then(function () {
+          snap.fit();
+          return waitPaint2();
+        })
         .then(function () { return nodeToPngBlobRobust(snap.node, bg); })
         .then(function (blob) {
           var suffix = types.length > 1 ? '全部服事安排' : types[0] + '_服事安排';
-          saveBlobAs(blob, safeFileName(month + '_' + suffix) + '.png');
+          saveBlobAs(blob, safeFileName(month + '_' + suffix + '_' + preset.fileTag) + '.png');
         })
         .finally(function () {
           snap.cleanup();
