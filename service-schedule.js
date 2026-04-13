@@ -12,6 +12,13 @@
 
   var TYPE_ORDER = ['青年团契', '主日下午', '主日晚上', '祷告会'];
   var WEEK_ORDER = ['第一周', '第二周', '第三周', '第四周', '第五周'];
+  var EXPORT_ITEMS = [
+    { key: 'all', label: '全部合并' },
+    { key: '青年团契', label: '青年' },
+    { key: '主日下午', label: '下午' },
+    { key: '主日晚上', label: '晚上' },
+    { key: '祷告会', label: '祷告会' }
+  ];
 
   var TYPE_C = {
     '主日下午': { accent:'#fbff00', bg:'#b9a50d', tx:'#fffa9f'},
@@ -90,12 +97,16 @@
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;
   padding:10px 12px;border-bottom:1px solid var(--cec-border2);background:var(--cec-bg2);
 }
+.cec-top{justify-content:space-between}
 .cec-sub,.cec-typebar{background:var(--cec-bg3)}
+.cec-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.cec-tools{position:relative;margin-left:auto}
 .cec-btn{
   appearance:none;border:none;cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;
   font:inherit;white-space:nowrap;transition:.12s ease;
 }
+.cec-btn:disabled{cursor:wait;opacity:.72}
 .cec-btn-month,.cec-btn-arr,.cec-btn-tool,.cec-btn-type{
   height:34px;border-radius:10px;border:1px solid var(--cec-border);
   background:var(--cec-btn-bg);color:var(--cec-ink2);
@@ -106,6 +117,22 @@
 .cec-btn-month:hover,.cec-btn-arr:hover,.cec-btn-tool:hover,.cec-btn-type:hover{background:var(--cec-hover);color:var(--cec-ink)}
 .cec-btn-month.on,.cec-btn-type.on{background:var(--cec-active);color:var(--cec-ink);border-color:var(--cec-active-border)}
 .cec-typebar .cec-btn-type{padding:0 12px;gap:6px;font-size:13px;font-weight:700}
+.cec-export-wrap{position:relative}
+.cec-export-wrap.open .cec-btn-tool{background:var(--cec-active);color:var(--cec-ink);border-color:var(--cec-active-border)}
+.cec-menu{
+  position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:none;flex-direction:column;
+  min-width:220px;padding:8px;border:1px solid var(--cec-border);border-radius:14px;
+  background:var(--cec-bg2);box-shadow:0 18px 36px rgba(18,24,38,.16);
+}
+.cec-export-wrap.open .cec-menu{display:flex}
+.cec-menu-title{
+  padding:6px 8px 10px;color:var(--cec-ink3);font-size:12px;font-weight:700;letter-spacing:.02em;
+}
+.cec-menu-item{
+  width:100%;min-height:40px;padding:0 12px;border-radius:10px;border:1px solid transparent;
+  background:transparent;color:var(--cec-ink);justify-content:flex-start;font-weight:700;
+}
+.cec-menu-item:hover{background:var(--cec-hover);border-color:var(--cec-border)}
 .cec-dot{width:8px;height:8px;border-radius:50%}
 .cec-wrap{width:100%;overflow-x:auto;background:var(--cec-bg)}
 .cec-tbl{
@@ -169,6 +196,54 @@
   display:flex;align-items:center;justify-content:center;gap:12px;
   padding:56px 20px;color:var(--cec-ink2);
 }
+.cec-export-shot{
+  position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;padding:24px;
+}
+.cec-export-card{
+  --cec-bg:#f4f6f9;
+  --cec-bg2:#ffffff;
+  --cec-bg3:#f0f2f6;
+  --cec-btn-bg:#eaecf1;
+  --cec-border:#d0d5df;
+  --cec-border2:#bcc3d1;
+  --cec-ink:#1a1d24;
+  --cec-ink2:#5a6275;
+  --cec-ink3:#8a94a6;
+  --cec-ink4:#9aa0ad;
+  --cec-ref:#1a7a3c;
+  --cec-npfx:#7a5500;
+  width:max-content;max-width:none;min-width:980px;padding:24px;
+  border-radius:24px;border:1px solid #d6dde8;
+  background:linear-gradient(180deg,#f9fbff 0%,#eef3f8 100%);
+  box-shadow:0 24px 56px rgba(15,23,42,.12);
+  color:var(--cec-ink);
+  font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+}
+.cec-export-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.cec-export-month{font-size:30px;font-weight:900;letter-spacing:.02em}
+.cec-export-sub{
+  font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cec-ink3);
+}
+.cec-export-section{
+  margin-top:18px;border:1px solid var(--cec-border);border-radius:18px;overflow:hidden;background:var(--cec-bg2);
+}
+.cec-export-section:first-of-type{margin-top:0}
+.cec-export-label{
+  display:flex;align-items:center;gap:10px;padding:16px 18px;
+  border-bottom:1px solid var(--cec-border2);background:var(--cec-bg2);
+  font-size:18px;font-weight:900;color:var(--cec-ink);
+}
+.cec-export-empty{
+  padding:32px 18px;color:var(--cec-ink2);font-size:14px;font-weight:700;
+}
+.cec-export-card .cec-wrap{overflow:visible}
+.cec-export-card .cec-tbl{min-width:0}
+.cec-export-card .cec-corner,
+.cec-export-card .cec-h{position:static}
+.cec-export-card .cec-cell:hover{background:var(--cec-bg)}
 .cec-spin{
   width:18px;height:18px;border:2px solid var(--cec-spin1);border-top-color:var(--cec-spin2);border-radius:50%;
   animation:cecspin .7s linear infinite;
@@ -176,11 +251,16 @@
 @keyframes cecspin{to{transform:rotate(360deg)}}
 .cec-err{padding:24px;color:var(--cec-err);line-height:1.8}
 @media(max-width:760px){
+  .cec-top{align-items:flex-start}
+  .cec-nav,.cec-tools{width:100%}
+  .cec-tools{margin-left:0}
+  .cec-export-wrap,.cec-btn-tool{width:100%}
+  .cec-menu{left:0;right:auto;min-width:min(100%,280px)}
   .cec-cell{min-width:120px;height:74px;padding:8px}
   .cec-corner,.cec-h,.cec-rowlbl{padding:10px 8px}
   .cec-badges{gap:6px}
   .cec-badge{font-size:10px;padding:5px 10px}
-}
+  }
 `;
     document.head.appendChild(st);
   }
@@ -222,6 +302,22 @@
     var months = Object.keys(byMonth).sort(function (a, b) { return ymOrd(a) - ymOrd(b); });
     var activeMonthIdx = pickCurrentMonth(months);
     var activeType = '青年团契';
+    var exportMenuOpen = false;
+    var exportBusy = false;
+
+    function onDocClick(e) {
+      if (!exportMenuOpen) return;
+      if (!EL.isConnected) {
+        document.removeEventListener('click', onDocClick);
+        return;
+      }
+      var wrap = EL.querySelector('.cec-export-wrap');
+      if (wrap && wrap.contains(e.target)) return;
+      exportMenuOpen = false;
+      render();
+    }
+
+    document.addEventListener('click', onDocClick);
 
     render();
 
@@ -229,13 +325,28 @@
       var month = months[activeMonthIdx];
       var monthRows = byMonth[month] || [];
 
-      var top = '<div class="cec-top">';
-      if (activeMonthIdx > 0) top += '<button class="cec-btn cec-btn-arr" id="mPrev">←</button>';
-      if (activeMonthIdx > 0) top += '<button class="cec-btn cec-btn-month" id="mPrevText">' + esc(months[activeMonthIdx - 1]) + '</button>';
-      top += '<button class="cec-btn cec-btn-month on">' + esc(month) + '</button>';
-      if (activeMonthIdx < months.length - 1) top += '<button class="cec-btn cec-btn-month" id="mNextText">' + esc(months[activeMonthIdx + 1]) + '</button>';
-      if (activeMonthIdx < months.length - 1) top += '<button class="cec-btn cec-btn-arr" id="mNext">→</button>';
-      top += '</div>';
+      var nav = '<div class="cec-nav">';
+      if (activeMonthIdx > 0) nav += '<button class="cec-btn cec-btn-arr" id="mPrev">←</button>';
+      if (activeMonthIdx > 0) nav += '<button class="cec-btn cec-btn-month" id="mPrevText">' + esc(months[activeMonthIdx - 1]) + '</button>';
+      nav += '<button class="cec-btn cec-btn-month on">' + esc(month) + '</button>';
+      if (activeMonthIdx < months.length - 1) nav += '<button class="cec-btn cec-btn-month" id="mNextText">' + esc(months[activeMonthIdx + 1]) + '</button>';
+      if (activeMonthIdx < months.length - 1) nav += '<button class="cec-btn cec-btn-arr" id="mNext">→</button>';
+      nav += '</div>';
+
+      var toolBtnText = exportBusy ? '生成中...' : '下载图片';
+      var toolMenu = '<div class="cec-tools">' +
+        '<div class="cec-export-wrap' + (exportMenuOpen ? ' open' : '') + '">' +
+        '<button class="cec-btn cec-btn-tool" id="exportToggle" type="button"' + (exportBusy ? ' disabled' : '') + '>🖼 ' + toolBtnText + '</button>' +
+        '<div class="cec-menu">' +
+        '<div class="cec-menu-title">选择要下载的内容</div>' +
+        EXPORT_ITEMS.map(function (item) {
+          return '<button class="cec-btn cec-menu-item" type="button" data-export-target="' + esc(item.key) + '">' + esc(item.label) + '</button>';
+        }).join('') +
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+      var top = '<div class="cec-top">' + nav + toolMenu + '</div>';
 
       var typebar = '<div class="cec-typebar">';
       TYPE_ORDER.forEach(function (tp) {
@@ -264,16 +375,60 @@
       bind('#mNextText', function () {
         if (activeMonthIdx < months.length - 1) { activeMonthIdx++; render(); }
       });
+      bind('#exportToggle', function (e) {
+        if (exportBusy) return;
+        e.stopPropagation();
+        exportMenuOpen = !exportMenuOpen;
+        render();
+      });
 
       EL.querySelectorAll('[data-type]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           activeType = this.getAttribute('data-type');
           lockedName = null;
+          exportMenuOpen = false;
           render();
         });
       });
 
+      EL.querySelectorAll('[data-export-target]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          startExport(this.getAttribute('data-export-target'));
+        });
+      });
+
       bindHighlight();
+    }
+
+    function startExport(target) {
+      if (exportBusy) return;
+      var month = months[activeMonthIdx];
+      var monthRows = byMonth[month] || [];
+      var types = target === 'all'
+        ? TYPE_ORDER.filter(function (tp) { return hasTypeRows(monthRows, tp); })
+        : [target];
+
+      if (!types.length) {
+        exportMenuOpen = false;
+        render();
+        window.alert('当前月份暂无可下载的服事安排');
+        return;
+      }
+
+      exportBusy = true;
+      exportMenuOpen = false;
+      render();
+
+      exportScheduleAsImage(month, monthRows, types)
+        .catch(function (err) {
+          try { console.error('[service-schedule] export image failed', err); } catch (_) {}
+          window.alert('下载失败，请稍后再试');
+        })
+        .finally(function () {
+          exportBusy = false;
+          render();
+        });
     }
   }
 
@@ -491,6 +646,265 @@
     var badges = EL.querySelectorAll('.cec-badge');
     badges.forEach(function (b) {
       b.classList.remove('lit', 'dim', 'locked', 'ldim');
+    });
+  }
+
+  function hasTypeRows(rows, type) {
+    return rows.some(function (r) { return tv(r.type) === type; });
+  }
+
+  function buildScheduleExportNode(month, rows, types) {
+    var host = document.createElement('div');
+    host.className = 'cec-export-shot';
+
+    var card = document.createElement('div');
+    card.className = 'cec-export-card';
+
+    var head = document.createElement('div');
+    head.className = 'cec-export-head';
+    head.innerHTML =
+      '<div class="cec-export-month">' + esc(month) + '</div>' +
+      '<div class="cec-export-sub">' + esc(types.length > 1 ? '服事安排总览' : types[0] + ' 服事安排') + '</div>';
+    card.appendChild(head);
+
+    types.forEach(function (type) {
+      var section = document.createElement('section');
+      section.className = 'cec-export-section';
+
+      var label = document.createElement('div');
+      label.className = 'cec-export-label';
+      label.innerHTML = '<span class="cec-dot" style="background:' + esc(TYPE_C[type].accent) + '"></span>' + esc(type);
+      section.appendChild(label);
+
+      if (!hasTypeRows(rows, type)) {
+        var empty = document.createElement('div');
+        empty.className = 'cec-export-empty';
+        empty.textContent = '本月暂无安排';
+        section.appendChild(empty);
+      } else {
+        var body = document.createElement('div');
+        body.innerHTML = type === '祷告会'
+          ? renderPrayerMatrix(rows)
+          : renderServiceMatrix(rows, type);
+        while (body.firstChild) section.appendChild(body.firstChild);
+      }
+
+      card.appendChild(section);
+    });
+
+    host.appendChild(card);
+    document.body.appendChild(host);
+
+    return {
+      node: card,
+      cleanup: function () { host.remove(); }
+    };
+  }
+
+  function waitPaint2() {
+    return new Promise(function (resolve) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(resolve);
+      });
+    });
+  }
+
+  function safeFileName(name) {
+    return String(name || 'service-schedule')
+      .trim()
+      .replace(/[\\/:*?"<>|]+/g, '-')
+      .replace(/\s+/g, '_')
+      .replace(/\.+$/g, '')
+      .slice(0, 100) || 'service-schedule';
+  }
+
+  var _cecH2cPromise = null;
+  function loadHtml2Canvas() {
+    if (window.html2canvas) return Promise.resolve(window.html2canvas);
+    if (_cecH2cPromise) return _cecH2cPromise;
+
+    _cecH2cPromise = new Promise(function (resolve, reject) {
+      function inject(src, next) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.onload = function () {
+          if (window.html2canvas) resolve(window.html2canvas);
+          else if (next) inject(next, null);
+          else reject(new Error('html2canvas unavailable'));
+        };
+        s.onerror = function () {
+          s.remove();
+          if (next) inject(next, null);
+          else reject(new Error('html2canvas load failed'));
+        };
+        document.head.appendChild(s);
+      }
+
+      inject(
+        'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+        'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js'
+      );
+    });
+
+    return _cecH2cPromise;
+  }
+
+  function canvasToPngBlob(canvas) {
+    return new Promise(function (resolve, reject) {
+      if (canvas.toBlob) {
+        canvas.toBlob(function (blob) {
+          if (blob) resolve(blob);
+          else reject(new Error('png conversion failed'));
+        }, 'image/png');
+      } else {
+        try {
+          var dataUrl = canvas.toDataURL('image/png');
+          var bin = atob(dataUrl.split(',')[1] || '');
+          var arr = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          resolve(new Blob([arr], { type: 'image/png' }));
+        } catch (err) {
+          reject(err);
+        }
+      }
+    });
+  }
+
+  function nodeToPngBlobByHtml2Canvas(node, bgColor) {
+    return loadHtml2Canvas()
+      .then(function (html2canvas) {
+        var dpr = Math.max(1, window.devicePixelRatio || 1);
+        return html2canvas(node, {
+          backgroundColor: bgColor || '#f4f6f9',
+          scale: Math.min(2, dpr),
+          foreignObjectRendering: false,
+          useCORS: true,
+          logging: false
+        });
+      })
+      .then(canvasToPngBlob);
+  }
+
+  function cloneWithComputedStyle(node) {
+    var cloned = node.cloneNode(true);
+
+    function sync(src, dst) {
+      if (!src || !dst) return;
+      if (src.nodeType === 1 && dst.nodeType === 1) {
+        var cs = getComputedStyle(src);
+        for (var i = 0; i < cs.length; i++) {
+          var prop = cs[i];
+          dst.style.setProperty(prop, cs.getPropertyValue(prop), cs.getPropertyPriority(prop));
+        }
+      }
+      var sKids = src.childNodes || [];
+      var dKids = dst.childNodes || [];
+      for (var k = 0; k < sKids.length; k++) {
+        if (dKids[k]) sync(sKids[k], dKids[k]);
+      }
+    }
+
+    sync(node, cloned);
+    return cloned;
+  }
+
+  function nodeToPngBlob(node, bgColor) {
+    return new Promise(function (resolve, reject) {
+      if (!node) {
+        reject(new Error('empty node'));
+        return;
+      }
+
+      var rect = node.getBoundingClientRect();
+      var width = Math.max(1, Math.ceil(rect.width));
+      var height = Math.max(1, Math.ceil(rect.height));
+      var snap = cloneWithComputedStyle(node);
+      snap.style.width = width + 'px';
+      snap.style.maxWidth = 'none';
+
+      var html = new XMLSerializer().serializeToString(snap);
+      var bg = bgColor || '#f4f6f9';
+      var foreign = [
+        '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + width + 'px;height:' + height + 'px;background:' + bg + ';">',
+        html,
+        '</div>'
+      ].join('');
+      var svg = [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="', width, '" height="', height, '" viewBox="0 0 ', width, ' ', height, '">',
+        '<foreignObject width="100%" height="100%">', foreign, '</foreignObject>',
+        '</svg>'
+      ].join('');
+
+      var svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      var svgUrl = URL.createObjectURL(svgBlob);
+      var img = new Image();
+
+      img.onload = function () {
+        URL.revokeObjectURL(svgUrl);
+        var maxSide = 4096;
+        var scale = Math.min(2, maxSide / width, maxSide / height);
+        if (!isFinite(scale) || scale <= 0) scale = 1;
+
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(width * scale));
+        canvas.height = Math.max(1, Math.round(height * scale));
+
+        var ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('canvas unavailable'));
+          return;
+        }
+
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        ctx.drawImage(img, 0, 0, width, height);
+        canvasToPngBlob(canvas).then(resolve).catch(reject);
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(svgUrl);
+        reject(new Error('svg render failed'));
+      };
+      img.src = svgUrl;
+    });
+  }
+
+  function nodeToPngBlobRobust(node, bgColor) {
+    return nodeToPngBlob(node, bgColor).catch(function (svgErr) {
+      try { console.warn('[service-schedule] svg export failed, fallback to html2canvas', svgErr); } catch (_) {}
+      return nodeToPngBlobByHtml2Canvas(node, bgColor);
+    });
+  }
+
+  function saveBlobAs(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 800);
+  }
+
+  function exportScheduleAsImage(month, rows, types) {
+    if (!types || !types.length) return Promise.reject(new Error('no export types'));
+
+    var bg = '#eef3f8';
+    var waitFonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+
+    return waitFonts.then(function () {
+      var snap = buildScheduleExportNode(month, rows, types);
+      return waitPaint2()
+        .then(function () { return nodeToPngBlobRobust(snap.node, bg); })
+        .then(function (blob) {
+          var suffix = types.length > 1 ? '全部服事安排' : types[0] + '_服事安排';
+          saveBlobAs(blob, safeFileName(month + '_' + suffix) + '.png');
+        })
+        .finally(function () {
+          snap.cleanup();
+        });
     });
   }
 
