@@ -552,35 +552,71 @@
           if(secName) entries.push({type:'sec',text:`[${secName}]`});
           sec.querySelectorAll('.sw-lrow').forEach(row=>{
             let chordLine='';
+            let jianpuLine='';
             let lyricLine='';
             row.querySelectorAll('.prev-seg').forEach(seg=>{
               const chord=((seg.querySelector('.p-chord')||{}).textContent||'').replace(/\u00a0/g,' ');
+              const jianpu=((seg.querySelector('.p-n')||{}).textContent||'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
               const lyric=((seg.querySelector('.p-lyric')||{}).textContent||'').replace(/\u00a0/g,' ');
               chordLine+=(chord||' ')+'  ';
+              jianpuLine+=(jianpu||' ')+'  ';
               lyricLine+=(lyric||' ')+'  ';
             });
             if(chordLine.trim()) entries.push({type:'chord',text:chordLine.trimEnd()});
+            if(jianpuLine.trim()) entries.push({type:'jianpu',text:jianpuLine.trimEnd()});
             if(lyricLine.trim()) entries.push({type:'lyric',text:lyricLine.trimEnd()});
           });
           entries.push({type:'gap',text:''});
         });
         if(!entries.length) entries.push({type:'sec',text:'[Transpose]'});
 
+        const toLuma=color=>{
+          const c=String(color||'').trim().toLowerCase();
+          let r=255,g=255,b=255,m=null;
+          m=c.match(/^#([0-9a-f]{3})$/i);
+          if(m){
+            r=parseInt(m[1].charAt(0)+m[1].charAt(0),16);
+            g=parseInt(m[1].charAt(1)+m[1].charAt(1),16);
+            b=parseInt(m[1].charAt(2)+m[1].charAt(2),16);
+            return 0.2126*r+0.7152*g+0.0722*b;
+          }
+          m=c.match(/^#([0-9a-f]{6})$/i);
+          if(m){
+            r=parseInt(m[1].slice(0,2),16);
+            g=parseInt(m[1].slice(2,4),16);
+            b=parseInt(m[1].slice(4,6),16);
+            return 0.2126*r+0.7152*g+0.0722*b;
+          }
+          m=c.match(/^rgba?\(([^)]+)\)$/i);
+          if(m){
+            const parts=m[1].split(',');
+            if(parts.length>=3){
+              r=parseFloat(parts[0])||0;
+              g=parseFloat(parts[1])||0;
+              b=parseFloat(parts[2])||0;
+            }
+          }
+          return 0.2126*r+0.7152*g+0.0722*b;
+        };
+        const isDarkBg=toLuma(bgColor||'#ffffff')<140;
+
         const fontFor=type=>{
           if(type==='sec') return '700 18px "Noto Serif SC","PingFang SC",serif';
+          if(type==='jianpu') return '700 18px "Space Mono","DM Mono",monospace';
           if(type==='lyric') return '500 19px "Noto Serif SC","PingFang SC",serif';
           return '700 14px "Space Mono","DM Mono",monospace';
         };
         const lhFor=type=>{
           if(type==='sec') return 30;
+          if(type==='jianpu') return 26;
           if(type==='lyric') return 28;
           if(type==='gap') return 14;
           return 24;
         };
         const colorFor=type=>{
-          if(type==='sec') return '#8a5a3b';
-          if(type==='lyric') return '#2d2a26';
-          return '#c2410c';
+          if(type==='sec') return isDarkBg ? '#a6b3cf' : '#8a5a3b';
+          if(type==='lyric'||type==='jianpu') return isDarkBg ? '#e5e7eb' : '#2d2a26';
+          return isDarkBg ? '#f59e0b' : '#c2410c';
         };
 
         const pad=26;
