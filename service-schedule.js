@@ -319,6 +319,9 @@
 }
 .cec-export-card .cec-wrap{overflow:visible}
 .cec-export-card .cec-tbl{min-width:0;width:max-content}
+.cec-export-badge-img{
+  display:block;flex:0 0 auto;overflow:visible;
+}
 .cec-export-card .cec-corner,
 .cec-export-card .cec-h{
   position:static;padding:10px 10px;background:#f6f8fc;color:#6a778e;
@@ -1014,6 +1017,61 @@
     card.style.transform = 'scale(' + scale + ')';
   }
 
+  function waitForNodeImages(node) {
+    if (!node) return Promise.resolve();
+    var imgs = Array.prototype.slice.call(node.querySelectorAll('img'));
+    var pending = imgs.filter(function (img) { return !img.complete || !img.naturalWidth; });
+    if (!pending.length) return Promise.resolve();
+
+    return Promise.all(pending.map(function (img) {
+      return new Promise(function (resolve) {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      });
+    }));
+  }
+
+  function replaceExportBadgesWithSvg(root) {
+    if (!root) return;
+
+    root.querySelectorAll('.cec-badge').forEach(function (badge) {
+      var labelEl = badge.querySelector('.cec-badge-txt');
+      var label = tv(labelEl ? labelEl.textContent : badge.textContent);
+      if (!label) return;
+
+      var badgeCs = getComputedStyle(badge);
+      var textCs = getComputedStyle(labelEl || badge);
+      var rect = badge.getBoundingClientRect();
+      var width = Math.max(1, Math.ceil(rect.width));
+      var height = Math.max(1, Math.ceil(rect.height));
+      var radius = parseFloat(badgeCs.borderTopLeftRadius) || parseFloat(badgeCs.borderRadius) || 0;
+      var fontSize = parseFloat(textCs.fontSize) || parseFloat(badgeCs.fontSize) || 11;
+      var fontWeight = textCs.fontWeight || badgeCs.fontWeight || '800';
+      var fontFamily = textCs.fontFamily || badgeCs.fontFamily || 'system-ui,sans-serif';
+      var bg = badgeCs.backgroundColor || '#4b5563';
+      var fg = badgeCs.color || '#f8fafc';
+      var svg = [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="', width, '" height="', height, '" viewBox="0 0 ', width, ' ', height, '">',
+        '<rect x="0" y="0" width="', width, '" height="', height, '" rx="', radius, '" ry="', radius, '" fill="', bg, '"></rect>',
+        '<text x="', width / 2, '" y="', height / 2, '" fill="', fg, '" font-size="', fontSize, '" font-weight="', esc(fontWeight), '" font-family="', esc(fontFamily), '" text-anchor="middle" dominant-baseline="central" text-rendering="geometricPrecision">',
+        esc(label),
+        '</text></svg>'
+      ].join('');
+
+      var img = document.createElement('img');
+      img.className = 'cec-export-badge-img';
+      img.alt = '';
+      img.setAttribute('aria-hidden', 'true');
+      img.width = width;
+      img.height = height;
+      img.style.width = width + 'px';
+      img.style.height = height + 'px';
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+
+      badge.replaceWith(img);
+    });
+  }
+
   function buildScheduleExportNode(month, rows, types, ratioKey) {
     var preset = getExportRatioPreset(ratioKey);
     var host = document.createElement('div');
@@ -1094,6 +1152,7 @@
     host.appendChild(frame);
     document.body.appendChild(host);
 
+    replaceExportBadgesWithSvg(card);
     fitExportFrame(card, scaleWrap, viewport);
 
     return {
@@ -1300,6 +1359,7 @@
     return waitFonts.then(function () {
       var snap = buildScheduleExportNode(month, rows, types, ratioKey);
       return waitPaint2()
+        .then(function () { return waitForNodeImages(snap.node); })
         .then(function () {
           snap.fit();
           return waitPaint2();
