@@ -24,7 +24,7 @@
     { key: '16:9', label: '16:9' }
   ];
   var EXPORT_RATIO_PRESETS = {
-    '4:3': { width: 1800, height: 1350, fileTag: '4x3', frameClass: 'is-r4x3' },
+    '4:3': { width: 1350, height: 1800, fileTag: '4x3', frameClass: 'is-r4x3' },
     '16:9': { width: 1920, height: 1080, fileTag: '16x9', frameClass: 'is-r16x9' }
   };
 
@@ -242,7 +242,7 @@
 }
 .cec-export-stage{
   position:absolute;inset:22px;padding:18px;border-radius:28px;overflow:hidden;
-  background:rgba(255,255,255,.86);border:1px solid #d9e2f0;
+  background:transparent;border:1px solid rgba(217,226,240,.45);
   box-shadow:0 18px 48px rgba(32,45,70,.10);
 }
 .cec-export-frame.is-r16x9 .cec-export-stage{inset:18px;padding:14px}
@@ -999,20 +999,17 @@
 
   function fitExportFrame(card, scaleWrap, viewport) {
     var naturalW = Math.max(1, Math.ceil(card.scrollWidth));
-    var naturalH = Math.max(1, Math.ceil(card.scrollHeight));
     var viewportW = Math.max(1, Math.ceil(viewport.clientWidth));
     var viewportH = Math.max(1, Math.ceil(viewport.clientHeight));
-    var scale = Math.min(viewportW / naturalW, viewportH / naturalH);
+    // Fill width, align to top — empty space below shows frame gradient
+    var scale = viewportW / naturalW;
     if (!isFinite(scale) || scale <= 0) scale = 1;
-
-    var left = Math.max(0, Math.round((viewportW - naturalW * scale) / 2));
-    var top = Math.max(0, Math.round((viewportH - naturalH * scale) / 2));
 
     scaleWrap.style.width = viewportW + 'px';
     scaleWrap.style.height = viewportH + 'px';
     card.style.position = 'absolute';
-    card.style.left = left + 'px';
-    card.style.top = top + 'px';
+    card.style.left = '0px';
+    card.style.top = '0px';
     card.style.transformOrigin = 'left top';
     card.style.transform = 'scale(' + scale + ')';
   }
