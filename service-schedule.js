@@ -205,7 +205,10 @@
   font-size:11px;font-weight:800;line-height:1.2;white-space:nowrap;
   transition:.12s ease;user-select:none;
 }
-.cec-badge-txt{display:block}
+.cec-badge-txt{
+  display:flex;align-items:center;justify-content:center;
+  line-height:inherit;white-space:nowrap;
+}
 .cec-badge.lit{
   transform:translateY(-1px);
   filter:brightness(1.08);
@@ -340,14 +343,13 @@
   min-height:0;gap:6px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-badge{
-  display:inline-grid;place-items:center;box-sizing:border-box;
-  min-height:0;height:28px;padding:0 12px;border-radius:999px;
-  font-size:11px;line-height:1;letter-spacing:0;text-align:center;
+  display:inline-flex;box-sizing:border-box;
+  min-height:28px;padding:4px 12px;border-radius:999px;
+  font-size:11px;line-height:1.12;letter-spacing:0;text-align:center;
   justify-content:center;align-items:center;vertical-align:middle;
-  overflow:hidden;
 }
 .cec-export-card .cec-badge-txt{
-  display:block;line-height:1;transform:translateY(-1.2px);
+  min-height:1em;line-height:1.12;
 }
 .cec-export-card .cec-note,
 .cec-export-card .cec-reading{
@@ -394,10 +396,10 @@
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badges{gap:4px}
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge{
-  height:22px;padding:0 8px;font-size:9px;
+  min-height:22px;padding:3px 8px;font-size:9px;line-height:1.08;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge-txt{
-  transform:translateY(-1px);
+  line-height:1.08;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-note,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-reading{gap:3px}
