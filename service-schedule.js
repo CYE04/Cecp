@@ -205,6 +205,7 @@
   font-size:11px;font-weight:800;line-height:1.2;white-space:nowrap;
   transition:.12s ease;user-select:none;
 }
+.cec-badge-txt{display:block}
 .cec-badge.lit{
   transform:translateY(-1px);
   filter:brightness(1.08);
@@ -343,6 +344,10 @@
   min-height:0;height:28px;padding:0 12px;border-radius:999px;
   font-size:11px;line-height:1;letter-spacing:0;text-align:center;
   justify-content:center;align-items:center;vertical-align:middle;
+  overflow:hidden;
+}
+.cec-export-card .cec-badge-txt{
+  display:block;line-height:1;transform:translateY(-1.2px);
 }
 .cec-export-card .cec-note,
 .cec-export-card .cec-reading{
@@ -390,6 +395,9 @@
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badges{gap:4px}
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge{
   height:22px;padding:0 8px;font-size:9px;
+}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-badge-txt{
+  transform:translateY(-1px);
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-note,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-reading{gap:3px}
@@ -820,7 +828,7 @@
 
   function mkBadge(name) {
     var c = badgeColor(name);
-    return '<span class="cec-badge" data-name="' + esc(name) + '" style="background:' + c[0] + ';color:' + c[1] + '">' + esc(name) + '</span>';
+    return '<span class="cec-badge" data-name="' + esc(name) + '" style="background:' + c[0] + ';color:' + c[1] + '"><span class="cec-badge-txt">' + esc(name) + '</span></span>';
   }
 
   function badgeColor(name) {
