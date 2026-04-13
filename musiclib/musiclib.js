@@ -759,18 +759,28 @@
       });
   }
 
-  function buildExportClone(panelInner){
+  function buildExportClone(panelInner,opt={}){
     const rect=panelInner.getBoundingClientRect();
     const mount=(panelInner&&panelInner.closest&&panelInner.closest('#music-library')) || document.body;
     const host=document.createElement('div');
     host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
     const clone=panelInner.cloneNode(true);
-    clone.style.width=Math.max(1,Math.ceil(rect.width))+'px';
+    if(opt.tight){
+      clone.style.display='inline-block';
+      clone.style.width='max-content';
+      clone.style.minWidth='0';
+    }else{
+      clone.style.width=Math.max(1,Math.ceil(rect.width))+'px';
+    }
     clone.style.maxWidth='none';
     clone.style.margin='0';
     clone.style.transform='none';
     host.appendChild(clone);
     mount.appendChild(host);
+    if(opt.tight){
+      const tightW=Math.max(1,Math.ceil(clone.scrollWidth||rect.width||0));
+      clone.style.width=tightW+'px';
+    }
     return {
       node:clone,
       cleanup:()=>host.remove()
@@ -864,7 +874,7 @@
     const waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
       .then(()=>{
-        const snap=buildExportClone(panelInner);
+        const snap=buildExportClone(panelInner,{tight:!!opt.tight});
         if(opt.hideTransposeOptions){
           const keyZone=snap.node.querySelector('.sw-ks');
           if(keyZone) keyZone.remove();
@@ -2371,10 +2381,10 @@
       exportBtn.disabled=true;
       exportBtn.style.opacity='.65';
       exportBtn.textContent='生成中...';
-      exportTransposePanel(panelInner,{
+      exportTransposePanel(lbDiv,{
         title:s.title||'transpose',
         key:'1='+curKey,
-        hideTransposeOptions:true,
+        tight:true,
         width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
       }).then(()=>{
         showToast('图片已下载');
