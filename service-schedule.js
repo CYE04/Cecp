@@ -336,16 +336,17 @@
   text-align:center;
 }
 .cec-export-card .cec-badges{
-  min-height:0;gap:6px;justify-content:center;align-items:center;
+  min-height:0;gap:6px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-badge{
-  min-height:26px;padding:5px 10px;border-radius:999px;
-  font-size:11px;line-height:1.15;letter-spacing:-.01em;text-align:center;
-  justify-content:center;align-items:center;
+  display:inline-grid;place-items:center;box-sizing:border-box;
+  min-height:0;height:28px;padding:0 12px;border-radius:999px;
+  font-size:11px;line-height:1;letter-spacing:0;text-align:center;
+  justify-content:center;align-items:center;vertical-align:middle;
 }
 .cec-export-card .cec-note,
 .cec-export-card .cec-reading{
-  min-height:0;gap:4px;justify-content:center;align-items:center;
+  min-height:0;gap:4px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-ref,
 .cec-export-card .cec-npfx,
@@ -388,7 +389,7 @@
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badges{gap:4px}
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge{
-  min-height:20px;padding:3px 7px;font-size:9px;
+  height:22px;padding:0 8px;font-size:9px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-note,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-reading{gap:3px}
@@ -647,21 +648,32 @@
 
   function renderPrayerMatrix(rows, opt) {
     opt = opt || {};
-    var filtered = rows.filter(function (r) { return tv(r.type) === '祷告会'; });
+    var filtered = rows.filter(function (r) {
+      return tv(r.type) === '祷告会' || tv(r.type) === '主日下午';
+    });
     var weekMap = {};
-    filtered.forEach(function (r) { weekMap[tv(r.week)] = true; });
+    filtered.forEach(function (r) {
+      var week = tv(r.week);
+      if (!week) return;
+      if (tv(r.type) === '祷告会') {
+        weekMap[week] = true;
+        return;
+      }
+      if (tv(r.type) === '主日下午' && tv(r.prayerLeader)) {
+        weekMap[week] = true;
+      }
+    });
     var weeks = opt.compact
       ? WEEK_ORDER.filter(function (w) { return weekMap[w]; })
       : WEEK_ORDER.slice();
     if (!weeks.length) weeks = WEEK_ORDER.slice(0, opt.compact ? 1 : WEEK_ORDER.length);
-    var cols = [
-      { subtype: '周三祷告会', label: '周三祷告会' },
-      { subtype: '周六祷告会', label: '周六祷告会' }
-    ];
+    var cols = getPrayerColumnDefs();
     var rowCol = opt.compact ? (opt.dense ? 92 : 118) : 132;
     var prayerCol = opt.compact ? (opt.dense ? 118 : 152) : 190;
 
-    var cg = '<colgroup><col style="width:' + rowCol + 'px"><col style="width:' + prayerCol + 'px"><col style="width:' + prayerCol + 'px"></colgroup>';
+    var cg = '<colgroup><col style="width:' + rowCol + 'px">' +
+      cols.map(function () { return '<col style="width:' + prayerCol + 'px">'; }).join('') +
+      '</colgroup>';
     var thead = '<thead><tr><th class="cec-corner">第几周</th>' +
       cols.map(function (c) { return '<th class="cec-h">' + esc(c.label) + '</th>'; }).join('') +
       '</tr></thead>';
@@ -670,9 +682,7 @@
     weeks.forEach(function (w) {
       tbody += '<tr><td class="cec-rowlbl">' + esc(w) + '</td>';
       cols.forEach(function (c) {
-        var item = filtered.find(function (r) {
-          return tv(r.week) === w && tv(r.subtype) === c.subtype;
-        });
+        var item = getPrayerCellItem(rows, w, c);
         tbody += renderPrayerCell(item, opt);
       });
       tbody += '</tr>';
@@ -696,6 +706,34 @@
     if (note && !opt.compact) html += '<span style="font-size:11px;color:#aeb6c3;line-height:1.3">' + esc(note) + '</span>';
     html += '</div></td>';
     return html;
+  }
+
+  function getPrayerColumnDefs() {
+    return [
+      { subtype: '周三祷告会', label: '周三祷告会', source: 'prayer' },
+      { subtype: '周六祷告会', label: '周六祷告会', source: 'prayer' },
+      { subtype: '周日下午祷告会', label: '周日下午祷告会', source: 'sunday-afternoon' }
+    ];
+  }
+
+  function getPrayerCellItem(rows, week, colDef) {
+    if (!colDef || !week) return null;
+
+    if (colDef.source === 'sunday-afternoon') {
+      var sundayItem = rows.find(function (r) {
+        return tv(r.type) === '主日下午' && tv(r.week) === week && tv(r.prayerLeader);
+      });
+      if (!sundayItem) return null;
+      return {
+        leader: sundayItem.prayerLeader,
+        time: tv(sundayItem.time),
+        note: ''
+      };
+    }
+
+    return rows.find(function (r) {
+      return tv(r.type) === '祷告会' && tv(r.week) === week && tv(r.subtype) === colDef.subtype;
+    }) || null;
   }
 
   function serviceRowsForType(type) {
@@ -879,10 +917,7 @@
     var tbody = '<tbody>';
     types.forEach(function (type) {
       var rowDefs = type === '祷告会'
-        ? [
-            { subtype: '周三祷告会', label: '周三祷告会', kind: 'prayer' },
-            { subtype: '周六祷告会', label: '周六祷告会', kind: 'prayer' }
-          ]
+        ? getPrayerColumnDefs()
         : getVisibleServiceRows(type, rows.filter(function (r) { return tv(r.type) === type; }), opt);
 
       rowDefs.forEach(function (rowDef, idx) {
@@ -894,9 +929,7 @@
 
         weeks.forEach(function (w) {
           if (type === '祷告会') {
-            var prayerItem = rows.find(function (r) {
-              return tv(r.type) === '祷告会' && tv(r.week) === w && tv(r.subtype) === rowDef.subtype;
-            });
+            var prayerItem = getPrayerCellItem(rows, w, rowDef);
             tbody += renderPrayerCell(prayerItem, { compact: true });
             return;
           }
@@ -993,7 +1026,7 @@
     var exportLabel = getExportLabel(types);
     head.innerHTML =
       '<div class="cec-export-head-left">' +
-      '<div class="cec-export-eyebrow">橄榄树团契 · Service Schedule</div>' +
+      '<div class="cec-export-eyebrow">主日事工表 · Service Schedule</div>' +
       '<div class="cec-export-month">' + esc(month) + '</div>' +
       '</div>' +
       '<div class="cec-export-meta">' +
