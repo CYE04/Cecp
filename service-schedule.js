@@ -340,20 +340,21 @@
   text-align:center;
 }
 .cec-export-card .cec-badges{
-  min-height:0;gap:6px;justify-content:center;align-items:center;align-content:center;
+  min-height:56px;gap:8px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-badge{
   display:inline-flex;box-sizing:border-box;
-  min-height:28px;padding:4px 12px;border-radius:999px;
-  font-size:11px;line-height:1.12;letter-spacing:0;text-align:center;
+  min-height:32px;padding:6px 12px;border-radius:7px;
+  font-size:11px;font-weight:800;line-height:1.2;letter-spacing:0;text-align:center;
   justify-content:center;align-items:center;vertical-align:middle;
+  white-space:nowrap;
 }
 .cec-export-card .cec-badge-txt{
-  min-height:1em;line-height:1.12;
+  min-height:auto;line-height:inherit;
 }
 .cec-export-card .cec-note,
 .cec-export-card .cec-reading{
-  min-height:0;gap:4px;justify-content:center;align-items:center;align-content:center;
+  min-height:56px;gap:6px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-ref,
 .cec-export-card .cec-npfx,
@@ -394,15 +395,20 @@
 .cec-export-frame.is-r16x9 .cec-export-card .cec-cell{
   min-width:114px;padding:5px 5px;
 }
-.cec-export-frame.is-r16x9 .cec-export-card .cec-badges{gap:4px}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-badges{
+  min-height:42px;gap:5px;
+}
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge{
-  min-height:22px;padding:3px 8px;font-size:9px;line-height:1.08;
+  min-height:24px;padding:4px 9px;border-radius:7px;
+  font-size:9px;line-height:1.15;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge-txt{
-  line-height:1.08;
+  line-height:inherit;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-note,
-.cec-export-frame.is-r16x9 .cec-export-card .cec-reading{gap:3px}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-reading{
+  min-height:42px;gap:4px;
+}
 .cec-export-frame.is-r16x9 .cec-type-pill{
   min-height:26px;padding:5px 10px;font-size:10px;
 }
