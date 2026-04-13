@@ -317,10 +317,10 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .dual-action:hover{opacity:.9;}
 
 /* ── 跨格子房子线（preview 层） ── */
-.prev-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
-.prev-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;box-sizing:border-box;}
+.prev-volta{display:inline-flex;align-items:flex-end;position:relative;}
+.prev-volta::before{content:'';position:absolute;top:calc(var(--volta-top,2px) - var(--volta-rail,0px));left:0;right:0;height:13px;border-top:1.5px solid var(--accent2);border-left:1.5px solid var(--accent2);pointer-events:none;box-sizing:border-box;}
 .prev-volta.closed::before{border-right:1.5px solid var(--accent2);}
-.prev-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:8px;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
+.prev-volta::after{content:attr(data-v);position:absolute;top:calc(var(--volta-top,2px) + 1px - var(--volta-rail,0px));left:3px;font-size:8px;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
 
 /* 状态栏 */
 /* ── 输入状态栏（总音符/八度/时值/附点/段落/房子线） ── */
@@ -432,11 +432,12 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .prev-sec{margin-bottom:20px;}
 .prev-sec-name{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .prev-sec-name::after{content:'';flex:1;height:1px;background:var(--border);}
-.prev-row{display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
+.prev-row{--volta-rail:0px;--volta-top:2px;--row-note-height:0px;display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-top:var(--volta-rail);padding-bottom:2px;}
+.prev-row.has-volta{--volta-rail:18px;}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
-.p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;}
+.p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;min-height:var(--row-note-height);}
 .p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
 .p-lyric.bold{font-weight:700;color:var(--ink);}
 .p-lyric2{opacity:0.65;margin-top:1px;}.p-lyric3{opacity:0.65;margin-top:1px;}.p-lyric4{opacity:0.65;margin-top:1px;}
@@ -444,14 +445,15 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 /* 音符结构 */
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
-.jp-plain-top{height:12px;}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;}.jp-plain-bot{height:16px;}
+.jp-plain-top{height:12px;}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;}.jp-plain-sym.is-dash{position:relative;top:-0.12em;}.jp-plain-bot{height:16px;}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;}
 .jp-dot-top{height:12px;justify-content:flex-end;}.jp-dot-bot{height:12px;justify-content:flex-start;}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
-.jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;}
-.jp-num{font-size:19px;line-height:1;display:inline-block;text-align:center;width:1em;}
-.jp-aug{position:absolute;right:-0.42em;top:0.1em;font-size:10px;line-height:1;pointer-events:none;}
-.jp-u2-line{position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--ink);}
+.jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px;}
+.jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em;}
+.jp-aug{position:absolute;right:-0.42em;top:-0.17em;font-size:10px;line-height:1;pointer-events:none;}
+.jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
+.jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:50% 50% 0 0/100% 100% 0 0;}
 .jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
@@ -1682,13 +1684,55 @@ function makeBarline(tok){
 function makeJpPlain(sym){
   var pl=document.createElement('span');pl.className='jp-plain';
   var t=document.createElement('span');t.className='jp-plain-top';pl.appendChild(t);
-  var s=document.createElement('span');s.className='jp-plain-sym';s.textContent=sym;pl.appendChild(s);
+  var s=document.createElement('span');s.className='jp-plain-sym'+(sym==='-'?' is-dash':'');s.textContent=sym;pl.appendChild(s);
+  s.style.display='inline-flex';
+  s.style.alignItems='center';
+  s.style.justifyContent='center';
+  s.style.width='1em';
+  s.style.height='1em';
+  if(sym==='-'){
+    s.style.position='relative';
+    s.style.top='-0.12em';
+  }
   var b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
   return pl;
 }
 function setDots(el,cnt){
   el.innerHTML='';
   for(var i=0;i<cnt;i++){var d=document.createElement('span');d.textContent='·';el.appendChild(d);}
+}
+function styleJpNumEl(el){
+  if(!el)return;
+  el.style.display='inline-flex';
+  el.style.alignItems='center';
+  el.style.justifyContent='center';
+  el.style.textAlign='center';
+  el.style.width='1em';
+  el.style.height='1em';
+  el.style.position='relative';
+  el.style.top='-0.12em';
+}
+function styleJpAugEl(el){
+  if(!el)return;
+  el.style.position='absolute';
+  el.style.right='-0.42em';
+  el.style.top='50%';
+  el.style.transform='translateY(-50%)';
+  el.style.pointerEvents='none';
+}
+function makeJpUnderlineLine(level){
+  var ln=document.createElement('span');
+  ln.className=level===2?'jp-u2-line':'jp-u1-line';
+  ln.style.display='block';
+  ln.style.position='absolute';
+  ln.style.left='0';
+  ln.style.right='0';
+  ln.style.bottom=level===2?'0':'3px';
+  ln.style.height='1.5px';
+  ln.style.background='currentColor';
+  ln.style.pointerEvents='none';
+  ln.style.zIndex='1';
+  return ln;
 }
 function parseDualJpToken(tok){
   var raw=String(tok||'').replace(/\uFF0F/g,'/');
@@ -1738,12 +1782,12 @@ function parseJpToken(tok,opts){
     var td=document.createElement('span');td.className='jp-dot-top';w.appendChild(td);
     var lw=document.createElement('span');lw.className='jp-lines-wrap';
     var nr=document.createElement('span');nr.className='jp-num-row';
-    var ns=document.createElement('span');ns.className='jp-num';ns.textContent='0';nr.appendChild(ns);
-    if(zm[1].indexOf('·')>-1){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';nr.appendChild(ag);}
+    var ns=document.createElement('span');ns.className='jp-num';ns.textContent='0';styleJpNumEl(ns);nr.appendChild(ns);
+    if(zm[1].indexOf('·')>-1){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';styleJpAugEl(ag);ns.appendChild(ag);}
     var ul=zm[2].length;
-    if(ul>=1)nr.style.borderBottom='1.5px solid currentColor';
     lw.appendChild(nr);
-    if(ul===2){var ul2=document.createElement('span');ul2.className='jp-u2-line';lw.appendChild(ul2);}
+    if(ul>=1)lw.appendChild(makeJpUnderlineLine(1));
+    if(ul===2)lw.appendChild(makeJpUnderlineLine(2));
     w.appendChild(lw);
     var bd=document.createElement('span');bd.className='jp-dot-bot';w.appendChild(bd);
     return w;
@@ -1758,11 +1802,11 @@ function parseJpToken(tok,opts){
   var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isH>=2?2:isH);w.appendChild(td);
   var lw=document.createElement('span');lw.className='jp-lines-wrap';
   var nr=document.createElement('span');nr.className='jp-num-row';
-  var ns=document.createElement('span');ns.className='jp-num';ns.textContent=num;nr.appendChild(ns);
-  if(isDot){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';nr.appendChild(ag);}
-  if(ul>=1)nr.style.borderBottom='1.5px solid currentColor';
+  var ns=document.createElement('span');ns.className='jp-num';ns.textContent=num;styleJpNumEl(ns);nr.appendChild(ns);
+  if(isDot){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';styleJpAugEl(ag);ns.appendChild(ag);}
   lw.appendChild(nr);
-  if(ul===2){var ul2=document.createElement('span');ul2.className='jp-u2-line';lw.appendChild(ul2);}
+  if(ul>=1)lw.appendChild(makeJpUnderlineLine(1));
+  if(ul===2)lw.appendChild(makeJpUnderlineLine(2));
   w.appendChild(lw);
   var bd=document.createElement('span');bd.className='jp-dot-bot';setDots(bd,isL>=2?2:isL);w.appendChild(bd);
   if(hasFermata){var fw=document.createElement('span');fw.className='jp-fermata';fw.appendChild(w);return fw;}
@@ -1832,6 +1876,17 @@ function fitPreview(){
     }
   });
 }
+function normalizePreviewRowHeights(scope){
+  if(!scope)return;
+  scope.querySelectorAll('.prev-row').forEach(function(row){
+    row.style.setProperty('--row-note-height','0px');
+    var maxH=0;
+    row.querySelectorAll('.p-n').forEach(function(noteLane){
+      maxH=Math.max(maxH,Math.ceil(noteLane.getBoundingClientRect().height||0));
+    });
+    if(maxH)row.style.setProperty('--row-note-height',maxH+'px');
+  });
+}
 function renderPreview(){
   var wrap=document.getElementById('previewWrap');wrap.innerHTML='';
   var inner=document.createElement('div');inner.className='prev-inner';
@@ -1855,7 +1910,7 @@ function renderPreview(){
       line.segs.forEach(function(seg){
         var s=document.createElement('div');s.className='prev-seg';
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
-        if(seg.n&&seg.n.trim())s.appendChild(renderNStr(seg.n));
+        s.appendChild(renderNStr(seg.n||''));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
         if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
         if(seg.lyric3){var l3=document.createElement('div');l3.className='p-lyric p-lyric3'+(line.bold?' bold':'');l3.textContent=seg.lyric3;s.appendChild(l3);}
@@ -1863,6 +1918,7 @@ function renderPreview(){
         // 检测 volta 开始（indexOf 避免反斜杠在 CMS 里丢失）
         var _vn=getVoltaStartLabel(seg.n);
         if(_vn){
+          row.classList.add('has-volta');
           voltaWrap=document.createElement('span');
           voltaWrap.className='prev-volta';
           voltaWrap.setAttribute('data-v',_vn+'.');
@@ -1881,6 +1937,7 @@ function renderPreview(){
     inner.appendChild(ps);
   });
   wrap.appendChild(inner);
+  normalizePreviewRowHeights(inner);
   fitPreview();
   renderCode();
 }
