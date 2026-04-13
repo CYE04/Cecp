@@ -294,6 +294,14 @@
   font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cec-ink3);
 }
 .cec-export-body{background:var(--cec-bg2)}
+.cec-export-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px;
+  background:transparent;
+}
+.cec-export-panel{
+  display:flex;flex-direction:column;overflow:hidden;border:1px solid #e2e8f3;
+  border-radius:18px;background:#ffffff;box-shadow:0 8px 22px rgba(32,45,70,.06);
+}
 .cec-export-section{
   margin-top:0;border:none;border-radius:0;overflow:hidden;background:var(--cec-bg2);
 }
@@ -321,16 +329,28 @@
 .cec-export-card tbody tr:nth-child(2n) .cec-rowlbl,
 .cec-export-card tbody tr:nth-child(2n) .cec-cell{background:#fcfdff}
 .cec-export-card .cec-cell:hover{background:#ffffff}
+.cec-export-card .cec-cell,
+.cec-export-card .cec-empty,
+.cec-export-card .cec-note,
+.cec-export-card .cec-reading{
+  text-align:center;
+}
 .cec-export-card .cec-badges{
-  min-height:0;gap:6px;
+  min-height:0;gap:6px;justify-content:center;align-items:center;
 }
 .cec-export-card .cec-badge{
   min-height:26px;padding:5px 10px;border-radius:999px;
-  font-size:11px;line-height:1.15;letter-spacing:-.01em;
+  font-size:11px;line-height:1.15;letter-spacing:-.01em;text-align:center;
+  justify-content:center;align-items:center;
 }
 .cec-export-card .cec-note,
 .cec-export-card .cec-reading{
-  min-height:0;gap:4px;
+  min-height:0;gap:4px;justify-content:center;align-items:center;
+}
+.cec-export-card .cec-ref,
+.cec-export-card .cec-npfx,
+.cec-export-card .cec-empty{
+  display:block;width:100%;text-align:center;
 }
 .cec-export-card .cec-ref{font-size:12px}
 .cec-export-card .cec-npfx{font-size:11px}
@@ -347,25 +367,37 @@
   padding:14px 18px 13px;
 }
 .cec-export-frame.is-r16x9 .cec-export-month{font-size:32px}
+.cec-export-frame.is-r16x9 .cec-export-grid{
+  gap:12px;padding:12px;
+}
+.cec-export-frame.is-r16x9 .cec-export-panel{
+  border-radius:16px;
+}
+.cec-export-frame.is-r16x9 .cec-export-label{
+  padding:9px 12px 8px;font-size:13px;
+}
 .cec-export-frame.is-r16x9 .cec-export-card .cec-corner,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-h{
   padding:8px 8px;font-size:12px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-rowlbl{
-  padding:8px 10px;font-size:12px;
+  padding:7px 9px;font-size:11px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-cell{
-  min-width:124px;padding:6px 6px;
+  min-width:114px;padding:5px 5px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badges{gap:4px}
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge{
-  min-height:22px;padding:4px 8px;font-size:10px;
+  min-height:20px;padding:3px 7px;font-size:9px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-note,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-reading{gap:3px}
 .cec-export-frame.is-r16x9 .cec-type-pill{
   min-height:26px;padding:5px 10px;font-size:10px;
 }
+.cec-export-frame.is-r16x9 .cec-export-card .cec-ref{font-size:10px}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-npfx,
+.cec-export-frame.is-r16x9 .cec-export-card .cec-empty{font-size:9px}
 .cec-spin{
   width:18px;height:18px;border:2px solid var(--cec-spin1);border-top-color:var(--cec-spin2);border-radius:50%;
   animation:cecspin .7s linear infinite;
@@ -584,9 +616,9 @@
     var weeks = WEEK_ORDER.filter(function (w) { return weekMap[w]; });
     if (!weeks.length) weeks = WEEK_ORDER.slice();
 
-    var rowDefs = serviceRowsForType(type);
-    var labelCol = opt.compact ? 118 : 132;
-    var weekCol = opt.compact ? 126 : 150;
+    var rowDefs = getVisibleServiceRows(type, filtered, opt);
+    var labelCol = opt.compact ? (opt.dense ? 92 : 118) : 132;
+    var weekCol = opt.compact ? (opt.dense ? 104 : 126) : 150;
 
     var cg = '<colgroup><col style="width:' + labelCol + 'px">' +
       weeks.map(function () { return '<col style="width:' + weekCol + 'px">'; }).join('') +
@@ -626,8 +658,8 @@
       { subtype: '周三祷告会', label: '周三祷告会' },
       { subtype: '周六祷告会', label: '周六祷告会' }
     ];
-    var rowCol = opt.compact ? 118 : 132;
-    var prayerCol = opt.compact ? 152 : 190;
+    var rowCol = opt.compact ? (opt.dense ? 92 : 118) : 132;
+    var prayerCol = opt.compact ? (opt.dense ? 118 : 152) : 190;
 
     var cg = '<colgroup><col style="width:' + rowCol + 'px"><col style="width:' + prayerCol + 'px"><col style="width:' + prayerCol + 'px"></colgroup>';
     var thead = '<thead><tr><th class="cec-corner">第几周</th>' +
@@ -703,6 +735,15 @@
       { key: 'bass',    label: '贝斯',     kind: 'badges' },
       { key: 'note',    label: '证道 / 主题', kind: 'note' }
     ];
+  }
+
+  function getVisibleServiceRows(type, filteredRows, opt) {
+    var defs = serviceRowsForType(type);
+    if (!opt || !opt.trimEmptyRows) return defs;
+    var visible = defs.filter(function (def) {
+      return filteredRows.some(function (row) { return tv(row[def.key]); });
+    });
+    return visible.length ? visible : defs;
   }
 
   function renderMatrixCell(kind, val) {
@@ -813,7 +854,8 @@
     return '<span class="cec-type-pill" style="background:' + esc(c.bg) + ';color:' + esc(c.tx) + '">' + esc(type) + '</span>';
   }
 
-  function renderAllMatrix(rows, types) {
+  function renderAllMatrix(rows, types, opt) {
+    opt = opt || {};
     types = (types || TYPE_ORDER).filter(function (type) { return hasTypeRows(rows, type); });
 
     var weekMap = {};
@@ -823,8 +865,11 @@
     var weeks = WEEK_ORDER.filter(function (w) { return weekMap[w]; });
     if (!weeks.length) weeks = WEEK_ORDER.slice(0, 1);
 
-    var cg = '<colgroup><col style="width:112px"><col style="width:138px">' +
-      weeks.map(function () { return '<col style="width:132px">'; }).join('') +
+    var typeCol = opt.dense ? 94 : 112;
+    var labelCol = opt.dense ? 116 : 138;
+    var weekCol = opt.dense ? 112 : 132;
+    var cg = '<colgroup><col style="width:' + typeCol + 'px"><col style="width:' + labelCol + 'px">' +
+      weeks.map(function () { return '<col style="width:' + weekCol + 'px">'; }).join('') +
       '</colgroup>';
 
     var thead = '<thead><tr><th class="cec-corner">聚会</th><th class="cec-h">项目</th>' +
@@ -838,7 +883,7 @@
             { subtype: '周三祷告会', label: '周三祷告会', kind: 'prayer' },
             { subtype: '周六祷告会', label: '周六祷告会', kind: 'prayer' }
           ]
-        : serviceRowsForType(type);
+        : getVisibleServiceRows(type, rows.filter(function (r) { return tv(r.type) === type; }), opt);
 
       rowDefs.forEach(function (rowDef, idx) {
         tbody += '<tr>';
@@ -869,6 +914,27 @@
     tbody += '</tbody>';
 
     return '<div class="cec-wrap"><table class="cec-tbl cec-tbl-all">' + cg + thead + tbody + '</table></div>';
+  }
+
+  function renderExportTypeSection(rows, type, opt) {
+    opt = opt || {};
+    if (!hasTypeRows(rows, type)) return '';
+    var content = type === '祷告会'
+      ? renderPrayerMatrix(rows, opt)
+      : renderServiceMatrix(rows, type, opt);
+    return '<section class="cec-export-panel">' +
+      '<div class="cec-export-label"><span class="cec-dot" style="background:' + esc(TYPE_C[type].accent) + '"></span>' + esc(type) + '</div>' +
+      content +
+      '</section>';
+  }
+
+  function renderLandscapePanels(rows, types) {
+    var ordered = (types || TYPE_ORDER).filter(function (type) { return hasTypeRows(rows, type); });
+    return '<div class="cec-export-grid">' +
+      ordered.map(function (type) {
+        return renderExportTypeSection(rows, type, { compact: true, dense: true, trimEmptyRows: true });
+      }).join('') +
+      '</div>';
   }
 
   function getExportLabel(types) {
@@ -940,11 +1006,15 @@
     bodyWrap.className = 'cec-export-body';
 
     if (types.length > 1) {
-      bodyWrap.innerHTML = renderAllMatrix(rows, types);
+      if (ratioKey === '16:9') {
+        bodyWrap.innerHTML = renderLandscapePanels(rows, types);
+      } else {
+        bodyWrap.innerHTML = renderAllMatrix(rows, types, { trimEmptyRows: true });
+      }
     } else {
       var type = types[0];
       var section = document.createElement('section');
-      section.className = 'cec-export-section';
+      section.className = ratioKey === '16:9' ? 'cec-export-panel' : 'cec-export-section';
 
       var sectionLabel = document.createElement('div');
       sectionLabel.className = 'cec-export-label';
@@ -959,8 +1029,8 @@
       } else {
         var body = document.createElement('div');
         body.innerHTML = type === '祷告会'
-          ? renderPrayerMatrix(rows, { compact: true })
-          : renderServiceMatrix(rows, type, { compact: true });
+          ? renderPrayerMatrix(rows, { compact: true, dense: ratioKey === '16:9' })
+          : renderServiceMatrix(rows, type, { compact: true, dense: ratioKey === '16:9', trimEmptyRows: true });
         while (body.firstChild) section.appendChild(body.firstChild);
       }
 
