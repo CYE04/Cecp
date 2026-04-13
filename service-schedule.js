@@ -350,7 +350,7 @@
   white-space:nowrap;
 }
 .cec-export-card .cec-badge-txt{
-  min-height:auto;line-height:inherit;
+  min-height:auto;line-height:inherit;transform:translateY(-0.1em);
 }
 .cec-export-card .cec-note,
 .cec-export-card .cec-reading{
@@ -403,7 +403,7 @@
   font-size:9px;line-height:1.15;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge-txt{
-  line-height:inherit;
+  line-height:inherit;transform:translateY(-0.1em);
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-note,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-reading{
@@ -1273,9 +1273,9 @@
   }
 
   function nodeToPngBlobRobust(node, bgColor) {
-    return nodeToPngBlob(node, bgColor).catch(function (svgErr) {
-      try { console.warn('[service-schedule] svg export failed, fallback to html2canvas', svgErr); } catch (_) {}
-      return nodeToPngBlobByHtml2Canvas(node, bgColor);
+    return nodeToPngBlobByHtml2Canvas(node, bgColor).catch(function (html2canvasErr) {
+      try { console.warn('[service-schedule] html2canvas export failed, fallback to svg', html2canvasErr); } catch (_) {}
+      return nodeToPngBlob(node, bgColor);
     });
   }
 
