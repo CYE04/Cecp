@@ -865,6 +865,10 @@
     return waitFonts
       .then(()=>{
         const snap=buildExportClone(panelInner);
+        if(opt.hideTransposeOptions){
+          const keyZone=snap.node.querySelector('.sw-ks');
+          if(keyZone) keyZone.remove();
+        }
         normalizeExportNotation(snap.node);
         return waitPaint2()
           .then(()=>nodeToPngBlobRobust(snap.node,bg))
@@ -2367,9 +2371,10 @@
       exportBtn.disabled=true;
       exportBtn.style.opacity='.65';
       exportBtn.textContent='生成中...';
-      exportTransposePanel(lbDiv,{
+      exportTransposePanel(panelInner,{
         title:s.title||'transpose',
         key:'1='+curKey,
+        hideTransposeOptions:true,
         width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
       }).then(()=>{
         showToast('图片已下载');
