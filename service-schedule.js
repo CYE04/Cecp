@@ -301,6 +301,7 @@
   font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cec-ink3);
 }
 .cec-export-body{background:var(--cec-bg2)}
+.cec-export-card *{box-sizing:border-box}
 .cec-export-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px;
   background:transparent;
@@ -386,7 +387,7 @@
   border-radius:999px;font-size:11px;font-weight:900;line-height:1.2;text-align:center;
 }
 .cec-tbl-all .cec-typecell .cec-type-pill{
-  display:flex;width:100%;
+  display:flex;width:100%;max-width:100%;
 }
 .cec-export-frame.is-r16x9 .cec-export-head{
   padding:14px 18px 13px;
