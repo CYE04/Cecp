@@ -284,12 +284,15 @@
 }
 .cec-export-month{font-size:38px;font-weight:900;letter-spacing:.02em;line-height:1.04;color:#1b2433}
 .cec-export-meta{
-  display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  align-items:center;justify-content:flex-end;gap:8px;width:max-content;
 }
 .cec-export-chip{
   display:inline-flex;align-items:center;justify-content:center;min-height:30px;
+  box-sizing:border-box;min-width:96px;width:calc(var(--cec-export-chip-cols,8) * 1em + 34px);
   padding:0 12px;border-radius:999px;border:1px solid #d8e1ee;
   background:#ffffff;color:#4b5a73;font-size:11px;font-weight:900;letter-spacing:.06em;
+  text-align:center;
 }
 .cec-export-chip.is-ratio{
   border-color:#c8d4ea;background:#eef4ff;color:#2c4f96;
@@ -367,14 +370,24 @@
 .cec-export-card .cec-ref{font-size:12px}
 .cec-export-card .cec-npfx{font-size:11px}
 .cec-export-card .cec-empty{font-size:12px}
+.cec-tbl-all .cec-corner,
 .cec-tbl-all .cec-typecell{
-  background:#f8fafc;padding:10px 10px;vertical-align:top;text-align:center;
+  width:var(--cec-type-col,112px);min-width:var(--cec-type-col,112px);
+}
+.cec-tbl-all .cec-h:nth-child(2),
+.cec-tbl-all .cec-rowlbl:not(.cec-typecell){
+  width:var(--cec-label-col,138px);min-width:var(--cec-label-col,138px);
+}
+.cec-tbl-all .cec-typecell{
+  background:#f8fafc;padding:10px 12px;vertical-align:top;text-align:center;
 }
 .cec-type-pill{
   display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:6px 12px;
   border-radius:999px;font-size:11px;font-weight:900;line-height:1.2;text-align:center;
 }
-.cec-tbl-all .cec-rowlbl{min-width:138px}
+.cec-tbl-all .cec-typecell .cec-type-pill{
+  display:flex;width:100%;
+}
 .cec-export-frame.is-r16x9 .cec-export-head{
   padding:14px 18px 13px;
 }
@@ -394,6 +407,9 @@
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-rowlbl{
   padding:7px 9px;font-size:11px;
+}
+.cec-export-frame.is-r16x9 .cec-tbl-all .cec-typecell{
+  padding:7px 9px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-cell{
   min-width:114px;padding:5px 5px;
@@ -965,7 +981,7 @@
     });
     tbody += '</tbody>';
 
-    return '<div class="cec-wrap"><table class="cec-tbl cec-tbl-all">' + cg + thead + tbody + '</table></div>';
+    return '<div class="cec-wrap"><table class="cec-tbl cec-tbl-all" style="--cec-type-col:' + typeCol + 'px;--cec-label-col:' + labelCol + 'px">' + cg + thead + tbody + '</table></div>';
   }
 
   function renderExportTypeSection(rows, type, opt) {
@@ -991,6 +1007,12 @@
 
   function getExportLabel(types) {
     return types.length > 1 ? '全部服事安排' : types[0] + '服事安排';
+  }
+
+  function getExportChipCols(exportLabel, ratioKey) {
+    return [exportLabel, ratioKey].reduce(function (max, label) {
+      return Math.max(max, tv(label).length);
+    }, 6);
   }
 
   function getExportRatioPreset(ratioKey) {
@@ -1105,12 +1127,13 @@
     var head = document.createElement('div');
     head.className = 'cec-export-head';
     var exportLabel = getExportLabel(types);
+    var chipCols = getExportChipCols(exportLabel, ratioKey);
     head.innerHTML =
       '<div class="cec-export-head-left">' +
       '<div class="cec-export-eyebrow">主日事工表 · Service Schedule</div>' +
       '<div class="cec-export-month">' + esc(month) + '</div>' +
       '</div>' +
-      '<div class="cec-export-meta">' +
+      '<div class="cec-export-meta" style="--cec-export-chip-cols:' + chipCols + '">' +
       '<span class="cec-export-chip">' + esc(exportLabel) + '</span>' +
       '<span class="cec-export-chip is-ratio">' + esc(ratioKey) + '</span>' +
       '</div>';
