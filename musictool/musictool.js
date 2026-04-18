@@ -945,11 +945,11 @@ function getSelRange(){
 function clearSel(){selA=-1;selB=-1;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
 function normalizeTimeSignValue(sig){
-  var m=String(sig||'').trim().replace(/\s+/g,'').replace(/\uFF0F/g,'/').match(/^(\d{1,2})\/(\d{1,2})$/);
+  var m=String(sig||'').trim().replace(/\\s+/g,'').replace(/\uFF0F/g,'/').match(/^(\\d{1,2})\\/(\\d{1,2})$/);
   return m?(m[1]+'/'+m[2]):'';
 }
 function extractInlineTimeSignToken(tok){
-  var m=String(tok||'').trim().match(/^\[(?:ts|timesign|meter):([^\]]+)\]$/i);
+  var m=String(tok||'').trim().match(/^\\[(?:ts|timesign|meter):([^\\]]+)\\]$/i);
   return m?normalizeTimeSignValue(m[1]):'';
 }
 function getSegInlineTimeSign(seg){
