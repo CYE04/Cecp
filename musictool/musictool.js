@@ -2280,12 +2280,14 @@ function applyBulkLyric(){
   renderEditor();
   if(curSi>=0)reactivate();
 }
-document.getElementById('lyfillOverlay').addEventListener('click',function(e){if(e.target===this)closeBulkLyric();});
-document.getElementById('lyfillTA').addEventListener('input',updateLyfillStats);
-(function(){
+setTimeout(function(){
+  var lyfillOverlay=document.getElementById('lyfillOverlay');
+  if(lyfillOverlay)lyfillOverlay.addEventListener('click',function(e){if(e.target===this)closeBulkLyric();});
+  var lyfillTA=document.getElementById('lyfillTA');
+  if(lyfillTA)lyfillTA.addEventListener('input',updateLyfillStats);
   var radios=document.querySelectorAll('input[name="lyfill-scope"]');
   radios.forEach(function(r){r.addEventListener('change',updateLyfillStats);});
-})();
+},0);
 
 /* ════════════════════════════════════════
    检查状态（音符 / 歌词 对照）
@@ -2321,7 +2323,10 @@ function openCheck(){
 function closeCheck(){
   document.getElementById('checkOverlay').classList.remove('open');
 }
-document.getElementById('checkOverlay').addEventListener('click',function(e){if(e.target===this)closeCheck();});
+setTimeout(function(){
+  var checkOverlay=document.getElementById('checkOverlay');
+  if(checkOverlay)checkOverlay.addEventListener('click',function(e){if(e.target===this)closeCheck();});
+},0);
 
 
 /* ════════════════════════════════════════
