@@ -568,6 +568,14 @@ html,body,#music-library{
 #music-library .jp-tuplet{margin-right:1px;}
 #music-library .jp-tuplet-br{position:absolute;top:2px;left:2px;right:2px;height:8px;border-top:1.5px solid var(--text);border-left:1.5px solid var(--text);border-right:1.5px solid var(--text);border-radius:3px 3px 0 0;pointer-events:none;}
 #music-library .jp-tuplet-num{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:8px;line-height:1;padding:0 3px;background:var(--bg);color:var(--text);pointer-events:none;}
+#music-library .jp-timesig{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;flex-shrink:0;min-width:1.52em;margin:0 6px 0 2px;position:relative;top:-1px;line-height:1;}
+#music-library .jp-timesig-pad{display:block;width:100%;flex-shrink:0;}
+#music-library .jp-timesig-pad-top{height:2px;}
+#music-library .jp-timesig-pad-bot{height:3px;}
+#music-library .jp-timesig-stack{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;min-width:1.52em;line-height:1;}
+#music-library .jp-timesig-top,#music-library .jp-timesig-bot{display:flex;align-items:center;justify-content:center;min-width:1.52em;text-align:center;font-size:20px;font-weight:700;line-height:1;}
+#music-library .jp-timesig-top{padding:0 1px 2px;border-bottom:1.6px solid currentColor;margin-bottom:1px;}
+#music-library .jp-timesig-bot{padding-top:0;}
 #music-library .jp-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
 #music-library .jp-volta::before{content:'';position:absolute;top:3px;left:0;right:0;height:13px;border-top:1.5px solid var(--text);border-left:1.5px solid var(--text);pointer-events:none;box-sizing:border-box;opacity:0.5;}
 #music-library .jp-volta.v-close::before{border-right:1.5px solid var(--text);}

@@ -1,7 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
-  const ML_VER='2026.04.12.5';
+  const ML_VER='2026.04.18.1';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -1325,6 +1325,18 @@
   function hasVoltaEnd(nStr){
     return !!(nStr&&nStr.indexOf(']v')>=0);
   }
+  function normalizeTimeSignValue(sig){
+    const m=String(sig||'').trim().replace(/\s+/g,'').replace(/\uFF0F/g,'/').match(/^(\d{1,2})\/(\d{1,2})$/);
+    return m?(m[1]+'/'+m[2]):'';
+  }
+  function extractInlineTimeSignToken(tok){
+    const m=String(tok||'').trim().match(/^\[(?:ts|timesign|meter):([^\]]+)\]$/i);
+    return m?normalizeTimeSignValue(m[1]):'';
+  }
+  function getSegInlineTimeSign(seg){
+    if(!seg)return '';
+    return normalizeTimeSignValue(seg.timeSign||seg.ts||seg.meter||'');
+  }
   function makeBarline(tok){
     const o=document.createElement('span');
     o.style.cssText='display:inline-flex;flex-direction:column;align-items:flex-start;vertical-align:bottom;';
@@ -1342,6 +1354,19 @@
     else if(tok==='|:|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thick());mid.appendChild(gap(1));mid.appendChild(thick());mid.appendChild(gap(3));mid.appendChild(dots());}
     o.appendChild(mid);
     const bot=document.createElement('span');bot.style.height='16px';o.appendChild(bot);
+    return o;
+  }
+  function makeTimeSignature(sig){
+    const norm=normalizeTimeSignValue(sig);
+    if(!norm) return document.createDocumentFragment();
+    const parts=norm.split('/');
+    const o=document.createElement('span');o.className='jp-timesig';o.setAttribute('data-ts',norm);
+    const topPad=document.createElement('span');topPad.className='jp-timesig-pad jp-timesig-pad-top';o.appendChild(topPad);
+    const stack=document.createElement('span');stack.className='jp-timesig-stack';
+    const top=document.createElement('span');top.className='jp-timesig-top';top.textContent=parts[0];
+    const bot=document.createElement('span');bot.className='jp-timesig-bot';bot.textContent=parts[1];
+    stack.appendChild(top);stack.appendChild(bot);o.appendChild(stack);
+    const botPad=document.createElement('span');botPad.className='jp-timesig-pad jp-timesig-pad-bot';o.appendChild(botPad);
     return o;
   }
   function makeJpPlain(sym){
@@ -1492,14 +1517,22 @@
     var nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);
     return w;
   }
-  function renderNStr(nStr){
+  function renderNStr(nStr,opts){
+    opts=opts||{};
     var d=document.createElement('div');d.className='p-n';
+    var headTimeSign=normalizeTimeSignValue(opts.inlineTimeSign||'');
+    if(headTimeSign)d.appendChild(makeTimeSignature(headTimeSign));
     if(!nStr||!nStr.trim())return d;
+    function appendRenderedTok(parent,tk){
+      var inlineTs=extractInlineTimeSignToken(tk);
+      parent.appendChild(inlineTs?makeTimeSignature(inlineTs):parseJpToken(tk));
+    }
     function isDualAtom(tk){
       if(!tk||tk==='/'||tk==='／')return false;
       if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
       if(tk==='|'||tk==='||'||tk==='||/'||tk==='|]'||tk==='|:'||tk===':|'||tk==='|:|')return false;
       if(/^\{(3|5)$/.test(tk))return false;
+      if(extractInlineTimeSignToken(tk))return false;
       if(/^\[v:(.+)\]$/.test(tk))return false;
       return true;
     }
@@ -1516,13 +1549,15 @@
     var i=0;
     while(i<toks.length){
       var t=toks[i];
-      if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));d.appendChild(sl);i++;continue;}
-      if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')so.appendChild(parseJpToken(toks[i++]));if(i<toks.length)i++;d.appendChild(so);continue;}
-      if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));d.appendChild(sc);continue;}
+      var inlineTs=extractInlineTimeSignToken(t);
+      if(inlineTs){d.appendChild(makeTimeSignature(inlineTs));i++;continue;}
+      if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')appendRenderedTok(sl,toks[i++]);d.appendChild(sl);i++;continue;}
+      if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')appendRenderedTok(so,toks[i++]);if(i<toks.length)i++;d.appendChild(so);continue;}
+      if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)appendRenderedTok(sc,toks[i++]);d.appendChild(sc);continue;}
       if(t==='[v1'||t==='[v2'||t===']v'||/^\[v:(.+)\]$/.test(t)){i++;continue;}
-      var tm2=t.match(/^\{(3|5)$/);if(tm2){var tn=parseInt(tm2[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));d.appendChild(tp);i++;continue;}
+      var tm2=t.match(/^\{(3|5)$/);if(tm2){var tn=parseInt(tm2[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')appendRenderedTok(tp,toks[i++]);d.appendChild(tp);i++;continue;}
       if(t==='}'){i++;continue;}
-      d.appendChild(parseJpToken(t));i++;
+      appendRenderedTok(d,t);i++;
     }
     return d;
   }
@@ -2475,7 +2510,7 @@
             chord.className='p-chord'+(seg.chord?'':' empty');
             setChordContent(chord,seg.chord?trChord(seg.chord,st,useFlat):'\u00a0');
             segEl.appendChild(chord);
-            segEl.appendChild(renderNStr(seg.n||''));
+            segEl.appendChild(renderNStr(seg.n||'',{inlineTimeSign:getSegInlineTimeSign(seg)}));
             const lyric=document.createElement('div');lyric.className='p-lyric'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(lyric,normLyricText(seg.lyric));
             segEl.appendChild(lyric);
             if(seg.lyric2){const ly2=document.createElement('div');ly2.className='p-lyric p-lyric2'+((!Array.isArray(line)&&line.b)?' bold':'');setLyricContent(ly2,normLyricText(seg.lyric2));segEl.appendChild(ly2);}
