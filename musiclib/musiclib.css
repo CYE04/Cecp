@@ -568,12 +568,12 @@ html,body,#music-library{
 #music-library .jp-tuplet{margin-right:1px;}
 #music-library .jp-tuplet-br{position:absolute;top:2px;left:2px;right:2px;height:8px;border-top:1.5px solid var(--text);border-left:1.5px solid var(--text);border-right:1.5px solid var(--text);border-radius:3px 3px 0 0;pointer-events:none;}
 #music-library .jp-tuplet-num{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:8px;line-height:1;padding:0 3px;background:var(--bg);color:var(--text);pointer-events:none;}
-#music-library .jp-timesig{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;flex-shrink:0;min-width:1.52em;margin:0 6px 0 2px;position:relative;top:-1px;line-height:1;}
+#music-library .jp-timesig{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;flex-shrink:0;min-width:1.42em;margin:0 5px 0 2px;position:relative;top:-1px;line-height:1;}
 #music-library .jp-timesig-pad{display:block;width:100%;flex-shrink:0;}
 #music-library .jp-timesig-pad-top{height:2px;}
 #music-library .jp-timesig-pad-bot{height:3px;}
-#music-library .jp-timesig-stack{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;min-width:1.52em;line-height:1;}
-#music-library .jp-timesig-top,#music-library .jp-timesig-bot{display:flex;align-items:center;justify-content:center;min-width:1.52em;text-align:center;font-size:20px;font-weight:700;line-height:1;}
+#music-library .jp-timesig-stack{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;min-width:1.42em;line-height:1;}
+#music-library .jp-timesig-top,#music-library .jp-timesig-bot{display:flex;align-items:center;justify-content:center;min-width:1.42em;text-align:center;font-size:18px;font-weight:700;line-height:1;}
 #music-library .jp-timesig-top{padding:0 1px 2px;border-bottom:1.6px solid currentColor;margin-bottom:1px;}
 #music-library .jp-timesig-bot{padding-top:0;}
 #music-library .jp-volta{display:inline-flex;align-items:flex-end;position:relative;padding-top:20px;}
