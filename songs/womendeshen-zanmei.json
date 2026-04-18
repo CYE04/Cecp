@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/womendeshen.lrc",
   "youtube": "https://youtu.be/kvrRtRe9AoU?si=U9EoWPCoZbR9B-gq",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/womendeshenG-zanmei.jpg",
-  "sections": [
+ "sections": [
   {
     "name": "我们的神",
     "lines": [
@@ -116,7 +116,7 @@
         {"chord":"D","n":"[v1 2 sp - sp -","lyric":"哉！"},
         {"chord":"","n":"1·_ sp_ 7,__ sp :| ]v","lyric":"你ㅤ说"},
         {"chord":"","n":"[v2","lyric":"ㅤ"},
-        {"chord":"Dsus4ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ E","n":"( 5 sp - sp ( 0·_ sp_ 3·__ sp 3_ sp_ 5_ sp | sp sp sp sp | sp 5 - ) ) sp sp","lyric":"哉！ㅤㅤㅤㅤㅤ(我 们ㅤ的ㅤㅤㅤㅤㅤㅤ 神！)"},
+        {"chord":"Dsus4ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ E","n":"( 5 sp - sp ( 0·_ sp_ 3·__ sp 3_ sp_ 5_ sp | sp sp sp sp | sp 5 - ) ) sp sp","lyric":"哉！ㅤㅤㅤㅤㅤ(我 们ㅤ的ㅤㅤㅤㅤㅤㅤ 神！)"},
         {"chord":"","n":"0_ sp_ 5,_ sp","lyric":"ㅤㅤ我ㅤ"},
         {"chord":" ToChorus","n":"4·_ sp_ 3__ sp || ]v","lyric":"们ㅤ的"}
       ]
