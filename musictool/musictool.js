@@ -379,6 +379,10 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .tok-dual-inline .in:focus{border-color:var(--accent);}
 .tok-dual-inline .btn{padding:4px 6px;border-radius:4px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);font-family:'Space Mono',monospace;font-size:9px;cursor:pointer;line-height:1;}
 .tok-dual-inline .btn:hover{border-color:var(--accent2);color:var(--ink);}
+.tok-meta-inline{display:flex;align-items:center;gap:4px;margin-top:4px;flex-wrap:wrap;}
+.tok-meta-inline .lbl{font-size:8px;color:var(--ink3);font-family:'Space Mono',monospace;white-space:nowrap;}
+.tok-meta-inline .in{width:58px;background:var(--panel2);border:1px solid var(--border);border-radius:4px;color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;padding:3px 4px;outline:none;}
+.tok-meta-inline .in:focus{border-color:var(--accent);}
 
 /* ── 导入弹窗 ── */
 .import-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
@@ -472,6 +476,12 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jb-thick{width:3.5px;background:currentColor;flex-shrink:0;}
 .jb-dots{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:6px;flex-shrink:0;}
 .jb-dot{width:3px;height:3px;border-radius:50%;background:currentColor;}
+.jp-timesig{display:inline-flex;align-items:stretch;vertical-align:bottom;flex-shrink:0;height:30px;margin:0 4px 0 1px;position:relative;top:-1px;}
+.jp-timesig-bar{width:1.5px;background:currentColor;border-radius:999px;align-self:stretch;opacity:.95;}
+.jp-timesig-stack{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:1.25em;padding-left:4px;line-height:1;}
+.jp-timesig-top,.jp-timesig-bot{display:block;min-width:1.15em;text-align:center;font-size:14px;font-weight:700;line-height:1;}
+.jp-timesig-top{padding-bottom:1px;border-bottom:1.25px solid currentColor;}
+.jp-timesig-bot{padding-top:1px;}
 
 /* ── 延长号 ── */
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px;}
@@ -621,6 +631,9 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
       <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">原调
         <input id="meta-key" placeholder="A" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
       </label>
+      <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">拍号
+        <input id="meta-timesign" placeholder="4/4" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
       <label style="font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">BPM
         <input id="meta-bpm" placeholder="72" type="number" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
       </label>
@@ -735,6 +748,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
               <button class="kbd-btn" onclick="appendTok('|:')" style="padding:6px 8px;">|: 反复开</button>
               <button class="kbd-btn" onclick="appendTok(':|')" style="padding:6px 8px;">:| 反复结</button>
               <button class="kbd-btn" onclick="appendTok('|:|')" style="padding:6px 8px;">|:| 反复段</button>
+              <button class="kbd-btn" onclick="appendInlineTimeSignToken()" style="padding:6px 8px;">拍号记号</button>
               <button class="kbd-btn slur-btn" id="slur-btn" onclick="toggleSlur()" style="padding:6px 8px;">( ) 连音<span class="shortcut">[ / S</span></button>
               <button class="kbd-btn slur-btn" id="xslur-btn" onclick="toggleXSlur()" style="padding:6px 8px;">跨线开<span class="shortcut">]</span></button>
               <button class="kbd-btn slur-btn" onclick="closeXSlur()" style="padding:6px 8px;">跨线结<span class="shortcut">X</span></button>
@@ -930,6 +944,31 @@ function getSelRange(){
 }
 function clearSel(){selA=-1;selB=-1;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
+function normalizeTimeSignValue(sig){
+  var m=String(sig||'').trim().replace(/\s+/g,'').replace(/\uFF0F/g,'/').match(/^(\d{1,2})\/(\d{1,2})$/);
+  return m?(m[1]+'/'+m[2]):'';
+}
+function extractInlineTimeSignToken(tok){
+  var m=String(tok||'').trim().match(/^\[(?:ts|timesign|meter):([^\]]+)\]$/i);
+  return m?normalizeTimeSignValue(m[1]):'';
+}
+function getSegInlineTimeSign(seg){
+  if(!seg)return'';
+  return normalizeTimeSignValue(seg.timeSign||seg.ts||seg.meter||'');
+}
+function setSegInlineTimeSign(seg,raw){
+  if(!seg)return;
+  var trimmed=String(raw||'').trim();
+  if(!trimmed){
+    delete seg.timeSign;
+    delete seg.ts;
+    delete seg.meter;
+    return;
+  }
+  seg.timeSign=normalizeTimeSignValue(trimmed)||trimmed;
+  delete seg.ts;
+  delete seg.meter;
+}
 
 /* ════════════════════════════════════════
    选择操作
@@ -974,11 +1013,19 @@ function appendCustomVolta(){
 }
 function appendCustomToken(){
   if(curSi<0){alert('请先点选一个简谱格子');return;}
-  var raw=prompt('输入 token（可一次输入多个，用空格分隔）\\n双行简谱示例：1/5 2/5 3/6');
+  var raw=prompt('输入 token（可一次输入多个，用空格分隔）\\n双行简谱示例：1/5 2/5 3/6\\n行内拍号示例：[ts:2/4]');
   if(raw===null)return;
   var toks=String(raw).trim().split(/\\s+/).filter(Boolean);
   if(!toks.length)return;
   insertToks(toks);
+}
+function appendInlineTimeSignToken(){
+  if(curSi<0){alert('请先点选一个简谱格子');return;}
+  var raw=prompt('输入行内拍号，例如 2/4、3/4、6/8');
+  if(raw===null)return;
+  var ts=normalizeTimeSignValue(raw);
+  if(!ts){alert('拍号格式请用 2/4、3/4、6/8 这种写法');return;}
+  insertToks(['[ts:'+ts+']']);
 }
 function dualInput(which){
   return document.getElementById(which==='bot'?'dual-bot':'dual-top');
@@ -1589,6 +1636,16 @@ function renderEditor(){
         };})(si,li,gi);
         dq.appendChild(dinTop);dq.appendChild(slash);dq.appendChild(dinBot);dq.appendChild(dqbtn);
         tdN.appendChild(dq);
+        var tsWrap=document.createElement('div');
+        tsWrap.className='tok-meta-inline';
+        var tsLbl=document.createElement('span');tsLbl.className='lbl';tsLbl.textContent='拍号';
+        var tsInp=document.createElement('input');tsInp.className='in';tsInp.placeholder='2/4';tsInp.value=seg.timeSign||seg.ts||seg.meter||'';
+        tsInp.oninput=(function(si,li,gi){return function(){
+          setSegInlineTimeSign(data[si].lines[li].segs[gi],this.value);
+          renderPreview();
+        };})(si,li,gi);
+        tsWrap.appendChild(tsLbl);tsWrap.appendChild(tsInp);
+        tdN.appendChild(tsWrap);
         tr.appendChild(tdN);
 
         // 歌词（上行 + 可选下行）
@@ -1679,6 +1736,18 @@ function makeBarline(tok){
   else if(tok==='|:|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thick());mid.appendChild(gap(1));mid.appendChild(thick());mid.appendChild(gap(3));mid.appendChild(dots());}
   o.appendChild(mid);
   var bot=document.createElement('span');bot.className='jp-bar-bot';o.appendChild(bot);
+  return o;
+}
+function makeTimeSignature(sig){
+  var norm=normalizeTimeSignValue(sig);
+  if(!norm)return document.createDocumentFragment();
+  var parts=norm.split('/');
+  var o=document.createElement('span');o.className='jp-timesig';o.setAttribute('data-ts',norm);
+  var bar=document.createElement('span');bar.className='jp-timesig-bar';o.appendChild(bar);
+  var stack=document.createElement('span');stack.className='jp-timesig-stack';
+  var top=document.createElement('span');top.className='jp-timesig-top';top.textContent=parts[0];
+  var bot=document.createElement('span');bot.className='jp-timesig-bot';bot.textContent=parts[1];
+  stack.appendChild(top);stack.appendChild(bot);o.appendChild(stack);
   return o;
 }
 function makeJpPlain(sym){
@@ -1818,14 +1887,22 @@ function makeTuplet(n){
   var nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);
   return w;
 }
-function renderNStr(nStr){
+function renderNStr(nStr,opts){
+  opts=opts||{};
   var div=document.createElement('div');div.className='p-n';
+  var headTimeSign=normalizeTimeSignValue(opts.inlineTimeSign||'');
+  if(headTimeSign)div.appendChild(makeTimeSignature(headTimeSign));
   if(!nStr||!nStr.trim())return div;
+  function appendRenderedTok(parent,tk){
+    var inlineTs=extractInlineTimeSignToken(tk);
+    parent.appendChild(inlineTs?makeTimeSignature(inlineTs):parseJpToken(tk));
+  }
   function isDualAtom(tk){
     if(!tk||tk==='/'||tk==='／')return false;
     if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
     if(tk==='|'||tk==='||'||tk==='||/'||tk==='|]'||tk==='|:'||tk===':|'||tk==='|:|')return false;
     if(/^\\{(3|5)$/.test(tk))return false;
+    if(extractInlineTimeSignToken(tk))return false;
     if(/^\\[v:(.+)\\]$/.test(tk))return false;
     return true;
   }
@@ -1842,13 +1919,15 @@ function renderNStr(nStr){
   var i=0;
   while(i<toks.length){
     var t=toks[i];
-    if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')sl.appendChild(parseJpToken(toks[i++]));div.appendChild(sl);i++;continue;}
-    if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') so.appendChild(parseJpToken(toks[i++]));div.appendChild(so);i++;continue;}
-    if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)sc.appendChild(parseJpToken(toks[i++]));div.appendChild(sc);continue;}
+    var inlineTs=extractInlineTimeSignToken(t);
+    if(inlineTs){div.appendChild(makeTimeSignature(inlineTs));i++;continue;}
+    if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')appendRenderedTok(sl,toks[i++]);div.appendChild(sl);i++;continue;}
+    if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') appendRenderedTok(so,toks[i++]);div.appendChild(so);i++;continue;}
+    if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)appendRenderedTok(sc,toks[i++]);div.appendChild(sc);continue;}
     if(t==='[v1'||t==='[v2'||t===']v'||/^\\[v:(.+)\\]$/.test(t)){i++;continue;} // 跨格volta由renderPreview层处理
-    var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')tp.appendChild(parseJpToken(toks[i++]));div.appendChild(tp);i++;continue;}
+    var tm=t.match(/^\\{(3|5)$/);if(tm){var tn=parseInt(tm[1],10);var tp=makeTuplet(tn);i++;while(i<toks.length&&toks[i]!=='}')appendRenderedTok(tp,toks[i++]);div.appendChild(tp);i++;continue;}
     if(t==='}'){i++;continue;}
-    div.appendChild(parseJpToken(t));i++;
+    appendRenderedTok(div,t);i++;
   }
   return div;
 }
@@ -1910,7 +1989,7 @@ function renderPreview(){
       line.segs.forEach(function(seg){
         var s=document.createElement('div');s.className='prev-seg';
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
-        s.appendChild(renderNStr(seg.n||''));
+        s.appendChild(renderNStr(seg.n||'',{inlineTimeSign:getSegInlineTimeSign(seg)}));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
         if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
         if(seg.lyric3){var l3=document.createElement('div');l3.className='p-lyric p-lyric3'+(line.bold?' bold':'');l3.textContent=seg.lyric3;s.appendChild(l3);}
@@ -1961,6 +2040,8 @@ function renderCode(){
       line.segs.forEach(function(seg,gi){
         var lastSeg=gi===line.segs.length-1;
         var obj={chord:seg.chord||''};
+        var segTimeSign=getSegInlineTimeSign(seg)||String(seg.timeSign||seg.ts||seg.meter||'').trim();
+        if(segTimeSign)obj.timeSign=segTimeSign;
         if(seg.n&&seg.n.trim())obj.n=seg.n;
         obj.lyric=seg.lyric||'';
         if(seg.lyric2)obj.lyric2=seg.lyric2;
@@ -2004,7 +2085,7 @@ function copyFullJson(){
     artist:document.getElementById('meta-artist').value||'',
     sub:document.getElementById('meta-sub').value||'',
     origKey:document.getElementById('meta-key').value||'C',
-    timeSign:'4/4',
+    timeSign:normalizeTimeSignValue(document.getElementById('meta-timesign').value)||'4/4',
     bpm:bpm,
     mp3:'',
     cover:document.getElementById('meta-cover').value||'',
