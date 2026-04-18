@@ -476,12 +476,14 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jb-thick{width:3.5px;background:currentColor;flex-shrink:0;}
 .jb-dots{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:6px;flex-shrink:0;}
 .jb-dot{width:3px;height:3px;border-radius:50%;background:currentColor;}
-.jp-timesig{display:inline-flex;align-items:stretch;vertical-align:bottom;flex-shrink:0;height:30px;margin:0 4px 0 1px;position:relative;top:-1px;}
-.jp-timesig-bar{width:1.5px;background:currentColor;border-radius:999px;align-self:stretch;opacity:.95;}
-.jp-timesig-stack{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:1.25em;padding-left:4px;line-height:1;}
-.jp-timesig-top,.jp-timesig-bot{display:block;min-width:1.15em;text-align:center;font-size:14px;font-weight:700;line-height:1;}
-.jp-timesig-top{padding-bottom:1px;border-bottom:1.25px solid currentColor;}
-.jp-timesig-bot{padding-top:1px;}
+.jp-timesig{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;flex-shrink:0;min-width:1.52em;margin:0 6px 0 2px;position:relative;top:-1px;line-height:1;}
+.jp-timesig-pad{display:block;width:100%;flex-shrink:0;}
+.jp-timesig-pad-top{height:2px;}
+.jp-timesig-pad-bot{height:3px;}
+.jp-timesig-stack{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;min-width:1.52em;line-height:1;}
+.jp-timesig-top,.jp-timesig-bot{display:flex;align-items:center;justify-content:center;min-width:1.52em;text-align:center;font-size:20px;font-weight:700;line-height:1;}
+.jp-timesig-top{padding:0 1px 2px;border-bottom:1.6px solid currentColor;margin-bottom:1px;}
+.jp-timesig-bot{padding-top:0;}
 
 /* ── 延长号 ── */
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px;}
@@ -1743,11 +1745,12 @@ function makeTimeSignature(sig){
   if(!norm)return document.createDocumentFragment();
   var parts=norm.split('/');
   var o=document.createElement('span');o.className='jp-timesig';o.setAttribute('data-ts',norm);
-  var bar=document.createElement('span');bar.className='jp-timesig-bar';o.appendChild(bar);
+  var topPad=document.createElement('span');topPad.className='jp-timesig-pad jp-timesig-pad-top';o.appendChild(topPad);
   var stack=document.createElement('span');stack.className='jp-timesig-stack';
   var top=document.createElement('span');top.className='jp-timesig-top';top.textContent=parts[0];
   var bot=document.createElement('span');bot.className='jp-timesig-bot';bot.textContent=parts[1];
   stack.appendChild(top);stack.appendChild(bot);o.appendChild(stack);
+  var botPad=document.createElement('span');botPad.className='jp-timesig-pad jp-timesig-pad-bot';o.appendChild(botPad);
   return o;
 }
 function makeJpPlain(sym){
