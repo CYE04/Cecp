@@ -476,12 +476,12 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jb-thick{width:3.5px;background:currentColor;flex-shrink:0;}
 .jb-dots{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:6px;flex-shrink:0;}
 .jb-dot{width:3px;height:3px;border-radius:50%;background:currentColor;}
-.jp-timesig{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;flex-shrink:0;min-width:1.52em;margin:0 6px 0 2px;position:relative;top:-1px;line-height:1;}
+.jp-timesig{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;flex-shrink:0;min-width:1.42em;margin:0 5px 0 2px;position:relative;top:-1px;line-height:1;}
 .jp-timesig-pad{display:block;width:100%;flex-shrink:0;}
 .jp-timesig-pad-top{height:2px;}
 .jp-timesig-pad-bot{height:3px;}
-.jp-timesig-stack{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;min-width:1.52em;line-height:1;}
-.jp-timesig-top,.jp-timesig-bot{display:flex;align-items:center;justify-content:center;min-width:1.52em;text-align:center;font-size:20px;font-weight:700;line-height:1;}
+.jp-timesig-stack{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;min-width:1.42em;line-height:1;}
+.jp-timesig-top,.jp-timesig-bot{display:flex;align-items:center;justify-content:center;min-width:1.42em;text-align:center;font-size:18px;font-weight:700;line-height:1;}
 .jp-timesig-top{padding:0 1px 2px;border-bottom:1.6px solid currentColor;margin-bottom:1px;}
 .jp-timesig-bot{padding-top:0;}
 
