@@ -9,7 +9,7 @@
     "wsUrl": "wss://cecp-ws.cecp.workers.dev/",
     "mode": "client",
     "layout": "floating",
-    "floatBottom": "120px"
+    "floatBottom": "120px",
     "defaultPreset": "🎤 蓝色话筒"
   },
   "pptUrl": null,
