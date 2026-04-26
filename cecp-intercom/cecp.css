@@ -1573,3 +1573,469 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     width: min(560px, calc(100vw - 12px));
   }
 }
+
+/* ============================================================
+   ▌ CECP — 全屏浮动面板扩展
+   用法：根元素加 data-fullscreen="1"
+   ============================================================ */
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-widget-panel {
+  position: fixed;
+  inset: 0;
+  right: 0;
+  bottom: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: 100dvh !important;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  transform: translateY(100%);
+  transition: opacity 0.26s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-widget-open
+  .cf-widget-panel {
+  transform: translateY(0) !important;
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-widget-open
+  .cf-widget-mask {
+  background: rgba(3, 5, 9, 0.62);
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-widget-bar {
+  padding-top: max(14px, env(safe-area-inset-top));
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-widget-panel .cf-stage {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0 16px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-widget-bar,
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-stage > * {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-panel-log,
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-panel-client-log,
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-panel-member-chat {
+  min-height: 0;
+  flex: 1;
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-log {
+  max-height: none;
+  flex: 1;
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-flash {
+  left: 50%;
+  right: auto;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+}
+
+/* ============================================================
+   ▌ CECP — 浅色主题（自动跟随系统）
+   原来的深色主题保持默认；以下样式在浅色模式下自动覆盖
+   ============================================================ */
+
+@media (prefers-color-scheme: light) {
+
+  /* 页面壳背景 */
+  html.cf-page-shell,
+  body.cf-page-shell {
+    background: #f0ece3;
+  }
+
+  html.cf-intercom-open,
+  html.cf-intercom-open body {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+  }
+
+  /* ── 全局 CSS 变量覆盖 ── */
+  :where(#cecp-root, [data-cecp-root]) {
+    --cf-bg:           #f0ece3;
+    --cf-bg-deep:      #e6e0d4;
+    --cf-surface:      rgba(255, 252, 246, 0.86);
+    --cf-surface-strong: rgba(255, 253, 249, 0.96);
+    --cf-surface-soft: rgba(253, 250, 244, 0.92);
+    --cf-border:       rgba(110, 95, 70, 0.16);
+    --cf-border-strong: rgba(110, 95, 70, 0.28);
+    --cf-text:         #18130a;
+    --cf-muted:        #6b5c41;
+    --cf-muted-2:      #9e8a6a;
+    --cf-gold:         #9a6b00;
+    --cf-gold-soft:    rgba(154, 107, 0, 0.12);
+    --cf-blue:         #1d62b8;
+    --cf-green:        #1a8048;
+    --cf-red:          #bf2e1f;
+    --cf-amber:        #b06a00;
+    --cf-shadow:       0 30px 60px rgba(0, 0, 0, 0.10);
+    --cf-shadow-soft:  0 18px 38px rgba(0, 0, 0, 0.07);
+  }
+
+  /* ── 页面布局背景渐变 ── */
+  :where(#cecp-root, [data-cecp-root]).cf-layout-page {
+    background:
+      radial-gradient(circle at top left,  rgba(220, 165, 60, 0.14),  transparent 30%),
+      radial-gradient(circle at top right, rgba(70, 130, 210, 0.10),  transparent 28%),
+      radial-gradient(circle at bottom center, rgba(50, 180, 100, 0.07), transparent 32%),
+      linear-gradient(180deg, #ede8dc 0%, var(--cf-bg) 42%, var(--cf-bg-deep) 100%);
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-layout-page::before {
+    background: #e8a030;
+    opacity: 0.10;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-layout-page::after {
+    background: #4080e0;
+    opacity: 0.09;
+  }
+
+  /* ── 浮动启动按钮 ── */
+  .cf-launcher {
+    border-color: rgba(154, 107, 0, 0.22);
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255, 220, 130, 0.28), transparent 36%),
+      linear-gradient(180deg, rgba(255, 250, 238, 0.98), rgba(248, 243, 228, 0.96));
+    color: #6b3d00;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+  .cf-launcher:hover {
+    border-color: rgba(154, 107, 0, 0.40);
+    box-shadow: 0 24px 42px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(154, 107, 0, 0.10);
+  }
+
+  /* ── 浮动面板 ── */
+  .cf-widget-panel {
+    border-color: rgba(110, 95, 70, 0.18);
+    background:
+      radial-gradient(circle at top left,  rgba(220, 165, 60, 0.10), transparent 34%),
+      radial-gradient(circle at top right, rgba(70, 130, 210, 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(255, 252, 245, 0.99), rgba(250, 246, 238, 0.99));
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.12);
+  }
+
+  /* 面板顶栏 */
+  .cf-widget-bar {
+    border-bottom-color: rgba(110, 95, 70, 0.14);
+    background: rgba(0, 0, 0, 0.018);
+  }
+
+  /* 关闭按钮 */
+  .cf-widget-close {
+    border-color: var(--cf-border);
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--cf-muted);
+  }
+  .cf-widget-close:hover {
+    color: #18130a;
+    border-color: rgba(154, 107, 0, 0.30);
+    background: rgba(154, 107, 0, 0.07);
+  }
+
+  /* 遮罩 */
+  .cf-widget-mask {
+    background: rgba(40, 30, 10, 0.18);
+  }
+
+  /* ── 卡片 / 面板 通用背景 ── */
+  .cf-header {
+    background: var(--cf-surface);
+    border-color: var(--cf-border);
+  }
+
+  .cf-setup-card {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1)),
+      var(--cf-surface-strong);
+    border-color: var(--cf-border-strong);
+  }
+
+  .cf-setup-card h2 {
+    color: #2a1c04;
+  }
+
+  .cf-setup-kicker {
+    border-color: rgba(154, 107, 0, 0.22);
+    background: rgba(154, 107, 0, 0.08);
+    color: var(--cf-gold);
+  }
+
+  /* ── 选项按钮（乐器 / 设备） ── */
+  .cf-preset-btn {
+    background: rgba(248, 244, 236, 0.98);
+    border-color: var(--cf-border);
+  }
+  .cf-preset-btn:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.10);
+  }
+  .cf-preset-btn.sel {
+    background: rgba(255, 252, 242, 0.99);
+  }
+
+  /* 提示按钮 */
+  .cf-cue-btn {
+    background:
+      linear-gradient(145deg, rgba(154, 107, 0, 0.06), transparent 42%),
+      var(--cf-surface);
+    border-color: var(--cf-border);
+  }
+  .cf-cue-btn:hover {
+    border-color: rgba(154, 107, 0, 0.26);
+    background:
+      linear-gradient(145deg, rgba(154, 107, 0, 0.10), transparent 42%),
+      var(--cf-surface-soft);
+  }
+
+  /* 主操作按钮保持金色，稍微加深 */
+  .cf-btn-primary {
+    background: linear-gradient(135deg, #ffe09a, #e8b030);
+    color: #2a1600;
+    box-shadow: 0 18px 30px rgba(200, 150, 0, 0.18);
+  }
+
+  /* ── 英雄区 ── */
+  .cf-client-hero {
+    background:
+      linear-gradient(145deg, rgba(154, 107, 0, 0.07), transparent 45%),
+      var(--cf-surface);
+    border-color: var(--cf-border);
+  }
+
+  /* 设备提示条 */
+  .cf-device-note {
+    border-color: rgba(154, 107, 0, 0.20);
+    background: rgba(154, 107, 0, 0.07);
+  }
+  .cf-device-note.is-subtle {
+    border-color: var(--cf-border);
+    background: rgba(0, 0, 0, 0.025);
+  }
+  .cf-device-reset-btn {
+    border-color: rgba(154, 107, 0, 0.26);
+    background: rgba(154, 107, 0, 0.09);
+    color: #5a3200;
+  }
+  .cf-device-reset-btn:hover {
+    background: rgba(154, 107, 0, 0.15);
+  }
+
+  /* ── 广播横幅 ── */
+  .cf-bcast {
+    background:
+      linear-gradient(135deg, rgba(29, 98, 184, 0.12), transparent 65%),
+      rgba(240, 245, 255, 0.96);
+    border-color: rgba(29, 98, 184, 0.26);
+  }
+
+  /* 广播弹窗 */
+  .cf-bcast-popup {
+    background:
+      linear-gradient(145deg, rgba(70, 130, 210, 0.10), transparent 54%),
+      rgba(248, 251, 255, 0.98);
+    border-color: rgba(29, 98, 184, 0.22);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.12);
+  }
+  .cf-bcast-popup-head {
+    color: #1a60b0;
+  }
+  .cf-bcast-popup-read {
+    border-color: rgba(154, 107, 0, 0.24);
+    background: rgba(154, 107, 0, 0.08);
+    color: #4a2800;
+  }
+  .cf-bcast-popup-read:hover {
+    background: rgba(154, 107, 0, 0.14);
+    border-color: rgba(154, 107, 0, 0.32);
+  }
+
+  /* 广播预设按钮 */
+  .cf-bcast-preset {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: var(--cf-border);
+    color: var(--cf-text);
+  }
+  .cf-bcast-preset:hover {
+    border-color: rgba(154, 107, 0, 0.26);
+    background: rgba(154, 107, 0, 0.07);
+  }
+
+  /* ── 日志条目 ── */
+  .cf-log-item {
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.6), transparent 45%),
+      var(--cf-surface-soft);
+    border-color: var(--cf-border);
+  }
+  .cf-log-item.is-outgoing {
+    border-color: rgba(154, 107, 0, 0.20);
+  }
+  .cf-log-item.is-incoming {
+    border-color: rgba(29, 98, 184, 0.18);
+  }
+  .cf-log-issue {
+    border-color: rgba(180, 100, 0, 0.26);
+  }
+  .cf-log-chat {
+    border-color: rgba(29, 98, 184, 0.22);
+  }
+  .cf-log-icon {
+    background: rgba(0, 0, 0, 0.04);
+  }
+  .cf-log-chip {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: var(--cf-border);
+    color: var(--cf-muted);
+  }
+  .cf-log-chip-in,
+  .cf-log-chip-chat {
+    border-color: rgba(29, 98, 184, 0.20);
+    color: #1a5aa8;
+  }
+  .cf-log-read-btn {
+    border-color: rgba(154, 107, 0, 0.24);
+    background: rgba(154, 107, 0, 0.07);
+    color: #4a2800;
+  }
+  .cf-log-read-btn:hover {
+    background: rgba(154, 107, 0, 0.13);
+  }
+
+  /* 聊天气泡 */
+  .cf-room-bubble {
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.6), transparent 45%),
+      var(--cf-surface-soft);
+    border-color: var(--cf-border);
+  }
+  .cf-room-msg.is-mine .cf-room-bubble {
+    border-color: rgba(154, 107, 0, 0.24);
+    background:
+      linear-gradient(145deg, rgba(154, 107, 0, 0.08), transparent 55%),
+      rgba(255, 250, 238, 0.92);
+  }
+
+  /* ── 自定义输入框 ── */
+  .cf-custom-area input {
+    background: rgba(255, 252, 244, 0.98);
+    border-color: var(--cf-border);
+    color: var(--cf-text);
+  }
+  .cf-custom-area input::placeholder {
+    color: var(--cf-muted-2);
+  }
+  .cf-custom-area input:focus {
+    border-color: rgba(154, 107, 0, 0.32);
+    box-shadow: 0 0 0 4px rgba(154, 107, 0, 0.08);
+  }
+  .cf-custom-area button {
+    background: linear-gradient(135deg, rgba(154, 107, 0, 0.14), rgba(154, 107, 0, 0.07));
+    border-color: rgba(154, 107, 0, 0.26);
+    color: #7a4800;
+  }
+  .cf-custom-area button:hover {
+    background: linear-gradient(135deg, rgba(154, 107, 0, 0.22), rgba(154, 107, 0, 0.12));
+  }
+
+  /* ── 浮动通知 Toast ── */
+  .cf-flash {
+    background: rgba(255, 252, 244, 0.98);
+    border-color: var(--cf-border-strong);
+    color: var(--cf-text);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  }
+  .cf-flash.is-error {
+    border-color: rgba(191, 46, 31, 0.36);
+    color: #8a1a10;
+  }
+
+  /* ── 统计卡片（调音台视图） ── */
+  .cf-stat-card {
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.5), transparent 46%),
+      var(--cf-surface);
+    border-color: var(--cf-border);
+  }
+  .cf-stat-alert {
+    background:
+      linear-gradient(145deg, rgba(191, 46, 31, 0.08), transparent 46%),
+      var(--cf-surface);
+  }
+  .cf-stat-value {
+    color: #2a1600;
+  }
+
+  .cf-panel {
+    background: var(--cf-surface);
+    border-color: var(--cf-border);
+  }
+
+  /* ── 成员 pill ── */
+  .cf-member-pill {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: var(--cf-border);
+  }
+
+  /* ── 操作按钮通用 ── */
+  .cf-screen-btn {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: var(--cf-border);
+    color: var(--cf-text);
+  }
+  .cf-screen-btn:hover {
+    border-color: rgba(154, 107, 0, 0.26);
+    background: rgba(154, 107, 0, 0.07);
+  }
+
+  .cf-clear-btn {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: var(--cf-border);
+    color: var(--cf-muted);
+  }
+  .cf-clear-btn:hover {
+    color: #8a1a10;
+    border-color: rgba(191, 46, 31, 0.26);
+  }
+
+  /* 已选身份徽章 */
+  .cf-selected {
+    background: rgba(0, 0, 0, 0.025);
+    border-color: var(--cf-border);
+  }
+
+  /* 在线状态点颜色不变（绿 / 红本身对比度足够） */
+
+  /* 全屏模式：浅色遮罩加深一点 */
+  :where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-widget-open
+    .cf-widget-mask {
+    background: rgba(30, 20, 5, 0.28);
+  }
+
+} /* end @media (prefers-color-scheme: light) */
