@@ -5,6 +5,12 @@
 
 @import url('https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
 
+html.cf-intercom-open,
+html.cf-intercom-open body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
 :where(#cecp-root, [data-cecp-root]) {
   --cf-bg: #090b12;
   --cf-bg-deep: #05060a;
@@ -173,9 +179,10 @@
   position: fixed;
   inset: 0;
   opacity: 0;
-  display: none;
   pointer-events: none;
-  background: transparent;
+  background: rgba(5, 8, 12, 0.22);
+  touch-action: none;
+  transition: opacity 0.18s ease;
 }
 
 .cf-widget-panel {
@@ -204,8 +211,8 @@
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-widget-open .cf-widget-mask {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-widget-open .cf-widget-panel {

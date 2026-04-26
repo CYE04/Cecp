@@ -579,9 +579,19 @@
       stage.innerHTML = html;
     }
 
+    function syncInteractionLock() {
+      if (!IS_FLOATING) return;
+      var rootEl = document.documentElement;
+      var bodyEl = document.body;
+      var shouldLock = !!widgetOpen;
+      if (rootEl) rootEl.classList.toggle('cf-intercom-open', shouldLock);
+      if (bodyEl) bodyEl.classList.toggle('cf-intercom-open', shouldLock);
+    }
+
     function syncWidgetState() {
       if (!IS_FLOATING) return;
       ROOT.classList.toggle('cf-widget-open', widgetOpen);
+      syncInteractionLock();
       var launcher = ROOT.querySelector('#cf-launcher');
       if (launcher) launcher.setAttribute('aria-expanded', widgetOpen ? 'true' : 'false');
     }
@@ -1231,6 +1241,10 @@
         document.removeEventListener('fullscreenchange', fullscreenChangeHandler);
         fullscreenChangeHandler = null;
       }
+      var rootEl = document.documentElement;
+      var bodyEl = document.body;
+      if (rootEl) rootEl.classList.remove('cf-intercom-open');
+      if (bodyEl) bodyEl.classList.remove('cf-intercom-open');
       if (ws) {
         try { ws.close(); } catch (err) {}
         ws = null;
