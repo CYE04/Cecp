@@ -16,6 +16,9 @@ body.cf-page-shell {
   margin: 0;
   min-height: 100%;
   background: #090b12;
+  /* 锁住 CMS 背景层，防止底层页面继续滚动 */
+  overflow: hidden !important;
+  overscroll-behavior: none;
 }
 
 :where(#cecp-root, [data-cecp-root]) {
@@ -68,8 +71,16 @@ body.cf-page-shell {
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-layout-page {
+  /* ── 突破 CMS 容器，直接覆盖整个视口 ── */
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9990 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
   min-height: 100dvh;
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   background:
     radial-gradient(circle at top left, rgba(255, 171, 79, 0.2), transparent 30%),
     radial-gradient(circle at top right, rgba(91, 163, 255, 0.18), transparent 28%),
@@ -1706,7 +1717,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
       radial-gradient(circle at top left,  rgba(220, 165, 60, 0.14),  transparent 30%),
       radial-gradient(circle at top right, rgba(70, 130, 210, 0.10),  transparent 28%),
       radial-gradient(circle at bottom center, rgba(50, 180, 100, 0.07), transparent 32%),
-      linear-gradient(180deg, #ede8dc 0%, var(--cf-bg) 42%, var(--cf-bg-deep) 100%);
+      linear-gradient(180deg, #ede8dc 0%, var(--cf-bg) 42%, var(--cf-bg-deep) 100%) !important;
   }
 
   :where(#cecp-root, [data-cecp-root]).cf-layout-page::before {
