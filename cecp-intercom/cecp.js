@@ -37,7 +37,13 @@
     '🎤 蓝色话筒',
     '🎤 白色话筒',
     '🎤 黑色话筒',
-    '🎤 棕色话筒'
+    '🎤 棕色话筒',
+    '🎹 钢琴',
+    '🎹 键盘',
+    '🎸 吉他',
+    '🎸 电吉他',
+    '🎸 贝斯',
+    '🥁 鼓'
   ];
 
   var DEFAULT_CUES = [
@@ -73,15 +79,23 @@
   var pingTimer = null;
   var msgLog = [];
   var flashTimers = {};
+  var memberCount = 0;
 
-  function stripMicPrefix(value) {
+  function stripIdentityPrefix(value) {
     return String(value || '')
-      .replace(/^🎤\s*/u, '')
+      .replace(/^[🎤🎹🎸🥁]\s*/u, '')
       .trim();
   }
 
+  function detectIdentityType(name) {
+    var text = stripIdentityPrefix(name);
+    if (/话筒/.test(text)) return 'mic';
+    if (/钢琴|键盘|吉他|电吉他|贝斯|鼓/.test(text)) return 'instrument';
+    return 'other';
+  }
+
   function detectIdentityTone(name) {
-    var text = stripMicPrefix(name);
+    var text = stripIdentityPrefix(name);
     if (/橘/.test(text)) return 'orange';
     if (/绿/.test(text)) return 'green';
     if (/紫/.test(text)) return 'purple';
@@ -91,16 +105,38 @@
     if (/白/.test(text)) return 'white';
     if (/黑/.test(text)) return 'black';
     if (/棕|褐|咖/.test(text)) return 'brown';
+    if (/钢琴/.test(text)) return 'gold';
+    if (/键盘/.test(text)) return 'blue';
+    if (/吉他/.test(text) && !/电吉他/.test(text)) return 'green';
+    if (/电吉他/.test(text)) return 'purple';
+    if (/贝斯/.test(text)) return 'brown';
+    if (/鼓/.test(text)) return 'red';
     return 'default';
+  }
+
+  function detectIdentityIcon(name) {
+    var text = stripIdentityPrefix(name);
+    if (/话筒/.test(text)) return '🎤';
+    if (/钢琴|键盘/.test(text)) return '🎹';
+    if (/吉他|电吉他|贝斯/.test(text)) return '🎸';
+    if (/鼓/.test(text)) return '🥁';
+    return '🎵';
+  }
+
+  function detectIdentitySubtitle(name) {
+    return detectIdentityType(name) === 'mic' ? '无线话筒' : '乐器通道';
   }
 
   function getIdentityMeta(name) {
     var displayName = String(name || '').trim();
-    var title = stripMicPrefix(displayName) || displayName;
+    var title = stripIdentityPrefix(displayName) || displayName;
     return {
       displayName: displayName,
       title: title,
-      tone: detectIdentityTone(displayName)
+      tone: detectIdentityTone(displayName),
+      type: detectIdentityType(displayName),
+      icon: detectIdentityIcon(displayName),
+      subtitle: detectIdentitySubtitle(displayName)
     };
   }
 
@@ -108,6 +144,7 @@
     var meta = getIdentityMeta(name);
     return [
       '<span class="cf-identity-pill cf-tone-', meta.tone, extraClass ? ' ' + extraClass : '', '">',
+      '  <span class="cf-identity-icon">', escapeHtml(meta.icon), '</span>',
       '  <span class="cf-identity-swatch"></span>',
       '  <span class="cf-identity-text">', escapeHtml(meta.title), '</span>',
       '</span>'
@@ -119,10 +156,10 @@
     return [
       '<button class="cf-preset-btn cf-tone-', meta.tone, isSelected ? ' sel' : '', '" data-name="', escapeHtml(meta.displayName), '">',
       '  <span class="cf-preset-led"></span>',
-      '  <span class="cf-preset-mic">🎤</span>',
+      '  <span class="cf-preset-mic">', escapeHtml(meta.icon), '</span>',
       '  <span class="cf-preset-copy">',
       '    <span class="cf-preset-name">', escapeHtml(meta.title), '</span>',
-      '    <span class="cf-preset-sub">现场无线话筒</span>',
+      '    <span class="cf-preset-sub">', escapeHtml(meta.subtitle), '</span>',
       '  </span>',
       '</button>'
     ].join('');
@@ -212,12 +249,13 @@
   function renderSetup() {
     var remembered = readRememberedName();
     var selected = PRESETS.indexOf(remembered) >= 0 ? remembered : '';
+    ROOT.classList.remove('cf-mode-operator');
 
     ROOT.innerHTML = [
       '<div class="cf-setup-card">',
-      '  <div class="cf-setup-kicker">WORSHIP COMMS</div>',
-      '  <h2>选择你手上的话筒</h2>',
-      '  <p class="cf-setup-sub">音控台会按颜色快速识别你，现场沟通更直观。</p>',
+      '  <div class="cf-setup-kicker">内通系统</div>',
+      '  <h2>选择你的设备</h2>',
+      '  <p class="cf-setup-sub">话筒和乐器都会同步显示到音控台，方便现场快速识别。</p>',
       '  <div class="cf-preset-grid">',
       PRESETS.map(function (preset) {
         return renderPresetButton(preset, preset === selected);
@@ -254,6 +292,7 @@
   }
 
   function renderClient() {
+    ROOT.classList.remove('cf-mode-operator');
     ROOT.innerHTML = [
       '<div class="cf-app">',
       '  <div class="cf-header">',
@@ -269,10 +308,10 @@
       '  </div>',
       '  <div class="cf-client-hero">',
       '    <div class="cf-badge-wrap">',
-      '      <div class="cf-badge-label">当前话筒</div>',
+      '      <div class="cf-badge-label">当前设备</div>',
       renderIdentityPill(whoAmI, 'cf-badge'),
       '    </div>',
-      '    <div class="cf-client-note">点击下方快捷消息，音控台会立刻看到你的颜色和需求。</div>',
+      '    <div class="cf-client-note">点击下方快捷消息，音控台会立刻看到你的设备和需求。</div>',
       '  </div>',
       '  <div class="cf-section-label">快捷消息</div>',
       '  <div class="cf-cue-grid">',
@@ -310,36 +349,57 @@
   }
 
   function renderOperator() {
+    ROOT.classList.add('cf-mode-operator');
     ROOT.innerHTML = [
       '<div class="cf-app cf-op">',
       '  <div class="cf-header">',
-      '    <span class="cf-title">CECP 音控台</span>',
-      '    <span class="cf-status">',
-      '      <span class="cf-dot" id="cf-dot"></span>',
-      '      <span id="cf-status-label">连接中…</span>',
-      '    </span>',
+      '    <div class="cf-header-copy">',
+      '      <span class="cf-title">CECP 音控台</span>',
+      '      <span class="cf-header-sub">成员消息、设备状态、广播控制</span>',
+      '    </div>',
+      '    <div class="cf-header-tools">',
+      '      <button class="cf-screen-btn" id="cf-fullscreen-btn">进入全屏</button>',
+      '      <span class="cf-status">',
+      '        <span class="cf-dot" id="cf-dot"></span>',
+      '        <span id="cf-status-label">连接中…</span>',
+      '      </span>',
+      '    </div>',
+      '  </div>',
+      '  <div class="cf-op-summary">',
+      '    <div class="cf-stat-card">',
+      '      <div class="cf-stat-label">在线设备</div>',
+      '      <div class="cf-stat-value" id="cf-stat-members">0</div>',
+      '    </div>',
+      '    <div class="cf-stat-card">',
+      '      <div class="cf-stat-label">消息总数</div>',
+      '      <div class="cf-stat-value" id="cf-stat-messages">0</div>',
+      '    </div>',
+      '    <div class="cf-stat-card cf-stat-alert">',
+      '      <div class="cf-stat-label">故障提醒</div>',
+      '      <div class="cf-stat-value" id="cf-stat-issues">0</div>',
+      '    </div>',
       '  </div>',
       '  <div class="cf-op-row">',
       '    <div class="cf-panel cf-panel-members">',
-      '      <div class="cf-panel-title" id="cf-member-title">🎵 在线成员</div>',
+      '      <div class="cf-panel-title" id="cf-member-title">在线设备</div>',
       '      <ul class="cf-member-list" id="cf-member-list">',
-      '        <li class="cf-member-empty">暂无成员在线</li>',
+      '        <li class="cf-member-empty">当前没有设备在线</li>',
       '      </ul>',
       '    </div>',
       '    <div class="cf-panel cf-panel-log">',
       '      <div class="cf-panel-title-row">',
-      '        <span class="cf-panel-title">📨 收到的消息</span>',
-      '        <button class="cf-clear-btn" id="cf-clear-btn">清空</button>',
+      '        <span class="cf-panel-title">收到的消息</span>',
+        '        <button class="cf-clear-btn" id="cf-clear-btn">清空</button>',
       '      </div>',
       '      <div class="cf-log" id="cf-log">',
-      '        <div class="cf-log-empty">暂无消息</div>',
+      '        <div class="cf-log-empty">暂时还没有收到消息</div>',
       '      </div>',
       '    </div>',
       '  </div>',
       '  <div class="cf-panel cf-panel-bcast">',
-      '    <div class="cf-panel-title">📢 广播给所有敬拜团成员</div>',
+      '    <div class="cf-panel-title">广播给所有成员</div>',
       '    <div class="cf-custom-area">',
-      '      <input id="cf-bcast-input" type="text" placeholder="输入广播消息…" maxlength="120">',
+        '      <input id="cf-bcast-input" type="text" placeholder="输入广播消息…" maxlength="120">',
       '      <button id="cf-bcast-send">发送</button>',
       '    </div>',
       '    <div class="cf-bcast-presets">',
@@ -367,6 +427,39 @@
       msgLog = [];
       renderLog();
     });
+    ROOT.querySelector('#cf-fullscreen-btn').addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', syncFullscreenButton);
+    syncFullscreenButton();
+    updateOperatorStats();
+  }
+
+  function isFullscreenActive() {
+    return !!document.fullscreenElement;
+  }
+
+  function syncFullscreenButton() {
+    var button = ROOT.querySelector('#cf-fullscreen-btn');
+    if (!button) return;
+    button.textContent = isFullscreenActive() ? '退出全屏' : '进入全屏';
+  }
+
+  function toggleFullscreen() {
+    if (isFullscreenActive()) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      return;
+    }
+    if (ROOT.requestFullscreen) ROOT.requestFullscreen();
+  }
+
+  function updateOperatorStats() {
+    var membersEl = ROOT.querySelector('#cf-stat-members');
+    var messagesEl = ROOT.querySelector('#cf-stat-messages');
+    var issuesEl = ROOT.querySelector('#cf-stat-issues');
+    var issueCount = msgLog.filter(function (item) { return item.kind === 'issue'; }).length;
+
+    if (membersEl) membersEl.textContent = String(memberCount);
+    if (messagesEl) messagesEl.textContent = String(msgLog.length);
+    if (issuesEl) issuesEl.textContent = String(issueCount);
   }
 
   function startPing() {
@@ -504,16 +597,19 @@
     var list = ROOT.querySelector('#cf-member-list');
     var title = ROOT.querySelector('#cf-member-title');
     if (!list) return;
+    memberCount = members.length;
 
     if (title) {
-      title.textContent = '🎵 在线成员（' + members.length + '）';
+      title.textContent = '在线设备（' + members.length + '）';
     }
 
     list.innerHTML = members.length
       ? members.map(function (member) {
           return '<li class="cf-member-item">' + renderIdentityPill(member.name, 'cf-member-pill') + '</li>';
         }).join('')
-      : '<li class="cf-member-empty">暂无成员在线</li>';
+      : '<li class="cf-member-empty">当前没有设备在线</li>';
+
+    updateOperatorStats();
   }
 
   function renderLog() {
@@ -521,7 +617,8 @@
     if (!log) return;
 
     if (!msgLog.length) {
-      log.innerHTML = '<div class="cf-log-empty">暂无消息</div>';
+      log.innerHTML = '<div class="cf-log-empty">暂时还没有收到消息</div>';
+      updateOperatorStats();
       return;
     }
 
@@ -545,6 +642,7 @@
       '</div>'
       ].join('');
     }).join('');
+    updateOperatorStats();
   }
 
   function flashEl(id, text, isError) {

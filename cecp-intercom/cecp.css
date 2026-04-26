@@ -86,6 +86,13 @@
   --cf-accent-ink: #fff7df;
 }
 
+.cf-tone-gold {
+  --cf-accent: #f3d283;
+  --cf-accent-soft: rgba(243, 210, 131, 0.18);
+  --cf-accent-ring: rgba(243, 210, 131, 0.35);
+  --cf-accent-ink: #fff7df;
+}
+
 .cf-tone-orange {
   --cf-accent: #ff9c46;
   --cf-accent-soft: rgba(255, 156, 70, 0.18);
@@ -162,7 +169,30 @@
 }
 
 .cf-op {
-  width: min(100%, 1080px);
+  width: min(100%, 1480px);
+}
+
+#cecp-root.cf-mode-operator {
+  min-height: 100vh;
+}
+
+#cecp-root.cf-mode-operator .cf-app {
+  width: min(100%, 1480px);
+  max-width: none;
+}
+
+#cecp-root:fullscreen {
+  width: 100vw;
+  height: 100vh;
+}
+
+#cecp-root:fullscreen .cf-op {
+  width: 100%;
+}
+
+#cecp-root:fullscreen .cf-app {
+  min-height: 100vh;
+  padding: 18px 18px 24px;
 }
 
 .cf-header,
@@ -185,11 +215,47 @@
   box-shadow: var(--cf-shadow-soft);
 }
 
+.cf-header-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
 .cf-title {
   font-family: var(--cf-font-title);
   font-size: 1.35rem;
   color: var(--cf-gold);
   letter-spacing: 0.01em;
+}
+
+.cf-header-sub {
+  color: var(--cf-muted);
+  font-size: 0.8rem;
+}
+
+.cf-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cf-screen-btn {
+  padding: 9px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--cf-border);
+  border-radius: 12px;
+  color: var(--cf-text);
+  font-family: var(--cf-font-body);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.cf-screen-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(243, 210, 131, 0.24);
+  background: rgba(243, 210, 131, 0.08);
 }
 
 .cf-status {
@@ -267,7 +333,7 @@
 
 .cf-preset-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -367,8 +433,7 @@
 .cf-badge-label,
 .cf-panel-title,
 .cf-section-label {
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.06em;
 }
 
 .cf-selected-label {
@@ -421,6 +486,15 @@
   background: var(--cf-accent);
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 0 0 4px var(--cf-accent-soft);
+  flex-shrink: 0;
+}
+
+.cf-identity-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  font-size: 0.96rem;
   flex-shrink: 0;
 }
 
@@ -670,10 +744,47 @@
   color: #ffdede;
 }
 
+.cf-op-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.cf-stat-card {
+  padding: 18px 18px 16px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.03), transparent 46%),
+    var(--cf-surface);
+  border: 1px solid var(--cf-border);
+  border-radius: 22px;
+  box-shadow: var(--cf-shadow-soft);
+}
+
+.cf-stat-alert {
+  background:
+    linear-gradient(145deg, rgba(255, 99, 99, 0.12), transparent 46%),
+    var(--cf-surface);
+}
+
+.cf-stat-label {
+  color: var(--cf-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+.cf-stat-value {
+  margin-top: 8px;
+  color: #fff6de;
+  font-family: var(--cf-font-title);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  line-height: 1;
+}
+
 .cf-op-row {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 14px;
+  align-items: start;
 }
 
 .cf-panel {
@@ -715,7 +826,7 @@
 }
 
 .cf-panel-members {
-  min-height: 184px;
+  min-height: 260px;
 }
 
 .cf-member-list {
@@ -743,14 +854,14 @@
 }
 
 .cf-panel-log {
-  min-height: 220px;
+  min-height: 520px;
 }
 
 .cf-log {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 420px;
+  max-height: 62vh;
   overflow-y: auto;
   padding-right: 2px;
 }
@@ -823,6 +934,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 168px;
 }
 
 .cf-bcast-presets {
@@ -850,6 +962,10 @@
 }
 
 @media (max-width: 860px) {
+  .cf-op-summary {
+    grid-template-columns: 1fr;
+  }
+
   .cf-op-row {
     grid-template-columns: 1fr;
   }
@@ -872,10 +988,17 @@
 
   .cf-header {
     padding: 12px 14px;
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .cf-title {
     font-size: 1.16rem;
+  }
+
+  .cf-header-tools {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .cf-setup-card {
