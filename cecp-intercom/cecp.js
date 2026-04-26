@@ -124,6 +124,9 @@
     var fullscreenChangeHandler = null;
     var destroyed = false;
     var pageShellApplied = false;
+    var _originalParent = null;
+    var _originalNextSibling = null;
+    var _hiddenBodyChildren = [];
 
     ROOT.__cecpMounted = true;
     if (FLOAT_RIGHT) ROOT.style.setProperty('--cf-float-right', FLOAT_RIGHT);
@@ -136,6 +139,27 @@
       var bodyEl = document.body;
       if (rootEl) rootEl.classList.toggle('cf-page-shell', !!active);
       if (bodyEl) bodyEl.classList.toggle('cf-page-shell', !!active);
+
+      if (active && bodyEl) {
+        /* 把 ROOT 提升到 body 直属子节点：
+           逃出任何有 transform/overflow 的 CMS 容器，
+           让 position:fixed; inset:0 真正覆盖整个视口。 */
+        _originalParent = ROOT.parentElement;
+        _originalNextSibling = ROOT.nextSibling;
+        if (ROOT.parentElement !== bodyEl) {
+          bodyEl.appendChild(ROOT);
+        }
+        /* 隐藏 body 里所有其他子元素（header、sidebar、main 等） */
+        _hiddenBodyChildren = [];
+        var kids = Array.prototype.slice.call(bodyEl.children);
+        for (var i = 0; i < kids.length; i++) {
+          var kid = kids[i];
+          if (kid !== ROOT) {
+            _hiddenBodyChildren.push({ el: kid, prev: kid.style.display });
+            kid.style.setProperty('display', 'none', 'important');
+          }
+        }
+      }
     }
 
     syncPageShell(true);
@@ -1436,6 +1460,22 @@
         if (rootEl) rootEl.classList.remove('cf-page-shell');
         if (bodyEl) bodyEl.classList.remove('cf-page-shell');
         pageShellApplied = false;
+        /* 还原被隐藏的 CMS 元素 */
+        for (var _i = 0; _i < _hiddenBodyChildren.length; _i++) {
+          var _item = _hiddenBodyChildren[_i];
+          _item.el.style.display = _item.prev;
+        }
+        _hiddenBodyChildren = [];
+        /* 把 ROOT 放回原位 */
+        if (_originalParent && _originalParent !== document.body) {
+          if (_originalNextSibling && _originalNextSibling.parentElement === _originalParent) {
+            _originalParent.insertBefore(ROOT, _originalNextSibling);
+          } else {
+            _originalParent.appendChild(ROOT);
+          }
+        }
+        _originalParent = null;
+        _originalNextSibling = null;
       }
       if (rootEl) rootEl.classList.remove('cf-intercom-open');
       if (bodyEl) bodyEl.classList.remove('cf-intercom-open');

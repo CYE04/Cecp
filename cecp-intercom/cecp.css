@@ -71,12 +71,12 @@ body.cf-page-shell {
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-layout-page {
-  /* ── 突破 CMS 容器，直接覆盖整个视口 ── */
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 2147483639 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
+  /* ── JS 已把 ROOT 移到 body 直属子节点，这里直接覆盖视口 ── */
+  position: fixed;
+  inset: 0;
+  z-index: 2147483639;
+  width: 100vw;
+  height: 100dvh;
   min-height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
