@@ -376,6 +376,24 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   width: min(100%, 1480px);
 }
 
+:where(#cecp-root, [data-cecp-root]).cf-layout-page .cf-client-app {
+  width: min(100%, 1280px);
+}
+
+.cf-client-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.cf-client-main,
+.cf-client-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 :where(#cecp-root, [data-cecp-root]).cf-mode-operator.cf-layout-page {
   min-height: 100vh;
 }
@@ -1222,6 +1240,17 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   min-height: 240px;
 }
 
+.cf-panel-member-chat {
+  min-height: 340px;
+}
+
+.cf-member-chat-note {
+  margin-bottom: 12px;
+  color: var(--cf-muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
 .cf-log {
   display: flex;
   flex-direction: column;
@@ -1238,8 +1267,14 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   max-height: 320px;
 }
 
+.cf-log-member-chat {
+  max-height: 380px;
+  gap: 12px;
+}
+
 :where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-panel-log,
-:where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-panel-client-log {
+:where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-panel-client-log,
+:where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-panel-member-chat {
   min-height: 0;
 }
 
@@ -1275,6 +1310,10 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 
 .cf-log-issue {
   border-color: rgba(255, 177, 86, 0.28);
+}
+
+.cf-log-chat {
+  border-color: rgba(98, 171, 255, 0.24);
 }
 
 .cf-log-icon {
@@ -1325,6 +1364,11 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   color: #b7d6ff;
 }
 
+.cf-log-chip-chat {
+  border-color: rgba(98, 171, 255, 0.22);
+  color: #b7d6ff;
+}
+
 .cf-log-read-btn {
   min-height: 36px;
   padding: 0 12px;
@@ -1358,6 +1402,60 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   color: var(--cf-muted-2);
   font-size: 0.7rem;
   flex-shrink: 0;
+}
+
+.cf-room-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  animation: cf-slidein 0.2s ease;
+}
+
+.cf-room-msg.is-mine {
+  align-items: flex-end;
+}
+
+.cf-room-msg-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cf-room-from {
+  padding: 7px 11px;
+}
+
+.cf-room-time {
+  color: var(--cf-muted-2);
+  font-size: 0.72rem;
+}
+
+.cf-room-bubble {
+  max-width: min(100%, 440px);
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--cf-border);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.03), transparent 45%),
+    var(--cf-surface-soft);
+  box-shadow: var(--cf-shadow-soft);
+}
+
+.cf-room-msg.is-mine .cf-room-bubble {
+  border-color: rgba(243, 210, 131, 0.24);
+  background:
+    linear-gradient(145deg, rgba(243, 210, 131, 0.08), transparent 55%),
+    rgba(29, 24, 12, 0.86);
+}
+
+.cf-room-text {
+  display: block;
+  color: var(--cf-text);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  word-break: break-word;
 }
 
 .cf-panel-bcast {
@@ -1395,12 +1493,17 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 }
 
 @media (max-width: 860px) {
+  .cf-client-grid,
   .cf-op-summary {
     grid-template-columns: 1fr;
   }
 
   .cf-op-row {
     grid-template-columns: 1fr;
+  }
+
+  .cf-room-bubble {
+    max-width: 100%;
   }
 }
 

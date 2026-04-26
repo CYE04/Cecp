@@ -43,6 +43,7 @@
     var IS_FLOATING = LAYOUT === 'floating' || LAYOUT === 'widget';
     var SHOW_CLIENT_LOG = ROOT.dataset.clientLog !== '0';
     var SHOW_BCAST_POPUP = ROOT.dataset.broadcastModal !== '0';
+    var ENABLE_MEMBER_CHAT = ROOT.dataset.memberChat !== '0';
     var LAUNCHER_ICON = String(ROOT.dataset.launcherIcon || '🎧');
     var LAUNCHER_LABEL = String(ROOT.dataset.launcherLabel || '调音助手');
     var WIDGET_TITLE = String(ROOT.dataset.widgetTitle || 'CECP 敬拜团内通');
@@ -93,11 +94,13 @@
       piano_down: '🎹',
       issue: '⚠️',
       custom: '💬',
-      broadcast: '📢'
+      broadcast: '📢',
+      member_chat: '🗨️'
     };
 
     var STORAGE_KEY = 'cecp:intercom:last-role:' + WS_URL + ':' + PAGE_KEY;
     var CLIENT_LOG_PREFIX = 'cecp:intercom:client-log:' + WS_URL + ':' + PAGE_KEY + ':';
+    var MEMBER_CHAT_KEY = 'cecp:intercom:member-chat:' + WS_URL + ':' + PAGE_KEY;
 
     var ws = null;
     var whoAmI = '';
@@ -105,6 +108,7 @@
     var pingTimer = null;
     var msgLog = [];
     var clientLog = [];
+    var memberChat = [];
     var flashTimers = {};
     var memberCount = 0;
     var widgetOpen = !IS_FLOATING;
@@ -317,6 +321,10 @@
       return whoAmI ? CLIENT_LOG_PREFIX + whoAmI : '';
     }
 
+    function memberChatKey() {
+      return MEMBER_CHAT_KEY;
+    }
+
     function normalizeClientLogItem(item) {
       if (!item || typeof item !== 'object') return null;
       var text = String(item.text || '').trim();
@@ -329,6 +337,19 @@
         ts: Number(item.ts || Date.now()),
         direction: item.direction === 'in' ? 'in' : 'out',
         read: item.direction === 'in' ? !!item.read : true
+      };
+    }
+
+    function normalizeMemberChatItem(item) {
+      if (!item || typeof item !== 'object') return null;
+      var text = String(item.text || '').trim();
+      var from = String(item.from || '').trim();
+      if (!text || !from) return null;
+      return {
+        id: String(item.id || nowId('member')),
+        from: from,
+        text: text,
+        ts: Number(item.ts || Date.now())
       };
     }
 
@@ -363,6 +384,38 @@
       renderClientLog();
       syncBroadcastPopup();
       syncLauncherBadge();
+    }
+
+    function loadMemberChat() {
+      memberChat = [];
+      var key = memberChatKey();
+      if (!key) return;
+      try {
+        var parsed = JSON.parse(localStorage.getItem(key) || '[]');
+        if (!Array.isArray(parsed)) return;
+        memberChat = parsed
+          .map(normalizeMemberChatItem)
+          .filter(Boolean)
+          .slice(-160);
+      } catch (err) {}
+    }
+
+    function saveMemberChat() {
+      var key = memberChatKey();
+      if (!key) return;
+      try {
+        localStorage.setItem(key, JSON.stringify(memberChat.slice(-160)));
+      } catch (err) {}
+    }
+
+    function appendMemberChat(entry) {
+      var normalized = normalizeMemberChatItem(entry);
+      if (!normalized) return;
+      if (memberChat.some(function (item) { return item.id === normalized.id; })) return;
+      memberChat.push(normalized);
+      if (memberChat.length > 160) memberChat = memberChat.slice(-160);
+      saveMemberChat();
+      renderMemberChat();
     }
 
     function unreadClientCount() {
@@ -709,6 +762,7 @@
         whoAmI = selected;
         rememberName(selected);
         loadClientLog();
+        loadMemberChat();
         renderClient();
         connect('client');
         if (IS_FLOATING) openWidget();
@@ -721,6 +775,7 @@
       ensureChrome();
 
       ROOT.classList.remove('cf-mode-operator');
+      var showMemberChat = ENABLE_MEMBER_CHAT;
 
       var defaultNotice = selectionSource === 'default'
         ? [
@@ -739,9 +794,12 @@
           ].join('');
 
       setStageHtml([
-        '<div class="cf-app">',
+        '<div class="cf-app cf-client-app">',
         '  <div class="cf-header">',
-        '    <span class="cf-title">CECP 敬拜团内通</span>',
+        '    <div class="cf-header-copy">',
+        '      <span class="cf-title">CECP 敬拜团成员通道</span>',
+        '      <span class="cf-header-sub">舞台请求、成员沟通、广播提醒都集中在这里</span>',
+        '    </div>',
         '    <span class="cf-status">',
         '      <span class="cf-dot" id="cf-dot"></span>',
         '      <span id="cf-status-label">连接中…</span>',
@@ -752,11 +810,13 @@
         '      <div class="cf-badge-label">当前设备</div>',
         renderIdentityPill(whoAmI, 'cf-badge'),
         '    </div>',
-        '    <div class="cf-client-note">点击下方快捷消息，音控台会立刻看到你的设备和需求；广播消息也会在这里留下记录。</div>',
+        '    <div class="cf-client-note">左边给音控组发舞台请求，右边保留成员沟通和广播记录，现场会更清楚也更顺手。</div>',
         defaultNotice,
         '  </div>',
-        '  <div class="cf-section-label">快捷消息</div>',
-        '  <div class="cf-cue-grid">',
+        '  <div class="cf-client-grid">',
+        '    <div class="cf-client-main">',
+        '      <div class="cf-section-label">快捷消息</div>',
+        '      <div class="cf-cue-grid">',
         CUES.map(function (cue) {
           return [
             '<button class="cf-cue-btn" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
@@ -768,23 +828,43 @@
             '</button>'
           ].join('');
         }).join(''),
-        '  </div>',
-        '  <div class="cf-section-label">💬 自定义消息</div>',
-        '  <div class="cf-custom-area">',
-        '    <input id="cf-custom-input" type="text" placeholder="自定义消息…" maxlength="120">',
-        '    <button id="cf-custom-send" type="button">➤</button>',
-        '  </div>',
-        SHOW_CLIENT_LOG ? [
-          '  <div class="cf-panel cf-panel-client-log">',
-          '    <div class="cf-panel-title-row">',
-          '      <span class="cf-panel-title">聊天记录</span>',
-          '      <button class="cf-clear-btn" id="cf-client-clear-btn" type="button">清空</button>',
-          '    </div>',
-          '    <div class="cf-log cf-log-client" id="cf-client-log">',
-          '      <div class="cf-log-empty">你发出的请求和收到的广播会显示在这里</div>',
-          '    </div>',
-          '  </div>'
+        '      </div>',
+        '      <div class="cf-section-label">💬 发给音控组</div>',
+        '      <div class="cf-custom-area">',
+        '        <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
+        '        <button id="cf-custom-send" type="button">发送</button>',
+        '      </div>',
+        '    </div>',
+        '    <div class="cf-client-side">',
+        showMemberChat ? [
+          '      <div class="cf-panel cf-panel-member-chat">',
+          '        <div class="cf-panel-title-row">',
+          '          <span class="cf-panel-title">成员群聊</span>',
+          '          <button class="cf-clear-btn" id="cf-member-chat-clear-btn" type="button">清空</button>',
+          '        </div>',
+          '        <div class="cf-member-chat-note">成员之间可以直接沟通段落、预备和现场提醒，不会盖掉舞台请求。</div>',
+          '        <div class="cf-log cf-log-member-chat" id="cf-member-chat-log">',
+          '          <div class="cf-log-empty">成员群聊会显示在这里</div>',
+          '        </div>',
+          '        <div class="cf-custom-area cf-member-chat-compose">',
+          '          <input id="cf-member-chat-input" type="text" placeholder="给成员说一句…" maxlength="180">',
+          '          <button id="cf-member-chat-send" type="button">发送</button>',
+          '        </div>',
+          '      </div>'
         ].join('') : '',
+        SHOW_CLIENT_LOG ? [
+          '      <div class="cf-panel cf-panel-client-log">',
+          '        <div class="cf-panel-title-row">',
+          '          <span class="cf-panel-title">音控记录</span>',
+          '          <button class="cf-clear-btn" id="cf-client-clear-btn" type="button">清空</button>',
+          '        </div>',
+          '        <div class="cf-log cf-log-client" id="cf-client-log">',
+          '          <div class="cf-log-empty">你发出的请求和收到的广播会显示在这里</div>',
+          '        </div>',
+          '      </div>'
+        ].join('') : '',
+        '    </div>',
+        '  </div>',
         '  <div class="cf-flash" id="cf-flash">发送成功 ✓</div>',
         '</div>'
       ].join(''));
@@ -801,6 +881,15 @@
       });
       ROOT.querySelector('#cf-reset-device').addEventListener('click', resetDeviceSelection);
 
+      var memberSendBtn = ROOT.querySelector('#cf-member-chat-send');
+      var memberInput = ROOT.querySelector('#cf-member-chat-input');
+      if (memberSendBtn && memberInput) {
+        memberSendBtn.addEventListener('click', sendMemberChat);
+        memberInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') sendMemberChat();
+        });
+      }
+
       var clearBtn = ROOT.querySelector('#cf-client-clear-btn');
       if (clearBtn) {
         clearBtn.addEventListener('click', function () {
@@ -812,6 +901,16 @@
         });
       }
 
+      var memberClearBtn = ROOT.querySelector('#cf-member-chat-clear-btn');
+      if (memberClearBtn) {
+        memberClearBtn.addEventListener('click', function () {
+          memberChat = [];
+          saveMemberChat();
+          renderMemberChat();
+        });
+      }
+
+      renderMemberChat();
       renderClientLog();
       syncBroadcastPopup();
       syncLauncherBadge();
@@ -960,6 +1059,35 @@
       });
     }
 
+    function renderMemberChat() {
+      var log = ROOT.querySelector('#cf-member-chat-log');
+      if (!log) return;
+
+      if (!memberChat.length) {
+        log.innerHTML = '<div class="cf-log-empty">成员群聊会显示在这里</div>';
+        return;
+      }
+
+      log.innerHTML = memberChat.map(function (item) {
+        var mine = item.from === whoAmI;
+        return [
+          '<div class="cf-room-msg', mine ? ' is-mine' : '', '">',
+          '  <div class="cf-room-msg-head">',
+          renderIdentityPill(item.from, 'cf-room-from'),
+          '    <span class="cf-room-time">', escapeHtml(formatTime(item.ts)), '</span>',
+          '  </div>',
+          '  <div class="cf-room-bubble">',
+          '    <span class="cf-room-text">', escapeHtml(item.text), '</span>',
+          '  </div>',
+          '</div>'
+        ].join('');
+      }).join('');
+
+      requestAnimationFrame(function () {
+        log.scrollTop = log.scrollHeight;
+      });
+    }
+
     function updateOperatorStats() {
       var membersEl = ROOT.querySelector('#cf-stat-members');
       var messagesEl = ROOT.querySelector('#cf-stat-messages');
@@ -1000,12 +1128,20 @@
 
       log.innerHTML = msgLog.map(function (item) {
         var icon = KIND_ICONS[item.kind] || '💬';
-        var extraClass = item.kind === 'issue' ? ' cf-log-issue' : '';
+        var extraClass = item.kind === 'issue'
+          ? ' cf-log-issue'
+          : (item.kind === 'member_chat' ? ' cf-log-chat' : '');
+        var routeChip = item.kind === 'member_chat'
+          ? '<span class="cf-log-chip cf-log-chip-chat">成员群聊</span>'
+          : '<span class="cf-log-chip">发给音控组</span>';
         return [
           '<div class="cf-log-item', extraClass, '">',
           '  <span class="cf-log-icon">', escapeHtml(icon), '</span>',
           '  <div class="cf-log-body">',
+          '    <div class="cf-log-meta-row">',
           renderIdentityPill(item.from, 'cf-log-from'),
+          routeChip,
+          '    </div>',
           '    <span class="cf-log-text">', escapeHtml(item.text), '</span>',
           '  </div>',
           '  <span class="cf-log-time">', escapeHtml(formatTime(item.ts)), '</span>',
@@ -1065,7 +1201,8 @@
         ws.send(JSON.stringify({
           type: 'register',
           name: role === 'operator' ? '音控组' : whoAmI,
-          role: role
+          role: role,
+          identityType: role === 'operator' ? 'operator' : detectIdentityType(whoAmI)
         }));
       });
 
@@ -1107,6 +1244,26 @@
           direction: 'in',
           read: false
         });
+        return;
+      }
+
+      if (msg.type === 'member_chat') {
+        appendMemberChat({
+          id: msg.id || nowId('member'),
+          from: msg.from,
+          text: msg.text,
+          ts: msg.ts || Date.now()
+        });
+        if (role === 'operator') {
+          msgLog.unshift({
+            from: msg.from,
+            kind: 'member_chat',
+            text: msg.text,
+            ts: msg.ts || Date.now()
+          });
+          if (msgLog.length > 80) msgLog.pop();
+          renderOperatorLog();
+        }
         return;
       }
 
@@ -1157,6 +1314,26 @@
       if (!text) return;
       sendWorshipMsg('custom', text);
       if (input) input.value = '';
+    }
+
+    function sendMemberChat() {
+      var input = ROOT.querySelector('#cf-member-chat-input');
+      var text = input && input.value ? input.value.trim() : '';
+      if (!text) return;
+      if (!wsReady()) {
+        flashEl('cf-flash', '当前离线，暂时无法发送群聊', true);
+        return;
+      }
+      var id = nowId('member');
+      ws.send(JSON.stringify({ type: 'member_chat', id: id, text: text }));
+      appendMemberChat({
+        id: id,
+        from: whoAmI,
+        text: text,
+        ts: Date.now()
+      });
+      if (input) input.value = '';
+      flashEl('cf-flash', '成员群聊已发送 ✓');
     }
 
     function sendBroadcast() {
@@ -1268,6 +1445,7 @@
       }
       if (whoAmI) {
         loadClientLog();
+        loadMemberChat();
         if (IS_FLOATING) ensureChrome();
         else renderClient();
         connect('client');
