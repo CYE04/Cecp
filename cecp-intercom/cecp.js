@@ -1339,24 +1339,36 @@
       /* ── 设备占用状态（客户端和调音台都处理）── */
       if (msg.type === 'taken_devices') {
         takenDevices = Array.isArray(msg.names) ? msg.names : [];
-        /* 如果当前在选择界面，刷新按钮状态 */
-        var grid = ROOT.querySelector('.cf-preset-grid');
-        if (grid) {
-          grid.innerHTML = PRESETS.map(function (preset) {
-            var isSelected = preset === (ROOT.querySelector('.cf-preset-btn.sel') && ROOT.querySelector('.cf-preset-btn.sel').dataset.name);
-            var taken = takenDevices.indexOf(preset) >= 0 && preset !== whoAmI;
-            return renderPresetButton(preset, isSelected, taken);
-          }).join('');
-          ROOT.querySelectorAll('.cf-preset-btn').forEach(function (button) {
-            button.addEventListener('click', function () {
-              if (button.disabled || button.classList.contains('taken')) return;
-              ROOT.querySelectorAll('.cf-preset-btn').forEach(function (other) { other.classList.remove('sel'); });
-              button.classList.add('sel');
-              var selPreview = button.dataset.name || '';
-              updateSelectedPreview(selPreview);
-            });
-          });
-        }
+        /* 如果当前在选择界面，只更新各按钮的占用状态，不重建 DOM
+           （重建会丢失 renderSetup 闭包里的 selected 变量，导致点"进入"时
+           误报"请先选择你的身份"） */
+        ROOT.querySelectorAll('.cf-preset-btn').forEach(function (button) {
+          var name = button.dataset.name || '';
+          var taken = takenDevices.indexOf(name) >= 0 && name !== whoAmI;
+          if (taken) {
+            button.disabled = true;
+            button.setAttribute('aria-disabled', 'true');
+            button.classList.add('taken');
+            var sub = button.querySelector('.cf-preset-sub');
+            if (sub) sub.textContent = '已有人使用';
+            var badge = button.querySelector('.cf-preset-taken-badge');
+            if (!badge) {
+              badge = document.createElement('span');
+              badge.className = 'cf-preset-taken-badge';
+              badge.textContent = '占用中';
+              button.appendChild(badge);
+            }
+          } else {
+            button.disabled = false;
+            button.removeAttribute('aria-disabled');
+            button.classList.remove('taken');
+            var sub = button.querySelector('.cf-preset-sub');
+            var meta = getIdentityMeta(name);
+            if (sub) sub.textContent = escapeHtml(meta.subtitle);
+            var badge = button.querySelector('.cf-preset-taken-badge');
+            if (badge) badge.parentElement.removeChild(badge);
+          }
+        });
         /* 同时更新调音台的成员列表（如果已有数据）*/
         if (role === 'operator' && msg.members) renderMembers(msg.members);
         return;
