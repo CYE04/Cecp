@@ -2231,6 +2231,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       launcherIcon: String(source.launcherIcon || C.intercomLauncherIcon || '🎧'),
       launcherLabel: String(source.launcherLabel || C.intercomLauncherLabel || '调音助手'),
       widgetTitle: String(source.widgetTitle || source.title || C.intercomTitle || 'CECP 敬拜团内通'),
+      floatRight: String(source.floatRight || C.intercomFloatRight || '').trim(),
+      floatBottom: String(source.floatBottom || C.intercomFloatBottom || '').trim(),
       clientLog: source.clientLog !== false,
       broadcastModal: source.broadcastModal !== false,
       presets: Array.isArray(source.presets) ? source.presets : null,
@@ -2254,6 +2256,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     host.dataset.launcherIcon = cfg.launcherIcon;
     host.dataset.launcherLabel = cfg.launcherLabel;
     host.dataset.widgetTitle = cfg.widgetTitle;
+    if (cfg.floatRight) host.dataset.floatRight = cfg.floatRight;
+    if (cfg.floatBottom) host.dataset.floatBottom = cfg.floatBottom;
     host.dataset.clientLog = cfg.clientLog ? '1' : '0';
     host.dataset.broadcastModal = cfg.broadcastModal ? '1' : '0';
     if (cfg.presets) host.dataset.presets = JSON.stringify(cfg.presets);
