@@ -37,17 +37,8 @@ export class WorshipRoom {
         });
         ws.send(JSON.stringify({ type: 'ack', name: msg.name }));
         this._pushMemberList();
-        // 让新加入的 client 也能看到当前被占用的设备列表
-        if (msg.role === 'client') {
-          const takenNames = this.state.getWebSockets()
-            .map(s => s.deserializeAttachment())
-            .filter(a => a?.role === 'client')
-            .map(a => a.name);
-          ws.send(JSON.stringify({ type: 'taken_devices', names: takenNames }));
-        }
         break;
       }
-
       case 'worship_msg': {
         // Member → Operator(s)
         const meta = ws.deserializeAttachment() || {};
@@ -60,45 +51,63 @@ export class WorshipRoom {
         }), ws, 'operator');
         break;
       }
-
       case 'member_chat': {
         const meta = ws.deserializeAttachment() || {};
-        // FIX: 原来用 break 跳出会静默丢消息；改为安全检查并提供回退
         const senderName = meta.name || msg.from || '?';
-        const senderRole = meta.role;
-
-        // 只有已注册为 client 的连接才能发群聊
-        // 用 senderRole 而不是直接 break，方便调试
-        if (senderRole && senderRole !== 'client') break;
-
-        const payload = JSON.stringify({
+        if (meta.role && meta.role !== 'client') break;
+        this._broadcast(JSON.stringify({
           type: 'member_chat',
           id:   msg.id || `member:${Date.now()}`,
           from: senderName,
           identityType: meta.identityType || 'other',
           text: msg.text,
           ts:   Date.now(),
-        });
-
-        // FIX: 广播给所有 client 和 operator，但跳过发送者自身（前端已本地追加）
-        this._broadcast(payload, ws, null, target =>
-          target?.role === 'client' || target?.role === 'operator'
-        );
+        }), ws, null, target => target?.role === 'client' || target?.role === 'operator');
         break;
       }
-
       case 'broadcast': {
         // Operator → all Members
-        const meta = ws.deserializeAttachment() || {};
-        if (meta.role !== 'operator') break; // 只有 operator 可以广播
+        const bcMeta = ws.deserializeAttachment() || {};
+        if (bcMeta.role !== 'operator') break;
         this._broadcast(JSON.stringify({
           type: 'broadcast',
           text: msg.text,
           ts:   Date.now(),
-        }), ws, 'client');
+        }), null, 'client');
         break;
       }
-
+      case 'kick': {
+        // Operator kicks a single member by name
+        const kickMeta = ws.deserializeAttachment() || {};
+        if (kickMeta.role !== 'operator') break;
+        const targetName = String(msg.name || '').trim();
+        if (!targetName) break;
+        for (const s of this.state.getWebSockets()) {
+          try {
+            const m = s.deserializeAttachment();
+            if (m?.name === targetName && m?.role === 'client') {
+              s.send(JSON.stringify({ type: 'kicked', reason: 'operator' }));
+              s.close(1000, 'kicked');
+            }
+          } catch {}
+        }
+        break;
+      }
+      case 'kick_all': {
+        // Operator kicks every member
+        const kaMeta = ws.deserializeAttachment() || {};
+        if (kaMeta.role !== 'operator') break;
+        for (const s of this.state.getWebSockets()) {
+          try {
+            const m = s.deserializeAttachment();
+            if (m?.role === 'client') {
+              s.send(JSON.stringify({ type: 'kicked', reason: 'operator' }));
+              s.close(1000, 'kicked');
+            }
+          } catch {}
+        }
+        break;
+      }
       case 'ping': {
         ws.send(JSON.stringify({ type: 'pong', ts: Date.now() }));
         break;
@@ -107,6 +116,7 @@ export class WorshipRoom {
   }
 
   async webSocketClose(ws) {
+    // Short delay so getWebSockets() reflects the closure
     await new Promise(r => setTimeout(r, 50));
     this._pushMemberList();
   }
@@ -117,17 +127,9 @@ export class WorshipRoom {
   }
 
   // ── Helpers ────────────────────────────────────────────────
-
-  /**
-   * @param {string}   payload     - JSON string to send
-   * @param {WebSocket|null} sender - 发送者 ws，跳过不转发（传 null 则不跳过任何人）
-   * @param {string|null}   targetRole - 限定目标 role（null 表示不限）
-   * @param {Function|null} predicate  - 额外过滤函数(meta) => bool
-   */
   _broadcast(payload, sender, targetRole, predicate) {
     for (const ws of this.state.getWebSockets()) {
       try {
-        // FIX: 跳过发送者自身，避免前端出现重复消息（前端虽有去重，但更干净）
         if (sender && ws === sender) continue;
         const meta = ws.deserializeAttachment();
         if (targetRole && meta?.role !== targetRole) continue;
@@ -146,17 +148,8 @@ export class WorshipRoom {
 
     const takenNames = members.map(m => m.name);
 
-    // 发给 operator：完整成员列表
-    this._broadcast(
-      JSON.stringify({ type: 'member_list', members }),
-      null, 'operator'
-    );
-
-    // FIX: 同时发给所有 client：设备占用列表，让选择界面实时更新
-    this._broadcast(
-      JSON.stringify({ type: 'taken_devices', names: takenNames }),
-      null, 'client'
-    );
+    this._broadcast(JSON.stringify({ type: 'member_list', members }), null, 'operator');
+    this._broadcast(JSON.stringify({ type: 'taken_devices', names: takenNames }), null, 'client');
   }
 }
 
