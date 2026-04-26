@@ -28,8 +28,8 @@
   --cf-font-body: 'Noto Sans SC', sans-serif;
   --cf-radius: 20px;
   --cf-radius-sm: 14px;
-  --cf-float-right: 34px;
-  --cf-float-bottom: 108px;
+  --cf-float-right: 42px;
+  --cf-float-bottom: 94px;
 }
 
 :where(#cecp-root, [data-cecp-root]),
@@ -93,7 +93,7 @@
   min-height: 0;
   overflow: visible;
   background: none;
-  pointer-events: auto;
+  pointer-events: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -111,8 +111,8 @@
 
 .cf-launcher {
   position: relative;
-  width: 68px;
-  height: 68px;
+  width: 60px;
+  height: 60px;
   border: 1px solid rgba(243, 210, 131, 0.18);
   border-radius: 50%;
   background:
@@ -245,6 +245,11 @@
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .cf-widget-close:hover {
@@ -749,6 +754,57 @@
   color: var(--cf-muted);
   font-size: 0.88rem;
   line-height: 1.65;
+}
+
+.cf-device-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(243, 210, 131, 0.18);
+  background: rgba(243, 210, 131, 0.08);
+}
+
+.cf-device-note.is-subtle {
+  border-color: var(--cf-border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.cf-device-note-copy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--cf-text);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.cf-device-note-pill {
+  padding: 6px 10px;
+}
+
+.cf-device-reset-btn {
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(243, 210, 131, 0.24);
+  background: rgba(243, 210, 131, 0.1);
+  color: #fff6de;
+  font-family: var(--cf-font-body);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.cf-device-reset-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(243, 210, 131, 0.16);
 }
 
 .cf-bcast {
@@ -1369,8 +1425,8 @@
   }
 
   :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
-    --cf-float-right: 18px;
-    --cf-float-bottom: 98px;
+    --cf-float-right: 24px;
+    --cf-float-bottom: 88px;
   }
 
   .cf-widget-panel {

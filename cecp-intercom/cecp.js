@@ -47,6 +47,7 @@
     var LAUNCHER_LABEL = String(ROOT.dataset.launcherLabel || '调音助手');
     var WIDGET_TITLE = String(ROOT.dataset.widgetTitle || 'CECP 敬拜团内通');
     var DEFAULT_PRESET = String(ROOT.dataset.defaultPreset || '').trim();
+    var PAGE_KEY = String(ROOT.dataset.pageKey || location.pathname || 'global').trim();
     var FLOAT_RIGHT = String(ROOT.dataset.floatRight || '').trim();
     var FLOAT_BOTTOM = String(ROOT.dataset.floatBottom || '').trim();
 
@@ -94,8 +95,8 @@
       broadcast: '📢'
     };
 
-    var STORAGE_KEY = 'cecp:intercom:last-role:' + WS_URL;
-    var CLIENT_LOG_PREFIX = 'cecp:intercom:client-log:' + WS_URL + ':';
+    var STORAGE_KEY = 'cecp:intercom:last-role:' + WS_URL + ':' + PAGE_KEY;
+    var CLIENT_LOG_PREFIX = 'cecp:intercom:client-log:' + WS_URL + ':' + PAGE_KEY + ':';
 
     var ws = null;
     var whoAmI = '';
@@ -108,6 +109,7 @@
     var widgetOpen = !IS_FLOATING;
     var operatorUnreadCount = 0;
     var isOnline = false;
+    var selectionSource = 'manual';
 
     ROOT.__cecpMounted = true;
     if (FLOAT_RIGHT) ROOT.style.setProperty('--cf-float-right', FLOAT_RIGHT);
@@ -165,6 +167,12 @@
     function rememberName(name) {
       try {
         localStorage.setItem(STORAGE_KEY, name);
+      } catch (err) {}
+    }
+
+    function forgetRememberedName() {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
       } catch (err) {}
     }
 
@@ -606,6 +614,22 @@
 
       ROOT.classList.remove('cf-mode-operator');
 
+      var defaultNotice = selectionSource === 'default'
+        ? [
+            '  <div class="cf-device-note">',
+            '    <div class="cf-device-note-copy">当前先用默认设备 ',
+            renderIdentityPill(whoAmI, 'cf-device-note-pill'),
+            ' ，如果不是你，请重新选择设备。</div>',
+            '    <button class="cf-device-reset-btn" id="cf-reset-device" type="button">重新选设备</button>',
+            '  </div>'
+          ].join('')
+        : [
+            '  <div class="cf-device-note is-subtle">',
+            '    <div class="cf-device-note-copy">如果这次不是这个设备，可以随时重新选择。</div>',
+            '    <button class="cf-device-reset-btn" id="cf-reset-device" type="button">更换设备</button>',
+            '  </div>'
+          ].join('');
+
       setStageHtml([
         '<div class="cf-app">',
         '  <div class="cf-header">',
@@ -621,6 +645,7 @@
         renderIdentityPill(whoAmI, 'cf-badge'),
         '    </div>',
         '    <div class="cf-client-note">点击下方快捷消息，音控台会立刻看到你的设备和需求；广播消息也会在这里留下记录。</div>',
+        defaultNotice,
         '  </div>',
         '  <div class="cf-section-label">快捷消息</div>',
         '  <div class="cf-cue-grid">',
@@ -666,6 +691,7 @@
       ROOT.querySelector('#cf-custom-input').addEventListener('keydown', function (event) {
         if (event.key === 'Enter') sendCustom();
       });
+      ROOT.querySelector('#cf-reset-device').addEventListener('click', resetDeviceSelection);
 
       var clearBtn = ROOT.querySelector('#cf-client-clear-btn');
       if (clearBtn) {
@@ -1051,6 +1077,22 @@
       }, 1800);
     }
 
+    function resetDeviceSelection() {
+      forgetRememberedName();
+      whoAmI = '';
+      selectionSource = 'manual';
+      clientLog = [];
+      stopPing();
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+      if (ws) {
+        try { ws.close(); } catch (err) {}
+        ws = null;
+      }
+      renderSetup();
+      if (IS_FLOATING) openWidget();
+    }
+
     if (MODE === 'operator') {
       renderOperator();
       connect('operator');
@@ -1059,6 +1101,9 @@
       if (!whoAmI && DEFAULT_PRESET && PRESETS.indexOf(DEFAULT_PRESET) >= 0) {
         whoAmI = DEFAULT_PRESET;
         rememberName(DEFAULT_PRESET);
+        selectionSource = 'default';
+      } else if (whoAmI) {
+        selectionSource = 'remembered';
       }
       if (whoAmI) {
         loadClientLog();
