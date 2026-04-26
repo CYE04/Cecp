@@ -1,10 +1,11 @@
 {
   "name": "cecp-ws",
-  "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
   },
   "devDependencies": {
-    "wrangler": "^3.0.0"
+    "wrangler": "^4.13.2"
   }
 }

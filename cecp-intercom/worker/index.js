@@ -6,121 +6,109 @@
 export class WorshipRoom {
   constructor(state, env) {
     this.state = state;
-    this.env = env;
+    this.env   = env;
   }
 
   async fetch(request) {
     const upgrade = request.headers.get('Upgrade');
     if (upgrade !== 'websocket') {
-      return new Response('Expected WebSocket', {
-        status: 426,
-        headers: corsHeaders()
-      });
+      return new Response('Expected WebSocket', { status: 426, headers: corsHeaders() });
     }
 
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
     this.state.acceptWebSocket(server);
 
-    return new Response(null, {
-      status: 101,
-      webSocket: client,
-      headers: corsHeaders()
-    });
+    return new Response(null, { status: 101, webSocket: client, headers: corsHeaders() });
   }
 
+  // ── Incoming messages ──────────────────────────────────────
   async webSocketMessage(ws, raw) {
     let msg;
-    try {
-      msg = JSON.parse(raw);
-    } catch (err) {
-      return;
-    }
+    try { msg = JSON.parse(raw); } catch { return; }
 
     switch (msg.type) {
-      case 'register':
-        ws.serializeAttachment({
-          name: msg.name,
-          role: msg.role,
-          ts: Date.now()
-        });
+      case 'register': {
+        ws.serializeAttachment({ name: msg.name, role: msg.role, ts: Date.now() });
         ws.send(JSON.stringify({ type: 'ack', name: msg.name }));
-        this.pushMemberList();
+        this._pushMemberList();
         break;
-
+      }
       case 'worship_msg': {
+        // Member → Operator(s)
         const meta = ws.deserializeAttachment() || {};
-        this.broadcast(JSON.stringify({
+        this._broadcast(JSON.stringify({
           type: 'worship_msg',
           from: meta.name || '?',
           kind: msg.kind,
           text: msg.text,
-          ts: Date.now()
+          ts:   Date.now(),
         }), 'operator');
         break;
       }
-
-      case 'broadcast':
-        this.broadcast(JSON.stringify({
+      case 'broadcast': {
+        // Operator → all Members
+        this._broadcast(JSON.stringify({
           type: 'broadcast',
           text: msg.text,
-          ts: Date.now()
+          ts:   Date.now(),
         }), 'client');
         break;
-
-      case 'ping':
+      }
+      case 'ping': {
         ws.send(JSON.stringify({ type: 'pong', ts: Date.now() }));
         break;
+      }
     }
   }
 
-  async webSocketClose() {
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    this.pushMemberList();
+  async webSocketClose(ws) {
+    // Short delay so getWebSockets() reflects the closure
+    await new Promise(r => setTimeout(r, 50));
+    this._pushMemberList();
   }
 
-  async webSocketError() {
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    this.pushMemberList();
+  async webSocketError(ws) {
+    await new Promise(r => setTimeout(r, 50));
+    this._pushMemberList();
   }
 
-  broadcast(payload, targetRole) {
+  // ── Helpers ────────────────────────────────────────────────
+  _broadcast(payload, targetRole) {
     for (const ws of this.state.getWebSockets()) {
       try {
         const meta = ws.deserializeAttachment();
-        if (!targetRole || meta?.role === targetRole) {
-          ws.send(payload);
-        }
-      } catch (err) {}
+        if (!targetRole || meta?.role === targetRole) ws.send(payload);
+      } catch {}
     }
   }
 
-  pushMemberList() {
+  _pushMemberList() {
     const members = this.state.getWebSockets()
-      .map((socket) => socket.deserializeAttachment())
-      .filter((meta) => meta?.role === 'client')
-      .map((meta) => ({ name: meta.name, ts: meta.ts }));
+      .map(ws => ws.deserializeAttachment())
+      .filter(a => a?.role === 'client')
+      .map(a => ({ name: a.name, ts: a.ts }));
 
-    this.broadcast(JSON.stringify({ type: 'member_list', members }), 'operator');
+    this._broadcast(JSON.stringify({ type: 'member_list', members }), 'operator');
   }
 }
 
+// ── Main Worker ──────────────────────────────────────────────
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders() });
     }
-
-    const id = env.ROOM.idFromName('cecp-main');
+    const id   = env.ROOM.idFromName('cecp-main');
     const room = env.ROOM.get(id);
     return room.fetch(request);
-  }
+  },
 };
 
 function corsHeaders() {
   return {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin':  '*',
     'Access-Control-Allow-Headers': 'Content-Type, Upgrade, Connection',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS'
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
   };
 }
