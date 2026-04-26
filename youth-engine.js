@@ -1811,8 +1811,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     function getImgs(){return Array.from(document.querySelectorAll('.sw-score img')).filter(function(i){return i&&i.src&&i.style.display!=='none';});}
     function syncNav(){var s=list.length>1;btnPrev.style.display=s?'':'none';btnNext.style.display=s?'':'none';}
     function showImg(i){if(!list.length)return;idx=(i+list.length)%list.length;lbImg.src=list[idx].src;}
-    function lbOpen(img){list=getImgs();idx=Math.max(0,list.indexOf(img));showImg(idx);syncNav();ov.classList.add('open');document.body.style.overflow='hidden';isOpen=true;}
-    function lbClose(){ov.classList.remove('open');document.body.style.overflow='';isOpen=false;}
+    function lbOpen(img){list=getImgs();idx=Math.max(0,list.indexOf(img));showImg(idx);syncNav();ov.classList.add('open');document.body.style.overflow='hidden';document.body.classList.add('ym-lb-open');isOpen=true;}
+    function lbClose(){ov.classList.remove('open');document.body.style.overflow='';document.body.classList.remove('ym-lb-open');isOpen=false;}
 
     btnClose.onclick=function(e){e.stopPropagation();lbClose();};
     btnPrev.onclick=function(e){e.stopPropagation();if(list.length>1)showImg(idx-1);};
@@ -2232,6 +2232,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       launcherLabel: String(source.launcherLabel || C.intercomLauncherLabel || '调音助手'),
       widgetTitle: String(source.widgetTitle || source.title || C.intercomTitle || 'CECP 敬拜团内通'),
       defaultPreset: String(source.defaultPreset || C.intercomDefaultPreset || '').trim(),
+      pageKey: String(source.pageKey || C.intercomPageKey || C.sheetName || C.week || '').trim(),
       floatRight: String(source.floatRight || C.intercomFloatRight || '').trim(),
       floatBottom: String(source.floatBottom || C.intercomFloatBottom || '').trim(),
       clientLog: source.clientLog !== false,
@@ -2258,6 +2259,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     host.dataset.launcherLabel = cfg.launcherLabel;
     host.dataset.widgetTitle = cfg.widgetTitle;
     if (cfg.defaultPreset) host.dataset.defaultPreset = cfg.defaultPreset;
+    if (cfg.pageKey) host.dataset.pageKey = cfg.pageKey;
     if (cfg.floatRight) host.dataset.floatRight = cfg.floatRight;
     if (cfg.floatBottom) host.dataset.floatBottom = cfg.floatBottom;
     host.dataset.clientLog = cfg.clientLog ? '1' : '0';
