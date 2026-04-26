@@ -1811,8 +1811,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     function getImgs(){return Array.from(document.querySelectorAll('.sw-score img')).filter(function(i){return i&&i.src&&i.style.display!=='none';});}
     function syncNav(){var s=list.length>1;btnPrev.style.display=s?'':'none';btnNext.style.display=s?'':'none';}
     function showImg(i){if(!list.length)return;idx=(i+list.length)%list.length;lbImg.src=list[idx].src;}
-    function lbOpen(img){list=getImgs();idx=Math.max(0,list.indexOf(img));showImg(idx);syncNav();ov.classList.add('open');document.body.style.overflow='hidden';document.body.classList.add('ym-lb-open');isOpen=true;}
-    function lbClose(){ov.classList.remove('open');document.body.style.overflow='';document.body.classList.remove('ym-lb-open');isOpen=false;}
+    function lbOpen(img){list=getImgs();idx=Math.max(0,list.indexOf(img));showImg(idx);syncNav();ov.classList.add('open');document.body.style.overflow='hidden';isOpen=true;}
+    function lbClose(){ov.classList.remove('open');document.body.style.overflow='';isOpen=false;}
 
     btnClose.onclick=function(e){e.stopPropagation();lbClose();};
     btnPrev.onclick=function(e){e.stopPropagation();if(list.length>1)showImg(idx-1);};
@@ -2167,124 +2167,6 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     ROOT.appendChild(frag);
   }
 
-  /* ══════════════ Intercom mount ══════════════ */
-  var _intercomAssetsPromise = null;
-
-  function ensureExternalStyleOnce(id, href) {
-    if (!href || document.getElementById(id)) return;
-    var link = document.createElement('link');
-    link.id = id;
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  }
-
-  function ensureIntercomAssets() {
-    ensureExternalStyleOnce('ym-cecp-intercom-css', YM_BASE + '/cecp-intercom/cecp.css');
-
-    if (window.CECPIntercom && typeof window.CECPIntercom.mount === 'function') {
-      return Promise.resolve(window.CECPIntercom);
-    }
-    if (_intercomAssetsPromise) return _intercomAssetsPromise;
-
-    _intercomAssetsPromise = new Promise(function(resolve, reject) {
-      var existing = document.querySelector('script[data-ym-intercom-script="1"]');
-      if (existing) {
-        existing.addEventListener('load', function() {
-          resolve(window.CECPIntercom || null);
-        }, { once: true });
-        existing.addEventListener('error', function() {
-          reject(new Error('内通脚本加载失败'));
-        }, { once: true });
-        return;
-      }
-
-      var script = document.createElement('script');
-      script.src = YM_BASE + '/cecp-intercom/cecp.js';
-      script.async = true;
-      script.setAttribute('data-ym-intercom-script', '1');
-      script.onload = function() {
-        resolve(window.CECPIntercom || null);
-      };
-      script.onerror = function() {
-        reject(new Error('内通脚本加载失败'));
-      };
-      document.head.appendChild(script);
-    });
-
-    return _intercomAssetsPromise;
-  }
-
-  function getIntercomConfig() {
-    if (!C || C.intercom === false) return null;
-
-    var source = C.intercom && typeof C.intercom === 'object' ? C.intercom : {};
-    if (source.enabled === false) return null;
-
-    var wsUrl = String(source.wsUrl || C.intercomWsUrl || '').trim();
-    if (!wsUrl) return null;
-
-    return {
-      wsUrl: wsUrl,
-      mode: String(source.mode || C.intercomMode || 'client').trim() || 'client',
-      layout: String(source.layout || C.intercomLayout || 'floating').trim() || 'floating',
-      launcherIcon: String(source.launcherIcon || C.intercomLauncherIcon || '🎧'),
-      launcherLabel: String(source.launcherLabel || C.intercomLauncherLabel || '调音助手'),
-      widgetTitle: String(source.widgetTitle || source.title || C.intercomTitle || 'CECP 敬拜团内通'),
-      defaultPreset: String(source.defaultPreset || C.intercomDefaultPreset || '').trim(),
-      pageKey: String(source.pageKey || C.intercomPageKey || C.sheetName || C.week || '').trim(),
-      floatRight: String(source.floatRight || C.intercomFloatRight || '').trim(),
-      floatBottom: String(source.floatBottom || C.intercomFloatBottom || '').trim(),
-      clientLog: source.clientLog !== false,
-      broadcastModal: source.broadcastModal !== false,
-      presets: Array.isArray(source.presets) ? source.presets : null,
-      cues: Array.isArray(source.cues) ? source.cues : null,
-      broadcastPresets: Array.isArray(source.broadcastPresets) ? source.broadcastPresets : null
-    };
-  }
-
-  function mountYouthIntercom() {
-    var cfg = getIntercomConfig();
-    var oldHost = document.querySelector('[data-ym-intercom-host="1"]');
-    if (oldHost && oldHost.__cecpApi && typeof oldHost.__cecpApi.destroy === 'function') {
-      try { oldHost.__cecpApi.destroy(); } catch (err) {}
-    }
-    if (oldHost && oldHost.parentNode) oldHost.parentNode.removeChild(oldHost);
-    if (!cfg) return;
-
-    var host = document.createElement('div');
-    host.setAttribute('data-ym-intercom-host', '1');
-    host.setAttribute('data-cecp-root', '1');
-    host.dataset.wsUrl = cfg.wsUrl;
-    host.dataset.mode = cfg.mode;
-    host.dataset.layout = cfg.layout;
-    host.dataset.launcherIcon = cfg.launcherIcon;
-    host.dataset.launcherLabel = cfg.launcherLabel;
-    host.dataset.widgetTitle = cfg.widgetTitle;
-    if (cfg.defaultPreset) host.dataset.defaultPreset = cfg.defaultPreset;
-    if (cfg.pageKey) host.dataset.pageKey = cfg.pageKey;
-    if (cfg.floatRight) host.dataset.floatRight = cfg.floatRight;
-    if (cfg.floatBottom) host.dataset.floatBottom = cfg.floatBottom;
-    host.dataset.clientLog = cfg.clientLog ? '1' : '0';
-    host.dataset.broadcastModal = cfg.broadcastModal ? '1' : '0';
-    if (cfg.presets) host.dataset.presets = JSON.stringify(cfg.presets);
-    if (cfg.cues) host.dataset.cues = JSON.stringify(cfg.cues);
-    if (cfg.broadcastPresets) host.dataset.broadcastPresets = JSON.stringify(cfg.broadcastPresets);
-    host.__cecpAnchorEl = ROOT.querySelector('.ym-hero')
-      || ROOT.querySelector('.ym-flow')
-      || ROOT.querySelector('.ym-block')
-      || ROOT;
-    document.body.appendChild(host);
-
-    ensureIntercomAssets()
-      .then(function(api) {
-        if (api && typeof api.mount === 'function') api.mount(host);
-      })
-      .catch(function(err) {
-        console.error('[YM intercom]', err);
-      });
-  }
-
   /* ══════════════ 核心运行函数 ══════════════ */
   function _run(cfg, root) {
     C = cfg;
@@ -2292,7 +2174,6 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     buildModal();
     buildPage();
     initLightbox();
-    mountYouthIntercom();
   }
 
   /* ══════════════ 对外 API（在 IIFE 内注册，可访问内部函数）══════════════ */
