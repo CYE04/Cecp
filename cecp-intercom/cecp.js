@@ -123,10 +123,22 @@
     var docKeyHandler = null;
     var fullscreenChangeHandler = null;
     var destroyed = false;
+    var pageShellApplied = false;
 
     ROOT.__cecpMounted = true;
     if (FLOAT_RIGHT) ROOT.style.setProperty('--cf-float-right', FLOAT_RIGHT);
     if (FLOAT_BOTTOM) ROOT.style.setProperty('--cf-float-bottom', FLOAT_BOTTOM);
+
+    function syncPageShell(active) {
+      if (IS_FLOATING) return;
+      pageShellApplied = !!active;
+      var rootEl = document.documentElement;
+      var bodyEl = document.body;
+      if (rootEl) rootEl.classList.toggle('cf-page-shell', !!active);
+      if (bodyEl) bodyEl.classList.toggle('cf-page-shell', !!active);
+    }
+
+    syncPageShell(true);
 
     function escapeHtml(value) {
       return String(value == null ? '' : value)
@@ -1420,6 +1432,11 @@
       }
       var rootEl = document.documentElement;
       var bodyEl = document.body;
+      if (pageShellApplied) {
+        if (rootEl) rootEl.classList.remove('cf-page-shell');
+        if (bodyEl) bodyEl.classList.remove('cf-page-shell');
+        pageShellApplied = false;
+      }
       if (rootEl) rootEl.classList.remove('cf-intercom-open');
       if (bodyEl) bodyEl.classList.remove('cf-intercom-open');
       if (ws) {
