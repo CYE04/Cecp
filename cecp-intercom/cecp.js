@@ -111,6 +111,7 @@
     var memberChat = [];
     var flashTimers = {};
     var memberCount = 0;
+    var takenDevices = [];   // 已被占用的设备名列表（来自服务端 taken_devices 消息）
     var widgetOpen = !IS_FLOATING;
     var operatorUnreadCount = 0;
     var isOnline = false;
@@ -309,16 +310,22 @@
       ].join('');
     }
 
-    function renderPresetButton(preset, isSelected) {
+    function renderPresetButton(preset, isSelected, isTaken) {
       var meta = getIdentityMeta(preset);
+      var cls = 'cf-preset-btn cf-tone-' + meta.tone;
+      if (isSelected) cls += ' sel';
+      if (isTaken)    cls += ' taken';
       return [
-        '<button class="cf-preset-btn cf-tone-', meta.tone, isSelected ? ' sel' : '', '" data-name="', escapeHtml(meta.displayName), '">',
+        '<button class="', cls, '"',
+        isTaken ? ' disabled aria-disabled="true"' : '',
+        ' data-name="', escapeHtml(meta.displayName), '">',
         '  <span class="cf-preset-led"></span>',
         '  <span class="cf-preset-mic">', escapeHtml(meta.icon), '</span>',
         '  <span class="cf-preset-copy">',
         '    <span class="cf-preset-name">', escapeHtml(meta.title), '</span>',
-        '    <span class="cf-preset-sub">', escapeHtml(meta.subtitle), '</span>',
+        '    <span class="cf-preset-sub">', isTaken ? '已有人使用' : escapeHtml(meta.subtitle), '</span>',
         '  </span>',
+        isTaken ? '  <span class="cf-preset-taken-badge">占用中</span>' : '',
         '</button>'
       ].join('');
     }
@@ -769,7 +776,8 @@
         '  <p class="cf-setup-sub">话筒和乐器都会同步显示到音控台，方便现场快速识别。</p>',
         '  <div class="cf-preset-grid">',
         PRESETS.map(function (preset) {
-          return renderPresetButton(preset, preset === selected);
+          var taken = takenDevices.indexOf(preset) >= 0 && preset !== whoAmI;
+          return renderPresetButton(preset, preset === selected, taken);
         }).join(''),
         '  </div>',
         '  <div class="cf-selected" id="cf-selected"></div>',
@@ -781,6 +789,7 @@
 
       ROOT.querySelectorAll('.cf-preset-btn').forEach(function (button) {
         button.addEventListener('click', function () {
+          if (button.disabled || button.classList.contains('taken')) return;
           ROOT.querySelectorAll('.cf-preset-btn').forEach(function (other) {
             other.classList.remove('sel');
           });
@@ -1270,6 +1279,40 @@
     function handleIncoming(msg, role) {
       if (msg.type === 'pong' || msg.type === 'ack') return;
 
+      /* ── 设备占用状态（客户端和调音台都处理）── */
+      if (msg.type === 'taken_devices') {
+        takenDevices = Array.isArray(msg.names) ? msg.names : [];
+        /* 如果当前在选择界面，刷新按钮状态 */
+        var grid = ROOT.querySelector('.cf-preset-grid');
+        if (grid) {
+          grid.innerHTML = PRESETS.map(function (preset) {
+            var isSelected = preset === (ROOT.querySelector('.cf-preset-btn.sel') && ROOT.querySelector('.cf-preset-btn.sel').dataset.name);
+            var taken = takenDevices.indexOf(preset) >= 0 && preset !== whoAmI;
+            return renderPresetButton(preset, isSelected, taken);
+          }).join('');
+          ROOT.querySelectorAll('.cf-preset-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+              if (button.disabled || button.classList.contains('taken')) return;
+              ROOT.querySelectorAll('.cf-preset-btn').forEach(function (other) { other.classList.remove('sel'); });
+              button.classList.add('sel');
+              var selPreview = button.dataset.name || '';
+              updateSelectedPreview(selPreview);
+            });
+          });
+        }
+        /* 同时更新调音台的成员列表（如果已有数据）*/
+        if (role === 'operator' && msg.members) renderMembers(msg.members);
+        return;
+      }
+
+      /* 调音台的 member_list 也顺带更新 takenDevices */
+      if (msg.type === 'member_list') {
+        var members = msg.members || [];
+        takenDevices = members.map(function (m) { return m.name; });
+        renderMembers(members);
+        return;
+      }
+
       if (role === 'client' && msg.type === 'broadcast') {
         appendClientLog({
           id: msg.id || nowId('broadcast'),
@@ -1317,9 +1360,7 @@
         return;
       }
 
-      if (role === 'operator' && msg.type === 'member_list') {
-        renderMembers(msg.members || []);
-      }
+      /* member_list is now handled above for all roles */
     }
 
     function wsReady() {

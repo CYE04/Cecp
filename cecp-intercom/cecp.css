@@ -2050,3 +2050,51 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   }
 
 } /* end @media (prefers-color-scheme: light) */
+
+/* ============================================================
+   ▌ CECP — 设备占用状态样式
+   ============================================================ */
+
+.cf-preset-btn.taken {
+  opacity: 0.44;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.5);
+  border-style: dashed;
+}
+
+.cf-preset-btn.taken .cf-preset-led {
+  background: var(--cf-muted-2);
+  box-shadow: none;
+}
+
+.cf-preset-btn.taken .cf-preset-sub {
+  color: var(--cf-red);
+  opacity: 0.8;
+}
+
+.cf-preset-taken-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 106, 106, 0.18);
+  border: 1px solid rgba(255, 106, 106, 0.3);
+  color: var(--cf-red);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  z-index: 2;
+}
+
+@media (prefers-color-scheme: light) {
+  .cf-preset-btn.taken {
+    border-color: rgba(150, 150, 150, 0.3);
+  }
+  .cf-preset-taken-badge {
+    background: rgba(191, 46, 31, 0.10);
+    border-color: rgba(191, 46, 31, 0.24);
+    color: var(--cf-red);
+  }
+}
