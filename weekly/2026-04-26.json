@@ -10,6 +10,7 @@
     "mode": "client",
     "layout": "floating",
     "floatBottom": "120px"
+    "defaultPreset": "🎤 蓝色话筒"
   },
   "pptUrl": null,
   "pptLabel": null,
