@@ -1309,6 +1309,31 @@
     function handleIncoming(msg, role) {
       if (msg.type === 'pong' || msg.type === 'ack') return;
 
+      /* ── 设备已被占用（注册被服务端拒绝）── */
+      if (msg.type === 'name_taken') {
+        /* 停止重连，清除身份，回到选择界面让用户换一个 */
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+        if (ws) {
+          try { ws.close(); } catch (err) {}
+          ws = null;
+        }
+        var takenName = msg.name || whoAmI;
+        forgetRememberedName();
+        whoAmI = '';
+        selectionSource = 'manual';
+        if (IS_FLOATING) {
+          renderSetup();
+          openWidget();
+        } else {
+          renderSetup();
+        }
+        setTimeout(function () {
+          alert('「' + takenName + '」已有人在使用，请选择其他设备。');
+        }, 100);
+        return;
+      }
+
       /* ── 被踢出 ── */
       if (msg.type === 'kicked') {
         /* 停止重连，清除身份，回到选择界面 */
