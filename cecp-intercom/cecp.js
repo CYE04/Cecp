@@ -50,6 +50,7 @@
     var PAGE_KEY = String(ROOT.dataset.pageKey || location.pathname || 'global').trim();
     var FLOAT_RIGHT = String(ROOT.dataset.floatRight || '').trim();
     var FLOAT_BOTTOM = String(ROOT.dataset.floatBottom || '').trim();
+    var ANCHOR_EL = ROOT.__cecpAnchorEl || null;
 
     var DEFAULT_PRESETS = [
       '🎤 橘色话筒',
@@ -110,6 +111,14 @@
     var operatorUnreadCount = 0;
     var isOnline = false;
     var selectionSource = 'manual';
+    var geomBound = false;
+    var geomRaf = 0;
+    var geomObserver = null;
+    var geometryHandler = null;
+    var viewportGeometryHandler = null;
+    var docKeyHandler = null;
+    var fullscreenChangeHandler = null;
+    var destroyed = false;
 
     ROOT.__cecpMounted = true;
     if (FLOAT_RIGHT) ROOT.style.setProperty('--cf-float-right', FLOAT_RIGHT);
@@ -461,16 +470,102 @@
         });
       }
 
-      document.addEventListener('keydown', function (event) {
-        if (event.key !== 'Escape') return;
-        if (IS_FLOATING && widgetOpen) {
-          closeWidget();
-        }
-      });
+      if (!docKeyHandler) {
+        docKeyHandler = function (event) {
+          if (event.key !== 'Escape') return;
+          if (IS_FLOATING && widgetOpen) {
+            closeWidget();
+          }
+        };
+        document.addEventListener('keydown', docKeyHandler);
+      }
 
       syncWidgetState();
       syncLauncherBadge();
       syncBroadcastPopup();
+      bindGeometry();
+      scheduleFloatingGeometry();
+    }
+
+    function parsePx(value, fallback) {
+      var n = parseFloat(String(value || '').replace('px', '').trim());
+      return isFinite(n) ? n : fallback;
+    }
+
+    function clamp(min, value, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function scheduleFloatingGeometry() {
+      if (!IS_FLOATING || destroyed || geomRaf) return;
+      var defer = window.requestAnimationFrame || function (cb) {
+        return window.setTimeout(cb, 16);
+      };
+      geomRaf = defer(function () {
+        geomRaf = 0;
+        updateFloatingGeometry();
+      });
+    }
+
+    function bindGeometry() {
+      if (!IS_FLOATING || geomBound) return;
+      geomBound = true;
+      geometryHandler = scheduleFloatingGeometry;
+      window.addEventListener('resize', geometryHandler, { passive: true });
+      window.addEventListener('orientationchange', geometryHandler, { passive: true });
+      if (window.visualViewport) {
+        viewportGeometryHandler = scheduleFloatingGeometry;
+        window.visualViewport.addEventListener('resize', viewportGeometryHandler, { passive: true });
+      }
+      if (window.ResizeObserver && ANCHOR_EL && ANCHOR_EL.nodeType === 1) {
+        geomObserver = new ResizeObserver(function () {
+          scheduleFloatingGeometry();
+        });
+        geomObserver.observe(ANCHOR_EL);
+      }
+    }
+
+    function updateFloatingGeometry() {
+      if (!IS_FLOATING || destroyed) return;
+      var vv = window.visualViewport;
+      var vw = Math.round(vv && vv.width ? vv.width : window.innerWidth);
+      var vh = Math.round(vv && vv.height ? vv.height : window.innerHeight);
+      var isTiny = vw <= 390;
+      var isCompact = vw <= 560 || vh <= 720;
+      var baseRight = parsePx(FLOAT_RIGHT, isTiny ? 16 : (vw <= 720 ? 20 : 34));
+      var baseBottom = parsePx(FLOAT_BOTTOM, isTiny ? 76 : (vw <= 560 ? 84 : 90));
+      var extraRight = 0;
+
+      if (vw <= 560) {
+        baseRight = Math.max(isTiny ? 14 : 18, baseRight - 4);
+        baseBottom = Math.max(isTiny ? 70 : 78, baseBottom - 8);
+      }
+
+      if (ANCHOR_EL && ANCHOR_EL.getBoundingClientRect) {
+        var rect = ANCHOR_EL.getBoundingClientRect();
+        if (rect && rect.width > 0 && isFinite(rect.right)) {
+          extraRight = Math.max(0, vw - rect.right);
+        }
+      }
+
+      var rightInset = vw >= 1200 ? 10 : (vw >= 900 ? 6 : 0);
+      var right = Math.round(baseRight + extraRight + rightInset);
+      var bottom = Math.round(baseBottom);
+      var launcher = isTiny ? 48 : (vw <= 560 ? 52 : (vw <= 900 ? 54 : 58));
+      var availableWidth = Math.max(240, vw - right - 14);
+      var desiredWidth = isTiny ? (vw - 10) : (vw <= 560 ? vw - 16 : 372);
+      var minWidth = isTiny ? 240 : 272;
+      var panelWidth = Math.round(Math.min(desiredWidth, availableWidth));
+      panelWidth = Math.max(Math.min(minWidth, availableWidth), panelWidth);
+      var desiredHeight = vw <= 560 ? vh - (isTiny ? 20 : 24) : vh - 42;
+      var maxHeight = Math.round(Math.max(300, Math.min(vw <= 560 ? 560 : 720, desiredHeight)));
+
+      ROOT.style.setProperty('--cf-float-right-auto', right + 'px');
+      ROOT.style.setProperty('--cf-float-bottom-auto', bottom + 'px');
+      ROOT.style.setProperty('--cf-launcher-size', launcher + 'px');
+      ROOT.style.setProperty('--cf-panel-width', panelWidth + 'px');
+      ROOT.style.setProperty('--cf-panel-max-height', maxHeight + 'px');
+      ROOT.classList.toggle('cf-compact', isCompact);
     }
 
     function getStageEl() {
@@ -494,6 +589,7 @@
     function openWidget() {
       if (!IS_FLOATING) return;
       ensureStageReadyForOpen();
+      scheduleFloatingGeometry();
       widgetOpen = true;
       operatorUnreadCount = 0;
       syncWidgetState();
@@ -607,6 +703,8 @@
         connect('client');
         if (IS_FLOATING) openWidget();
       });
+
+      scheduleFloatingGeometry();
     }
 
     function renderClient() {
@@ -708,6 +806,7 @@
       syncBroadcastPopup();
       syncLauncherBadge();
       setStatus(isOnline);
+      scheduleFloatingGeometry();
     }
 
     function renderOperator() {
@@ -796,13 +895,17 @@
       var fullscreenBtn = ROOT.querySelector('#cf-fullscreen-btn');
       if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', toggleFullscreen);
-        document.addEventListener('fullscreenchange', syncFullscreenButton);
+        if (!fullscreenChangeHandler) {
+          fullscreenChangeHandler = syncFullscreenButton;
+          document.addEventListener('fullscreenchange', fullscreenChangeHandler);
+        }
         syncFullscreenButton();
       }
 
       renderOperatorLog();
       updateOperatorStats();
       setStatus(isOnline);
+      scheduleFloatingGeometry();
     }
 
     function renderClientLog() {
@@ -937,6 +1040,7 @@
     }
 
     function connect(role) {
+      if (destroyed) return;
       clearTimeout(reconnectTimer);
       if (ws) {
         try { ws.close(); } catch (err) {}
@@ -945,6 +1049,7 @@
       ws = new WebSocket(WS_URL);
 
       ws.addEventListener('open', function () {
+        if (destroyed) return;
         setStatus(true);
         startPing();
         ws.send(JSON.stringify({
@@ -955,6 +1060,7 @@
       });
 
       ws.addEventListener('close', function () {
+        if (destroyed) return;
         setStatus(false);
         stopPing();
         reconnectTimer = setTimeout(function () {
@@ -967,6 +1073,7 @@
       });
 
       ws.addEventListener('message', function (event) {
+        if (destroyed) return;
         var msg;
         try {
           msg = JSON.parse(event.data);
@@ -1093,6 +1200,46 @@
       if (IS_FLOATING) openWidget();
     }
 
+    function destroy() {
+      destroyed = true;
+      stopPing();
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+      if (geomRaf) {
+        if (window.cancelAnimationFrame) window.cancelAnimationFrame(geomRaf);
+        else clearTimeout(geomRaf);
+        geomRaf = 0;
+      }
+      if (geometryHandler) {
+        window.removeEventListener('resize', geometryHandler);
+        window.removeEventListener('orientationchange', geometryHandler);
+        geometryHandler = null;
+      }
+      if (viewportGeometryHandler && window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', viewportGeometryHandler);
+        viewportGeometryHandler = null;
+      }
+      if (geomObserver) {
+        try { geomObserver.disconnect(); } catch (err) {}
+        geomObserver = null;
+      }
+      if (docKeyHandler) {
+        document.removeEventListener('keydown', docKeyHandler);
+        docKeyHandler = null;
+      }
+      if (fullscreenChangeHandler) {
+        document.removeEventListener('fullscreenchange', fullscreenChangeHandler);
+        fullscreenChangeHandler = null;
+      }
+      if (ws) {
+        try { ws.close(); } catch (err) {}
+        ws = null;
+      }
+      ROOT.__cecpChromeReady = false;
+      ROOT.__cecpMounted = false;
+      ROOT.__cecpApi = null;
+    }
+
     if (MODE === 'operator') {
       renderOperator();
       connect('operator');
@@ -1119,7 +1266,9 @@
     ROOT.__cecpApi = {
       mount: mount,
       open: openWidget,
-      close: closeWidget
+      close: closeWidget,
+      refreshLayout: scheduleFloatingGeometry,
+      destroy: destroy
     };
 
     return ROOT.__cecpApi;

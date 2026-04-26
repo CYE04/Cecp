@@ -30,6 +30,11 @@
   --cf-radius-sm: 14px;
   --cf-float-right: 42px;
   --cf-float-bottom: 94px;
+  --cf-float-right-auto: var(--cf-float-right);
+  --cf-float-bottom-auto: var(--cf-float-bottom);
+  --cf-launcher-size: 58px;
+  --cf-panel-width: 360px;
+  --cf-panel-max-height: 720px;
 }
 
 :where(#cecp-root, [data-cecp-root]),
@@ -86,16 +91,18 @@
 
 :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   position: fixed;
-  right: var(--cf-float-right);
-  bottom: var(--cf-float-bottom);
+  right: var(--cf-float-right-auto, var(--cf-float-right));
+  bottom: var(--cf-float-bottom-auto, var(--cf-float-bottom));
   z-index: 2147483640;
-  width: auto;
-  min-height: 0;
+  width: var(--cf-launcher-size, 58px);
+  min-width: var(--cf-launcher-size, 58px);
+  min-height: var(--cf-launcher-size, 58px);
   overflow: visible;
   background: none;
   pointer-events: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  touch-action: auto;
+  isolation: isolate;
 }
 
 .cf-stage {
@@ -106,20 +113,22 @@
 
 .cf-widget-shell {
   position: relative;
+  width: var(--cf-launcher-size, 58px);
+  min-height: var(--cf-launcher-size, 58px);
   pointer-events: auto;
 }
 
 .cf-launcher {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: var(--cf-launcher-size, 58px);
+  height: var(--cf-launcher-size, 58px);
   border: 1px solid rgba(243, 210, 131, 0.18);
   border-radius: 50%;
   background:
     radial-gradient(circle at 30% 25%, rgba(255, 227, 161, 0.3), transparent 36%),
     linear-gradient(180deg, rgba(14, 20, 30, 0.98), rgba(7, 10, 16, 0.96));
   color: #fff5d8;
-  font-size: 1.55rem;
+  font-size: max(1.1rem, calc(var(--cf-launcher-size, 58px) * 0.42));
   cursor: pointer;
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(255, 255, 255, 0.03);
   pointer-events: auto;
@@ -144,15 +153,15 @@
 
 .cf-launcher-badge {
   position: absolute;
-  top: -4px;
-  right: -2px;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 7px;
+  top: -3px;
+  right: -1px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
   border-radius: 999px;
   background: linear-gradient(180deg, #ff8b8b, #e33d3d);
   color: #fff;
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -166,16 +175,16 @@
   opacity: 0;
   pointer-events: none;
   background: rgba(5, 8, 12, 0.26);
-  backdrop-filter: blur(3px);
   transition: opacity 0.18s ease;
 }
 
 .cf-widget-panel {
   position: absolute;
   right: 0;
-  bottom: 76px;
-  width: min(390px, calc(100vw - 24px));
-  max-height: min(78vh, 760px);
+  bottom: calc(var(--cf-launcher-size, 58px) + 12px);
+  width: min(var(--cf-panel-width, 360px), calc(100vw - 12px));
+  max-width: calc(100vw - 12px);
+  max-height: min(var(--cf-panel-max-height, 720px), calc(100vh - 28px));
   border: 1px solid rgba(157, 172, 209, 0.16);
   border-radius: 28px;
   overflow: hidden;
@@ -262,6 +271,8 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .cf-tone-default {
@@ -1425,14 +1436,13 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   }
 
   :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
-    --cf-float-right: 24px;
-    --cf-float-bottom: 88px;
+    --cf-float-right: 18px;
+    --cf-float-bottom: 80px;
   }
 
   .cf-widget-panel {
-    width: min(390px, calc(100vw - 12px));
-    bottom: 72px;
-    max-height: min(82vh, 760px);
+    width: min(var(--cf-panel-width, calc(100vw - 10px)), calc(100vw - 10px));
+    max-height: min(var(--cf-panel-max-height, 560px), calc(100vh - 20px));
   }
 
   .cf-bcast-popup {
