@@ -2245,7 +2245,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   function mountYouthIntercom() {
     var cfg = getIntercomConfig();
-    var oldHost = ROOT.querySelector('[data-ym-intercom-host="1"]');
+    var oldHost = document.querySelector('[data-ym-intercom-host="1"]');
+    if (oldHost && oldHost.__cecpApi && typeof oldHost.__cecpApi.destroy === 'function') {
+      try { oldHost.__cecpApi.destroy(); } catch (err) {}
+    }
     if (oldHost && oldHost.parentNode) oldHost.parentNode.removeChild(oldHost);
     if (!cfg) return;
 
@@ -2267,7 +2270,11 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     if (cfg.presets) host.dataset.presets = JSON.stringify(cfg.presets);
     if (cfg.cues) host.dataset.cues = JSON.stringify(cfg.cues);
     if (cfg.broadcastPresets) host.dataset.broadcastPresets = JSON.stringify(cfg.broadcastPresets);
-    ROOT.appendChild(host);
+    host.__cecpAnchorEl = ROOT.querySelector('.ym-hero')
+      || ROOT.querySelector('.ym-flow')
+      || ROOT.querySelector('.ym-block')
+      || ROOT;
+    document.body.appendChild(host);
 
     ensureIntercomAssets()
       .then(function(api) {
