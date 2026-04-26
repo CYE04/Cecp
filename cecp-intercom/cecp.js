@@ -7,7 +7,7 @@
      </div>
      <script src="cecp.js"></script>
    Optional:
-     data-presets='["🎤 无线1号","🎹 琴"]'
+     data-presets='["🎤 橘色话筒","🎤 蓝色话筒"]'
      data-cues='[{"kind":"self_up","icon":"🔊","label":"多点自己","desc":"自己声音太小听不清"}]'
      data-broadcast-presets='["排练开始","下一首"]'
    ============================================================ */
@@ -29,9 +29,15 @@
     || 'client';
 
   var DEFAULT_PRESETS = [
-    '🎤 无线1号', '🎤 无线2号', '🎤 无线3号',
-    '🎤 无线4号', '🎤 无线5号',
-    '🎹 琴', '🥁 鼓', '🎸 吉他', '🎸 贝斯'
+    '🎤 橘色话筒',
+    '🎤 绿色话筒',
+    '🎤 紫色话筒',
+    '🎤 黄色话筒',
+    '🎤 红色话筒',
+    '🎤 蓝色话筒',
+    '🎤 白色话筒',
+    '🎤 黑色话筒',
+    '🎤 棕色话筒'
   ];
 
   var DEFAULT_CUES = [
@@ -67,6 +73,77 @@
   var pingTimer = null;
   var msgLog = [];
   var flashTimers = {};
+
+  function stripMicPrefix(value) {
+    return String(value || '')
+      .replace(/^🎤\s*/u, '')
+      .trim();
+  }
+
+  function detectIdentityTone(name) {
+    var text = stripMicPrefix(name);
+    if (/橘/.test(text)) return 'orange';
+    if (/绿/.test(text)) return 'green';
+    if (/紫/.test(text)) return 'purple';
+    if (/黄/.test(text)) return 'yellow';
+    if (/红/.test(text)) return 'red';
+    if (/蓝/.test(text)) return 'blue';
+    if (/白/.test(text)) return 'white';
+    if (/黑/.test(text)) return 'black';
+    if (/棕|褐|咖/.test(text)) return 'brown';
+    return 'default';
+  }
+
+  function getIdentityMeta(name) {
+    var displayName = String(name || '').trim();
+    var title = stripMicPrefix(displayName) || displayName;
+    return {
+      displayName: displayName,
+      title: title,
+      tone: detectIdentityTone(displayName)
+    };
+  }
+
+  function renderIdentityPill(name, extraClass) {
+    var meta = getIdentityMeta(name);
+    return [
+      '<span class="cf-identity-pill cf-tone-', meta.tone, extraClass ? ' ' + extraClass : '', '">',
+      '  <span class="cf-identity-swatch"></span>',
+      '  <span class="cf-identity-text">', escapeHtml(meta.title), '</span>',
+      '</span>'
+    ].join('');
+  }
+
+  function renderPresetButton(preset, isSelected) {
+    var meta = getIdentityMeta(preset);
+    return [
+      '<button class="cf-preset-btn cf-tone-', meta.tone, isSelected ? ' sel' : '', '" data-name="', escapeHtml(meta.displayName), '">',
+      '  <span class="cf-preset-led"></span>',
+      '  <span class="cf-preset-mic">🎤</span>',
+      '  <span class="cf-preset-copy">',
+      '    <span class="cf-preset-name">', escapeHtml(meta.title), '</span>',
+      '    <span class="cf-preset-sub">现场无线话筒</span>',
+      '  </span>',
+      '</button>'
+    ].join('');
+  }
+
+  function updateSelectedPreview(name) {
+    var selectedEl = ROOT.querySelector('#cf-selected');
+    if (!selectedEl) return;
+
+    if (!name) {
+      selectedEl.classList.remove('show');
+      selectedEl.innerHTML = '';
+      return;
+    }
+
+    selectedEl.classList.add('show');
+    selectedEl.innerHTML = [
+      '<span class="cf-selected-label">当前选择</span>',
+      renderIdentityPill(name, 'cf-selected-pill')
+    ].join('');
+  }
 
   function escapeHtml(value) {
     return String(value == null ? '' : value)
@@ -138,17 +215,20 @@
 
     ROOT.innerHTML = [
       '<div class="cf-setup-card">',
-      '  <h2>请选择你的身份</h2>',
+      '  <div class="cf-setup-kicker">WORSHIP COMMS</div>',
+      '  <h2>选择你手上的话筒</h2>',
+      '  <p class="cf-setup-sub">音控台会按颜色快速识别你，现场沟通更直观。</p>',
       '  <div class="cf-preset-grid">',
       PRESETS.map(function (preset) {
-        var safeName = escapeHtml(preset);
-        var isSel = preset === selected ? ' sel' : '';
-        return '<button class="cf-preset-btn' + isSel + '" data-name="' + safeName + '">' + safeName + '</button>';
+        return renderPresetButton(preset, preset === selected);
       }).join(''),
       '  </div>',
-      '  <button class="cf-btn-primary" id="cf-join-btn">加入</button>',
+      '  <div class="cf-selected" id="cf-selected"></div>',
+      '  <button class="cf-btn-primary" id="cf-join-btn">进入成员端</button>',
       '</div>'
     ].join('');
+
+    updateSelectedPreview(selected);
 
     ROOT.querySelectorAll('.cf-preset-btn').forEach(function (button) {
       button.addEventListener('click', function () {
@@ -157,6 +237,7 @@
         });
         button.classList.add('sel');
         selected = button.dataset.name || '';
+        updateSelectedPreview(selected);
       });
     });
 
@@ -186,7 +267,13 @@
       '    <div class="cf-bcast-from">📢 音控组</div>',
       '    <div class="cf-bcast-text" id="cf-bcast-text"></div>',
       '  </div>',
-      '  <div class="cf-badge">' + escapeHtml(whoAmI) + '</div>',
+      '  <div class="cf-client-hero">',
+      '    <div class="cf-badge-wrap">',
+      '      <div class="cf-badge-label">当前话筒</div>',
+      renderIdentityPill(whoAmI, 'cf-badge'),
+      '    </div>',
+      '    <div class="cf-client-note">点击下方快捷消息，音控台会立刻看到你的颜色和需求。</div>',
+      '  </div>',
       '  <div class="cf-section-label">快捷消息</div>',
       '  <div class="cf-cue-grid">',
       CUES.map(function (cue) {
@@ -424,7 +511,7 @@
 
     list.innerHTML = members.length
       ? members.map(function (member) {
-          return '<li class="cf-member-item"><span class="cf-dot online"></span>' + escapeHtml(member.name) + '</li>';
+          return '<li class="cf-member-item">' + renderIdentityPill(member.name, 'cf-member-pill') + '</li>';
         }).join('')
       : '<li class="cf-member-empty">暂无成员在线</li>';
   }
@@ -451,11 +538,11 @@
         '<div class="cf-log-item', extraClass, '">',
         '  <span class="cf-log-icon">', escapeHtml(icon), '</span>',
         '  <div class="cf-log-body">',
-        '    <span class="cf-log-from">', escapeHtml(item.from), '</span>',
+        renderIdentityPill(item.from, 'cf-log-from'),
         '    <span class="cf-log-text">', escapeHtml(item.text), '</span>',
         '  </div>',
         '  <span class="cf-log-time">', escapeHtml(time), '</span>',
-        '</div>'
+      '</div>'
       ].join('');
     }).join('');
   }
