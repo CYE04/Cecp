@@ -173,9 +173,9 @@
   position: fixed;
   inset: 0;
   opacity: 0;
+  display: none;
   pointer-events: none;
-  background: rgba(5, 8, 12, 0.26);
-  transition: opacity 0.18s ease;
+  background: transparent;
 }
 
 .cf-widget-panel {
@@ -184,7 +184,7 @@
   bottom: calc(var(--cf-launcher-size, 58px) + 12px);
   width: min(var(--cf-panel-width, 360px), calc(100vw - 12px));
   max-width: calc(100vw - 12px);
-  max-height: min(var(--cf-panel-max-height, 720px), calc(100vh - 28px));
+  max-height: min(var(--cf-panel-max-height, 720px), calc(100dvh - 28px));
   border: 1px solid rgba(157, 172, 209, 0.16);
   border-radius: 28px;
   overflow: hidden;
@@ -199,12 +199,13 @@
   transition: opacity 0.2s ease, transform 0.2s ease;
   display: flex;
   flex-direction: column;
+  overscroll-behavior: contain;
   touch-action: pan-y;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-widget-open .cf-widget-mask {
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 0;
+  pointer-events: none;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-widget-open .cf-widget-panel {
@@ -1441,8 +1442,8 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   }
 
   .cf-widget-panel {
-    width: min(var(--cf-panel-width, calc(100vw - 10px)), calc(100vw - 10px));
-    max-height: min(var(--cf-panel-max-height, 560px), calc(100vh - 20px));
+    width: min(var(--cf-panel-width, calc(100vw - 22px)), calc(100vw - 22px));
+    max-height: min(var(--cf-panel-max-height, 540px), calc(100dvh - 20px));
   }
 
   .cf-bcast-popup {
