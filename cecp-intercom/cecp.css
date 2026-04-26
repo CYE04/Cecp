@@ -21,14 +21,6 @@ body.cf-page-shell {
   overscroll-behavior: none;
 }
 
-/* 隐藏 CMS 页面上所有其他元素（侧边栏、导航等），只保留 CECP 根节点 */
-body.cf-page-shell > *:not(#cecp-root):not([data-cecp-root]):not(script):not(style):not(link):not(noscript) {
-  display: none !important;
-}
-html.cf-page-shell > *:not(body):not(head) {
-  display: none !important;
-}
-
 :where(#cecp-root, [data-cecp-root]) {
   --cf-bg: #090b12;
   --cf-bg-deep: #05060a;
