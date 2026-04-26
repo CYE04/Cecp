@@ -46,6 +46,9 @@
     var LAUNCHER_ICON = String(ROOT.dataset.launcherIcon || '🎧');
     var LAUNCHER_LABEL = String(ROOT.dataset.launcherLabel || '调音助手');
     var WIDGET_TITLE = String(ROOT.dataset.widgetTitle || 'CECP 敬拜团内通');
+    var DEFAULT_PRESET = String(ROOT.dataset.defaultPreset || '').trim();
+    var FLOAT_RIGHT = String(ROOT.dataset.floatRight || '').trim();
+    var FLOAT_BOTTOM = String(ROOT.dataset.floatBottom || '').trim();
 
     var DEFAULT_PRESETS = [
       '🎤 橘色话筒',
@@ -104,8 +107,11 @@
     var memberCount = 0;
     var widgetOpen = !IS_FLOATING;
     var operatorUnreadCount = 0;
+    var isOnline = false;
 
     ROOT.__cecpMounted = true;
+    if (FLOAT_RIGHT) ROOT.style.setProperty('--cf-float-right', FLOAT_RIGHT);
+    if (FLOAT_BOTTOM) ROOT.style.setProperty('--cf-float-bottom', FLOAT_BOTTOM);
 
     function escapeHtml(value) {
       return String(value == null ? '' : value)
@@ -479,6 +485,7 @@
 
     function openWidget() {
       if (!IS_FLOATING) return;
+      ensureStageReadyForOpen();
       widgetOpen = true;
       operatorUnreadCount = 0;
       syncWidgetState();
@@ -490,6 +497,19 @@
       widgetOpen = false;
       syncWidgetState();
       syncLauncherBadge();
+    }
+
+    function ensureStageReadyForOpen() {
+      if (!IS_FLOATING) return;
+      if (MODE === 'operator') {
+        if (!ROOT.querySelector('#cf-log')) renderOperator();
+        return;
+      }
+      if (whoAmI) {
+        if (!ROOT.querySelector('#cf-custom-send')) renderClient();
+        return;
+      }
+      if (!ROOT.querySelector('#cf-join-btn')) renderSetup();
     }
 
     function syncLauncherBadge() {
@@ -661,6 +681,7 @@
       renderClientLog();
       syncBroadcastPopup();
       syncLauncherBadge();
+      setStatus(isOnline);
     }
 
     function renderOperator() {
@@ -755,6 +776,7 @@
 
       renderOperatorLog();
       updateOperatorStats();
+      setStatus(isOnline);
     }
 
     function renderClientLog() {
@@ -1008,6 +1030,7 @@
     }
 
     function setStatus(online) {
+      isOnline = !!online;
       var dot = ROOT.querySelector('#cf-dot');
       if (dot) dot.classList.toggle('online', online);
       var label = ROOT.querySelector('#cf-status-label');
@@ -1032,7 +1055,20 @@
       renderOperator();
       connect('operator');
     } else {
-      renderSetup();
+      whoAmI = readRememberedName();
+      if (!whoAmI && DEFAULT_PRESET && PRESETS.indexOf(DEFAULT_PRESET) >= 0) {
+        whoAmI = DEFAULT_PRESET;
+        rememberName(DEFAULT_PRESET);
+      }
+      if (whoAmI) {
+        loadClientLog();
+        if (IS_FLOATING) ensureChrome();
+        else renderClient();
+        connect('client');
+      } else {
+        if (IS_FLOATING) ensureChrome();
+        else renderSetup();
+      }
     }
 
     ROOT.__cecpApi = {

@@ -28,6 +28,8 @@
   --cf-font-body: 'Noto Sans SC', sans-serif;
   --cf-radius: 20px;
   --cf-radius-sm: 14px;
+  --cf-float-right: 34px;
+  --cf-float-bottom: 108px;
 }
 
 :where(#cecp-root, [data-cecp-root]),
@@ -84,30 +86,33 @@
 
 :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
-  z-index: 2147483000;
+  right: var(--cf-float-right);
+  bottom: var(--cf-float-bottom);
+  z-index: 2147483640;
   width: auto;
   min-height: 0;
   overflow: visible;
   background: none;
-  pointer-events: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-stage {
   position: relative;
   z-index: 1;
+  pointer-events: auto;
 }
 
 .cf-widget-shell {
   position: relative;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .cf-launcher {
   position: relative;
-  width: 62px;
-  height: 62px;
+  width: 68px;
+  height: 68px;
   border: 1px solid rgba(243, 210, 131, 0.18);
   border-radius: 50%;
   background:
@@ -119,6 +124,8 @@
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(255, 255, 255, 0.03);
   pointer-events: auto;
   transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-launcher:hover {
@@ -176,13 +183,14 @@
     radial-gradient(circle at top left, rgba(255, 171, 79, 0.14), transparent 34%),
     radial-gradient(circle at top right, rgba(91, 163, 255, 0.12), transparent 28%),
     linear-gradient(180deg, rgba(15, 20, 29, 0.98), rgba(8, 10, 16, 0.98));
-  box-shadow: 0 36px 90px rgba(0, 0, 0, 0.44);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.34);
   opacity: 0;
   transform: translateY(18px) scale(0.98);
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
   display: flex;
   flex-direction: column;
+  touch-action: pan-y;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-widget-open .cf-widget-mask {
@@ -203,7 +211,7 @@
   gap: 12px;
   padding: 14px 16px;
   border-bottom: 1px solid rgba(157, 172, 209, 0.12);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.015);
 }
 
 .cf-widget-copy {
@@ -226,8 +234,8 @@
 }
 
 .cf-widget-close {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--cf-border);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
@@ -235,6 +243,8 @@
   font-size: 1.1rem;
   cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-widget-close:hover {
@@ -382,6 +392,14 @@
 .cf-client-hero,
 .cf-bcast {
   backdrop-filter: blur(18px);
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-header,
+:where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-panel,
+:where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-setup-card,
+:where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-client-hero,
+:where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-bcast {
+  backdrop-filter: none;
 }
 
 .cf-header {
@@ -757,21 +775,21 @@
 
 .cf-bcast-popup {
   position: fixed;
-  right: 22px;
-  bottom: 96px;
-  width: min(360px, calc(100vw - 24px));
+  left: 50%;
+  top: 16px;
+  width: min(560px, calc(100vw - 24px));
   padding: 16px 16px 14px;
   border: 1px solid rgba(98, 171, 255, 0.28);
   border-radius: 22px;
   background:
     linear-gradient(145deg, rgba(91, 163, 255, 0.16), transparent 54%),
     rgba(12, 18, 27, 0.96);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.28);
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateX(-50%) translateY(-16px);
   pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s ease;
-  z-index: 2147483001;
+  z-index: 2147483641;
 }
 
 .cf-bcast-popup[hidden] {
@@ -780,7 +798,7 @@
 
 .cf-bcast-popup.show {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
 
@@ -813,13 +831,16 @@
 .cf-bcast-popup-read {
   border: 1px solid rgba(243, 210, 131, 0.22);
   border-radius: 999px;
-  padding: 8px 14px;
+  min-height: 42px;
+  padding: 8px 16px;
   background: rgba(243, 210, 131, 0.08);
   color: #fff5d8;
   font-family: var(--cf-font-body);
   font-size: 0.82rem;
   cursor: pointer;
   transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-bcast-popup-read:hover {
@@ -858,6 +879,8 @@
   text-align: left;
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-cue-btn:hover {
@@ -935,6 +958,7 @@
   font-size: 0.9rem;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
 }
 
 .cf-custom-area input:focus {
@@ -948,6 +972,8 @@
 
 .cf-custom-area button {
   flex-shrink: 0;
+  min-width: 48px;
+  min-height: 48px;
   padding: 0 16px;
   background: linear-gradient(135deg, rgba(243, 210, 131, 0.18), rgba(243, 210, 131, 0.08));
   border: 1px solid rgba(243, 210, 131, 0.24);
@@ -957,6 +983,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-custom-area button:hover {
@@ -968,7 +996,7 @@
   position: fixed;
   left: 50%;
   bottom: 22px;
-  z-index: 2147483002;
+  z-index: 2147483642;
   padding: 10px 16px;
   background: rgba(14, 18, 27, 0.96);
   border: 1px solid var(--cf-border-strong);
@@ -1065,7 +1093,8 @@
 }
 
 .cf-clear-btn {
-  padding: 6px 10px;
+  min-height: 36px;
+  padding: 6px 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--cf-border);
   border-radius: 10px;
@@ -1073,6 +1102,8 @@
   font-size: 0.76rem;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-clear-btn:hover {
@@ -1123,6 +1154,9 @@
   max-height: 62vh;
   overflow-y: auto;
   padding-right: 2px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .cf-log-client {
@@ -1217,8 +1251,8 @@
 }
 
 .cf-log-read-btn {
-  min-height: 30px;
-  padding: 0 11px;
+  min-height: 36px;
+  padding: 0 12px;
   border-radius: 999px;
   border: 1px solid rgba(243, 210, 131, 0.22);
   background: rgba(243, 210, 131, 0.08);
@@ -1227,6 +1261,8 @@
   font-family: var(--cf-font-body);
   cursor: pointer;
   transition: transform 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-log-read-btn:hover {
@@ -1263,6 +1299,7 @@
 }
 
 .cf-bcast-preset {
+  min-height: 38px;
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--cf-border);
@@ -1272,6 +1309,8 @@
   font-size: 0.82rem;
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .cf-bcast-preset:hover {
@@ -1330,8 +1369,8 @@
   }
 
   :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
-    right: 12px;
-    bottom: 12px;
+    --cf-float-right: 18px;
+    --cf-float-bottom: 98px;
   }
 
   .cf-widget-panel {
@@ -1341,8 +1380,7 @@
   }
 
   .cf-bcast-popup {
-    right: 12px;
-    bottom: 86px;
-    width: min(360px, calc(100vw - 12px));
+    top: 12px;
+    width: min(560px, calc(100vw - 12px));
   }
 }
