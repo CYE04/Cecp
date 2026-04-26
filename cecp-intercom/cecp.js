@@ -804,6 +804,11 @@
           alert('请先选择你的身份');
           return;
         }
+        /* 二次防护：如果这个设备已被人占用就拒绝 */
+        if (takenDevices.indexOf(selected) >= 0) {
+          alert('「' + selected + '」已有人在使用，请选择其他设备。');
+          return;
+        }
         whoAmI = selected;
         rememberName(selected);
         loadClientLog();
@@ -999,7 +1004,10 @@
         '  </div>',
         '  <div class="cf-op-row">',
         '    <div class="cf-panel cf-panel-members">',
-        '      <div class="cf-panel-title" id="cf-member-title">在线设备</div>',
+        '      <div class="cf-panel-title-row">',
+        '        <span class="cf-panel-title" id="cf-member-title">在线设备</span>',
+        '        <button class="cf-clear-btn cf-kick-all-btn" id="cf-kick-all-btn" type="button">踢出全员</button>',
+        '      </div>',
         '      <ul class="cf-member-list" id="cf-member-list">',
         '        <li class="cf-member-empty">当前没有设备在线</li>',
         '      </ul>',
@@ -1045,6 +1053,13 @@
         msgLog = [];
         renderOperatorLog();
       });
+
+      var kickAllBtn = ROOT.querySelector('#cf-kick-all-btn');
+      if (kickAllBtn) {
+        kickAllBtn.addEventListener('click', function () {
+          sendKickAll();
+        });
+      }
 
       var fullscreenBtn = ROOT.querySelector('#cf-fullscreen-btn');
       if (fullscreenBtn) {
@@ -1154,9 +1169,21 @@
 
       list.innerHTML = members.length
         ? members.map(function (member) {
-            return '<li class="cf-member-item">' + renderIdentityPill(member.name, 'cf-member-pill') + '</li>';
+            return [
+              '<li class="cf-member-item">',
+              renderIdentityPill(member.name, 'cf-member-pill'),
+              '<button class="cf-kick-btn" type="button" data-kick-name="', escapeHtml(member.name), '" title="踢出该成员">踢出</button>',
+              '</li>'
+            ].join('');
           }).join('')
         : '<li class="cf-member-empty">当前没有设备在线</li>';
+
+      list.querySelectorAll('.cf-kick-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var name = btn.getAttribute('data-kick-name') || '';
+          if (name) sendKick(name);
+        });
+      });
 
       updateOperatorStats();
     }
@@ -1175,10 +1202,13 @@
         var icon = KIND_ICONS[item.kind] || '💬';
         var extraClass = item.kind === 'issue'
           ? ' cf-log-issue'
-          : (item.kind === 'member_chat' ? ' cf-log-chat' : '');
+          : (item.kind === 'member_chat' ? ' cf-log-chat'
+          : (item.kind === 'broadcast' ? ' cf-log-broadcast' : ''));
         var routeChip = item.kind === 'member_chat'
           ? '<span class="cf-log-chip cf-log-chip-chat">成员群聊</span>'
-          : '<span class="cf-log-chip">发给音控组</span>';
+          : (item.kind === 'broadcast'
+          ? '<span class="cf-log-chip cf-log-chip-bcast">已广播</span>'
+          : '<span class="cf-log-chip">发给音控组</span>');
         return [
           '<div class="cf-log-item', extraClass, '">',
           '  <span class="cf-log-icon">', escapeHtml(icon), '</span>',
@@ -1278,6 +1308,33 @@
 
     function handleIncoming(msg, role) {
       if (msg.type === 'pong' || msg.type === 'ack') return;
+
+      /* ── 被踢出 ── */
+      if (msg.type === 'kicked') {
+        /* 停止重连，清除身份，回到选择界面 */
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+        if (ws) {
+          try { ws.close(); } catch (err) {}
+          ws = null;
+        }
+        forgetRememberedName();
+        whoAmI = '';
+        selectionSource = 'manual';
+        clientLog = [];
+        memberChat = [];
+        if (IS_FLOATING) {
+          renderSetup();
+          openWidget();
+        } else {
+          renderSetup();
+        }
+        /* 用 alert 给成员明确提示 */
+        setTimeout(function () {
+          alert('你已被音控组踢出，请重新选择设备后再加入。');
+        }, 100);
+        return;
+      }
 
       /* ── 设备占用状态（客户端和调音台都处理）── */
       if (msg.type === 'taken_devices') {
@@ -1422,8 +1479,35 @@
         return;
       }
       ws.send(JSON.stringify({ type: 'broadcast', id: nowId('broadcast'), text: text }));
+      /* 记录到音控消息日志，方便回看自己发了什么 */
+      msgLog.unshift({
+        from: '音控组',
+        kind: 'broadcast',
+        text: text,
+        ts: Date.now()
+      });
+      if (msgLog.length > 80) msgLog.pop();
+      renderOperatorLog();
       if (input) input.value = '';
       flashEl('cf-flash', '已广播 ✓');
+    }
+
+    function sendKick(name) {
+      if (!wsReady()) {
+        flashEl('cf-flash', '当前离线，无法踢出', true);
+        return;
+      }
+      ws.send(JSON.stringify({ type: 'kick', name: name }));
+      flashEl('cf-flash', '已踢出 ' + name + ' ✓');
+    }
+
+    function sendKickAll() {
+      if (!wsReady()) {
+        flashEl('cf-flash', '当前离线，无法踢出', true);
+        return;
+      }
+      ws.send(JSON.stringify({ type: 'kick_all' }));
+      flashEl('cf-flash', '已踢出全员 ✓');
     }
 
     function setStatus(online) {
