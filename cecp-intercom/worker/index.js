@@ -29,14 +29,38 @@ export class WorshipRoom {
 
     switch (msg.type) {
       case 'register': {
+        const regName = String(msg.name || '').trim();
+        const regRole = String(msg.role || 'client').trim();
+
+        // 只对 client 做重复占用检查
+        if (regRole === 'client') {
+          const alreadyTaken = this.state.getWebSockets().some(s => {
+            if (s === ws) return false; // 自己重新注册不算
+            const m = s.deserializeAttachment();
+            return m?.role === 'client' && m?.name === regName;
+          });
+          if (alreadyTaken) {
+            ws.send(JSON.stringify({ type: 'name_taken', name: regName }));
+            break;
+          }
+        }
+
         ws.serializeAttachment({
-          name: msg.name,
-          role: msg.role,
+          name: regName,
+          role: regRole,
           identityType: msg.identityType || 'other',
           ts: Date.now()
         });
-        ws.send(JSON.stringify({ type: 'ack', name: msg.name }));
+        ws.send(JSON.stringify({ type: 'ack', name: regName }));
         this._pushMemberList();
+        // 把当前占用列表单独推给新加入的 client
+        if (regRole === 'client') {
+          const takenNames = this.state.getWebSockets()
+            .map(s => s.deserializeAttachment())
+            .filter(a => a?.role === 'client')
+            .map(a => a.name);
+          ws.send(JSON.stringify({ type: 'taken_devices', names: takenNames }));
+        }
         break;
       }
       case 'worship_msg': {
