@@ -2370,3 +2370,72 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     justify-content: flex-start;
   }
 }
+
+
+/* ============================================================
+   ▌ CECP — 手机端设备选择至少两列
+   ============================================================ */
+
+@media (max-width: 640px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-grid,
+  :where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-preset-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-btn {
+    min-height: 74px;
+    padding: 12px 10px;
+    gap: 9px;
+    border-radius: 15px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-mic {
+    font-size: 1.28rem;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-name {
+    font-size: 0.88rem;
+    line-height: 1.22;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-sub {
+    font-size: 0.68rem;
+    margin-top: 3px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-led {
+    width: 9px;
+    height: 9px;
+    box-shadow: 0 0 0 4px var(--cf-accent-soft), 0 0 10px var(--cf-accent-ring);
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-taken-badge {
+    right: 7px;
+    top: 7px;
+    font-size: 0.62rem;
+    padding: 3px 6px;
+  }
+}
+
+/* 超小屏也保持 2 列，只进一步压缩间距 */
+@media (max-width: 370px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-grid,
+  :where(#cecp-root, [data-cecp-root]).cf-layout-floating .cf-preset-grid {
+    gap: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-btn {
+    min-height: 70px;
+    padding: 10px 8px;
+    gap: 7px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-name {
+    font-size: 0.82rem;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-sub {
+    font-size: 0.64rem;
+  }
+}
