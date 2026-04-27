@@ -1080,10 +1080,25 @@
         '</', quickPanelTag, '>'
       ].join('');
 
+      var chatSection = ENABLE_MEMBER_CHAT ? [
+        '<section class="cf-vocal-card cf-client-chat-card" id="cf-member-chat-room">',
+        '  <div class="cf-vocal-card-head">',
+        '    <div><span class="cf-card-icon">♧</span><h2>成员群聊</h2></div>',
+        '    <em>仅敬拜团内部可见</em>',
+        '  </div>',
+        '  <div class="cf-log cf-log-member-chat cf-client-chat-log" id="cf-member-chat-log"><div class="cf-log-empty">成员群聊会显示在这里</div></div>',
+        '  <div class="cf-custom-area cf-member-chat-compose">',
+        '    <input id="cf-member-chat-input" type="text" placeholder="跟团内说点什么…Enter 发送" maxlength="180">',
+        '    <button id="cf-member-chat-send" type="button">发送</button>',
+        '  </div>',
+        '</section>'
+      ].join('') : '';
+
       var mobileTabs = [
         '<nav class="cf-vocal-tabs" aria-label="Vocal navigation">',
         '  <a class="is-active" href="#cf-broadcast-compose"><span>◉</span>广播</a>',
         '  <a href="#cf-quick-reminders"><span>◌</span>快捷信息</a>',
+        ENABLE_MEMBER_CHAT ? '  <a href="#cf-member-chat-room"><span>♧</span>群聊</a>' : '',
         '  <a href="#cf-recent-broadcasts"><span>◷</span>历史记录</a>',
         '</nav>'
       ].join('');
@@ -1093,6 +1108,7 @@
         '  <nav class="cf-vocal-side-nav" aria-label="Vocal navigation">',
         '    <a class="is-active" href="#cf-broadcast-compose"><span>◉</span>广播</a>',
         '    <a href="#cf-quick-reminders"><span>◌</span>快捷信息</a>',
+        ENABLE_MEMBER_CHAT ? '    <a href="#cf-member-chat-room"><span>♧</span>成员群聊</a>' : '',
         '    <a href="#cf-recent-broadcasts"><span>◷</span>历史记录</a>',
         '  </nav>',
         '</aside>'
@@ -1105,6 +1121,7 @@
             composeSection,
             previewSection,
             quickSection,
+            chatSection,
             recentSection,
             '</div>'
           ].join('')
@@ -1115,6 +1132,7 @@
             '  <main class="cf-vocal-main">',
             composeSection,
             previewSection,
+            chatSection,
             recentSection,
             '  </main>',
             quickSection,
@@ -1235,6 +1253,20 @@
           if (list) list.setAttribute('data-limit', showAllRecent ? '12' : '4');
           viewAllBtn.textContent = showAllRecent ? '收起' : '查看全部';
           renderClientLog();
+        });
+      }
+
+      var memberChatSendBtn = ROOT.querySelector('#cf-member-chat-send');
+      var memberChatInput = ROOT.querySelector('#cf-member-chat-input');
+      if (memberChatSendBtn) {
+        memberChatSendBtn.addEventListener('click', sendMemberChat);
+      }
+      if (memberChatInput) {
+        memberChatInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMemberChat();
+          }
         });
       }
 

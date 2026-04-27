@@ -20,6 +20,10 @@ body.cf-page-shell {
   overflow: hidden !important;
   overscroll-behavior: none;
 }
+html.cf-page-shell.cf-theme-dark,
+body.cf-page-shell.cf-theme-dark {
+  background: #090b12 !important;
+}
 
 :where(#cecp-root, [data-cecp-root]) {
   --cf-bg: #090b12;
@@ -51,6 +55,80 @@ body.cf-page-shell {
   --cf-launcher-size: 58px;
   --cf-panel-width: 360px;
   --cf-panel-max-height: 720px;
+  --cf-page-bg: linear-gradient(180deg, #121726 0%, var(--cf-bg) 42%, var(--cf-bg-deep) 100%);
+  --cf-page-glow-1: rgba(255, 171, 79, 0.2);
+  --cf-page-glow-2: rgba(91, 163, 255, 0.18);
+  --cf-page-glow-3: rgba(89, 214, 140, 0.1);
+  color-scheme: dark;
+}
+
+/* ============================================================
+   Light theme — auto applied when system prefers light, or
+   when html/body has data-cf-theme="light" or .cf-theme-light.
+   ============================================================ */
+@media (prefers-color-scheme: light) {
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) {
+    --cf-bg: #f4f6fb;
+    --cf-bg-deep: #e9ecf4;
+    --cf-surface: rgba(255, 255, 255, 0.96);
+    --cf-surface-strong: #ffffff;
+    --cf-surface-soft: rgba(248, 249, 252, 0.95);
+    --cf-border: rgba(15, 23, 42, 0.08);
+    --cf-border-strong: rgba(15, 23, 42, 0.16);
+    --cf-text: #1f2433;
+    --cf-muted: #5b6478;
+    --cf-muted-2: #8b94a7;
+    --cf-gold: #c8893f;
+    --cf-gold-soft: rgba(200, 137, 63, 0.14);
+    --cf-blue: #2f7bff;
+    --cf-green: #1f9d5a;
+    --cf-red: #d94747;
+    --cf-amber: #d68326;
+    --cf-shadow: 0 24px 48px rgba(15, 23, 42, 0.1);
+    --cf-shadow-soft: 0 12px 28px rgba(15, 23, 42, 0.08);
+    --cf-page-bg: linear-gradient(180deg, #f8faff 0%, #f3f5fb 50%, #e9ecf4 100%);
+    --cf-page-glow-1: rgba(255, 191, 110, 0.22);
+    --cf-page-glow-2: rgba(110, 168, 255, 0.18);
+    --cf-page-glow-3: rgba(120, 220, 158, 0.16);
+    color-scheme: light;
+  }
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-theme-light {
+  --cf-bg: #f4f6fb;
+  --cf-bg-deep: #e9ecf4;
+  --cf-surface: rgba(255, 255, 255, 0.96);
+  --cf-surface-strong: #ffffff;
+  --cf-surface-soft: rgba(248, 249, 252, 0.95);
+  --cf-border: rgba(15, 23, 42, 0.08);
+  --cf-border-strong: rgba(15, 23, 42, 0.16);
+  --cf-text: #1f2433;
+  --cf-muted: #5b6478;
+  --cf-muted-2: #8b94a7;
+  --cf-gold: #c8893f;
+  --cf-gold-soft: rgba(200, 137, 63, 0.14);
+  --cf-blue: #2f7bff;
+  --cf-green: #1f9d5a;
+  --cf-red: #d94747;
+  --cf-amber: #d68326;
+  --cf-shadow: 0 24px 48px rgba(15, 23, 42, 0.1);
+  --cf-shadow-soft: 0 12px 28px rgba(15, 23, 42, 0.08);
+  --cf-page-bg: linear-gradient(180deg, #f8faff 0%, #f3f5fb 50%, #e9ecf4 100%);
+  --cf-page-glow-1: rgba(255, 191, 110, 0.22);
+  --cf-page-glow-2: rgba(110, 168, 255, 0.18);
+  --cf-page-glow-3: rgba(120, 220, 158, 0.16);
+  color-scheme: light;
+}
+
+html.cf-page-shell.cf-theme-light,
+body.cf-page-shell.cf-theme-light {
+  background: #e9ecf4 !important;
+}
+@media (prefers-color-scheme: light) {
+  html.cf-page-shell:not(.cf-theme-dark),
+  body.cf-page-shell:not(.cf-theme-dark) {
+    background: #e9ecf4 !important;
+  }
 }
 
 :where(#cecp-root, [data-cecp-root]),
@@ -82,10 +160,10 @@ body.cf-page-shell {
   overflow-x: hidden;
   overscroll-behavior: contain;
   background:
-    radial-gradient(circle at top left, rgba(255, 171, 79, 0.2), transparent 30%),
-    radial-gradient(circle at top right, rgba(91, 163, 255, 0.18), transparent 28%),
-    radial-gradient(circle at bottom center, rgba(89, 214, 140, 0.1), transparent 32%),
-    linear-gradient(180deg, #121726 0%, var(--cf-bg) 42%, var(--cf-bg-deep) 100%);
+    radial-gradient(circle at top left, var(--cf-page-glow-1), transparent 30%),
+    radial-gradient(circle at top right, var(--cf-page-glow-2), transparent 28%),
+    radial-gradient(circle at bottom center, var(--cf-page-glow-3), transparent 32%),
+    var(--cf-page-bg);
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-layout-page::before,
@@ -5067,10 +5145,15 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 
 :where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-side,
 :where(#cecp-root, [data-cecp-root]).cf-client-tablet .cf-setup-side {
-  order: -1 !important;
+  order: 2 !important;
   display: block !important;
   width: 100% !important;
   align-self: stretch !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-card-vocal,
+:where(#cecp-root, [data-cecp-root]).cf-client-tablet .cf-setup-card-vocal {
+  order: 1 !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-identity-card,
@@ -6694,5 +6777,656 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 
   .cf-vocal-side-nav {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   ▦  LIGHT THEME OVERRIDES  ▦
+   Mirrors the CECP screenshots (white surfaces, soft shadows,
+   amber/blue accents). Applied automatically when the user's
+   OS prefers light, OR when html / body / root has the
+   `.cf-theme-light` class. Prefix-scoped so CMS pages aren't
+   affected.
+   ============================================================ */
+
+/* ---- shared light-mode block (used by both auto + manual) ---- */
+.cf-light-mode-overrides,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-shell,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-app {
+  color: var(--cf-text);
+}
+
+/* sidebar */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-sidebar {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f8fc 100%) !important;
+  border-right: 1px solid var(--cf-border) !important;
+  box-shadow: 1px 0 0 rgba(15, 23, 42, 0.04) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-brand,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-brand-text {
+  color: #c8893f !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-cross {
+  color: #c8893f !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-nav-item {
+  color: #475063 !important;
+  background: transparent !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-nav-item:hover {
+  background: rgba(15, 23, 42, 0.04) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-nav-item.is-active {
+  background: rgba(200, 137, 63, 0.12) !important;
+  color: #c8893f !important;
+  border-left: 3px solid #c8893f !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-nav-count {
+  background: #c8893f !important;
+  color: #fff !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-system-card {
+  background: rgba(31, 157, 90, 0.1) !important;
+  color: #1f9d5a !important;
+  border: 1px solid rgba(31, 157, 90, 0.16) !important;
+}
+
+/* main + topbar */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-main {
+  background: transparent !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-topbar {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-bottom: 1px solid var(--cf-border) !important;
+  backdrop-filter: blur(10px);
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-heading h1 {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-heading p {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-select,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-search,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-icon-btn,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-bell {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-search input {
+  color: #1f2433 !important;
+  background: transparent !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-search input::placeholder {
+  color: var(--cf-muted-2) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-bell span {
+  background: #d94747 !important;
+  color: #fff !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-avatar {
+  background: linear-gradient(135deg, #f6c989 0%, #c8893f 100%) !important;
+  color: #fff !important;
+}
+
+/* stat cards */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-stats {
+  background: transparent !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-stat {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  box-shadow: var(--cf-shadow-soft) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-stat-label {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-stat-value {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-stat-sub {
+  color: var(--cf-muted-2) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-stat-icon {
+  color: #fff !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-tone-gold .cf-op-stat-icon {
+  background: linear-gradient(135deg, #f5c279, #d68326) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-tone-blue .cf-op-stat-icon {
+  background: linear-gradient(135deg, #6fa5ff, #2f7bff) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-tone-green .cf-op-stat-icon {
+  background: linear-gradient(135deg, #6cd49a, #1f9d5a) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-tone-red .cf-op-stat-icon {
+  background: linear-gradient(135deg, #ef8a8a, #d94747) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-tone-purple .cf-op-stat-icon {
+  background: linear-gradient(135deg, #b894ff, #7c54e6) !important;
+}
+
+/* cards */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-card {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  box-shadow: var(--cf-shadow-soft) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-card h2 {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-card-head {
+  border-bottom: 1px solid var(--cf-border) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-card-head h2 span {
+  color: #c8893f !important;
+}
+
+/* tables / lists */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-table-head {
+  background: rgba(15, 23, 42, 0.04) !important;
+  color: var(--cf-muted) !important;
+  border-bottom: 1px solid var(--cf-border) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-table-row {
+  border-bottom: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-table-row:hover {
+  background: rgba(200, 137, 63, 0.06) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-msg-row {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-msg-row.is-active {
+  background: rgba(200, 137, 63, 0.08) !important;
+  border-color: #c8893f !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-msg-row strong {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-msg-row em {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-msg-time {
+  color: var(--cf-muted-2) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-empty {
+  color: var(--cf-muted-2) !important;
+}
+
+/* chips / tags */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-msg-chip,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-tag {
+  background: rgba(15, 23, 42, 0.06) !important;
+  color: #1f2433 !important;
+  border: 1px solid var(--cf-border) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-chip-gold,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-tag-gold {
+  background: rgba(200, 137, 63, 0.14) !important;
+  color: #c8893f !important;
+  border-color: rgba(200, 137, 63, 0.3) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-chip-green,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-tag-green {
+  background: rgba(31, 157, 90, 0.12) !important;
+  color: #1f9d5a !important;
+  border-color: rgba(31, 157, 90, 0.28) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-chip-red {
+  background: rgba(217, 71, 71, 0.12) !important;
+  color: #d94747 !important;
+  border-color: rgba(217, 71, 71, 0.26) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-chip-blue {
+  background: rgba(47, 123, 255, 0.12) !important;
+  color: #2f7bff !important;
+  border-color: rgba(47, 123, 255, 0.26) !important;
+}
+
+/* buttons / inputs */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-textarea,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-card input[type="text"],
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-card input[type="search"],
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-broadcast-textarea {
+  background: rgba(248, 249, 252, 1) !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-textarea::placeholder,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-broadcast-textarea::placeholder {
+  color: var(--cf-muted-2) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-target-chip {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-target-chip.is-active {
+  background: rgba(200, 137, 63, 0.14) !important;
+  border-color: #c8893f !important;
+  color: #c8893f !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-primary,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-send-broadcast {
+  background: linear-gradient(135deg, #d6a157 0%, #c8893f 100%) !important;
+  color: #fff !important;
+  border: none !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-secondary {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-template-grid button,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-fav-list button,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-recent-list button {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-template-grid button:hover {
+  background: rgba(200, 137, 63, 0.06) !important;
+  border-color: rgba(200, 137, 63, 0.32) !important;
+}
+
+/* identity pill / preset buttons (client side) */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-identity-pill {
+  background: rgba(15, 23, 42, 0.04) !important;
+  color: #1f2433 !important;
+  border: 1px solid var(--cf-border) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-preset-btn {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+  box-shadow: var(--cf-shadow-soft) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-preset-btn.sel {
+  border-color: #c8893f !important;
+  background: rgba(200, 137, 63, 0.08) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-preset-btn.taken {
+  background: rgba(15, 23, 42, 0.04) !important;
+  color: var(--cf-muted-2) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-preset-name {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-preset-sub {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-preset-taken-badge {
+  background: rgba(217, 71, 71, 0.12) !important;
+  color: #d94747 !important;
+}
+
+/* setup card (client first-screen) */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-card-vocal,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-identity-card {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  box-shadow: var(--cf-shadow-soft) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-card-vocal h2 {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-kicker {
+  color: #c8893f !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-sub,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-help {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-name-input {
+  background: rgba(248, 249, 252, 1) !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-section-head h3 {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-setup-field-label {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-btn-primary {
+  background: linear-gradient(135deg, #d6a157 0%, #c8893f 100%) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+/* Vocal client header / cards */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-top {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+  backdrop-filter: blur(10px);
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-brand strong {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-brand span {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-icon-btn {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-card {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  box-shadow: var(--cf-shadow-soft) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-card h2,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-card h3 {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-card em {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-tabs,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-side-nav {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-tabs a,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-side-nav a {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-tabs a.is-active,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-vocal-side-nav a.is-active {
+  color: #1f9d5a !important;
+  background: rgba(31, 157, 90, 0.1) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-target-btn {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-target-btn.is-active {
+  background: rgba(31, 157, 90, 0.12) !important;
+  border-color: #1f9d5a !important;
+  color: #1f9d5a !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-level-btn {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-level-btn.is-active {
+  background: rgba(31, 157, 90, 0.12) !important;
+  border-color: #1f9d5a !important;
+  color: #1f9d5a !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-quick-card {
+  background: linear-gradient(135deg, #1d2535 0%, #11161f 100%) !important;
+  border: 1px solid rgba(31, 157, 90, 0.2) !important;
+  color: #edf1ff !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-preview-strip {
+  background: linear-gradient(135deg, #1d2535 0%, #11161f 100%) !important;
+  color: #edf1ff !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-recent-chip {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-recent-chip strong {
+  color: #1f2433 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-recent-chip em {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-clear-btn,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-link {
+  color: #2f7bff !important;
+}
+
+/* status / dot */
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-status,
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-op-status {
+  color: var(--cf-muted) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-dot {
+  background: #d94747 !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-dot.online {
+  background: #1f9d5a !important;
+}
+
+/* theme toggle button */
+.cf-theme-toggle {
+  background: transparent !important;
+  border: 1px solid var(--cf-border) !important;
+  border-radius: 12px !important;
+  padding: 6px 10px !important;
+  color: var(--cf-text) !important;
+  font: inherit !important;
+  cursor: pointer !important;
+  transition: background 0.2s, border-color 0.2s !important;
+}
+.cf-theme-toggle:hover {
+  background: rgba(200, 137, 63, 0.1) !important;
+  border-color: rgba(200, 137, 63, 0.4) !important;
+}
+:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-theme-toggle {
+  background: #fff !important;
+  border: 1px solid var(--cf-border) !important;
+  color: #1f2433 !important;
+}
+
+/* ============================================================
+   ▦  AUTO LIGHT (system prefers-color-scheme: light)  ▦
+   Re-applies the same overrides automatically when the OS
+   reports light, unless an explicit .cf-theme-dark override
+   is present.
+   ============================================================ */
+@media (prefers-color-scheme: light) {
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-sidebar {
+    background: linear-gradient(180deg, #ffffff 0%, #f7f8fc 100%) !important;
+    border-right: 1px solid var(--cf-border) !important;
+  }
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-brand,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-brand-text,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-cross {
+    color: #c8893f !important;
+  }
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-nav-item {
+    color: #475063 !important;
+  }
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-nav-item.is-active {
+    background: rgba(200, 137, 63, 0.12) !important;
+    color: #c8893f !important;
+    border-left: 3px solid #c8893f !important;
+  }
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-stat,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-card,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-msg-row,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-vocal-card,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-setup-card-vocal,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-setup-identity-card,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-preset-btn,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-recent-chip {
+    background: #fff !important;
+    border: 1px solid var(--cf-border) !important;
+    color: #1f2433 !important;
+    box-shadow: var(--cf-shadow-soft) !important;
+  }
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-topbar,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-vocal-top {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-bottom: 1px solid var(--cf-border) !important;
+    color: #1f2433 !important;
+  }
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-heading h1,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-vocal-brand strong {
+    color: #1f2433 !important;
+  }
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-heading p,
+  :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-vocal-brand span {
+    color: var(--cf-muted) !important;
+  }
+}
+
+/* ============================================================
+   ▦  MOBILE PORTRAIT SETUP FIX  ▦
+   Make sure the device picker, the name input AND the join
+   button are always visible & usable in portrait phones.
+   ============================================================ */
+@media (max-width: 720px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    padding: 14px 14px 110px !important;
+    gap: 14px !important;
+    min-height: auto !important;
+  }
+  /* picker first, identity card pinned to bottom for one-handed thumb access */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal {
+    order: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px 14px !important;
+    border-radius: 22px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-side {
+    order: 2 !important;
+    position: sticky !important;
+    bottom: 8px !important;
+    width: 100% !important;
+    align-self: stretch !important;
+    z-index: 5 !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-identity-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 22px !important;
+    padding: 16px 14px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-identity-card .cf-setup-name-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 16px !important; /* prevent iOS zoom */
+    padding: 12px 14px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-identity-card #cf-join-btn {
+    width: 100% !important;
+    padding: 14px !important;
+    font-size: 16px !important;
+    border-radius: 14px !important;
+    margin-top: 10px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal .cf-preset-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal .cf-preset-btn {
+    min-height: 120px !important;
+    padding: 12px 10px !important;
+    border-radius: 16px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-hero {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-hero-icon {
+    font-size: 26px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal .cf-preset-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal .cf-preset-btn {
+    min-height: 108px !important;
+    padding: 10px 8px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal .cf-preset-name {
+    font-size: 14px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal .cf-preset-sub {
+    font-size: 11px !important;
+  }
+}
+
+/* ============================================================
+   Client-side 成员群聊 panel — restored
+   ============================================================ */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-log {
+  flex: 1 1 auto;
+  min-height: 220px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card .cf-member-chat-compose {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card .cf-member-chat-compose input {
+  flex: 1 1 auto;
+  border-radius: 12px;
+  border: 1px solid var(--cf-border);
+  background: var(--cf-input-bg, var(--cf-surface));
+  color: var(--cf-text, #ffffff);
+  padding: 12px 14px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card .cf-member-chat-compose input:focus {
+  border-color: var(--cf-accent, #c8893f);
+  box-shadow: 0 0 0 3px rgba(200, 137, 63, 0.18);
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card .cf-member-chat-compose button {
+  border: none;
+  border-radius: 12px;
+  padding: 0 18px;
+  background: var(--cf-accent, #c8893f);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card .cf-member-chat-compose button:hover {
+  opacity: 0.9;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card .cf-member-chat-compose button:active {
+  transform: translateY(1px);
+}
+@media (max-width: 720px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-log {
+    min-height: 180px;
+    max-height: 300px;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card .cf-member-chat-compose input {
+    font-size: 16px; /* prevent iOS zoom */
   }
 }
