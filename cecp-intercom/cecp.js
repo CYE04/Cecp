@@ -1123,6 +1123,18 @@
         });
       }
 
+      if (!ROOT.querySelector('#cf-reset-device')) {
+        var badgeWrap = ROOT.querySelector('.cf-badge-wrap');
+        if (badgeWrap) {
+          var resetBtn = document.createElement('button');
+          resetBtn.id = 'cf-reset-device';
+          resetBtn.className = 'cf-screen-btn cf-reset-device';
+          resetBtn.type = 'button';
+          resetBtn.textContent = '换设备';
+          badgeWrap.appendChild(resetBtn);
+        }
+      }
+
       ROOT.querySelectorAll('.cf-cue-btn').forEach(function (button) {
         button.addEventListener('click', function () {
           sendWorshipMsg(button.dataset.kind, button.dataset.msg);
@@ -1133,7 +1145,8 @@
       ROOT.querySelector('#cf-custom-input').addEventListener('keydown', function (event) {
         if (event.key === 'Enter') sendCustom();
       });
-      ROOT.querySelector('#cf-reset-device').addEventListener('click', resetDeviceSelection);
+      var resetDeviceBtn = ROOT.querySelector('#cf-reset-device');
+      if (resetDeviceBtn) resetDeviceBtn.addEventListener('click', resetDeviceSelection);
 
       var memberSendBtn = ROOT.querySelector('#cf-member-chat-send');
       var memberInput = ROOT.querySelector('#cf-member-chat-input');

@@ -3175,3 +3175,111 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     padding: 10px 8px !important;
   }
 }
+
+
+/* ============================================================
+   ▌ CECP — 修复敬拜成员端：换设备 / 在线文字 / 时间日期恢复
+   ============================================================ */
+
+/* 之前为了首屏可达把手机端一些文字隐藏得太狠，这里只恢复关键状态 */
+@media (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-status {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 0.76rem !important;
+    color: var(--cf-muted) !important;
+    white-space: nowrap !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-status .cf-dot {
+    width: 8px !important;
+    height: 8px !important;
+    flex: 0 0 auto !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) #cf-status-label {
+    display: inline !important;
+    font-size: 0.76rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-pill {
+    display: inline-flex !important;
+    min-height: 34px !important;
+    padding: 5px 9px !important;
+    gap: 6px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-icon {
+    display: inline-flex !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-main {
+    display: inline !important;
+    font-size: 0.9rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-date {
+    display: inline !important;
+    font-size: 0.66rem !important;
+  }
+
+  /* 换设备按钮/重选设备按钮强制恢复 */
+  :where(#cecp-root, [data-cecp-root]) #cf-reset-device,
+  :where(#cecp-root, [data-cecp-root]) .cf-reset-device,
+  :where(#cecp-root, [data-cecp-root]) [data-cf-reset-device] {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) #cf-reset-device {
+    min-height: 34px !important;
+    padding: 7px 11px !important;
+    border-radius: 999px !important;
+    font-size: 0.76rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* 当前设备区域不能把换设备按钮挤没 */
+  :where(#cecp-root, [data-cecp-root]) .cf-client-hero {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-badge-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-header-tools {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    flex-shrink: 0 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-header {
+    align-items: center !important;
+  }
+}
+
+@media (max-width: 390px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-date {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-status {
+    font-size: 0.72rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) #cf-reset-device {
+    font-size: 0.72rem !important;
+    padding-inline: 9px !important;
+  }
+}
