@@ -2246,3 +2246,127 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     display: none;
   }
 }
+
+
+/* ============================================================
+   ▌ CECP — 选择设备后填写名字
+   ============================================================ */
+
+.cf-name-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: grid-template-rows .24s ease, opacity .2s ease, transform .2s ease;
+}
+
+.cf-name-panel.show {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  margin-top: 14px;
+}
+
+.cf-name-panel > * {
+  min-height: 0;
+}
+
+.cf-name-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--cf-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.cf-name-input-row {
+  display: grid;
+  grid-template-columns: minmax(92px, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--cf-border);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(243, 210, 131, .10), rgba(255,255,255,.03));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.cf-name-device {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 13px;
+  background: var(--cf-accent-soft, rgba(243,210,131,.16));
+  color: var(--cf-accent-ink, var(--cf-text));
+  font-size: .86rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cf-name-input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--cf-border);
+  border-radius: 13px;
+  background: rgba(255,255,255,.05);
+  color: var(--cf-text);
+  padding: 0 13px;
+  font-family: var(--cf-font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.cf-name-input::placeholder {
+  color: var(--cf-muted-2);
+}
+
+.cf-name-input:focus {
+  border-color: var(--cf-accent-ring, rgba(243,210,131,.35));
+  box-shadow: 0 0 0 4px var(--cf-accent-soft, rgba(243,210,131,.16));
+  background: rgba(255,255,255,.08);
+}
+
+.cf-name-hint {
+  margin-top: 8px;
+  color: var(--cf-muted);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.cf-name-hint span {
+  color: var(--cf-accent, var(--cf-gold));
+  font-weight: 800;
+}
+
+@media (prefers-color-scheme: light) {
+  .cf-name-input-row {
+    background:
+      linear-gradient(135deg, rgba(201,146,42,.10), rgba(255,255,255,.72));
+  }
+
+  .cf-name-input {
+    background: rgba(255,255,255,.78);
+  }
+
+  .cf-name-input:focus {
+    background: #fff;
+  }
+}
+
+@media (max-width: 520px) {
+  .cf-name-input-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .cf-name-device {
+    justify-content: flex-start;
+  }
+}

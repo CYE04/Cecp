@@ -241,6 +241,30 @@
         .trim();
     }
 
+    function deviceBaseName(value) {
+      return stripIdentityPrefix(value)
+        .replace(/\s*[｜|·•／/]\s*[^｜|·•／/]+$/u, '')
+        .trim();
+    }
+
+    function buildDisplayName(deviceName, personName) {
+      var device = String(deviceName || '').trim();
+      var person = String(personName || '').trim();
+      if (!device || !person) return device;
+      return device + '｜' + person;
+    }
+
+    function getDeviceFromDisplayName(value) {
+      var text = String(value || '').trim();
+      return text.split(/[｜|]/)[0].trim();
+    }
+
+    function getPersonFromDisplayName(value) {
+      var text = String(value || '').trim();
+      var parts = text.split(/[｜|]/);
+      return parts.length > 1 ? parts.slice(1).join('｜').trim() : '';
+    }
+
     function detectIdentityType(name) {
       var text = stripIdentityPrefix(name);
       if (/音控/.test(text)) return 'operator';
@@ -289,7 +313,10 @@
 
     function getIdentityMeta(name) {
       var displayName = String(name || '').trim();
-      var title = stripIdentityPrefix(displayName) || displayName;
+      var baseName = getDeviceFromDisplayName(displayName);
+      var personName = getPersonFromDisplayName(displayName);
+      var title = stripIdentityPrefix(baseName) || baseName || displayName;
+      if (personName) title += ' · ' + personName;
       return {
         displayName: displayName,
         title: title,
@@ -804,7 +831,10 @@
       ensureChrome();
 
       var remembered = readRememberedName();
-      var selected = PRESETS.indexOf(remembered) >= 0 ? remembered : '';
+      var rememberedDevice = getDeviceFromDisplayName(remembered);
+      var rememberedPerson = getPersonFromDisplayName(remembered);
+      var selected = PRESETS.indexOf(rememberedDevice) >= 0 ? rememberedDevice : '';
+      var personName = rememberedPerson || '';
 
       ROOT.classList.remove('cf-mode-operator');
 
@@ -812,19 +842,54 @@
         '<div class="cf-setup-card">',
         '  <div class="cf-setup-kicker">内通系统</div>',
         '  <h2>选择你的设备</h2>',
-        '  <p class="cf-setup-sub">话筒和乐器都会同步显示到音控台，方便现场快速识别。</p>',
+        '  <p class="cf-setup-sub">先点你的话筒或乐器，再写自己的名字。音控台会显示“设备 + 名字”，现场更好认。</p>',
         '  <div class="cf-preset-grid">',
         PRESETS.map(function (preset) {
-          var taken = takenDevices.indexOf(preset) >= 0 && preset !== whoAmI;
+          var taken = takenDevices.indexOf(preset) >= 0 && preset !== selected;
           return renderPresetButton(preset, preset === selected, taken);
         }).join(''),
         '  </div>',
         '  <div class="cf-selected" id="cf-selected"></div>',
+        '  <div class="cf-name-panel" id="cf-name-panel">',
+        '    <label class="cf-name-label" for="cf-person-name">填写你的名字</label>',
+        '    <div class="cf-name-input-row">',
+        '      <span class="cf-name-device" id="cf-name-device">请选择设备</span>',
+        '      <input class="cf-name-input" id="cf-person-name" type="text" inputmode="text" autocomplete="name" maxlength="18" placeholder="例如：小明 / David" value="', escapeHtml(personName), '">',
+        '    </div>',
+        '    <p class="cf-name-hint">音控端会看到：<span id="cf-name-preview">请选择设备</span></p>',
+        '  </div>',
         '  <button class="cf-btn-primary" id="cf-join-btn">进入成员端</button>',
         '</div>'
       ].join(''));
 
       updateSelectedPreview(selected);
+
+      function syncNamePanel(focusInput) {
+        var panel = ROOT.querySelector('#cf-name-panel');
+        var input = ROOT.querySelector('#cf-person-name');
+        var deviceEl = ROOT.querySelector('#cf-name-device');
+        var preview = ROOT.querySelector('#cf-name-preview');
+        if (!panel || !input || !deviceEl || !preview) return;
+
+        panel.classList.toggle('show', !!selected);
+        deviceEl.textContent = selected ? (stripIdentityPrefix(selected) || selected) : '请选择设备';
+
+        var name = String(input.value || '').trim();
+        var finalName = buildDisplayName(selected, name);
+        preview.textContent = selected
+          ? (name ? (stripIdentityPrefix(selected) + '｜' + name) : (stripIdentityPrefix(selected) + '｜你的名字'))
+          : '请选择设备';
+
+        updateSelectedPreview(finalName || selected);
+
+        if (focusInput && selected) {
+          setTimeout(function () {
+            try { input.focus(); } catch (err) {}
+          }, 80);
+        }
+      }
+
+      syncNamePanel(false);
 
       ROOT.querySelectorAll('.cf-preset-btn').forEach(function (button) {
         button.addEventListener('click', function () {
@@ -834,22 +899,47 @@
           });
           button.classList.add('sel');
           selected = button.dataset.name || '';
-          updateSelectedPreview(selected);
+          syncNamePanel(true);
         });
       });
 
+      var nameInput = ROOT.querySelector('#cf-person-name');
+      if (nameInput) {
+        nameInput.addEventListener('input', function () {
+          personName = String(nameInput.value || '').trim();
+          syncNamePanel(false);
+        });
+        nameInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            var joinBtn = ROOT.querySelector('#cf-join-btn');
+            if (joinBtn) joinBtn.click();
+          }
+        });
+      }
+
       ROOT.querySelector('#cf-join-btn').addEventListener('click', function () {
         if (!selected) {
-          alert('请先选择你的身份');
+          alert('请先选择你的设备');
           return;
         }
+
         /* 二次防护：如果这个设备已被人占用就拒绝 */
         if (takenDevices.indexOf(selected) >= 0) {
           alert('「' + selected + '」已有人在使用，请选择其他设备。');
           return;
         }
-        whoAmI = selected;
-        rememberName(selected);
+
+        personName = String((ROOT.querySelector('#cf-person-name') || {}).value || '').trim();
+        if (!personName) {
+          alert('请填写你的名字，方便音控知道是谁。');
+          var input = ROOT.querySelector('#cf-person-name');
+          if (input) input.focus();
+          return;
+        }
+
+        whoAmI = buildDisplayName(selected, personName);
+        rememberName(whoAmI);
         loadClientLog();
         loadMemberChat();
         renderClient();
@@ -1329,6 +1419,8 @@
         ws.send(JSON.stringify({
           type: 'register',
           name: role === 'operator' ? '音控组' : whoAmI,
+          deviceName: role === 'operator' ? '音控组' : getDeviceFromDisplayName(whoAmI),
+          personName: role === 'operator' ? '' : getPersonFromDisplayName(whoAmI),
           role: role,
           identityType: role === 'operator' ? 'operator' : detectIdentityType(whoAmI)
         }));
