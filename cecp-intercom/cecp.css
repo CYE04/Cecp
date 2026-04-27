@@ -1240,7 +1240,40 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 }
 
 .cf-member-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-member-item .cf-member-pill {
+  flex: 1;
+}
+
+.cf-kick-btn {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 4px 10px;
+  background: rgba(255, 106, 106, 0.07);
+  border: 1px solid rgba(255, 106, 106, 0.22);
+  border-radius: 8px;
+  color: var(--cf-red);
+  font-size: 0.72rem;
+  font-family: var(--cf-font-body);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+
+.cf-kick-btn:hover {
+  background: rgba(255, 106, 106, 0.14);
+  border-color: rgba(255, 106, 106, 0.40);
+  transform: translateY(-1px);
+}
+
+.cf-kick-btn:active {
+  transform: translateY(0);
 }
 
 .cf-member-pill {
@@ -1385,6 +1418,15 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 .cf-log-chip-chat {
   border-color: rgba(98, 171, 255, 0.22);
   color: #b7d6ff;
+}
+
+.cf-log-chip-bcast {
+  border-color: rgba(243, 210, 131, 0.26);
+  color: #f3d283;
+}
+
+.cf-log-broadcast {
+  border-color: rgba(243, 210, 131, 0.20);
 }
 
 .cf-log-read-btn {
