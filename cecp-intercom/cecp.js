@@ -106,6 +106,7 @@
     var whoAmI = '';
     var reconnectTimer = null;
     var pingTimer = null;
+    var clockTimer = null;
     var msgLog = [];
     var clientLog = [];
     var memberChat = [];
@@ -358,6 +359,44 @@
         second: '2-digit',
         hour12: false
       });
+    }
+
+    function formatLiveClock() {
+      return new Date().toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }
+
+    function formatLiveDate() {
+      return new Date().toLocaleDateString('zh-CN', {
+        month: '2-digit',
+        day: '2-digit',
+        weekday: 'short'
+      }).replace(/\//g, '.');
+    }
+
+    function syncLiveClock() {
+      var clockEls = ROOT.querySelectorAll('[data-cf-live-clock]');
+      var dateEls = ROOT.querySelectorAll('[data-cf-live-date]');
+      if (!clockEls.length && !dateEls.length) return;
+
+      var time = formatLiveClock();
+      var date = formatLiveDate();
+
+      clockEls.forEach(function (el) {
+        el.textContent = time;
+      });
+      dateEls.forEach(function (el) {
+        el.textContent = date;
+      });
+    }
+
+    function startLiveClock() {
+      syncLiveClock();
+      if (clockTimer) return;
+      clockTimer = setInterval(syncLiveClock, 10000);
     }
 
     function clientLogKey() {
@@ -850,10 +889,17 @@
         '      <span class="cf-title">CECP 敬拜团成员通道</span>',
         '      <span class="cf-header-sub">舞台请求、成员沟通、广播提醒都集中在这里</span>',
         '    </div>',
-        '    <span class="cf-status">',
-        '      <span class="cf-dot" id="cf-dot"></span>',
-        '      <span id="cf-status-label">连接中…</span>',
-        '    </span>',
+        '    <div class="cf-header-tools">',
+        '      <span class="cf-live-clock-pill" title="当前时间">',
+        '        <span class="cf-live-clock-icon">🕒</span>',
+        '        <span class="cf-live-clock-main" data-cf-live-clock>--:--</span>',
+        '        <span class="cf-live-clock-date" data-cf-live-date></span>',
+        '      </span>',
+        '      <span class="cf-status">',
+        '        <span class="cf-dot" id="cf-dot"></span>',
+        '        <span id="cf-status-label">连接中…</span>',
+        '      </span>',
+        '    </div>',
         '  </div>',
         '  <div class="cf-client-hero">',
         '    <div class="cf-badge-wrap">',
@@ -965,6 +1011,7 @@
       syncBroadcastPopup();
       syncLauncherBadge();
       setStatus(isOnline);
+      startLiveClock();
       scheduleFloatingGeometry();
     }
 
@@ -981,6 +1028,11 @@
         '      <span class="cf-header-sub">成员消息、设备状态、广播控制</span>',
         '    </div>',
         '    <div class="cf-header-tools">',
+        '      <span class="cf-live-clock-pill" title="当前时间">',
+        '        <span class="cf-live-clock-icon">🕒</span>',
+        '        <span class="cf-live-clock-main" data-cf-live-clock>--:--</span>',
+        '        <span class="cf-live-clock-date" data-cf-live-date></span>',
+        '      </span>',
         IS_FLOATING ? '' : '      <button class="cf-screen-btn" id="cf-fullscreen-btn" type="button">进入全屏</button>',
         '      <span class="cf-status">',
         '        <span class="cf-dot" id="cf-dot"></span>',
@@ -1074,6 +1126,7 @@
       renderOperatorLog();
       updateOperatorStats();
       setStatus(isOnline);
+      startLiveClock();
       scheduleFloatingGeometry();
     }
 
