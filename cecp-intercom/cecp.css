@@ -3310,3 +3310,807 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   .cf-op-table-row { grid-template-columns: 1fr; gap: 8px; }
   .cf-op-chat-log { height: 420px; max-height: 56vh; }
 }
+
+/* ============================================================
+   CECP Operator UI v3.1 — mobile portrait polish + notes/tasks removed
+   ============================================================ */
+@media (max-width: 760px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-operator.cf-layout-page {
+    height: 100svh;
+    min-height: 100svh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cf-op-shell {
+    display: block;
+    min-height: 100svh;
+  }
+
+  .cf-op-sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: auto;
+    padding: 10px 12px 8px;
+    gap: 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--cf-op-border);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 10px 26px rgba(18, 24, 38, 0.06);
+  }
+
+  .cf-op-brand {
+    display: none;
+  }
+
+  .cf-op-nav {
+    flex-direction: row;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 2px 0 4px;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cf-op-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cf-op-nav-item {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.74);
+    font-size: 0.86rem;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+
+  .cf-op-nav-item:hover {
+    transform: none;
+  }
+
+  .cf-op-nav-icon {
+    width: auto;
+    font-size: 1rem;
+  }
+
+  .cf-op-nav-count {
+    min-width: 19px;
+    height: 19px;
+    padding: 0 6px;
+    font-size: 0.66rem;
+  }
+
+  .cf-op-main {
+    padding: 14px 12px calc(26px + env(safe-area-inset-bottom));
+  }
+
+  .cf-op-topbar {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .cf-op-heading h1 {
+    font-size: 1.72rem;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+
+  .cf-op-heading p {
+    margin-top: 5px;
+    font-size: 0.82rem;
+  }
+
+  .cf-op-toolbar {
+    gap: 8px;
+    align-items: center;
+  }
+
+  .cf-op-select,
+  .cf-op-search,
+  .cf-op-icon-btn,
+  .cf-op-bell,
+  .cf-op-avatar {
+    height: 40px;
+    border-radius: 11px;
+  }
+
+  .cf-op-select {
+    padding: 0 10px;
+    font-size: 0.78rem;
+  }
+
+  .cf-op-search {
+    order: 10;
+    width: 100%;
+    padding: 0 12px;
+  }
+
+  .cf-op-icon-btn,
+  .cf-op-bell,
+  .cf-op-avatar {
+    width: 40px;
+  }
+
+  .cf-op-icon-btn {
+    display: none;
+  }
+
+  .cf-op-status {
+    min-width: auto;
+    height: 34px;
+    padding: 0 9px;
+    font-size: 0.75rem;
+  }
+
+  .cf-op-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .cf-op-stat {
+    min-height: 86px;
+    padding: 12px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+
+  .cf-op-stat-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+
+  .cf-op-stat-label {
+    margin-bottom: 4px;
+    font-size: 0.72rem;
+  }
+
+  .cf-op-stat-value {
+    font-size: 1.28rem;
+    line-height: 1.05;
+  }
+
+  .cf-op-stat-sub {
+    display: none;
+  }
+
+  .cf-op-grid {
+    gap: 12px;
+  }
+
+  .cf-op-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .cf-op-card-head {
+    margin-bottom: 10px;
+  }
+
+  .cf-op-card h2 {
+    font-size: 0.98rem;
+  }
+
+  .cf-op-textarea {
+    min-height: 120px;
+    padding: 12px;
+  }
+
+  .cf-op-textarea-lg {
+    min-height: 150px;
+  }
+
+  .cf-op-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .cf-op-primary,
+  .cf-op-secondary {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 14px;
+  }
+
+  .cf-op-quick-grid,
+  .cf-op-template-grid,
+  .cf-op-reply-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .cf-op-quick-grid button,
+  .cf-op-template-grid button {
+    min-height: 64px;
+    font-size: 0.86rem;
+  }
+
+  .cf-op-quick-row > div:last-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .cf-op-msg-row {
+    min-height: 62px;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .cf-op-msg-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .cf-op-msg-main {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .cf-op-msg-main strong {
+    min-width: 0;
+    font-size: 0.88rem;
+  }
+
+  .cf-op-msg-main em {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .cf-op-msg-chip {
+    grid-column: 2;
+    justify-self: start;
+    min-height: 24px;
+    padding: 0 8px;
+    font-size: 0.7rem;
+  }
+
+  .cf-op-list-large {
+    max-height: none;
+  }
+
+  .cf-op-tabs {
+    gap: 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+
+  .cf-op-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cf-op-detail-box {
+    padding: 14px;
+  }
+
+  .cf-op-detail-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cf-op-detail-message {
+    font-size: 0.98rem !important;
+  }
+
+  .cf-op-table-row {
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.56);
+  }
+
+  .cf-op-table {
+    display: grid;
+    gap: 8px;
+    border: 0;
+    background: transparent;
+  }
+
+  .cf-op-member-chips {
+    gap: 8px;
+  }
+
+  .cf-op-shell .cf-identity-pill {
+    max-width: 100%;
+  }
+
+  .cf-op-chat-log {
+    height: 50svh;
+    max-height: 50svh;
+    min-height: 320px;
+    padding: 12px;
+  }
+
+  .cf-member-chat-compose {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    padding-top: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0), var(--cf-op-panel-strong) 32%);
+  }
+}
+
+@media (max-width: 430px) {
+  .cf-op-select,
+  .cf-op-status {
+    display: none;
+  }
+
+  .cf-op-heading h1 {
+    font-size: 1.55rem;
+  }
+
+  .cf-op-heading p {
+    font-size: 0.78rem;
+  }
+
+  .cf-op-stat {
+    min-height: 78px;
+    padding: 10px;
+  }
+
+  .cf-op-stat-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  .cf-op-stat-value {
+    font-size: 1.16rem;
+  }
+
+  .cf-op-quick-grid,
+  .cf-op-template-grid,
+  .cf-op-reply-grid,
+  .cf-op-quick-row > div:last-child {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-op-search input {
+    font-size: 0.84rem;
+  }
+}
+
+.cf-op-preview-row {
+  cursor: default;
+}
+
+.cf-op-preview-row:hover {
+  background: transparent;
+}
+
+/* ============================================================
+   CECP Operator UI v3.2 — 强制手机竖屏修复
+   说明：有些手机浏览器会用 desktop viewport，@media 不一定触发，
+   JS 会根据真实 screen.width 给 root 加 .cf-op-mobile。
+   ============================================================ */
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile.cf-mode-operator.cf-layout-page {
+  height: 100svh !important;
+  min-height: 100svh !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-shell {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100svh !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-sidebar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 30 !important;
+  width: 100% !important;
+  height: auto !important;
+  padding: 10px 12px 8px !important;
+  gap: 10px !important;
+  border-right: 0 !important;
+  border-bottom: 1px solid var(--cf-op-border) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 26px rgba(18, 24, 38, 0.06);
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-brand {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-nav {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 7px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 2px 0 4px !important;
+  white-space: nowrap !important;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-nav::-webkit-scrollbar {
+  display: none;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-nav-item {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: max-content !important;
+  min-height: 40px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.74);
+  font-size: 0.86rem !important;
+  line-height: 1 !important;
+  scroll-snap-align: start;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-nav-item:hover {
+  transform: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-nav-icon {
+  width: auto !important;
+  font-size: 1rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-nav-count {
+  min-width: 19px !important;
+  height: 19px !important;
+  padding: 0 6px !important;
+  font-size: 0.66rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-system-card {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-main {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  padding: 14px 12px calc(26px + env(safe-area-inset-bottom)) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-topbar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  margin-bottom: 14px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-heading h1 {
+  font-size: 1.72rem !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.035em !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-heading p {
+  margin-top: 5px !important;
+  font-size: 0.82rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-toolbar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto auto !important;
+  gap: 8px !important;
+  align-items: center !important;
+  justify-content: stretch !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-select,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-search,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-icon-btn,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-bell,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-avatar {
+  height: 40px !important;
+  border-radius: 11px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-select {
+  padding: 0 10px !important;
+  font-size: 0.78rem !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-search {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  order: 10 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-search input {
+  font-size: 0.84rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-icon-btn {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-bell,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-avatar {
+  width: 40px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-status {
+  min-width: auto !important;
+  width: auto !important;
+  height: 34px !important;
+  padding: 0 9px !important;
+  font-size: 0.75rem !important;
+  white-space: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stats {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-bottom: 14px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat {
+  min-width: 0 !important;
+  min-height: 86px !important;
+  padding: 12px !important;
+  gap: 10px !important;
+  border-radius: 14px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat-icon {
+  width: 38px !important;
+  height: 38px !important;
+  font-size: 1.1rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat-copy {
+  min-width: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat-label {
+  margin-bottom: 4px !important;
+  font-size: 0.72rem !important;
+  white-space: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat-value {
+  font-size: 1.28rem !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat-sub {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-span-3,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-span-4,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-span-5,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-span-6,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-span-7,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-span-8,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-span-12 {
+  grid-column: 1 / -1 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 14px !important;
+  border-radius: 14px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-card-head {
+  margin-bottom: 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-card h2 {
+  font-size: 0.98rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-textarea {
+  min-height: 120px !important;
+  padding: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-textarea-lg {
+  min-height: 150px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-actions,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-shell .cf-custom-area {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 9px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-primary,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-secondary,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-shell .cf-custom-area button {
+  width: 100% !important;
+  min-height: 46px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-quick-grid,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-template-grid,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-reply-grid,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-quick-row > div:last-child {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-quick-grid button,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-template-grid button,
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-quick-row button {
+  min-height: 54px !important;
+  font-size: 0.86rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-msg-row {
+  min-height: 62px !important;
+  grid-template-columns: 34px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  padding: 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-msg-icon {
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 1rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-msg-main {
+  min-width: 0 !important;
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-msg-main strong {
+  min-width: 0 !important;
+  font-size: 0.88rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-msg-main em {
+  white-space: normal !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 0.86rem !important;
+  line-height: 1.45 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-msg-time {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-msg-chip {
+  grid-column: 2 !important;
+  justify-self: start !important;
+  min-height: 24px !important;
+  padding: 0 8px !important;
+  font-size: 0.7rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-list-large {
+  max-height: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-tabs {
+  gap: 14px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none;
+  white-space: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-table {
+  display: grid !important;
+  gap: 8px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-table-head {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-table-row {
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  padding: 12px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.56) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-member-chips {
+  gap: 8px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-shell .cf-identity-pill {
+  max-width: 100% !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-chat-log {
+  height: 50svh !important;
+  max-height: 50svh !important;
+  min-height: 320px !important;
+  padding: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-member-chat-compose {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 2 !important;
+  padding-top: 10px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0), var(--cf-op-panel-strong) 32%) !important;
+}
+
+@media (max-width: 430px) {
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-select,
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-status {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-heading h1 {
+    font-size: 1.55rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat {
+    min-height: 78px !important;
+    padding: 10px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat-icon {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 1rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-stat-value {
+    font-size: 1.16rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-quick-grid,
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-template-grid,
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-reply-grid,
+  :where(#cecp-root, [data-cecp-root]).cf-op-mobile .cf-op-quick-row > div:last-child {
+    grid-template-columns: 1fr !important;
+  }
+}

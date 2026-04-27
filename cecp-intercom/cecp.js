@@ -101,8 +101,6 @@
     var STORAGE_KEY = 'cecp:intercom:last-role:' + WS_URL + ':' + PAGE_KEY;
     var CLIENT_LOG_PREFIX = 'cecp:intercom:client-log:' + WS_URL + ':' + PAGE_KEY + ':';
     var MEMBER_CHAT_KEY = 'cecp:intercom:member-chat:' + WS_URL + ':' + PAGE_KEY;
-    var OPERATOR_NOTES_KEY = 'cecp:intercom:operator-notes:' + WS_URL + ':' + PAGE_KEY;
-    var OPERATOR_TASKS_KEY = 'cecp:intercom:operator-tasks:' + WS_URL + ':' + PAGE_KEY;
     var OPERATOR_QUICK_KEY = 'cecp:intercom:operator-quick:' + WS_URL + ':' + PAGE_KEY;
 
     var ws = null;
@@ -129,6 +127,8 @@
     var viewportGeometryHandler = null;
     var docKeyHandler = null;
     var fullscreenChangeHandler = null;
+    var operatorResponsiveHandler = null;
+    var operatorClockTimer = null;
     var destroyed = false;
     var pageShellApplied = false;
     var _originalParent = null;
@@ -990,6 +990,44 @@
       return String(ROOT.dataset.scheduleTime || '09:30');
     }
 
+    function opNowTime() {
+      return new Date().toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }
+
+    function opSyncResponsiveMode() {
+      if (MODE !== 'operator') return;
+      var doc = document.documentElement || {};
+      var vw = window.innerWidth || doc.clientWidth || 0;
+      var sw = 0;
+      try { sw = Math.min(screen.width || 0, screen.height || 0) || 0; } catch (err) {}
+      var coarse = false;
+      try { coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (err2) {}
+      var mobile = vw <= 760 || sw <= 760 || (coarse && sw > 0 && sw <= 920);
+      ROOT.classList.toggle('cf-op-mobile', !!mobile);
+    }
+
+    function opBindResponsiveMode() {
+      if (operatorResponsiveHandler || MODE !== 'operator') return;
+      operatorResponsiveHandler = function () { opSyncResponsiveMode(); };
+      window.addEventListener('resize', operatorResponsiveHandler, { passive: true });
+      window.addEventListener('orientationchange', operatorResponsiveHandler, { passive: true });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', operatorResponsiveHandler, { passive: true });
+      }
+      opSyncResponsiveMode();
+    }
+
+    function opStartClock() {
+      if (operatorClockTimer || MODE !== 'operator') return;
+      operatorClockTimer = setInterval(function () {
+        if (MODE === 'operator') updateOperatorStats();
+      }, 15000);
+    }
+
     function opIsUrgent(item) {
       var text = String((item && item.text) || '');
       return !!item && (item.kind === 'issue' || /故障|紧急|不正常|没声|没有声音|断|爆音|噪音/.test(text));
@@ -1024,39 +1062,6 @@
       try { localStorage.setItem(key, JSON.stringify(value || [])); } catch (err) {}
     }
 
-    function defaultOperatorNotes() {
-      return [
-        { id: 'flow', title: '主日敬拜流程', body: '09:30 会前祷告\n09:45 团队预备与设备检查\n10:00 会众入场与暖场\n10:15 敬拜赞美\n10:30 信息分享\n11:15 回应与祷告\n11:30 结束与会后交通', tag: '流程', pinned: true, ts: Date.now() },
-        { id: 'handheld', title: '讲员手持麦提醒', body: '讲员需要手持麦，敬拜结束后请协助切换。', tag: '提醒', pinned: false, ts: Date.now() - 3600000 },
-        { id: 'newcomer', title: '下周新人加入', body: '下周有新人加入敬拜团队，需要提前安排同工协助。', tag: '人员', pinned: false, ts: Date.now() - 7200000 }
-      ];
-    }
-
-    function getOperatorNotes() {
-      return readJsonArray(OPERATOR_NOTES_KEY, defaultOperatorNotes()).slice(0, 24);
-    }
-
-    function saveOperatorNotes(notes) {
-      writeJsonArray(OPERATOR_NOTES_KEY, notes.slice(0, 24));
-    }
-
-    function defaultOperatorTasks() {
-      return [
-        { id: 'speaker-mic', text: '检查讲员麦克风电量', done: true, due: '今天' },
-        { id: 'song-order', text: '确认敬拜曲目顺序', done: true, due: '今天' },
-        { id: 'stage-cables', text: '舞台设备线材检查', done: false, due: '今天' },
-        { id: 'after-service', text: '服务结束后设备收纳', done: false, due: '会后' }
-      ];
-    }
-
-    function getOperatorTasks() {
-      return readJsonArray(OPERATOR_TASKS_KEY, defaultOperatorTasks()).slice(0, 30);
-    }
-
-    function saveOperatorTasks(tasks) {
-      writeJsonArray(OPERATOR_TASKS_KEY, tasks.slice(0, 30));
-    }
-
     function getOperatorCustomQuick() {
       return readJsonArray(OPERATOR_QUICK_KEY, []).slice(0, 40);
     }
@@ -1072,8 +1077,7 @@
         { id: 'broadcast', icon: '⌁', label: '广播中心' },
         { id: 'quick', icon: 'ϟ', label: '快捷信息' },
         { id: 'devices', icon: '▣', label: '在线设备', count: operatorMembers.length || '' },
-        { id: 'chat', icon: '♧', label: '成员群聊', count: memberChat.length || '' },
-        { id: 'notes', icon: '☷', label: '团队备注' }
+        { id: 'chat', icon: '♧', label: '成员群聊', count: memberChat.length || '' }
       ];
     }
 
@@ -1093,7 +1097,6 @@
     function opTopStats(kind) {
       var issueCount = msgLog.filter(opIsUrgent).length;
       var bcastCount = opBroadcasts().length;
-      var notesCount = getOperatorNotes().length;
       if (kind === 'inbox') {
         return [
           opStatCard('●', '未读消息', opRequests().length + ' 条', '需要查看', 'blue', 'cf-stat-messages'),
@@ -1128,25 +1131,17 @@
       }
       if (kind === 'chat') {
         return [
-          opStatCard('♧', '在线成员', operatorMembers.length + ' / ' + Math.max(operatorMembers.length, 1), '当前在线', 'green'),
-          opStatCard('●', '今日消息', memberChat.length, '条消息', 'blue'),
-          opStatCard('📌', '置顶话题', '3', '个话题', 'gold'),
-          opStatCard('…', '未读对话', '0', '个对话', 'purple')
-        ].join('');
-      }
-      if (kind === 'notes') {
-        return [
-          opStatCard('📌', '置顶备注', getOperatorNotes().filter(function(n){return n.pinned;}).length + ' 条', '重要备注', 'gold'),
-          opStatCard('+', '今日新增', '0 条', '本地记录', 'blue'),
-          opStatCard('◷', '待跟进', getOperatorTasks().filter(function(t){return !t.done;}).length + ' 条', '需要处理', 'gold'),
-          opStatCard('▤', '已归档', notesCount + ' 条', '历史备注', 'green')
+          opStatCard('♧', '在线成员', operatorMembers.length + ' 人', '当前已选择设备', 'green', 'cf-stat-members'),
+          opStatCard('●', '今日消息', memberChat.length + ' 条', '成员群聊记录', 'blue', 'cf-stat-chat'),
+          opStatCard('🎤', '已选话筒', opMicMembers().length + ' 支', '当前被选择', 'green', 'cf-stat-mics'),
+          opStatCard('🎸', '已选乐器', opInstrumentMembers().length + ' 项', '当前被选择', 'blue', 'cf-stat-instruments')
         ].join('');
       }
       return [
-        opStatCard('□', '今日流程', opScheduleTime(), opServiceTitle(), 'gold'),
-        opStatCard('⌁', '设备在线', operatorMembers.length + ' / ' + Math.max(operatorMembers.length, PRESETS.length), '已选择设备', 'green', 'cf-stat-members'),
+        opStatCard('◷', '当前时间', opNowTime(), opServiceTitle(), 'gold', 'cf-stat-clock'),
+        opStatCard('⌁', '设备在线', operatorMembers.length + ' 人', '已选择设备', 'green', 'cf-stat-members'),
         opStatCard('●', '未读信息', opRequests().length + ' 条', '需要查看', 'blue', 'cf-stat-messages'),
-        opStatCard('✓', '待处理事项', getOperatorTasks().filter(function(t){return !t.done;}).length + ' 项', '需要跟进', 'gold')
+        opStatCard('➤', '今日广播', opBroadcasts().length + ' 条', '已发送记录', 'gold', 'cf-stat-broadcasts')
       ].join('');
     }
 
@@ -1285,46 +1280,6 @@
       }).join('');
     }
 
-    function opBuildTasks(limit) {
-      var tasks = getOperatorTasks();
-      if (typeof limit === 'number') tasks = tasks.slice(0, limit);
-      return tasks.map(function (task) {
-        return [
-          '<label class="cf-op-task-row">',
-          '  <input type="checkbox" data-op-task="', escapeHtml(task.id), '"', task.done ? ' checked' : '', '>',
-          '  <span>', escapeHtml(task.text), '</span>',
-          '  <em>', escapeHtml(task.due || ''), '</em>',
-          '</label>'
-        ].join('');
-      }).join('') || '<div class="cf-op-empty">暂无待办事项</div>';
-    }
-
-    function opBuildNotesList(limit) {
-      var notes = getOperatorNotes().sort(function (a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
-      if (typeof limit === 'number') notes = notes.slice(0, limit);
-      if (!notes.length) return '<div class="cf-op-empty">暂无团队备注</div>';
-      return notes.map(function (note, idx) {
-        return [
-          '<button class="cf-op-note-row', idx === 0 ? ' is-active' : '', '" type="button" data-op-note-id="', escapeHtml(note.id), '">',
-          '  <strong>', escapeHtml(note.title), note.pinned ? ' 📌' : '', '</strong>',
-          '  <span>', escapeHtml(note.tag || '备注'), '</span>',
-          '</button>'
-        ].join('');
-      }).join('');
-    }
-
-    function opBuildNoteDetail() {
-      var notes = getOperatorNotes();
-      var note = notes[0];
-      if (!note) return '<div class="cf-op-empty">选择一条备注后，这里会显示内容</div>';
-      return [
-        '<div class="cf-op-note-detail">',
-        '  <div class="cf-op-note-detail-head"><h2>', escapeHtml(note.title), note.pinned ? ' 📌' : '', '</h2><span>', escapeHtml(note.tag || '备注'), '</span></div>',
-        '  <pre>', escapeHtml(note.body || ''), '</pre>',
-        '</div>'
-      ].join('');
-    }
-
     function opRenderOverview() {
       return opShell('音控区', 'Intercom Control Center', 'overview', [
         '<section class="cf-op-stats">', opTopStats('overview'), '</section>',
@@ -1332,9 +1287,8 @@
         opCard('收到的信息', '▣', '<div class="cf-op-list" data-cf-op-log data-filter="requests" data-limit="5">' + opBuildMessageList(5, 'requests', true) + '</div><button class="cf-op-link" data-op-view="inbox" type="button">查看全部信息 ›</button>', 'cf-op-span-4'),
         opCard('广播所有成员', '⌁', '<textarea id="cf-bcast-input" class="cf-op-textarea" placeholder="请输入广播内容..." maxlength="200"></textarea><div class="cf-op-chips"><span>全体 ×</span><span>敬拜组 ×</span><span>音控组 ×</span><button type="button">+ 添加</button></div><div class="cf-op-actions"><button class="cf-op-primary" id="cf-bcast-send" type="button">➤ 发送广播</button><button class="cf-op-secondary" id="cf-bcast-clear" type="button">清空</button></div>', 'cf-op-span-4'),
         opCard('快捷信息', 'ϟ', '<div class="cf-op-quick-grid">' + BCAST_PRESETS.slice(0, 6).map(function(t){return '<button type="button" data-op-send-text="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';}).join('') + '</div><button class="cf-op-link" data-op-view="quick" type="button">管理快捷信息 ›</button>', 'cf-op-span-4'),
-        opCard('在线设备', '▣', '<div data-cf-member-list>' + opBuildMemberRows(6) + '</div><button class="cf-op-link" data-op-view="devices" type="button">查看全部设备 ›</button>', 'cf-op-span-4'),
-        opCard('团队备注', '☷', '<ul class="cf-op-note-mini"><li>注意舞台区电源使用，避免超载。</li><li>讲员需要手持麦，提前测试。</li><li>下周有新人加入，安排同工协助。</li></ul><button class="cf-op-link" data-op-view="notes" type="button">查看全部备注 ›</button>', 'cf-op-span-4'),
-        opCard('待办事项', '✓', '<div class="cf-op-tasks">' + opBuildTasks(4) + '</div><button class="cf-op-link" data-op-view="notes" type="button">查看全部待办 ›</button>', 'cf-op-span-4'),
+        opCard('在线设备', '▣', '<div data-cf-member-list>' + opBuildMemberRows(8) + '</div><button class="cf-op-link" data-op-view="devices" type="button">查看全部设备 ›</button>', 'cf-op-span-6'),
+        opCard('成员群聊', '♧', '<div class="cf-op-list" id="cf-op-chat-preview"><div class="cf-log-empty">成员群聊会显示在这里</div></div><button class="cf-op-link" data-op-view="chat" type="button">进入成员群聊 ›</button>', 'cf-op-span-6'),
         '</section>'
       ].join(''));
     }
@@ -1400,19 +1354,6 @@
         opCard('对话列表', '♧', '<div class="cf-op-room-list"><button class="is-active" type="button"><strong>全体</strong><span>团队同步</span></button><button type="button"><strong>敬拜组</strong><span>排练沟通</span></button><button type="button"><strong>音控组</strong><span>技术确认</span></button><button type="button"><strong>后台协助</strong><span>流程提醒</span></button></div>', 'cf-op-span-3'),
         opCard('全体', '♧', '<div class="cf-log cf-log-member-chat cf-op-chat-log" id="cf-member-chat-log"><div class="cf-log-empty">成员群聊会显示在这里</div></div><div class="cf-custom-area cf-member-chat-compose"><input id="cf-member-chat-input" type="text" placeholder="输入消息，Enter 发送..." maxlength="180"><button id="cf-member-chat-send" type="button">发送</button></div>', 'cf-op-span-6'),
         opCard('成员列表', '☰', '<div data-cf-member-list>' + opBuildMemberRows(10) + '</div>', 'cf-op-span-3'),
-        opCard('置顶公告', '📌', '<div class="cf-op-pin-list"><p>主日聚会流程安排</p><p>音控组注意事项</p><p>下次服事轮值表</p></div>', 'cf-op-span-3'),
-        '</section>'
-      ].join(''));
-    }
-
-    function opRenderNotes() {
-      return opShell('团队备注', 'Team Notes', 'notes', [
-        '<section class="cf-op-stats">', opTopStats('notes'), '</section>',
-        '<section class="cf-op-grid cf-op-grid-notes">',
-        opCard('备注列表', '☷', '<div class="cf-op-note-search"><input type="search" placeholder="搜索备注标题或内容..."></div><div class="cf-op-note-list">' + opBuildNotesList() + '</div><div class="cf-custom-area"><input id="cf-op-note-title" type="text" placeholder="新建备注标题..." maxlength="50"><button id="cf-op-add-note" type="button">新建备注</button></div>', 'cf-op-span-4'),
-        opCard('备注内容', '📌', opBuildNoteDetail() + '<textarea id="cf-op-note-body" class="cf-op-textarea" placeholder="添加备注或更新记录..."></textarea>', 'cf-op-span-5'),
-        opCard('置顶备注', '📌', '<div class="cf-op-note-list is-small">' + opBuildNotesList(4) + '</div>', 'cf-op-span-3'),
-        opCard('待办提醒', '✓', '<div class="cf-op-tasks">' + opBuildTasks() + '</div>', 'cf-op-span-3'),
         '</section>'
       ].join(''));
     }
@@ -1423,7 +1364,6 @@
       if (operatorView === 'quick') return opRenderQuick();
       if (operatorView === 'devices') return opRenderDevices();
       if (operatorView === 'chat') return opRenderChat();
-      if (operatorView === 'notes') return opRenderNotes();
       operatorView = 'overview';
       return opRenderOverview();
     }
@@ -1515,18 +1455,6 @@
         });
       });
 
-      ROOT.querySelectorAll('[data-op-task]').forEach(function (input) {
-        input.addEventListener('change', function () {
-          var id = input.getAttribute('data-op-task') || '';
-          var tasks = getOperatorTasks().map(function (task) {
-            if (task.id === id) task.done = input.checked;
-            return task;
-          });
-          saveOperatorTasks(tasks);
-          updateOperatorStats();
-        });
-      });
-
       var addQuick = ROOT.querySelector('#cf-op-add-quick');
       if (addQuick) addQuick.addEventListener('click', function () {
         var quickInput = ROOT.querySelector('#cf-op-custom-quick-input');
@@ -1535,19 +1463,6 @@
         var items = getOperatorCustomQuick();
         items.unshift(text);
         saveOperatorCustomQuick(items);
-        renderOperator();
-      });
-
-      var addNote = ROOT.querySelector('#cf-op-add-note');
-      if (addNote) addNote.addEventListener('click', function () {
-        var titleInput = ROOT.querySelector('#cf-op-note-title');
-        var bodyInput = ROOT.querySelector('#cf-op-note-body');
-        var title = titleInput && titleInput.value ? titleInput.value.trim() : '';
-        var body = bodyInput && bodyInput.value ? bodyInput.value.trim() : '';
-        if (!title) return;
-        var notes = getOperatorNotes();
-        notes.unshift({ id: nowId('note'), title: title, body: body || '暂无内容', tag: '备注', pinned: false, ts: Date.now() });
-        saveOperatorNotes(notes);
         renderOperator();
       });
 
@@ -1572,6 +1487,9 @@
     function renderOperator() {
       ensureChrome();
       ROOT.classList.add('cf-mode-operator');
+      opBindResponsiveMode();
+      opSyncResponsiveMode();
+      opStartClock();
       setStageHtml(opRenderCurrent());
       bindOperatorDashboard();
       renderMembers(operatorMembers);
@@ -1625,6 +1543,20 @@
     }
 
     function renderMemberChat() {
+      var preview = ROOT.querySelector('#cf-op-chat-preview');
+      if (preview) {
+        var latest = memberChat.slice(-5).reverse();
+        preview.innerHTML = latest.length ? latest.map(function (item) {
+          return [
+            '<div class="cf-op-msg-row cf-op-preview-row">',
+            '  <span class="cf-op-msg-icon">🗨️</span>',
+            '  <span class="cf-op-msg-main"><strong>', escapeHtml(stripIdentityPrefix(item.from) || item.from || '成员'), '</strong><em>', escapeHtml(item.text), '</em></span>',
+            '  <span class="cf-op-msg-time">', escapeHtml(formatTime(item.ts)), '</span>',
+            '</div>'
+          ].join('');
+        }).join('') : '<div class="cf-op-empty">成员群聊会显示在这里</div>';
+      }
+
       var log = ROOT.querySelector('#cf-member-chat-log');
       if (!log) return;
 
@@ -1659,17 +1591,16 @@
       var chatCount = memberChat.length;
       var micCount = opMicMembers().length;
       var instrumentCount = opInstrumentMembers().length;
-      var pendingTasks = getOperatorTasks().filter(function (task) { return !task.done; }).length;
 
       var values = {
+        'cf-stat-clock': opNowTime(),
         'cf-stat-members': String(memberCount),
         'cf-stat-messages': String(msgLog.length),
         'cf-stat-issues': String(issueCount),
         'cf-stat-broadcasts': String(broadcastCount),
         'cf-stat-chat': String(chatCount),
         'cf-stat-mics': String(micCount),
-        'cf-stat-instruments': String(instrumentCount),
-        'cf-stat-tasks': String(pendingTasks)
+        'cf-stat-instruments': String(instrumentCount)
       };
 
       Object.keys(values).forEach(function (id) {
@@ -2120,6 +2051,18 @@
       if (fullscreenChangeHandler) {
         document.removeEventListener('fullscreenchange', fullscreenChangeHandler);
         fullscreenChangeHandler = null;
+      }
+      if (operatorResponsiveHandler) {
+        window.removeEventListener('resize', operatorResponsiveHandler);
+        window.removeEventListener('orientationchange', operatorResponsiveHandler);
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', operatorResponsiveHandler);
+        }
+        operatorResponsiveHandler = null;
+      }
+      if (operatorClockTimer) {
+        clearInterval(operatorClockTimer);
+        operatorClockTimer = null;
       }
       var rootEl = document.documentElement;
       var bodyEl = document.body;
