@@ -1060,38 +1060,21 @@
         '        <div class="cf-cue-grid">',
         CUES.map(function (cue) {
           return [
-            '<div class="cf-cue-btn cf-cue-card" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
-            '  <div class="cf-cue-card-main">',
-            '    <span class="cf-icon">', escapeHtml(cue.icon), '</span>',
-            '    <div>',
-            '      <div class="cf-cue-label">', escapeHtml(cue.label), '</div>',
-            '      <div class="cf-cue-desc">', escapeHtml(cue.desc), '</div>',
-            '    </div>',
+            '<button class="cf-cue-btn" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
+            '  <span class="cf-icon">', escapeHtml(cue.icon), '</span>',
+            '  <div>',
+            '    <div class="cf-cue-label">', escapeHtml(cue.label), '</div>',
+            '    <div class="cf-cue-desc">', escapeHtml(cue.desc), '</div>',
             '  </div>',
-            '  <div class="cf-cue-actions">',
-            '    <button class="cf-cue-send cf-cue-to-sound" type="button" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">音控</button>',
-            '    <button class="cf-cue-send cf-cue-to-team" type="button" data-msg="', escapeHtml(cue.label), '">群员</button>',
-            '  </div>',
-            '</div>'
+            '</button>'
           ].join('');
         }).join(''),
         '        </div>',
         '      </div>',
-        '      <div class="cf-dual-compose">',
-        '        <div class="cf-compose-card cf-compose-sound">',
-        '          <div class="cf-section-label">🎛️ 发给音控</div>',
-        '          <div class="cf-custom-area">',
-        '            <input id="cf-custom-input" type="text" placeholder="例如：主歌前多一点钢琴…" maxlength="120">',
-        '            <button id="cf-custom-send" type="button">发送</button>',
-        '          </div>',
-        '        </div>',
-        '        <div class="cf-compose-card cf-compose-team">',
-        '          <div class="cf-section-label">🗨️ 发给群员</div>',
-        '          <div class="cf-custom-area">',
-        '            <input id="cf-member-chat-input-main" type="text" placeholder="例如：副歌进 / 重来一次…" maxlength="180">',
-        '            <button id="cf-member-chat-send-main" type="button">发送</button>',
-        '          </div>',
-        '        </div>',
+        '      <div class="cf-section-label">💬 发给音控组</div>',
+        '      <div class="cf-custom-area">',
+        '        <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
+        '        <button id="cf-custom-send" type="button">发送</button>',
         '      </div>',
         '    </div>',
         '    <div class="cf-client-side">',
@@ -1140,23 +1123,7 @@
         });
       }
 
-      ROOT.querySelectorAll('.cf-cue-to-sound').forEach(function (button) {
-        button.addEventListener('click', function (event) {
-          event.preventDefault();
-          event.stopPropagation();
-          sendWorshipMsg(button.dataset.kind, button.dataset.msg);
-        });
-      });
-
-      ROOT.querySelectorAll('.cf-cue-to-team').forEach(function (button) {
-        button.addEventListener('click', function (event) {
-          event.preventDefault();
-          event.stopPropagation();
-          sendMemberChatText(button.dataset.msg, '快捷消息已发给群员 ✓');
-        });
-      });
-
-      ROOT.querySelectorAll('.cf-cue-btn:not(.cf-cue-card)').forEach(function (button) {
+      ROOT.querySelectorAll('.cf-cue-btn').forEach(function (button) {
         button.addEventListener('click', function () {
           sendWorshipMsg(button.dataset.kind, button.dataset.msg);
         });
@@ -1177,16 +1144,6 @@
         });
       }
 
-      var memberSendBtnMain = ROOT.querySelector('#cf-member-chat-send-main');
-      var memberInputMain = ROOT.querySelector('#cf-member-chat-input-main');
-      if (memberSendBtnMain && memberInputMain) {
-        memberSendBtnMain.addEventListener('click', function () {
-          sendMemberChatFromInput('#cf-member-chat-input-main');
-        });
-        memberInputMain.addEventListener('keydown', function (event) {
-          if (event.key === 'Enter') sendMemberChatFromInput('#cf-member-chat-input-main');
-        });
-      }
 
       var clearBtn = ROOT.querySelector('#cf-client-clear-btn');
       if (clearBtn) {

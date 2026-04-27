@@ -3112,3 +3112,66 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     color: #24547e;
   }
 }
+
+
+/* ============================================================
+   ▌ CECP — 恢复快捷信息第一版样式
+   - 保留新增快捷消息
+   - 快捷消息不再分「音控 / 群员」
+   - 点击快捷消息默认发给音控
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]) .cf-cue-card,
+:where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+  cursor: pointer;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-cue-actions,
+:where(#cecp-root, [data-cecp-root]) .cf-cue-send {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-cue-card-main {
+  display: contents !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-dual-compose {
+  display: block !important;
+}
+
+@media (max-width: 760px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    min-height: 82px !important;
+    padding: 11px 10px !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn .cf-icon {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 1.08rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-label {
+    font-size: .82rem !important;
+    line-height: 1.2 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-desc {
+    font-size: .66rem !important;
+    line-height: 1.25 !important;
+    margin-top: 3px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+}
+
+@media (max-width: 370px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    min-height: 78px !important;
+    padding: 10px 8px !important;
+  }
+}
