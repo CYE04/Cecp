@@ -2835,3 +2835,280 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
       inset 0 1px 0 rgba(255,255,255,.75);
   }
 }
+
+
+/* ============================================================
+   ▌ CECP — 降低透明度：手机快捷面板更实、更清楚
+   ============================================================ */
+
+@media (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-head {
+    background: var(--cf-surface-strong) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-color: var(--cf-border-strong) !important;
+    box-shadow: 0 12px 28px rgba(0,0,0,.22) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show > .cf-cue-grid {
+    background: var(--cf-surface-strong) !important;
+    border-color: var(--cf-border-strong) !important;
+    box-shadow:
+      0 24px 58px rgba(0,0,0,.42),
+      0 0 0 1px rgba(255,255,255,.04) inset !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    background: var(--cf-surface-soft) !important;
+    border-color: var(--cf-border-strong) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn:hover,
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn:active {
+    background: linear-gradient(135deg, var(--cf-accent-soft), var(--cf-surface-soft)) !important;
+    border-color: var(--cf-accent-ring) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area,
+  :where(#cecp-root, [data-cecp-root]) .cf-panel,
+  :where(#cecp-root, [data-cecp-root]) .cf-client-hero,
+  :where(#cecp-root, [data-cecp-root]) .cf-header {
+    background: var(--cf-surface-strong) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area input {
+    background: var(--cf-surface-soft) !important;
+  }
+}
+
+@media (prefers-color-scheme: light) and (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]) {
+    --cf-surface-strong: #ffffff;
+    --cf-surface-soft: #f8f6f1;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-head,
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show > .cf-cue-grid,
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area,
+  :where(#cecp-root, [data-cecp-root]) .cf-panel,
+  :where(#cecp-root, [data-cecp-root]) .cf-client-hero,
+  :where(#cecp-root, [data-cecp-root]) .cf-header {
+    background: #ffffff !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn,
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area input {
+    background: #f8f6f1 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show > .cf-cue-grid {
+    box-shadow:
+      0 24px 58px rgba(70,55,25,.20),
+      0 0 0 1px rgba(255,255,255,.80) inset !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]) {
+    --cf-surface-strong: #111724;
+    --cf-surface-soft: #171f2f;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-head,
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show > .cf-cue-grid,
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area,
+  :where(#cecp-root, [data-cecp-root]) .cf-panel,
+  :where(#cecp-root, [data-cecp-root]) .cf-client-hero,
+  :where(#cecp-root, [data-cecp-root]) .cf-header {
+    background: #111724 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn,
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area input {
+    background: #171f2f !important;
+  }
+}
+
+
+/* ============================================================
+   ▌ CECP — 双通道发送 + 音控分栏 + 快捷消息直接显示
+   ============================================================ */
+
+.cf-dual-compose {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.cf-compose-card {
+  min-width: 0;
+}
+
+.cf-cue-card {
+  cursor: default;
+}
+
+.cf-cue-card-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cf-cue-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.cf-cue-send {
+  min-height: 32px;
+  border: 1px solid var(--cf-border);
+  border-radius: 10px;
+  background: rgba(255,255,255,.05);
+  color: var(--cf-text);
+  font-family: var(--cf-font-body);
+  font-size: .75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.cf-cue-send:active {
+  transform: scale(.98);
+}
+
+.cf-cue-to-sound {
+  border-color: var(--cf-accent-ring, var(--cf-border));
+  background: var(--cf-accent-soft, rgba(243,210,131,.16));
+  color: var(--cf-accent-ink, var(--cf-text));
+}
+
+.cf-cue-to-team {
+  background: rgba(91, 163, 255, .12);
+  border-color: rgba(91, 163, 255, .28);
+  color: var(--cf-text);
+}
+
+.cf-op-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, .85fr) minmax(360px, 1.25fr) minmax(340px, 1fr) minmax(340px, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.cf-op-layout .cf-panel {
+  min-width: 0;
+}
+
+.cf-panel-stage-log,
+.cf-panel-group-log,
+.cf-panel-broadcast-log {
+  min-height: 430px;
+}
+
+.cf-panel-broadcast-log {
+  display: flex;
+  flex-direction: column;
+}
+
+.cf-panel-broadcast-log .cf-bcast-presets {
+  margin-bottom: 10px;
+}
+
+.cf-bcast-log {
+  flex: 1;
+  min-height: 180px;
+}
+
+.cf-panel-group-log .cf-log,
+.cf-panel-stage-log .cf-log {
+  min-height: 340px;
+}
+
+@media (max-width: 1280px) {
+  .cf-op-layout {
+    grid-template-columns: minmax(260px, .9fr) minmax(360px, 1.1fr);
+  }
+
+  .cf-panel-broadcast-log,
+  .cf-panel-group-log {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 760px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-dual-compose {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-toggle {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown,
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show {
+    position: static !important;
+    display: block !important;
+    grid-template-rows: 1fr !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    max-height: none !important;
+    margin-bottom: 8px !important;
+    overflow: visible !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show::before {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown > .cf-cue-grid,
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show > .cf-cue-grid {
+    max-height: 35dvh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    min-height: 112px !important;
+    align-items: stretch !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-card-main {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-actions {
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-send {
+    min-height: 34px;
+    font-size: .72rem;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-op-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .cf-cue-send {
+    background: #fff;
+  }
+
+  .cf-cue-to-team {
+    background: #edf5ff;
+    color: #24547e;
+  }
+}
