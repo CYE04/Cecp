@@ -68,6 +68,7 @@ export class WorshipRoom {
         const meta = ws.deserializeAttachment() || {};
         this._broadcast(JSON.stringify({
           type: 'worship_msg',
+          id:   msg.id || `worship:${Date.now()}`,
           from: meta.name || '?',
           kind: msg.kind,
           text: msg.text,
@@ -78,7 +79,7 @@ export class WorshipRoom {
       case 'member_chat': {
         const meta = ws.deserializeAttachment() || {};
         const senderName = meta.name || msg.from || '?';
-        if (meta.role && meta.role !== 'client') break;
+        if (meta.role && meta.role !== 'client' && meta.role !== 'operator') break;
         this._broadcast(JSON.stringify({
           type: 'member_chat',
           id:   msg.id || `member:${Date.now()}`,
@@ -95,7 +96,10 @@ export class WorshipRoom {
         if (bcMeta.role !== 'operator') break;
         this._broadcast(JSON.stringify({
           type: 'broadcast',
+          id:   msg.id || `broadcast:${Date.now()}`,
+          from: bcMeta.name || '音控组',
           text: msg.text,
+          targets: Array.isArray(msg.targets) ? msg.targets : [],
           ts:   Date.now(),
         }), null, 'client');
         break;
