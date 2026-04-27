@@ -831,120 +831,152 @@
       ensureChrome();
 
       ROOT.classList.remove('cf-mode-operator');
-      var showMemberChat = ENABLE_MEMBER_CHAT;
+      ROOT.classList.add('cf-mode-client-broadcast');
 
       var defaultNotice = selectionSource === 'default'
         ? [
-            '  <div class="cf-device-note">',
-            '    <div class="cf-device-note-copy">当前先用默认设备 ',
-            renderIdentityPill(whoAmI, 'cf-device-note-pill'),
-            ' ，如果不是你，请重新选择设备。</div>',
-            '    <button class="cf-device-reset-btn" id="cf-reset-device" type="button">重新选设备</button>',
+            '  <div class="cf-client-mini-note">',
+            '    <span>当前先用默认身份</span>',
+            renderIdentityPill(whoAmI, 'cf-client-mini-pill'),
+            '    <button class="cf-device-reset-btn" id="cf-reset-device" type="button">重新选择</button>',
             '  </div>'
           ].join('')
         : [
-            '  <div class="cf-device-note is-subtle">',
-            '    <div class="cf-device-note-copy">如果这次不是这个设备，可以随时重新选择。</div>',
-            '    <button class="cf-device-reset-btn" id="cf-reset-device" type="button">更换设备</button>',
+            '  <div class="cf-client-mini-note">',
+            '    <span>当前身份</span>',
+            renderIdentityPill(whoAmI, 'cf-client-mini-pill'),
+            '    <button class="cf-device-reset-btn" id="cf-reset-device" type="button">更换</button>',
             '  </div>'
           ].join('');
 
       setStageHtml([
-        '<div class="cf-app cf-client-app">',
-        '  <div class="cf-header">',
-        '    <div class="cf-header-copy">',
-        '      <span class="cf-title">CECP 敬拜团成员通道</span>',
-        '      <span class="cf-header-sub">舞台请求、成员沟通、广播提醒都集中在这里</span>',
+        '<div class="cf-app cf-client-app cf-broadcast-app">',
+        '  <header class="cf-client-topbar">',
+        '    <div class="cf-brand-lockup">',
+        '      <span class="cf-brand-logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>',
+        '      <span class="cf-brand-copy"><strong>Vocal</strong><em>敬拜团队沟通</em></span>',
         '    </div>',
-        '    <span class="cf-status">',
-        '      <span class="cf-dot" id="cf-dot"></span>',
-        '      <span id="cf-status-label">连接中…</span>',
-        '    </span>',
-        '  </div>',
-        '  <div class="cf-client-hero">',
-        '    <div class="cf-badge-wrap">',
-        '      <div class="cf-badge-label">当前设备</div>',
-        renderIdentityPill(whoAmI, 'cf-badge'),
+        '    <div class="cf-client-top-actions">',
+        '      <span class="cf-status cf-client-status"><span class="cf-dot" id="cf-dot"></span><span id="cf-status-label">连接中…</span></span>',
+        '      <button class="cf-icon-btn" type="button" aria-label="搜索">⌕</button>',
+        '      <button class="cf-icon-btn" type="button" aria-label="设置">⚙</button>',
         '    </div>',
-        '    <div class="cf-client-note">左边给音控组发舞台请求，右边保留成员沟通和广播记录，现场会更清楚也更顺手。</div>',
+        '  </header>',
+        '  <nav class="cf-client-tabs" aria-label="功能切换">',
+        '    <button class="is-active" type="button"><span>⌁</span>广播</button>',
+        '    <button type="button" data-scroll-to="cf-quick-section"><span>⚡</span>快捷信息</button>',
+        '    <button type="button" data-scroll-to="cf-recent-section"><span>◷</span>历史记录</button>',
+        '  </nav>',
         defaultNotice,
-        '  </div>',
-        '  <div class="cf-client-grid">',
-        '    <div class="cf-client-main">',
-        '      <div class="cf-section-label">快捷消息</div>',
-        '      <div class="cf-cue-grid">',
+        '  <main class="cf-broadcast-layout">',
+        '    <section class="cf-card cf-broadcast-compose">',
+        '      <div class="cf-card-head">',
+        '        <span class="cf-card-icon">📣</span>',
+        '        <div><h2>广播发送</h2><p>把当前提醒直接发送到指定区域，适合敬拜现场快速沟通。</p></div>',
+        '      </div>',
+        '      <div class="cf-compose-row">',
+        '        <span class="cf-compose-label">发送对象</span>',
+        '        <div class="cf-target-group" role="tablist" aria-label="发送对象">',
+        '          <button class="cf-client-target is-active" type="button" data-target="worship">👥 敬拜团区域</button>',
+        '          <button class="cf-client-target" type="button" data-target="operator">🎧 音控聊天</button>',
+        '        </div>',
+        '        <button class="cf-target-select" type="button">全部成员 <span>⌄</span></button>',
+        '      </div>',
+        '      <label class="cf-compose-label" for="cf-custom-input">广播内容</label>',
+        '      <div class="cf-broadcast-input-wrap">',
+        '        <textarea id="cf-custom-input" maxlength="200" placeholder="请输入广播内容…"></textarea>',
+        '        <span id="cf-char-count" class="cf-char-count">0/200</span>',
+        '      </div>',
+        '      <div class="cf-compose-row cf-severity-row">',
+        '        <span class="cf-compose-label">重要程度</span>',
+        '        <button class="cf-severity is-active" type="button" data-severity="normal"><i></i>普通</button>',
+        '        <button class="cf-severity" type="button" data-severity="notice"><i></i>提醒</button>',
+        '        <button class="cf-severity cf-severity-urgent" type="button" data-severity="urgent"><i></i>紧急</button>',
+        '      </div>',
+        '      <button class="cf-send-main" id="cf-custom-send" type="button">➤ 发送广播</button>',
+        '    </section>',
+        '    <aside class="cf-card cf-quick-panel" id="cf-quick-section">',
+        '      <div class="cf-card-head cf-card-head-sm">',
+        '        <span class="cf-card-icon">⚡</span>',
+        '        <div><h2>快捷提醒</h2><p>一键发送常用现场提醒。</p></div>',
+        '      </div>',
+        '      <div class="cf-cue-grid cf-quick-reminder-grid">',
         CUES.map(function (cue) {
           return [
-            '<button class="cf-cue-btn" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
+            '<button class="cf-cue-btn cf-quick-reminder" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '" data-desc="', escapeHtml(cue.desc), '">',
             '  <span class="cf-icon">', escapeHtml(cue.icon), '</span>',
-            '  <div>',
-            '    <div class="cf-cue-label">', escapeHtml(cue.label), '</div>',
-            '    <div class="cf-cue-desc">', escapeHtml(cue.desc), '</div>',
-            '  </div>',
+            '  <span class="cf-quick-copy"><strong>', escapeHtml(cue.label), '</strong><em>', escapeHtml(cue.desc), '</em></span>',
+            '  <span class="cf-quick-arrow">›</span>',
             '</button>'
           ].join('');
         }).join(''),
         '      </div>',
-        '      <div class="cf-section-label">💬 发给音控组</div>',
-        '      <div class="cf-custom-area">',
-        '        <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
-        '        <button id="cf-custom-send" type="button">发送</button>',
+        '    </aside>',
+        '    <section class="cf-card cf-preview-card">',
+        '      <div class="cf-preview-title"><span>◎ 广播预览</span><em>成员将看到的广播效果</em></div>',
+        '      <div class="cf-preview-display" id="cf-broadcast-preview">',
+        '        <span class="cf-preview-mega">📢</span>',
+        '        <strong>请全员安静，预备开始</strong>',
+        '        <small><i></i>普通提醒</small>',
+        '        <time>刚刚</time>',
         '      </div>',
-        '    </div>',
-        '    <div class="cf-client-side">',
-        showMemberChat ? [
-          '      <div class="cf-panel cf-panel-member-chat">',
-          '        <div class="cf-panel-title-row">',
-          '          <span class="cf-panel-title">成员群聊</span>',
-          '          <button class="cf-clear-btn" id="cf-member-chat-clear-btn" type="button">清空</button>',
-          '        </div>',
-          '        <div class="cf-member-chat-note">成员之间可以直接沟通段落、预备和现场提醒，不会盖掉舞台请求。</div>',
-          '        <div class="cf-log cf-log-member-chat" id="cf-member-chat-log">',
-          '          <div class="cf-log-empty">成员群聊会显示在这里</div>',
-          '        </div>',
-          '        <div class="cf-custom-area cf-member-chat-compose">',
-          '          <input id="cf-member-chat-input" type="text" placeholder="给成员说一句…" maxlength="180">',
-          '          <button id="cf-member-chat-send" type="button">发送</button>',
-          '        </div>',
-          '      </div>'
-        ].join('') : '',
+        '    </section>',
         SHOW_CLIENT_LOG ? [
-          '      <div class="cf-panel cf-panel-client-log">',
-          '        <div class="cf-panel-title-row">',
-          '          <span class="cf-panel-title">音控记录</span>',
-          '          <button class="cf-clear-btn" id="cf-client-clear-btn" type="button">清空</button>',
-          '        </div>',
-          '        <div class="cf-log cf-log-client" id="cf-client-log">',
-          '          <div class="cf-log-empty">你发出的请求和收到的广播会显示在这里</div>',
-          '        </div>',
-          '      </div>'
+          '    <section class="cf-card cf-recent-card" id="cf-recent-section">',
+          '      <div class="cf-panel-title-row">',
+          '        <span class="cf-panel-title">最近广播</span>',
+          '        <button class="cf-clear-btn" id="cf-client-clear-btn" type="button">清空</button>',
+          '      </div>',
+          '      <div class="cf-recent-list" id="cf-client-recent">',
+          '        <div class="cf-log-empty">最近发送和收到的提醒会显示在这里</div>',
+          '      </div>',
+          '    </section>'
         ].join('') : '',
-        '    </div>',
-        '  </div>',
+        '  </main>',
         '  <div class="cf-flash" id="cf-flash">发送成功 ✓</div>',
         '</div>'
       ].join(''));
 
+      ROOT.querySelectorAll('.cf-client-target').forEach(function (button) {
+        button.addEventListener('click', function () {
+          ROOT.querySelectorAll('.cf-client-target').forEach(function (other) { other.classList.remove('is-active'); });
+          button.classList.add('is-active');
+          syncClientPreview();
+        });
+      });
+
+      ROOT.querySelectorAll('.cf-severity').forEach(function (button) {
+        button.addEventListener('click', function () {
+          ROOT.querySelectorAll('.cf-severity').forEach(function (other) { other.classList.remove('is-active'); });
+          button.classList.add('is-active');
+          syncClientPreview();
+        });
+      });
+
+      ROOT.querySelectorAll('[data-scroll-to]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          var id = button.getAttribute('data-scroll-to');
+          var target = id ? ROOT.querySelector('#' + id) : null;
+          if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
       ROOT.querySelectorAll('.cf-cue-btn').forEach(function (button) {
         button.addEventListener('click', function () {
-          sendWorshipMsg(button.dataset.kind, button.dataset.msg);
+          sendClientBroadcast(button.dataset.kind, button.dataset.msg, button.dataset.desc || '');
         });
       });
 
-      ROOT.querySelector('#cf-custom-send').addEventListener('click', sendCustom);
-      ROOT.querySelector('#cf-custom-input').addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') sendCustom();
-      });
-      ROOT.querySelector('#cf-reset-device').addEventListener('click', resetDeviceSelection);
-
-      var memberSendBtn = ROOT.querySelector('#cf-member-chat-send');
-      var memberInput = ROOT.querySelector('#cf-member-chat-input');
-      if (memberSendBtn && memberInput) {
-        memberSendBtn.addEventListener('click', sendMemberChat);
-        memberInput.addEventListener('keydown', function (event) {
-          if (event.key === 'Enter') sendMemberChat();
+      var input = ROOT.querySelector('#cf-custom-input');
+      if (input) {
+        input.addEventListener('input', syncClientPreview);
+        input.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) sendCustom();
         });
       }
+
+      ROOT.querySelector('#cf-custom-send').addEventListener('click', sendCustom);
+      ROOT.querySelector('#cf-reset-device').addEventListener('click', resetDeviceSelection);
 
       var clearBtn = ROOT.querySelector('#cf-client-clear-btn');
       if (clearBtn) {
@@ -957,21 +989,76 @@
         });
       }
 
-      var memberClearBtn = ROOT.querySelector('#cf-member-chat-clear-btn');
-      if (memberClearBtn) {
-        memberClearBtn.addEventListener('click', function () {
-          memberChat = [];
-          saveMemberChat();
-          renderMemberChat();
-        });
-      }
-
-      renderMemberChat();
+      syncClientPreview();
       renderClientLog();
       syncBroadcastPopup();
       syncLauncherBadge();
       setStatus(isOnline);
       scheduleFloatingGeometry();
+    }
+
+    function clientTarget() {
+      var active = ROOT.querySelector('.cf-client-target.is-active');
+      return active ? String(active.getAttribute('data-target') || 'worship') : 'worship';
+    }
+
+    function clientSeverity() {
+      var active = ROOT.querySelector('.cf-severity.is-active');
+      return active ? String(active.getAttribute('data-severity') || 'normal') : 'normal';
+    }
+
+    function clientSeverityLabel(value) {
+      if (value === 'urgent') return '紧急提醒';
+      if (value === 'notice') return '提醒';
+      return '普通提醒';
+    }
+
+    function clientSeverityKind(kind) {
+      var level = clientSeverity();
+      if (level === 'urgent') return 'issue';
+      return kind || (level === 'notice' ? 'custom' : 'custom');
+    }
+
+    function syncClientPreview() {
+      var input = ROOT.querySelector('#cf-custom-input');
+      var count = ROOT.querySelector('#cf-char-count');
+      var preview = ROOT.querySelector('#cf-broadcast-preview');
+      var text = input && input.value ? input.value.trim() : '请全员安静，预备开始';
+      var level = clientSeverity();
+      if (count && input) count.textContent = String(input.value.length) + '/200';
+      if (!preview) return;
+      preview.innerHTML = [
+        '<span class="cf-preview-mega">📢</span>',
+        '<strong>', escapeHtml(text), '</strong>',
+        '<small class="cf-level-', escapeHtml(level), '"><i></i>', escapeHtml(clientSeverityLabel(level)), '</small>',
+        '<time>刚刚</time>'
+      ].join('');
+    }
+
+    function sendClientBroadcast(kind, text, desc) {
+      text = String(text || '').trim();
+      if (!text) return;
+      var target = clientTarget();
+      var finalKind = clientSeverityKind(kind);
+      var finalText = text;
+      if (desc && !/^\s*$/.test(desc)) {
+        finalText = text + '｜' + desc;
+      }
+
+      if (target === 'worship') {
+        if (!wsReady()) {
+          flashEl('cf-flash', '当前离线，正在重连…', true);
+          return;
+        }
+        var id = nowId('member');
+        ws.send(JSON.stringify({ type: 'member_chat', id: id, text: finalText }));
+        appendMemberChat({ id: id, from: whoAmI, text: finalText, ts: Date.now() });
+        appendClientLog({ id: nowId('out'), from: whoAmI, kind: 'member_chat', text: finalText, ts: Date.now(), direction: 'out', read: true });
+        flashEl('cf-flash', '已发送到敬拜团 ✓');
+        return;
+      }
+
+      sendWorshipMsg(finalKind, finalText);
     }
 
     /* ============================================================
@@ -1501,7 +1588,52 @@
     }
 
     function renderClientLog() {
+      var recent = ROOT.querySelector('#cf-client-recent');
       var log = ROOT.querySelector('#cf-client-log');
+
+      function targetLabel(item) {
+        if (item.kind === 'member_chat') return '敬拜团区域';
+        if (item.direction === 'in') return '来自音控';
+        return '音控聊天';
+      }
+
+      function levelClass(item) {
+        var text = String((item && item.text) || '');
+        if (item && (item.kind === 'issue' || /故障|紧急|没声|杂音|爆音|排查/.test(text))) return 'urgent';
+        if (/提醒|耳返|多点|少点|注意|调整/.test(text)) return 'notice';
+        return 'normal';
+      }
+
+      function levelLabel(level) {
+        return level === 'urgent' ? '紧急' : (level === 'notice' ? '提醒' : '普通');
+      }
+
+      if (recent) {
+        if (!clientLog.length) {
+          recent.innerHTML = '<div class="cf-log-empty">最近发送和收到的提醒会显示在这里</div>';
+        } else {
+          recent.innerHTML = clientLog.slice(0, 8).map(function (item) {
+            var level = levelClass(item);
+            return [
+              '<div class="cf-recent-item cf-recent-', level, '">',
+              '  <span class="cf-recent-dot"></span>',
+              '  <div class="cf-recent-main">',
+              '    <strong>', escapeHtml(item.text), '</strong>',
+              '    <em>', escapeHtml(levelLabel(level)), ' · ', escapeHtml(targetLabel(item)), ' · ', escapeHtml(formatTime(item.ts)), '</em>',
+              '  </div>',
+              item.direction === 'in' && !item.read ? '  <button class="cf-log-read-btn" type="button" data-read-id="' + escapeHtml(item.id) + '">已读</button>' : '  <span class="cf-recent-arrow">›</span>',
+              '</div>'
+            ].join('');
+          }).join('');
+        }
+
+        recent.querySelectorAll('[data-read-id]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            markClientEntryRead(button.getAttribute('data-read-id') || '');
+          });
+        });
+      }
+
       if (!log) return;
 
       if (!clientLog.length) {
@@ -1512,13 +1644,13 @@
       log.innerHTML = clientLog.map(function (item) {
         var icon = KIND_ICONS[item.kind] || '💬';
         var dirChip = item.direction === 'out'
-          ? '<span class="cf-log-chip">发给音控组</span>'
+          ? '<span class="cf-log-chip">已发送</span>'
           : '<span class="cf-log-chip cf-log-chip-in">来自音控组</span>';
         var readChip = item.direction === 'in'
           ? (item.read
               ? '<span class="cf-log-chip">已读</span>'
               : '<button class="cf-log-read-btn" type="button" data-read-id="' + escapeHtml(item.id) + '">已读</button>')
-          : '<span class="cf-log-chip">已发送</span>';
+          : '<span class="cf-log-chip">' + escapeHtml(targetLabel(item)) + '</span>';
         return [
           '<div class="cf-log-item', item.direction === 'out' ? ' is-outgoing' : ' is-incoming', '">',
           '  <span class="cf-log-icon">', escapeHtml(icon), '</span>',
@@ -1933,8 +2065,9 @@
       var input = ROOT.querySelector('#cf-custom-input');
       var text = input && input.value ? input.value.trim() : '';
       if (!text) return;
-      sendWorshipMsg('custom', text);
+      sendClientBroadcast('custom', text, '');
       if (input) input.value = '';
+      syncClientPreview();
     }
 
     function sendMemberChat() {
