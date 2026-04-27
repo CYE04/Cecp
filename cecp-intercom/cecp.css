@@ -3283,3 +3283,258 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     padding-inline: 9px !important;
   }
 }
+
+
+/* ============================================================
+   ▌ CECP — 快捷信息正常页面展开版
+   - 不折叠
+   - 不底部浮层
+   - 不内部上下滑动
+   - 全部快捷信息直接在页面里显示
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]) .cf-quick-toggle {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-quick-head {
+  position: static !important;
+  top: auto !important;
+  z-index: auto !important;
+  margin-bottom: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-quick-sub {
+  display: block !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown,
+:where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show {
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: auto !important;
+  display: block !important;
+  grid-template-rows: 1fr !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  margin: 0 0 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown::before,
+:where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show::before {
+  display: none !important;
+  content: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown > .cf-cue-grid,
+:where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show > .cf-cue-grid {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  -webkit-overflow-scrolling: auto !important;
+  overscroll-behavior: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 手机端仍保持两列，但让页面整体滚动，不让快捷区自己滚 */
+@media (max-width: 760px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-head {
+    display: block !important;
+    margin-bottom: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-sub {
+    display: block !important;
+    margin-top: 3px !important;
+    font-size: 0.7rem !important;
+    line-height: 1.35 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    min-height: 82px !important;
+    padding: 11px 10px !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+}
+
+
+/* ============================================================
+   ▌ CECP — 手机端状态栏不截断 + 换设备固定显示
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]) .cf-device-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-device-main {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]) .cf-device-reset-main,
+:where(#cecp-root, [data-cecp-root]) #cf-reset-device {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  min-height: 36px !important;
+  padding: 8px 13px !important;
+  border: 1px solid var(--cf-border-strong, var(--cf-border)) !important;
+  border-radius: 999px !important;
+  background: var(--cf-accent-soft, rgba(243, 210, 131, .16)) !important;
+  color: var(--cf-accent-ink, var(--cf-text)) !important;
+  font-family: var(--cf-font-body) !important;
+  font-size: .78rem !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
+}
+
+@media (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    overflow: visible !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-header-copy {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-header-tools {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    max-width: 58% !important;
+    overflow: visible !important;
+    flex-wrap: wrap !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-pill {
+    order: 1 !important;
+    flex: 0 0 auto !important;
+    max-width: 100% !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-status {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    max-width: none !important;
+    min-width: fit-content !important;
+    padding: 5px 8px !important;
+    border: 1px solid var(--cf-border) !important;
+    border-radius: 999px !important;
+    background: var(--cf-surface-soft, rgba(255,255,255,.06)) !important;
+    color: var(--cf-muted) !important;
+    font-size: .72rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-status .cf-dot {
+    width: 7px !important;
+    height: 7px !important;
+    flex: 0 0 7px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) #cf-status-label {
+    display: inline-block !important;
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+    font-size: .72rem !important;
+    line-height: 1 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-client-hero {
+    overflow: visible !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-device-row {
+    flex-wrap: nowrap !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-device-main .cf-identity-pill {
+    max-width: min(62vw, 260px) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-device-main .cf-identity-text {
+    max-width: min(46vw, 190px) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) #cf-reset-device {
+    min-height: 34px !important;
+    padding: 7px 11px !important;
+    font-size: .74rem !important;
+  }
+}
+
+@media (max-width: 390px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-header-tools {
+    max-width: 62% !important;
+    gap: 5px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-pill {
+    padding: 5px 7px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-date {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-status {
+    padding: 5px 7px !important;
+    font-size: .7rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-device-main .cf-identity-text {
+    max-width: 42vw !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) #cf-reset-device {
+    padding-inline: 9px !important;
+  }
+}

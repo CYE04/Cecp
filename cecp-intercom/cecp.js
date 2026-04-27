@@ -1007,13 +1007,13 @@
             '    <div class="cf-device-note-copy">当前先用默认设备 ',
             renderIdentityPill(whoAmI, 'cf-device-note-pill'),
             ' ，如果不是你，请重新选择设备。</div>',
-            '    <button class="cf-device-reset-btn" id="cf-reset-device" type="button">重新选设备</button>',
+            '    <button class="cf-device-reset-btn" data-cf-old-reset="1" type="button">重新选设备</button>',
             '  </div>'
           ].join('')
         : [
             '  <div class="cf-device-note is-subtle">',
             '    <div class="cf-device-note-copy">如果这次不是这个设备，可以随时重新选择。</div>',
-            '    <button class="cf-device-reset-btn" id="cf-reset-device" type="button">更换设备</button>',
+            '    <button class="cf-device-reset-btn" data-cf-old-reset="1" type="button">更换设备</button>',
             '  </div>'
           ].join('');
 
@@ -1037,12 +1037,14 @@
         '    </div>',
         '  </div>',
         '  <div class="cf-client-hero">',
-        '    <div class="cf-badge-wrap">',
-        '      <div class="cf-badge-label">当前设备</div>',
+        '    <div class="cf-badge-wrap cf-device-row">',
+        '      <div class="cf-device-main">',
+        '        <div class="cf-badge-label">当前设备</div>',
         renderIdentityPill(whoAmI, 'cf-badge'),
+        '      </div>',
+        '      <button class="cf-device-reset-btn cf-device-reset-main" id="cf-reset-device" type="button">换设备</button>',
         '    </div>',
         '    <div class="cf-client-note">左边给音控组发舞台请求，右边保留成员沟通和广播记录，现场会更清楚也更顺手。</div>',
-        defaultNotice,
         '  </div>',
         '  <div class="cf-client-grid">',
         '    <div class="cf-client-main">',
@@ -1056,7 +1058,7 @@
         '          <span class="cf-quick-arrow">⌄</span>',
         '        </button>',
         '      </div>',
-        '      <div class="cf-quick-dropdown" id="cf-quick-dropdown">',
+        '      <div class="cf-quick-dropdown show" id="cf-quick-dropdown">',
         '        <div class="cf-cue-grid">',
         CUES.map(function (cue) {
           return [
@@ -1145,8 +1147,9 @@
       ROOT.querySelector('#cf-custom-input').addEventListener('keydown', function (event) {
         if (event.key === 'Enter') sendCustom();
       });
-      var resetDeviceBtn = ROOT.querySelector('#cf-reset-device');
-      if (resetDeviceBtn) resetDeviceBtn.addEventListener('click', resetDeviceSelection);
+      ROOT.querySelectorAll('#cf-reset-device, [data-cf-old-reset="1"]').forEach(function (btn) {
+        btn.addEventListener('click', resetDeviceSelection);
+      });
 
       var memberSendBtn = ROOT.querySelector('#cf-member-chat-send');
       var memberInput = ROOT.querySelector('#cf-member-chat-input');
