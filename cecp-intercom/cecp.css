@@ -2439,3 +2439,164 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     font-size: 0.64rem;
   }
 }
+
+
+/* ============================================================
+   ▌ CECP — 快捷消息 DropList + 手机最多两列
+   ============================================================ */
+
+.cf-quick-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.cf-quick-sub {
+  margin-top: 4px;
+  color: var(--cf-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.cf-quick-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid var(--cf-border);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, var(--cf-accent-soft, rgba(243, 210, 131, .14)), rgba(255, 255, 255, .04));
+  color: var(--cf-accent-ink, var(--cf-text));
+  font-family: var(--cf-font-body);
+  font-size: .82rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.cf-quick-toggle:hover {
+  transform: translateY(-1px);
+  border-color: var(--cf-accent-ring, rgba(243, 210, 131, .32));
+  box-shadow: 0 10px 20px rgba(0,0,0,.12);
+}
+
+.cf-quick-arrow {
+  display: inline-flex;
+  transition: transform .18s ease;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.cf-quick-toggle.open .cf-quick-arrow {
+  transform: rotate(180deg);
+}
+
+.cf-quick-dropdown {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-5px);
+  pointer-events: none;
+  transition: grid-template-rows .24s ease, opacity .2s ease, transform .2s ease;
+  margin-bottom: 12px;
+}
+
+.cf-quick-dropdown.show {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.cf-quick-dropdown > .cf-cue-grid {
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px;
+  border: 1px solid var(--cf-border);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top left, var(--cf-accent-soft, rgba(243,210,131,.12)), transparent 38%),
+    rgba(255,255,255,.025);
+}
+
+/* 桌面保持清楚的卡片网格，手机最多/固定两列 */
+@media (max-width: 640px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-head {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-toggle {
+    width: 100%;
+    min-height: 42px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    min-height: 82px;
+    padding: 11px 10px;
+    gap: 8px;
+    border-radius: 15px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn .cf-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1.08rem;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-label {
+    font-size: .82rem;
+    line-height: 1.2;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-desc {
+    font-size: .66rem;
+    line-height: 1.25;
+    margin-top: 3px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 370px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-grid {
+    gap: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    min-height: 78px;
+    padding: 10px 8px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-label {
+    font-size: .78rem;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-desc {
+    font-size: .62rem;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .cf-quick-dropdown > .cf-cue-grid {
+    background:
+      radial-gradient(circle at top left, rgba(201,146,42,.10), transparent 38%),
+      rgba(255,255,255,.70);
+  }
+}
