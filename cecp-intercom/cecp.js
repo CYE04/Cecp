@@ -73,25 +73,70 @@
 
     var DEFAULT_CUES = [
       { kind: 'more_monitor', icon: '🎧', label: '耳返多点', desc: '耳返整体声音太小' },
+      { kind: 'less_monitor', icon: '🎧', label: '耳返少点', desc: '耳返整体声音太大' },
       { kind: 'self_up',      icon: '🔊', label: '多点自己', desc: '自己声音太小听不清' },
       { kind: 'self_down',    icon: '🔉', label: '少点自己', desc: '自己声音太大了' },
+      { kind: 'voice_up',     icon: '🎤', label: '人声多点', desc: '主唱/和声需要更清楚' },
+      { kind: 'voice_down',   icon: '🎤', label: '人声少点', desc: '人声太突出或太大' },
       { kind: 'piano_up',     icon: '🎹', label: '琴声多点', desc: '琴声太小听不清' },
       { kind: 'piano_down',   icon: '🎹', label: '琴声少点', desc: '琴声太大了' },
+      { kind: 'guitar_up',    icon: '🎸', label: '吉他多点', desc: '吉他需要更清楚' },
+      { kind: 'bass_up',      icon: '🎸', label: '贝斯多点', desc: '低频不够稳' },
+      { kind: 'drum_up',      icon: '🥁', label: '鼓多点', desc: '节奏需要更清楚' },
+      { kind: 'click_up',     icon: '⏱️', label: '节拍多点', desc: 'Click/节拍听不清' },
+      { kind: 'track_up',     icon: '🎼', label: '伴奏多点', desc: '伴奏或Pad需要更清楚' },
+      { kind: 'reverb_down',  icon: '🌫️', label: '混响少点', desc: '声音太糊或太湿' },
+      { kind: 'wait',         icon: '✋', label: '稍等一下', desc: '先暂停处理一下' },
       { kind: 'issue',        icon: '⚠️', label: '设备故障', desc: '需要帮忙处理' }
     ];
 
     var DEFAULT_BCAST_PRESETS = ['排练开始', '排练结束', '下一首', '重来', '稍等一下'];
 
     var PRESETS = readPresetList(ROOT.dataset.presets, DEFAULT_PRESETS);
-    var CUES = readCueList(ROOT.dataset.cues, DEFAULT_CUES);
+    var CUES = mergeExtraCues(readCueList(ROOT.dataset.cues, DEFAULT_CUES));
     var BCAST_PRESETS = readPresetList(ROOT.dataset.broadcastPresets, DEFAULT_BCAST_PRESETS);
+
+    function mergeExtraCues(list) {
+      if (ROOT.dataset.disableExtraCues === '1') return list;
+      var extras = [
+        { kind: 'less_monitor', icon: '🎧', label: '耳返少点', desc: '耳返整体声音太大' },
+        { kind: 'voice_up',     icon: '🎤', label: '人声多点', desc: '主唱/和声需要更清楚' },
+        { kind: 'voice_down',   icon: '🎤', label: '人声少点', desc: '人声太突出或太大' },
+        { kind: 'guitar_up',    icon: '🎸', label: '吉他多点', desc: '吉他需要更清楚' },
+        { kind: 'bass_up',      icon: '🎸', label: '贝斯多点', desc: '低频不够稳' },
+        { kind: 'drum_up',      icon: '🥁', label: '鼓多点', desc: '节奏需要更清楚' },
+        { kind: 'click_up',     icon: '⏱️', label: '节拍多点', desc: 'Click/节拍听不清' },
+        { kind: 'track_up',     icon: '🎼', label: '伴奏多点', desc: '伴奏或Pad需要更清楚' },
+        { kind: 'reverb_down',  icon: '🌫️', label: '混响少点', desc: '声音太糊或太湿' },
+        { kind: 'wait',         icon: '✋', label: '稍等一下', desc: '先暂停处理一下' }
+      ];
+      var seen = {};
+      list.forEach(function (cue) {
+        if (cue && cue.label) seen[String(cue.label)] = true;
+      });
+      extras.forEach(function (cue) {
+        if (!seen[cue.label]) list.push(cue);
+      });
+      return list;
+    }
+
 
     var KIND_ICONS = {
       more_monitor: '🎧',
+      less_monitor: '🎧',
       self_up: '🔊',
       self_down: '🔉',
+      voice_up: '🎤',
+      voice_down: '🎤',
       piano_up: '🎹',
       piano_down: '🎹',
+      guitar_up: '🎸',
+      bass_up: '🎸',
+      drum_up: '🥁',
+      click_up: '⏱️',
+      track_up: '🎼',
+      reverb_down: '🌫️',
+      wait: '✋',
       issue: '⚠️',
       custom: '💬',
       broadcast: '📢',
@@ -1001,8 +1046,18 @@
         '  </div>',
         '  <div class="cf-client-grid">',
         '    <div class="cf-client-main">',
-        '      <div class="cf-section-label">快捷消息</div>',
-        '      <div class="cf-cue-grid">',
+        '      <div class="cf-quick-head">',
+        '        <div>',
+        '          <div class="cf-section-label">消息快捷</div>',
+        '          <div class="cf-quick-sub">像游戏快捷消息一样，点开后选择要发给音控的提醒。</div>',
+        '        </div>',
+        '        <button class="cf-quick-toggle" id="cf-quick-toggle" type="button" aria-expanded="false">',
+        '          <span>消息快捷</span>',
+        '          <span class="cf-quick-arrow">⌄</span>',
+        '        </button>',
+        '      </div>',
+        '      <div class="cf-quick-dropdown" id="cf-quick-dropdown">',
+        '        <div class="cf-cue-grid">',
         CUES.map(function (cue) {
           return [
             '<button class="cf-cue-btn" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
@@ -1014,6 +1069,7 @@
             '</button>'
           ].join('');
         }).join(''),
+        '        </div>',
         '      </div>',
         '      <div class="cf-section-label">💬 发给音控组</div>',
         '      <div class="cf-custom-area">',
@@ -1055,9 +1111,30 @@
         '</div>'
       ].join(''));
 
+      var quickToggle = ROOT.querySelector('#cf-quick-toggle');
+      var quickDropdown = ROOT.querySelector('#cf-quick-dropdown');
+      if (quickToggle && quickDropdown) {
+        quickToggle.addEventListener('click', function () {
+          var open = quickDropdown.classList.toggle('show');
+          quickToggle.classList.toggle('open', open);
+          quickToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          var label = quickToggle.querySelector('span');
+          if (label) label.textContent = open ? '收起快捷' : '消息快捷';
+        });
+      }
+
       ROOT.querySelectorAll('.cf-cue-btn').forEach(function (button) {
         button.addEventListener('click', function () {
           sendWorshipMsg(button.dataset.kind, button.dataset.msg);
+          if (quickDropdown && quickDropdown.classList.contains('show')) {
+            quickDropdown.classList.remove('show');
+            if (quickToggle) {
+              quickToggle.classList.remove('open');
+              quickToggle.setAttribute('aria-expanded', 'false');
+              var label = quickToggle.querySelector('span');
+              if (label) label.textContent = '消息快捷';
+            }
+          }
         });
       });
 

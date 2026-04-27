@@ -2600,3 +2600,238 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
       rgba(255,255,255,.70);
   }
 }
+
+
+/* ============================================================
+   ▌ CECP — 手机首屏可达 + 吃鸡式快捷消息浮层
+   - 手机端把最重要操作压到首屏：当前设备、快捷消息、手动发送
+   - 快捷消息按钮固定在操作区顶部，点开后以底部浮层出现
+   ============================================================ */
+
+@media (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]).cf-layout-page .cf-app {
+    padding: 10px 10px calc(16px + env(safe-area-inset-bottom)) !important;
+    gap: 9px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-header {
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+    gap: 10px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-title {
+    font-size: 1.08rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-header-sub {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-header-tools {
+    gap: 7px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-status {
+    font-size: 0;
+    gap: 0;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-status .cf-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-pill {
+    min-height: 32px !important;
+    padding: 5px 9px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-client-hero {
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-badge-wrap {
+    gap: 7px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-badge-label {
+    font-size: .66rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-identity-pill {
+    padding: 7px 10px !important;
+    gap: 7px !important;
+    max-width: 100%;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-identity-text {
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-client-note,
+  :where(#cecp-root, [data-cecp-root]) .cf-device-note {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-client-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 9px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-client-main {
+    gap: 8px !important;
+    order: 1;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-client-side {
+    gap: 9px !important;
+    order: 2;
+  }
+
+  /* 首屏核心：消息快捷入口 */
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-head {
+    position: sticky;
+    top: 8px;
+    z-index: 30;
+    margin-bottom: 6px !important;
+    padding: 10px;
+    border: 1px solid var(--cf-border);
+    border-radius: 16px;
+    background:
+      linear-gradient(135deg, var(--cf-accent-soft, rgba(243, 210, 131, .15)), rgba(255,255,255,.05)),
+      var(--cf-surface-strong);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 12px 26px rgba(0,0,0,.16);
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-sub {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-toggle {
+    min-height: 40px !important;
+    border-radius: 14px !important;
+  }
+
+  /* 点开后不是在页面里撑开，而是像游戏快捷消息一样从底部浮起来 */
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown {
+    margin: 0 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show {
+    position: fixed !important;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    z-index: 2147483646;
+    max-height: min(58dvh, 420px);
+    overflow: visible;
+    transform: translateY(0) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show::before {
+    content: '消息快捷';
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 34px;
+    padding: 0 4px 8px;
+    color: var(--cf-muted);
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show > .cf-cue-grid {
+    max-height: calc(min(58dvh, 420px) - 34px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 10px !important;
+    border-radius: 22px !important;
+    box-shadow:
+      0 24px 56px rgba(0,0,0,.34),
+      inset 0 1px 0 rgba(255,255,255,.08);
+  }
+
+  /* 快捷消息手机端最多/固定两列，方便拇指点 */
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show .cf-cue-grid,
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    min-height: 76px !important;
+    padding: 10px 9px !important;
+  }
+
+  /* 手动发送也压缩，尽量保持在首屏内 */
+  :where(#cecp-root, [data-cecp-root]) .cf-section-label {
+    margin-top: 2px !important;
+    font-size: .72rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area {
+    gap: 7px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area input {
+    min-height: 42px !important;
+    font-size: .9rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area button {
+    min-height: 42px !important;
+    padding-inline: 13px !important;
+  }
+
+  /* 记录区降低首屏存在感，操作优先 */
+  :where(#cecp-root, [data-cecp-root]) .cf-panel {
+    border-radius: 16px !important;
+    padding: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-log {
+    max-height: 190px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-app {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-btn {
+    min-height: 72px !important;
+    padding: 9px 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-desc {
+    -webkit-line-clamp: 1 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-identity-text {
+    max-width: 170px;
+  }
+}
+
+@media (prefers-color-scheme: light) and (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-head {
+    background:
+      linear-gradient(135deg, rgba(201,146,42,.10), rgba(255,255,255,.76)),
+      var(--cf-surface-strong);
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-quick-dropdown.show > .cf-cue-grid {
+    box-shadow:
+      0 24px 56px rgba(80,64,30,.18),
+      inset 0 1px 0 rgba(255,255,255,.75);
+  }
+}
