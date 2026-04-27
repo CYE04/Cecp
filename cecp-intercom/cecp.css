@@ -5241,17 +5241,57 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   min-height: 50px !important;
 }
 
+/* Portrait orientation: keep natural flow (devices on top, identity card below)
+   to avoid sticky overlay swallowing tap events on the device picker.
+   The identity card is intentionally NOT sticky so the name input and the
+   "进入广播" button can receive focus and clicks reliably on portrait phones. */
 @media (orientation: portrait) {
+  :where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-shell,
+  :where(#cecp-root, [data-cecp-root]).cf-client-tablet .cf-setup-shell {
+    padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important;
+  }
+
   :where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-side,
   :where(#cecp-root, [data-cecp-root]).cf-client-tablet .cf-setup-side {
-    position: sticky !important;
-    top: max(10px, env(safe-area-inset-top)) !important;
-    z-index: 6 !important;
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
   }
 
   :where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-identity-card,
   :where(#cecp-root, [data-cecp-root]).cf-client-tablet .cf-setup-identity-card {
     box-shadow: 0 18px 34px rgba(8, 34, 30, 0.16) !important;
+    pointer-events: auto !important;
+  }
+
+  /* Make sure preset buttons are real clickable tap targets; nothing
+     should sit above them blocking taps. */
+  :where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-card-vocal .cf-preset-btn,
+  :where(#cecp-root, [data-cecp-root]).cf-client-tablet .cf-setup-card-vocal .cf-preset-btn {
+    position: relative !important;
+    z-index: 1 !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: rgba(200, 137, 63, 0.18) !important;
+  }
+
+  /* Name input must be tappable + not zoomed by iOS */
+  :where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-name-input,
+  :where(#cecp-root, [data-cecp-root]).cf-client-tablet .cf-setup-name-input {
+    width: 100% !important;
+    min-height: 50px !important;
+    font-size: 16px !important;
+    padding: 12px 14px !important;
+    -webkit-user-select: text !important;
+    user-select: text !important;
+  }
+
+  /* Join button: full-width, big tap target */
+  :where(#cecp-root, [data-cecp-root]).cf-client-mobile .cf-setup-identity-card .cf-btn-primary,
+  :where(#cecp-root, [data-cecp-root]).cf-client-tablet .cf-setup-identity-card .cf-btn-primary {
+    width: 100% !important;
+    min-height: 54px !important;
+    margin-top: 12px !important;
+    touch-action: manipulation !important;
   }
 }
 
@@ -6078,8 +6118,9 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 
 @media (max-width: 720px) {
   .cf-setup-shell { min-height: auto !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; width: 100% !important; padding: 14px !important; gap: 14px !important; }
-  .cf-setup-side { order: -1 !important; width: 100% !important; align-self: stretch !important; }
-  .cf-setup-card-vocal, .cf-setup-identity-card { width: 100% !important; max-width: 100% !important; border-radius: 22px !important; }
+  .cf-setup-card-vocal { order: 1 !important; }
+  .cf-setup-side { order: 2 !important; width: 100% !important; align-self: stretch !important; position: static !important; top: auto !important; }
+  .cf-setup-card-vocal, .cf-setup-identity-card { width: 100% !important; max-width: 100% !important; border-radius: 22px !important; position: static !important; }
   .cf-setup-card-vocal { padding: 18px 14px !important; }
   .cf-setup-card-vocal .cf-preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
   .cf-setup-card-vocal .cf-preset-btn { min-height: 136px !important; padding: 14px 10px !important; border-radius: 18px !important; }
@@ -7207,32 +7248,12 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   background: #1f9d5a !important;
 }
 
-/* theme toggle button */
-.cf-theme-toggle {
-  background: transparent !important;
-  border: 1px solid var(--cf-border) !important;
-  border-radius: 12px !important;
-  padding: 6px 10px !important;
-  color: var(--cf-text) !important;
-  font: inherit !important;
-  cursor: pointer !important;
-  transition: background 0.2s, border-color 0.2s !important;
-}
-.cf-theme-toggle:hover {
-  background: rgba(200, 137, 63, 0.1) !important;
-  border-color: rgba(200, 137, 63, 0.4) !important;
-}
-:where(#cecp-root, [data-cecp-root]).cf-theme-light .cf-theme-toggle {
-  background: #fff !important;
-  border: 1px solid var(--cf-border) !important;
-  color: #1f2433 !important;
-}
-
 /* ============================================================
    ▦  AUTO LIGHT (system prefers-color-scheme: light)  ▦
    Re-applies the same overrides automatically when the OS
    reports light, unless an explicit .cf-theme-dark override
-   is present.
+   is present. There is intentionally NO manual toggle button —
+   the theme follows the user's OS / browser preference.
    ============================================================ */
 @media (prefers-color-scheme: light) {
   :where(#cecp-root, [data-cecp-root]):not(.cf-theme-dark) .cf-op-sidebar {
@@ -7306,11 +7327,12 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   }
   :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-side {
     order: 2 !important;
-    position: sticky !important;
-    bottom: 8px !important;
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
     width: 100% !important;
     align-self: stretch !important;
-    z-index: 5 !important;
+    z-index: auto !important;
   }
   :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-identity-card {
     width: 100% !important;
@@ -7428,5 +7450,52 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   }
   :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-chat-card .cf-member-chat-compose input {
     font-size: 16px; /* prevent iOS zoom */
+  }
+}
+
+/* ============================================================
+   Mobile portrait setup-flow tap-target hardening
+   Ensures device cards + name input + join button all reliably
+   receive pointer events on phones in portrait orientation.
+   ============================================================ */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-preset-btn {
+  -webkit-tap-highlight-color: rgba(200, 137, 63, 0.18);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-preset-btn > * {
+  pointer-events: none;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-preset-btn[disabled],
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-preset-btn.taken {
+  cursor: not-allowed;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-name-input {
+  -webkit-user-select: text;
+  user-select: text;
+  pointer-events: auto;
+}
+:where(#cecp-root, [data-cecp-root]).cf-mode-client #cf-join-btn {
+  -webkit-tap-highlight-color: rgba(200, 137, 63, 0.24);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+@media (max-width: 720px) and (orientation: portrait) {
+  /* Final overrides: drop any sticky/fixed positioning on the setup
+     flow so the picker and the identity card stack naturally. */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-shell,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-side,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-identity-card {
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-card-vocal {
+    order: 1 !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-setup-side {
+    order: 2 !important;
   }
 }
