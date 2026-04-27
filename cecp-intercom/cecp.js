@@ -101,6 +101,9 @@
     var STORAGE_KEY = 'cecp:intercom:last-role:' + WS_URL + ':' + PAGE_KEY;
     var CLIENT_LOG_PREFIX = 'cecp:intercom:client-log:' + WS_URL + ':' + PAGE_KEY + ':';
     var MEMBER_CHAT_KEY = 'cecp:intercom:member-chat:' + WS_URL + ':' + PAGE_KEY;
+    var OPERATOR_NOTES_KEY = 'cecp:intercom:operator-notes:' + WS_URL + ':' + PAGE_KEY;
+    var OPERATOR_TASKS_KEY = 'cecp:intercom:operator-tasks:' + WS_URL + ':' + PAGE_KEY;
+    var OPERATOR_QUICK_KEY = 'cecp:intercom:operator-quick:' + WS_URL + ':' + PAGE_KEY;
 
     var ws = null;
     var whoAmI = '';
@@ -111,6 +114,9 @@
     var memberChat = [];
     var flashTimers = {};
     var memberCount = 0;
+    var operatorMembers = [];
+    var operatorView = String(ROOT.dataset.operatorView || 'overview').trim() || 'overview';
+    var operatorSelectedMsgIndex = 0;
     var takenDevices = [];   // 已被占用的设备名列表（来自服务端 taken_devices 消息）
     var widgetOpen = !IS_FLOATING;
     var operatorUnreadCount = 0;
@@ -968,98 +974,589 @@
       scheduleFloatingGeometry();
     }
 
-    function renderOperator() {
-      ensureChrome();
+    /* ============================================================
+       Operator dashboard helpers — only affects data-mode="operator"
+       ============================================================ */
 
-      ROOT.classList.add('cf-mode-operator');
+    function opServiceLabel() {
+      return String(ROOT.dataset.serviceLabel || ROOT.dataset.eventLabel || '2026 / 主日聚会');
+    }
 
-      setStageHtml([
-        '<div class="cf-app cf-op">',
-        '  <div class="cf-header">',
-        '    <div class="cf-header-copy">',
-        '      <span class="cf-title">CECP 音控台</span>',
-        '      <span class="cf-header-sub">成员消息、设备状态、广播控制</span>',
-        '    </div>',
-        '    <div class="cf-header-tools">',
-        IS_FLOATING ? '' : '      <button class="cf-screen-btn" id="cf-fullscreen-btn" type="button">进入全屏</button>',
-        '      <span class="cf-status">',
-        '        <span class="cf-dot" id="cf-dot"></span>',
-        '        <span id="cf-status-label">连接中…</span>',
-        '      </span>',
-        '    </div>',
+    function opServiceTitle() {
+      return String(ROOT.dataset.serviceTitle || '主日敬拜');
+    }
+
+    function opScheduleTime() {
+      return String(ROOT.dataset.scheduleTime || '09:30');
+    }
+
+    function opIsUrgent(item) {
+      var text = String((item && item.text) || '');
+      return !!item && (item.kind === 'issue' || /故障|紧急|不正常|没声|没有声音|断|爆音|噪音/.test(text));
+    }
+
+    function opBroadcasts() {
+      return msgLog.filter(function (item) { return item.kind === 'broadcast'; });
+    }
+
+    function opRequests() {
+      return msgLog.filter(function (item) { return item.kind !== 'broadcast'; });
+    }
+
+    function opMicMembers() {
+      return operatorMembers.filter(function (m) { return detectIdentityType(m.name) === 'mic'; });
+    }
+
+    function opInstrumentMembers() {
+      return operatorMembers.filter(function (m) { return detectIdentityType(m.name) === 'instrument'; });
+    }
+
+    function readJsonArray(key, fallback) {
+      try {
+        var parsed = JSON.parse(localStorage.getItem(key) || 'null');
+        return Array.isArray(parsed) ? parsed : fallback.slice();
+      } catch (err) {
+        return fallback.slice();
+      }
+    }
+
+    function writeJsonArray(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value || [])); } catch (err) {}
+    }
+
+    function defaultOperatorNotes() {
+      return [
+        { id: 'flow', title: '主日敬拜流程', body: '09:30 会前祷告\n09:45 团队预备与设备检查\n10:00 会众入场与暖场\n10:15 敬拜赞美\n10:30 信息分享\n11:15 回应与祷告\n11:30 结束与会后交通', tag: '流程', pinned: true, ts: Date.now() },
+        { id: 'handheld', title: '讲员手持麦提醒', body: '讲员需要手持麦，敬拜结束后请协助切换。', tag: '提醒', pinned: false, ts: Date.now() - 3600000 },
+        { id: 'newcomer', title: '下周新人加入', body: '下周有新人加入敬拜团队，需要提前安排同工协助。', tag: '人员', pinned: false, ts: Date.now() - 7200000 }
+      ];
+    }
+
+    function getOperatorNotes() {
+      return readJsonArray(OPERATOR_NOTES_KEY, defaultOperatorNotes()).slice(0, 24);
+    }
+
+    function saveOperatorNotes(notes) {
+      writeJsonArray(OPERATOR_NOTES_KEY, notes.slice(0, 24));
+    }
+
+    function defaultOperatorTasks() {
+      return [
+        { id: 'speaker-mic', text: '检查讲员麦克风电量', done: true, due: '今天' },
+        { id: 'song-order', text: '确认敬拜曲目顺序', done: true, due: '今天' },
+        { id: 'stage-cables', text: '舞台设备线材检查', done: false, due: '今天' },
+        { id: 'after-service', text: '服务结束后设备收纳', done: false, due: '会后' }
+      ];
+    }
+
+    function getOperatorTasks() {
+      return readJsonArray(OPERATOR_TASKS_KEY, defaultOperatorTasks()).slice(0, 30);
+    }
+
+    function saveOperatorTasks(tasks) {
+      writeJsonArray(OPERATOR_TASKS_KEY, tasks.slice(0, 30));
+    }
+
+    function getOperatorCustomQuick() {
+      return readJsonArray(OPERATOR_QUICK_KEY, []).slice(0, 40);
+    }
+
+    function saveOperatorCustomQuick(items) {
+      writeJsonArray(OPERATOR_QUICK_KEY, items.slice(0, 40));
+    }
+
+    function opNavItems() {
+      return [
+        { id: 'overview', icon: '⌂', label: '总览' },
+        { id: 'inbox', icon: '✉', label: '收到的信息', count: opRequests().length || '' },
+        { id: 'broadcast', icon: '⌁', label: '广播中心' },
+        { id: 'quick', icon: 'ϟ', label: '快捷信息' },
+        { id: 'devices', icon: '▣', label: '在线设备', count: operatorMembers.length || '' },
+        { id: 'chat', icon: '♧', label: '成员群聊', count: memberChat.length || '' },
+        { id: 'notes', icon: '☷', label: '团队备注' }
+      ];
+    }
+
+    function opStatCard(icon, label, value, sub, tone, id) {
+      return [
+        '<div class="cf-op-stat cf-op-tone-', escapeHtml(tone || 'gold'), '">',
+        '  <div class="cf-op-stat-icon">', escapeHtml(icon), '</div>',
+        '  <div class="cf-op-stat-copy">',
+        '    <div class="cf-op-stat-label">', escapeHtml(label), '</div>',
+        '    <div class="cf-op-stat-value"', id ? ' id="' + escapeHtml(id) + '"' : '', '>', escapeHtml(value), '</div>',
+        '    <div class="cf-op-stat-sub">', escapeHtml(sub || ''), '</div>',
         '  </div>',
-        '  <div class="cf-op-summary">',
-        '    <div class="cf-stat-card">',
-        '      <div class="cf-stat-label">在线设备</div>',
-        '      <div class="cf-stat-value" id="cf-stat-members">0</div>',
-        '    </div>',
-        '    <div class="cf-stat-card">',
-        '      <div class="cf-stat-label">消息总数</div>',
-        '      <div class="cf-stat-value" id="cf-stat-messages">0</div>',
-        '    </div>',
-        '    <div class="cf-stat-card cf-stat-alert">',
-        '      <div class="cf-stat-label">故障提醒</div>',
-        '      <div class="cf-stat-value" id="cf-stat-issues">0</div>',
-        '    </div>',
-        '  </div>',
-        '  <div class="cf-op-row">',
-        '    <div class="cf-panel cf-panel-members">',
-        '      <div class="cf-panel-title-row">',
-        '        <span class="cf-panel-title" id="cf-member-title">在线设备</span>',
-        '        <button class="cf-clear-btn cf-kick-all-btn" id="cf-kick-all-btn" type="button">踢出全员</button>',
-        '      </div>',
-        '      <ul class="cf-member-list" id="cf-member-list">',
-        '        <li class="cf-member-empty">当前没有设备在线</li>',
-        '      </ul>',
-        '    </div>',
-        '    <div class="cf-panel cf-panel-log">',
-        '      <div class="cf-panel-title-row">',
-        '        <span class="cf-panel-title">收到的消息</span>',
-        '        <button class="cf-clear-btn" id="cf-clear-btn" type="button">清空</button>',
-        '      </div>',
-        '      <div class="cf-log" id="cf-log">',
-        '        <div class="cf-log-empty">暂时还没有收到消息</div>',
-        '      </div>',
-        '    </div>',
-        '  </div>',
-        '  <div class="cf-panel cf-panel-bcast">',
-        '    <div class="cf-panel-title">广播给所有成员</div>',
-        '    <div class="cf-custom-area">',
-        '      <input id="cf-bcast-input" type="text" placeholder="输入广播消息…" maxlength="120">',
-        '      <button id="cf-bcast-send" type="button">发送</button>',
-        '    </div>',
-        '    <div class="cf-bcast-presets">',
-        BCAST_PRESETS.map(function (text) {
-          var safeText = escapeHtml(text);
-          return '<button class="cf-bcast-preset" type="button" data-text="' + safeText + '">' + safeText + '</button>';
-        }).join(''),
-        '    </div>',
-        '  </div>',
-        '  <div class="cf-flash" id="cf-flash">已广播 ✓</div>',
         '</div>'
-      ].join(''));
+      ].join('');
+    }
 
-      ROOT.querySelector('#cf-bcast-send').addEventListener('click', sendBroadcast);
-      ROOT.querySelector('#cf-bcast-input').addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') sendBroadcast();
+    function opTopStats(kind) {
+      var issueCount = msgLog.filter(opIsUrgent).length;
+      var bcastCount = opBroadcasts().length;
+      var notesCount = getOperatorNotes().length;
+      if (kind === 'inbox') {
+        return [
+          opStatCard('●', '未读消息', opRequests().length + ' 条', '需要查看', 'blue', 'cf-stat-messages'),
+          opStatCard('◷', '处理中', issueCount + ' 条', '正在跟进', 'gold', 'cf-stat-issues'),
+          opStatCard('✓', '已读', Math.max(0, msgLog.length - issueCount) + ' 条', '已处理', 'green'),
+          opStatCard('!', '紧急消息', issueCount + ' 条', '需要优先处理', 'red')
+        ].join('');
+      }
+      if (kind === 'broadcast') {
+        return [
+          opStatCard('⌁', '今日广播', bcastCount + ' 条', '已发送记录', 'gold', 'cf-stat-broadcasts'),
+          opStatCard('✎', '草稿', '0 条', '当前未保存', 'green'),
+          opStatCard('➤', '已发送', bcastCount + ' 条', '广播历史', 'blue'),
+          opStatCard('◎', '定向广播', '0 条', '当前未使用', 'purple')
+        ].join('');
+      }
+      if (kind === 'quick') {
+        return [
+          opStatCard('☰', '常用快捷信息', (BCAST_PRESETS.length + CUES.length) + ' 条', '点击即可发送', 'gold'),
+          opStatCard('☆', '已收藏', Math.min(8, BCAST_PRESETS.length) + ' 条', '常用广播', 'gold'),
+          opStatCard('▦', '本场预设', BCAST_PRESETS.length + ' 条', '当前聚会预设', 'green'),
+          opStatCard('➤', '最近发送', bcastCount + ' 条', '近7天发送记录', 'blue')
+        ].join('');
+      }
+      if (kind === 'devices') {
+        return [
+          opStatCard('▣', '已选成员', operatorMembers.length + ' 人', '已选择设备', 'gold', 'cf-stat-members'),
+          opStatCard('🎤', '已选话筒', opMicMembers().length + ' 支', '当前被选择', 'green', 'cf-stat-mics'),
+          opStatCard('🎸', '已选乐器', opInstrumentMembers().length + ' 项', '当前被选择', 'blue', 'cf-stat-instruments'),
+          opStatCard('◴', '当前场次', opServiceTitle(), '本次聚会', 'gold')
+        ].join('');
+      }
+      if (kind === 'chat') {
+        return [
+          opStatCard('♧', '在线成员', operatorMembers.length + ' / ' + Math.max(operatorMembers.length, 1), '当前在线', 'green'),
+          opStatCard('●', '今日消息', memberChat.length, '条消息', 'blue'),
+          opStatCard('📌', '置顶话题', '3', '个话题', 'gold'),
+          opStatCard('…', '未读对话', '0', '个对话', 'purple')
+        ].join('');
+      }
+      if (kind === 'notes') {
+        return [
+          opStatCard('📌', '置顶备注', getOperatorNotes().filter(function(n){return n.pinned;}).length + ' 条', '重要备注', 'gold'),
+          opStatCard('+', '今日新增', '0 条', '本地记录', 'blue'),
+          opStatCard('◷', '待跟进', getOperatorTasks().filter(function(t){return !t.done;}).length + ' 条', '需要处理', 'gold'),
+          opStatCard('▤', '已归档', notesCount + ' 条', '历史备注', 'green')
+        ].join('');
+      }
+      return [
+        opStatCard('□', '今日流程', opScheduleTime(), opServiceTitle(), 'gold'),
+        opStatCard('⌁', '设备在线', operatorMembers.length + ' / ' + Math.max(operatorMembers.length, PRESETS.length), '已选择设备', 'green', 'cf-stat-members'),
+        opStatCard('●', '未读信息', opRequests().length + ' 条', '需要查看', 'blue', 'cf-stat-messages'),
+        opStatCard('✓', '待处理事项', getOperatorTasks().filter(function(t){return !t.done;}).length + ' 项', '需要跟进', 'gold')
+      ].join('');
+    }
+
+    function opShell(title, subtitle, page, contentHtml) {
+      var nav = opNavItems().map(function (item) {
+        return [
+          '<button class="cf-op-nav-item', item.id === page ? ' is-active' : '', '" type="button" data-op-view="', escapeHtml(item.id), '">',
+          '  <span class="cf-op-nav-icon">', escapeHtml(item.icon), '</span>',
+          '  <span class="cf-op-nav-label">', escapeHtml(item.label), '</span>',
+          item.count ? '<span class="cf-op-nav-count">' + escapeHtml(item.count) + '</span>' : '',
+          '</button>'
+        ].join('');
+      }).join('');
+
+      return [
+        '<div class="cf-op-shell">',
+        '  <aside class="cf-op-sidebar">',
+        '    <div class="cf-op-brand"><span class="cf-op-cross">✝</span><span class="cf-op-brand-text">CECP</span></div>',
+        '    <nav class="cf-op-nav">', nav, '</nav>',
+        '    <div class="cf-op-system-card"><span class="cf-op-system-dot"></span><div><strong>系统运行正常</strong><span>所有设备在线</span></div><span>›</span></div>',
+        '  </aside>',
+        '  <main class="cf-op-main">',
+        '    <header class="cf-op-topbar">',
+        '      <div class="cf-op-heading"><h1>', escapeHtml(title), '</h1><p>', escapeHtml(subtitle), '</p></div>',
+        '      <div class="cf-op-toolbar">',
+        '        <button class="cf-op-select" type="button">□ ', escapeHtml(opServiceLabel()), '⌄</button>',
+        '        <div class="cf-op-search">⌕ <input type="search" placeholder="搜索成员或信息..." aria-label="搜索"></div>',
+        IS_FLOATING ? '' : '<button class="cf-op-icon-btn" id="cf-fullscreen-btn" type="button" aria-label="全屏">⛶</button>',
+        '        <button class="cf-op-bell" type="button" aria-label="通知">♢<span>', escapeHtml(String(opRequests().length || 0)), '</span></button>',
+        '        <div class="cf-op-avatar">C</div>',
+        '        <span class="cf-status cf-op-status"><span class="cf-dot" id="cf-dot"></span><span id="cf-status-label">连接中…</span></span>',
+        '      </div>',
+        '    </header>',
+        contentHtml,
+        '  </main>',
+        '  <div class="cf-flash" id="cf-flash">操作完成 ✓</div>',
+        '</div>'
+      ].join('');
+    }
+
+    function opCard(title, icon, body, extraClass, action) {
+      return [
+        '<section class="cf-op-card ', escapeHtml(extraClass || ''), '">',
+        '  <div class="cf-op-card-head"><h2><span>', escapeHtml(icon || ''), '</span>', escapeHtml(title), '</h2>', action || '', '</div>',
+        body,
+        '</section>'
+      ].join('');
+    }
+
+    function opBuildMessageList(limit, filter, compact) {
+      var items = msgLog.filter(function (item) {
+        if (filter === 'requests') return item.kind !== 'broadcast';
+        if (filter === 'broadcast') return item.kind === 'broadcast';
+        if (filter === 'urgent') return opIsUrgent(item);
+        return true;
       });
-      ROOT.querySelectorAll('.cf-bcast-preset').forEach(function (button) {
+      if (typeof limit === 'number' && limit > 0) items = items.slice(0, limit);
+      if (!items.length) return '<div class="cf-op-empty">暂时还没有收到消息</div>';
+      return items.map(function (item) {
+        var idx = msgLog.indexOf(item);
+        var icon = KIND_ICONS[item.kind] || detectIdentityIcon(item.from) || '💬';
+        var urgent = opIsUrgent(item);
+        var meta = item.kind === 'broadcast' ? '已广播' : (item.kind === 'member_chat' ? '成员群聊' : '处理中');
+        return [
+          '<button class="cf-op-msg-row', operatorSelectedMsgIndex === idx ? ' is-active' : '', urgent ? ' is-urgent' : '', '" type="button" data-msg-index="', idx, '">',
+          '  <span class="cf-op-msg-icon">', escapeHtml(icon), '</span>',
+          '  <span class="cf-op-msg-main"><strong>', escapeHtml(stripIdentityPrefix(item.from) || item.from || '音控组'), '</strong><em>', escapeHtml(item.text), '</em></span>',
+          compact ? '' : '<span class="cf-op-msg-time">' + escapeHtml(formatTime(item.ts)) + '</span>',
+          '  <span class="cf-op-msg-chip">', urgent ? '紧急' : escapeHtml(meta), '</span>',
+          '</button>'
+        ].join('');
+      }).join('');
+    }
+
+    function opBuildMessageDetail() {
+      if (!msgLog.length) return '<div class="cf-op-empty">选择一条信息后，这里会显示详情</div>';
+      if (operatorSelectedMsgIndex < 0 || operatorSelectedMsgIndex >= msgLog.length) operatorSelectedMsgIndex = 0;
+      var item = msgLog[operatorSelectedMsgIndex] || msgLog[0];
+      var urgent = opIsUrgent(item);
+      return [
+        '<div class="cf-op-detail-box">',
+        '  <div class="cf-op-detail-top">', renderIdentityPill(item.from || '音控组', 'cf-op-detail-from'), '<span class="cf-op-detail-status">', urgent ? '紧急' : '普通', '</span></div>',
+        '  <dl class="cf-op-detail-list">',
+        '    <dt>发送时间</dt><dd>', escapeHtml(formatTime(item.ts)), '</dd>',
+        '    <dt>消息内容</dt><dd class="cf-op-detail-message">', escapeHtml(item.text), '</dd>',
+        '    <dt>消息类型</dt><dd>', escapeHtml(item.kind === 'broadcast' ? '广播记录' : (item.kind === 'member_chat' ? '成员群聊' : '发给音控组')), '</dd>',
+        '  </dl>',
+        '  <div class="cf-op-reply-grid">',
+        '    <button type="button" data-op-send-text="已收到">✓ 已收到</button>',
+        '    <button type="button" data-op-send-text="正在处理">◷ 正在处理</button>',
+        '    <button type="button" data-op-send-text="马上安排">➤ 马上安排</button>',
+        '    <button type="button" data-op-send-text="稍等一下">⌛ 稍等一下</button>',
+        '  </div>',
+        '</div>'
+      ].join('');
+    }
+
+    function opBuildMemberRows(limit) {
+      var members = operatorMembers.slice(0, limit || operatorMembers.length);
+      if (!members.length) return '<div class="cf-op-empty">当前没有设备在线</div>';
+      return members.map(function (member) {
+        return [
+          '<div class="cf-op-device-row">',
+          renderIdentityPill(member.name, 'cf-member-pill'),
+          '<button class="cf-kick-btn" type="button" data-kick-name="', escapeHtml(member.name), '" title="踢出该成员">踢出</button>',
+          '</div>'
+        ].join('');
+      }).join('');
+    }
+
+    function opBuildDeviceTable() {
+      if (!operatorMembers.length) return '<div class="cf-op-empty">还没有成员选择话筒或乐器，所以设备列表为空。</div>';
+      return [
+        '<div class="cf-op-table">',
+        '  <div class="cf-op-table-head"><span>设备</span><span>类型</span><span>状态</span><span>操作</span></div>',
+        operatorMembers.map(function (member) {
+          var meta = getIdentityMeta(member.name);
+          return [
+            '<div class="cf-op-table-row">',
+            '  <span>', renderIdentityPill(member.name, 'cf-member-pill'), '</span>',
+            '  <span><b class="cf-op-tag">', meta.type === 'mic' ? '话筒' : (meta.type === 'instrument' ? '乐器' : '设备'), '</b></span>',
+            '  <span><i class="cf-op-online-dot"></i> 已选择</span>',
+            '  <span><button class="cf-kick-btn" type="button" data-kick-name="', escapeHtml(member.name), '">踢出</button></span>',
+            '</div>'
+          ].join('');
+        }).join(''),
+        '</div>'
+      ].join('');
+    }
+
+    function opBuildSplitDevices(kind) {
+      var members = kind === 'mic' ? opMicMembers() : opInstrumentMembers();
+      if (!members.length) return '<div class="cf-op-empty">暂无' + (kind === 'mic' ? '话筒' : '乐器') + '被选择</div>';
+      return members.map(function (m) {
+        return '<div class="cf-op-mini-line">' + renderIdentityPill(m.name, 'cf-member-pill') + '</div>';
+      }).join('');
+    }
+
+    function opBuildTasks(limit) {
+      var tasks = getOperatorTasks();
+      if (typeof limit === 'number') tasks = tasks.slice(0, limit);
+      return tasks.map(function (task) {
+        return [
+          '<label class="cf-op-task-row">',
+          '  <input type="checkbox" data-op-task="', escapeHtml(task.id), '"', task.done ? ' checked' : '', '>',
+          '  <span>', escapeHtml(task.text), '</span>',
+          '  <em>', escapeHtml(task.due || ''), '</em>',
+          '</label>'
+        ].join('');
+      }).join('') || '<div class="cf-op-empty">暂无待办事项</div>';
+    }
+
+    function opBuildNotesList(limit) {
+      var notes = getOperatorNotes().sort(function (a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
+      if (typeof limit === 'number') notes = notes.slice(0, limit);
+      if (!notes.length) return '<div class="cf-op-empty">暂无团队备注</div>';
+      return notes.map(function (note, idx) {
+        return [
+          '<button class="cf-op-note-row', idx === 0 ? ' is-active' : '', '" type="button" data-op-note-id="', escapeHtml(note.id), '">',
+          '  <strong>', escapeHtml(note.title), note.pinned ? ' 📌' : '', '</strong>',
+          '  <span>', escapeHtml(note.tag || '备注'), '</span>',
+          '</button>'
+        ].join('');
+      }).join('');
+    }
+
+    function opBuildNoteDetail() {
+      var notes = getOperatorNotes();
+      var note = notes[0];
+      if (!note) return '<div class="cf-op-empty">选择一条备注后，这里会显示内容</div>';
+      return [
+        '<div class="cf-op-note-detail">',
+        '  <div class="cf-op-note-detail-head"><h2>', escapeHtml(note.title), note.pinned ? ' 📌' : '', '</h2><span>', escapeHtml(note.tag || '备注'), '</span></div>',
+        '  <pre>', escapeHtml(note.body || ''), '</pre>',
+        '</div>'
+      ].join('');
+    }
+
+    function opRenderOverview() {
+      return opShell('音控区', 'Intercom Control Center', 'overview', [
+        '<section class="cf-op-stats">', opTopStats('overview'), '</section>',
+        '<section class="cf-op-grid cf-op-grid-overview">',
+        opCard('收到的信息', '▣', '<div class="cf-op-list" data-cf-op-log data-filter="requests" data-limit="5">' + opBuildMessageList(5, 'requests', true) + '</div><button class="cf-op-link" data-op-view="inbox" type="button">查看全部信息 ›</button>', 'cf-op-span-4'),
+        opCard('广播所有成员', '⌁', '<textarea id="cf-bcast-input" class="cf-op-textarea" placeholder="请输入广播内容..." maxlength="200"></textarea><div class="cf-op-chips"><span>全体 ×</span><span>敬拜组 ×</span><span>音控组 ×</span><button type="button">+ 添加</button></div><div class="cf-op-actions"><button class="cf-op-primary" id="cf-bcast-send" type="button">➤ 发送广播</button><button class="cf-op-secondary" id="cf-bcast-clear" type="button">清空</button></div>', 'cf-op-span-4'),
+        opCard('快捷信息', 'ϟ', '<div class="cf-op-quick-grid">' + BCAST_PRESETS.slice(0, 6).map(function(t){return '<button type="button" data-op-send-text="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';}).join('') + '</div><button class="cf-op-link" data-op-view="quick" type="button">管理快捷信息 ›</button>', 'cf-op-span-4'),
+        opCard('在线设备', '▣', '<div data-cf-member-list>' + opBuildMemberRows(6) + '</div><button class="cf-op-link" data-op-view="devices" type="button">查看全部设备 ›</button>', 'cf-op-span-4'),
+        opCard('团队备注', '☷', '<ul class="cf-op-note-mini"><li>注意舞台区电源使用，避免超载。</li><li>讲员需要手持麦，提前测试。</li><li>下周有新人加入，安排同工协助。</li></ul><button class="cf-op-link" data-op-view="notes" type="button">查看全部备注 ›</button>', 'cf-op-span-4'),
+        opCard('待办事项', '✓', '<div class="cf-op-tasks">' + opBuildTasks(4) + '</div><button class="cf-op-link" data-op-view="notes" type="button">查看全部待办 ›</button>', 'cf-op-span-4'),
+        '</section>'
+      ].join(''));
+    }
+
+    function opRenderInbox() {
+      return opShell('收到的信息', 'Message Inbox', 'inbox', [
+        '<section class="cf-op-stats">', opTopStats('inbox'), '</section>',
+        '<section class="cf-op-grid cf-op-grid-inbox">',
+        opCard('消息列表', '✉', '<div class="cf-op-tabs"><span class="is-active">全部 <b>' + msgLog.length + '</b></span><span>未读 <b>' + opRequests().length + '</b></span><span>处理中 <b>' + msgLog.filter(opIsUrgent).length + '</b></span><span>已读 <b>' + Math.max(0, msgLog.length - opRequests().length) + '</b></span></div><div class="cf-op-list cf-op-list-large" data-cf-op-log data-filter="all">' + opBuildMessageList(0, 'all', false) + '</div><button class="cf-op-link" id="cf-clear-btn" type="button">清空消息记录 ›</button>', 'cf-op-span-7'),
+        opCard('消息详情', '▣', '<div id="cf-op-message-detail">' + opBuildMessageDetail() + '</div>', 'cf-op-span-5'),
+        '</section>'
+      ].join(''));
+    }
+
+    function opRenderBroadcast() {
+      return opShell('广播中心', 'Broadcast Center', 'broadcast', [
+        '<section class="cf-op-stats">', opTopStats('broadcast'), '</section>',
+        '<section class="cf-op-grid cf-op-grid-broadcast">',
+        opCard('发送广播', '⌁', '<textarea id="cf-bcast-input" class="cf-op-textarea cf-op-textarea-lg" placeholder="输入广播内容..." maxlength="200"></textarea><div class="cf-op-chips"><span>全体</span><span>敬拜组</span><span>音控组</span><span>讲员</span><span>后台</span><button type="button">+ 更多</button></div><div class="cf-op-actions"><button class="cf-op-primary" id="cf-bcast-send" type="button">➤ 发送广播</button><button class="cf-op-secondary" type="button" id="cf-bcast-save">保存草稿</button><button class="cf-op-secondary" type="button" id="cf-bcast-clear">清空</button></div>', 'cf-op-span-7'),
+        opCard('广播模板', '☰', '<div class="cf-op-template-grid">' + BCAST_PRESETS.concat(['请预备','请安静','五分钟后开始','结束后集合','请回到位置']).slice(0, 8).map(function(t){return '<button type="button" data-op-fill-text="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';}).join('') + '</div>', 'cf-op-span-5'),
+        opCard('最近广播记录', '☷', '<div class="cf-op-list" data-cf-op-log data-filter="broadcast">' + opBuildMessageList(8, 'broadcast', true) + '</div>', 'cf-op-span-7'),
+        opCard('广播规则', '♢', '<div class="cf-op-rule-list"><p><strong>广播即刻送达</strong><span>广播信息会即时推送到所有选定成员设备。</span></p><p><strong>定向清楚</strong><span>按团队或角色发送，避免信息干扰。</span></p><p><strong>记录可追溯</strong><span>所有广播会自动保存，方便查询与回溯。</span></p></div>', 'cf-op-span-5'),
+        '</section>'
+      ].join(''));
+    }
+
+    function opRenderQuick() {
+      var custom = getOperatorCustomQuick();
+      var quickRows = [
+        { icon: '♪', title: '排练', items: BCAST_PRESETS.concat(['请预备', '下一首', '请稍等', '请安静']).slice(0, 5) },
+        { icon: '♥', title: '敬拜', items: ['下一首', '请安静', '耳返正常吗', '请开讲员麦', '请注意节奏'] },
+        { icon: '🎤', title: '讲道', items: ['请开讲员麦', '请安静', '可以开始', '请稍等', '谢谢牧师'] },
+        { icon: '▣', title: '现场秩序', items: ['请保持安静', '注意安全', '请勿走动', '请看屏幕', '请遵守秩序'] },
+        { icon: '⚑', title: '结束提醒', items: ['结束后集合', '清理场地', '请关设备', '感谢配合'] }
+      ];
+      return opShell('快捷信息', 'Quick Messages', 'quick', [
+        '<section class="cf-op-stats">', opTopStats('quick'), '</section>',
+        '<section class="cf-op-grid cf-op-grid-quick">',
+        opCard('快捷信息库', '☰', '<div class="cf-op-quick-library">' + quickRows.map(function(row){return '<div class="cf-op-quick-row"><div><span>' + escapeHtml(row.icon) + '</span><strong>' + escapeHtml(row.title) + '</strong><em>' + row.items.length + ' 条</em></div><div>' + row.items.map(function(t){return '<button type="button" data-op-send-text="' + escapeHtml(t) + '">' + escapeHtml(t) + ' ➤</button>';}).join('') + '</div></div>';}).join('') + '</div>', 'cf-op-span-8'),
+        opCard('收藏夹', '☆', '<div class="cf-op-fav-list">' + BCAST_PRESETS.concat(['请保持安静','谢谢配合']).slice(0, 8).map(function(t){return '<button type="button" data-op-send-text="' + escapeHtml(t) + '">☆ ' + escapeHtml(t) + ' ➤</button>';}).join('') + '</div>', 'cf-op-span-4'),
+        opCard('自定义快捷信息', '✎', '<div class="cf-op-custom-quick"><div class="cf-custom-area"><input id="cf-op-custom-quick-input" type="text" placeholder="新建快捷信息..." maxlength="80"><button id="cf-op-add-quick" type="button">添加</button></div>' + (custom.length ? custom.map(function(t){return '<button type="button" data-op-send-text="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';}).join('') : '<div class="cf-op-empty">还没有自定义快捷信息</div>') + '</div>', 'cf-op-span-8'),
+        opCard('最近使用', '◷', '<div class="cf-op-recent-list">' + opBroadcasts().slice(0, 6).map(function(item){return '<button type="button" data-op-send-text="' + escapeHtml(item.text) + '"><span>' + escapeHtml(item.text) + '</span><em>' + escapeHtml(formatTime(item.ts)) + '</em></button>';}).join('') + '</div>', 'cf-op-span-4'),
+        '</section>'
+      ].join(''));
+    }
+
+    function opRenderDevices() {
+      return opShell('在线设备', 'Selected Devices', 'devices', [
+        '<section class="cf-op-stats">', opTopStats('devices'), '</section>',
+        '<section class="cf-op-grid cf-op-grid-devices">',
+        opCard('设备列表', '▣', '<div data-cf-member-table>' + opBuildDeviceTable() + '</div>', 'cf-op-span-7'),
+        opCard('话筒颜色', '🎤', '<div class="cf-op-split-list" data-cf-mic-list>' + opBuildSplitDevices('mic') + '</div>', 'cf-op-span-5'),
+        opCard('乐器分配', '🎸', '<div class="cf-op-split-list" data-cf-instrument-list>' + opBuildSplitDevices('instrument') + '</div>', 'cf-op-span-5'),
+        opCard('成员选择概览', '♧', '<div class="cf-op-member-chips">' + operatorMembers.map(function(m){return renderIdentityPill(m.name, 'cf-member-pill');}).join('') + '</div>', 'cf-op-span-7'),
+        '</section>'
+      ].join(''));
+    }
+
+    function opRenderChat() {
+      return opShell('成员群聊', 'Team Chat', 'chat', [
+        '<section class="cf-op-stats">', opTopStats('chat'), '</section>',
+        '<section class="cf-op-grid cf-op-grid-chat">',
+        opCard('对话列表', '♧', '<div class="cf-op-room-list"><button class="is-active" type="button"><strong>全体</strong><span>团队同步</span></button><button type="button"><strong>敬拜组</strong><span>排练沟通</span></button><button type="button"><strong>音控组</strong><span>技术确认</span></button><button type="button"><strong>后台协助</strong><span>流程提醒</span></button></div>', 'cf-op-span-3'),
+        opCard('全体', '♧', '<div class="cf-log cf-log-member-chat cf-op-chat-log" id="cf-member-chat-log"><div class="cf-log-empty">成员群聊会显示在这里</div></div><div class="cf-custom-area cf-member-chat-compose"><input id="cf-member-chat-input" type="text" placeholder="输入消息，Enter 发送..." maxlength="180"><button id="cf-member-chat-send" type="button">发送</button></div>', 'cf-op-span-6'),
+        opCard('成员列表', '☰', '<div data-cf-member-list>' + opBuildMemberRows(10) + '</div>', 'cf-op-span-3'),
+        opCard('置顶公告', '📌', '<div class="cf-op-pin-list"><p>主日聚会流程安排</p><p>音控组注意事项</p><p>下次服事轮值表</p></div>', 'cf-op-span-3'),
+        '</section>'
+      ].join(''));
+    }
+
+    function opRenderNotes() {
+      return opShell('团队备注', 'Team Notes', 'notes', [
+        '<section class="cf-op-stats">', opTopStats('notes'), '</section>',
+        '<section class="cf-op-grid cf-op-grid-notes">',
+        opCard('备注列表', '☷', '<div class="cf-op-note-search"><input type="search" placeholder="搜索备注标题或内容..."></div><div class="cf-op-note-list">' + opBuildNotesList() + '</div><div class="cf-custom-area"><input id="cf-op-note-title" type="text" placeholder="新建备注标题..." maxlength="50"><button id="cf-op-add-note" type="button">新建备注</button></div>', 'cf-op-span-4'),
+        opCard('备注内容', '📌', opBuildNoteDetail() + '<textarea id="cf-op-note-body" class="cf-op-textarea" placeholder="添加备注或更新记录..."></textarea>', 'cf-op-span-5'),
+        opCard('置顶备注', '📌', '<div class="cf-op-note-list is-small">' + opBuildNotesList(4) + '</div>', 'cf-op-span-3'),
+        opCard('待办提醒', '✓', '<div class="cf-op-tasks">' + opBuildTasks() + '</div>', 'cf-op-span-3'),
+        '</section>'
+      ].join(''));
+    }
+
+    function opRenderCurrent() {
+      if (operatorView === 'inbox') return opRenderInbox();
+      if (operatorView === 'broadcast') return opRenderBroadcast();
+      if (operatorView === 'quick') return opRenderQuick();
+      if (operatorView === 'devices') return opRenderDevices();
+      if (operatorView === 'chat') return opRenderChat();
+      if (operatorView === 'notes') return opRenderNotes();
+      operatorView = 'overview';
+      return opRenderOverview();
+    }
+
+    function operatorSendBroadcastText(text) {
+      text = String(text || '').trim();
+      if (!text) return;
+      if (!wsReady()) {
+        flashEl('cf-flash', '当前离线，无法广播', true);
+        return;
+      }
+      ws.send(JSON.stringify({ type: 'broadcast', id: nowId('broadcast'), text: text }));
+      msgLog.unshift({ from: '音控组', kind: 'broadcast', text: text, ts: Date.now() });
+      if (msgLog.length > 80) msgLog.pop();
+      operatorSelectedMsgIndex = 0;
+      renderOperatorLog();
+      flashEl('cf-flash', '已广播 ✓');
+    }
+
+    function operatorSendMemberChat() {
+      var input = ROOT.querySelector('#cf-member-chat-input');
+      var text = input && input.value ? input.value.trim() : '';
+      if (!text) return;
+      if (!wsReady()) {
+        flashEl('cf-flash', '当前离线，暂时无法发送群聊', true);
+        return;
+      }
+      var id = nowId('member');
+      ws.send(JSON.stringify({ type: 'member_chat', id: id, text: text }));
+      appendMemberChat({ id: id, from: '音控组', text: text, ts: Date.now() });
+      if (input) input.value = '';
+      flashEl('cf-flash', '成员群聊已发送 ✓');
+    }
+
+    function bindOperatorDashboard() {
+      ROOT.querySelectorAll('[data-op-view]').forEach(function (button) {
         button.addEventListener('click', function () {
-          ROOT.querySelector('#cf-bcast-input').value = button.dataset.text || '';
-          sendBroadcast();
+          var view = button.getAttribute('data-op-view') || 'overview';
+          operatorView = view;
+          renderOperator();
         });
       });
-      ROOT.querySelector('#cf-clear-btn').addEventListener('click', function () {
+
+      ROOT.querySelectorAll('[data-op-send-text]').forEach(function (button) {
+        if (button.__opBound) return;
+        button.__opBound = true;
+        button.addEventListener('click', function () {
+          operatorSendBroadcastText(button.getAttribute('data-op-send-text') || button.textContent || '');
+        });
+      });
+
+      ROOT.querySelectorAll('[data-op-fill-text]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          var input = ROOT.querySelector('#cf-bcast-input');
+          if (input) input.value = button.getAttribute('data-op-fill-text') || '';
+        });
+      });
+
+      var sendBtn = ROOT.querySelector('#cf-bcast-send');
+      var input = ROOT.querySelector('#cf-bcast-input');
+      if (sendBtn) sendBtn.addEventListener('click', sendBroadcast);
+      if (input) {
+        input.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) sendBroadcast();
+        });
+      }
+      var clearInput = ROOT.querySelector('#cf-bcast-clear');
+      if (clearInput) clearInput.addEventListener('click', function () {
+        var i = ROOT.querySelector('#cf-bcast-input');
+        if (i) i.value = '';
+      });
+
+      var clearBtn = ROOT.querySelector('#cf-clear-btn');
+      if (clearBtn) clearBtn.addEventListener('click', function () {
         msgLog = [];
-        renderOperatorLog();
+        operatorSelectedMsgIndex = 0;
+        renderOperator();
       });
 
       var kickAllBtn = ROOT.querySelector('#cf-kick-all-btn');
-      if (kickAllBtn) {
-        kickAllBtn.addEventListener('click', function () {
-          sendKickAll();
+      if (kickAllBtn) kickAllBtn.addEventListener('click', sendKickAll);
+
+      ROOT.querySelectorAll('[data-msg-index]').forEach(function (row) {
+        if (row.__opMsgBound) return;
+        row.__opMsgBound = true;
+        row.addEventListener('click', function () {
+          operatorSelectedMsgIndex = Number(row.getAttribute('data-msg-index') || 0) || 0;
+          renderOperatorLog();
         });
-      }
+      });
+
+      ROOT.querySelectorAll('[data-op-task]').forEach(function (input) {
+        input.addEventListener('change', function () {
+          var id = input.getAttribute('data-op-task') || '';
+          var tasks = getOperatorTasks().map(function (task) {
+            if (task.id === id) task.done = input.checked;
+            return task;
+          });
+          saveOperatorTasks(tasks);
+          updateOperatorStats();
+        });
+      });
+
+      var addQuick = ROOT.querySelector('#cf-op-add-quick');
+      if (addQuick) addQuick.addEventListener('click', function () {
+        var quickInput = ROOT.querySelector('#cf-op-custom-quick-input');
+        var text = quickInput && quickInput.value ? quickInput.value.trim() : '';
+        if (!text) return;
+        var items = getOperatorCustomQuick();
+        items.unshift(text);
+        saveOperatorCustomQuick(items);
+        renderOperator();
+      });
+
+      var addNote = ROOT.querySelector('#cf-op-add-note');
+      if (addNote) addNote.addEventListener('click', function () {
+        var titleInput = ROOT.querySelector('#cf-op-note-title');
+        var bodyInput = ROOT.querySelector('#cf-op-note-body');
+        var title = titleInput && titleInput.value ? titleInput.value.trim() : '';
+        var body = bodyInput && bodyInput.value ? bodyInput.value.trim() : '';
+        if (!title) return;
+        var notes = getOperatorNotes();
+        notes.unshift({ id: nowId('note'), title: title, body: body || '暂无内容', tag: '备注', pinned: false, ts: Date.now() });
+        saveOperatorNotes(notes);
+        renderOperator();
+      });
+
+      var memberSendBtn = ROOT.querySelector('#cf-member-chat-send');
+      var memberInput = ROOT.querySelector('#cf-member-chat-input');
+      if (memberSendBtn) memberSendBtn.addEventListener('click', operatorSendMemberChat);
+      if (memberInput) memberInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') operatorSendMemberChat();
+      });
 
       var fullscreenBtn = ROOT.querySelector('#cf-fullscreen-btn');
       if (fullscreenBtn) {
@@ -1070,8 +1567,16 @@
         }
         syncFullscreenButton();
       }
+    }
 
+    function renderOperator() {
+      ensureChrome();
+      ROOT.classList.add('cf-mode-operator');
+      setStageHtml(opRenderCurrent());
+      bindOperatorDashboard();
+      renderMembers(operatorMembers);
       renderOperatorLog();
+      renderMemberChat();
       updateOperatorStats();
       setStatus(isOnline);
       scheduleFloatingGeometry();
@@ -1129,7 +1634,7 @@
       }
 
       log.innerHTML = memberChat.map(function (item) {
-        var mine = item.from === whoAmI;
+        var mine = item.from === whoAmI || (MODE === 'operator' && item.from === '音控组');
         return [
           '<div class="cf-room-msg', mine ? ' is-mine' : '', '">',
           '  <div class="cf-room-msg-head">',
@@ -1149,36 +1654,59 @@
     }
 
     function updateOperatorStats() {
-      var membersEl = ROOT.querySelector('#cf-stat-members');
-      var messagesEl = ROOT.querySelector('#cf-stat-messages');
-      var issuesEl = ROOT.querySelector('#cf-stat-issues');
-      var issueCount = msgLog.filter(function (item) { return item.kind === 'issue'; }).length;
+      var issueCount = msgLog.filter(opIsUrgent).length;
+      var broadcastCount = opBroadcasts().length;
+      var chatCount = memberChat.length;
+      var micCount = opMicMembers().length;
+      var instrumentCount = opInstrumentMembers().length;
+      var pendingTasks = getOperatorTasks().filter(function (task) { return !task.done; }).length;
 
-      if (membersEl) membersEl.textContent = String(memberCount);
-      if (messagesEl) messagesEl.textContent = String(msgLog.length);
-      if (issuesEl) issuesEl.textContent = String(issueCount);
+      var values = {
+        'cf-stat-members': String(memberCount),
+        'cf-stat-messages': String(msgLog.length),
+        'cf-stat-issues': String(issueCount),
+        'cf-stat-broadcasts': String(broadcastCount),
+        'cf-stat-chat': String(chatCount),
+        'cf-stat-mics': String(micCount),
+        'cf-stat-instruments': String(instrumentCount),
+        'cf-stat-tasks': String(pendingTasks)
+      };
+
+      Object.keys(values).forEach(function (id) {
+        ROOT.querySelectorAll('#' + id).forEach(function (el) {
+          el.textContent = values[id];
+        });
+      });
+
+      ROOT.querySelectorAll('.cf-op-bell span').forEach(function (el) {
+        el.textContent = String(opRequests().length || 0);
+      });
     }
 
     function renderMembers(members) {
-      var list = ROOT.querySelector('#cf-member-list');
+      operatorMembers = Array.isArray(members) ? members.slice() : [];
+      memberCount = operatorMembers.length;
+
       var title = ROOT.querySelector('#cf-member-title');
-      if (!list) return;
+      if (title) title.textContent = '在线设备（' + operatorMembers.length + '）';
 
-      memberCount = members.length;
-      if (title) title.textContent = '在线设备（' + members.length + '）';
+      ROOT.querySelectorAll('[data-cf-member-list]').forEach(function (list) {
+        list.innerHTML = opBuildMemberRows(Number(list.getAttribute('data-limit') || 0) || 0);
+      });
 
-      list.innerHTML = members.length
-        ? members.map(function (member) {
-            return [
-              '<li class="cf-member-item">',
-              renderIdentityPill(member.name, 'cf-member-pill'),
-              '<button class="cf-kick-btn" type="button" data-kick-name="', escapeHtml(member.name), '" title="踢出该成员">踢出</button>',
-              '</li>'
-            ].join('');
-          }).join('')
-        : '<li class="cf-member-empty">当前没有设备在线</li>';
+      ROOT.querySelectorAll('[data-cf-member-table]').forEach(function (box) {
+        box.innerHTML = opBuildDeviceTable();
+      });
 
-      list.querySelectorAll('.cf-kick-btn').forEach(function (btn) {
+      ROOT.querySelectorAll('[data-cf-mic-list]').forEach(function (box) {
+        box.innerHTML = opBuildSplitDevices('mic');
+      });
+
+      ROOT.querySelectorAll('[data-cf-instrument-list]').forEach(function (box) {
+        box.innerHTML = opBuildSplitDevices('instrument');
+      });
+
+      ROOT.querySelectorAll('.cf-kick-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
           var name = btn.getAttribute('data-kick-name') || '';
           if (name) sendKick(name);
@@ -1189,40 +1717,31 @@
     }
 
     function renderOperatorLog() {
-      var log = ROOT.querySelector('#cf-log');
-      if (!log) return;
+      ROOT.querySelectorAll('[data-cf-op-log]').forEach(function (log) {
+        var limit = Number(log.getAttribute('data-limit') || 0) || 0;
+        var filter = log.getAttribute('data-filter') || 'all';
+        log.innerHTML = opBuildMessageList(limit, filter, log.classList.contains('cf-op-list-compact'));
+      });
 
-      if (!msgLog.length) {
-        log.innerHTML = '<div class="cf-log-empty">暂时还没有收到消息</div>';
-        updateOperatorStats();
-        return;
-      }
+      var detail = ROOT.querySelector('#cf-op-message-detail');
+      if (detail) detail.innerHTML = opBuildMessageDetail();
 
-      log.innerHTML = msgLog.map(function (item) {
-        var icon = KIND_ICONS[item.kind] || '💬';
-        var extraClass = item.kind === 'issue'
-          ? ' cf-log-issue'
-          : (item.kind === 'member_chat' ? ' cf-log-chat'
-          : (item.kind === 'broadcast' ? ' cf-log-broadcast' : ''));
-        var routeChip = item.kind === 'member_chat'
-          ? '<span class="cf-log-chip cf-log-chip-chat">成员群聊</span>'
-          : (item.kind === 'broadcast'
-          ? '<span class="cf-log-chip cf-log-chip-bcast">已广播</span>'
-          : '<span class="cf-log-chip">发给音控组</span>');
-        return [
-          '<div class="cf-log-item', extraClass, '">',
-          '  <span class="cf-log-icon">', escapeHtml(icon), '</span>',
-          '  <div class="cf-log-body">',
-          '    <div class="cf-log-meta-row">',
-          renderIdentityPill(item.from, 'cf-log-from'),
-          routeChip,
-          '    </div>',
-          '    <span class="cf-log-text">', escapeHtml(item.text), '</span>',
-          '  </div>',
-          '  <span class="cf-log-time">', escapeHtml(formatTime(item.ts)), '</span>',
-          '</div>'
-        ].join('');
-      }).join('');
+      ROOT.querySelectorAll('[data-msg-index]').forEach(function (row) {
+        if (row.__opMsgBound) return;
+        row.__opMsgBound = true;
+        row.addEventListener('click', function () {
+          operatorSelectedMsgIndex = Number(row.getAttribute('data-msg-index') || 0) || 0;
+          renderOperatorLog();
+        });
+      });
+
+      ROOT.querySelectorAll('[data-op-send-text]').forEach(function (button) {
+        if (button.__opBound) return;
+        button.__opBound = true;
+        button.addEventListener('click', function () {
+          operatorSendBroadcastText(button.getAttribute('data-op-send-text') || button.textContent || '');
+        });
+      });
 
       updateOperatorStats();
     }
@@ -1511,22 +2030,8 @@
       var input = ROOT.querySelector('#cf-bcast-input');
       var text = input && input.value ? input.value.trim() : '';
       if (!text) return;
-      if (!wsReady()) {
-        flashEl('cf-flash', '当前离线，无法广播', true);
-        return;
-      }
-      ws.send(JSON.stringify({ type: 'broadcast', id: nowId('broadcast'), text: text }));
-      /* 记录到音控消息日志，方便回看自己发了什么 */
-      msgLog.unshift({
-        from: '音控组',
-        kind: 'broadcast',
-        text: text,
-        ts: Date.now()
-      });
-      if (msgLog.length > 80) msgLog.pop();
-      renderOperatorLog();
+      operatorSendBroadcastText(text);
       if (input) input.value = '';
-      flashEl('cf-flash', '已广播 ✓');
     }
 
     function sendKick(name) {
