@@ -146,12 +146,14 @@
     var STORAGE_KEY = 'cecp:intercom:last-role:' + WS_URL + ':' + PAGE_KEY;
     var CLIENT_LOG_PREFIX = 'cecp:intercom:client-log:' + WS_URL + ':' + PAGE_KEY + ':';
     var MEMBER_CHAT_KEY = 'cecp:intercom:member-chat:' + WS_URL + ':' + PAGE_KEY;
+    var DAILY_CLEAR_KEY = 'cecp:intercom:daily-clear:' + WS_URL + ':' + PAGE_KEY;
 
     var ws = null;
     var whoAmI = '';
     var reconnectTimer = null;
     var pingTimer = null;
     var clockTimer = null;
+    var midnightResetTimer = null;
     var msgLog = [];
     var clientLog = [];
     var memberChat = [];
@@ -452,27 +454,13 @@
       }).replace(/\//g, '.');
     }
 
-    function getWeekNumber(date) {
-      var d = new Date(date.getTime());
-      d.setHours(0, 0, 0, 0);
-      d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-      var week1 = new Date(d.getFullYear(), 0, 4);
-      return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
-    }
-
-    function formatLiveWeek() {
-      return '第' + getWeekNumber(new Date()) + '周';
-    }
-
     function syncLiveClock() {
       var clockEls = ROOT.querySelectorAll('[data-cf-live-clock]');
       var dateEls = ROOT.querySelectorAll('[data-cf-live-date]');
-      var weekEls = ROOT.querySelectorAll('[data-cf-live-week]');
-      if (!clockEls.length && !dateEls.length && !weekEls.length) return;
+      if (!clockEls.length && !dateEls.length) return;
 
       var time = formatLiveClock();
       var date = formatLiveDate();
-      var week = formatLiveWeek();
 
       clockEls.forEach(function (el) {
         el.textContent = time;
@@ -480,12 +468,74 @@
       dateEls.forEach(function (el) {
         el.textContent = date;
       });
-      weekEls.forEach(function (el) {
-        el.textContent = week;
-      });
+    }
+
+    function formatLocalDayStamp(date) {
+      var d = date || new Date();
+      var year = d.getFullYear();
+      var month = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+
+    function markDailyClearStamp(stamp) {
+      try {
+        localStorage.setItem(DAILY_CLEAR_KEY, String(stamp || formatLocalDayStamp()));
+      } catch (err) {}
+    }
+
+    function readDailyClearStamp() {
+      try {
+        return localStorage.getItem(DAILY_CLEAR_KEY) || '';
+      } catch (err) {
+        return '';
+      }
+    }
+
+    function clearClientHistory(shouldRender) {
+      clientLog = [];
+      saveClientLog();
+      if (shouldRender !== false) renderClientLog();
+      syncBroadcastPopup();
+      syncLauncherBadge();
+    }
+
+    function clearMemberHistory(shouldRender) {
+      memberChat = [];
+      saveMemberChat();
+      if (shouldRender !== false) renderMemberChat();
+    }
+
+    function clearAllChatHistory(shouldRender) {
+      clearClientHistory(shouldRender);
+      clearMemberHistory(shouldRender);
+    }
+
+    function runDailyChatReset() {
+      clearAllChatHistory(true);
+      markDailyClearStamp();
+    }
+
+    function ensureDailyChatReset() {
+      var today = formatLocalDayStamp();
+      if (readDailyClearStamp() === today) return;
+      runDailyChatReset();
+    }
+
+    function scheduleDailyChatReset() {
+      clearTimeout(midnightResetTimer);
+      midnightResetTimer = null;
+      var now = new Date();
+      var nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+      var delay = Math.max(1000, nextMidnight.getTime() - now.getTime());
+      midnightResetTimer = setTimeout(function () {
+        runDailyChatReset();
+        scheduleDailyChatReset();
+      }, delay);
     }
 
     function startLiveClock() {
+      scheduleDailyChatReset();
       syncLiveClock();
       if (clockTimer) return;
       clockTimer = setInterval(syncLiveClock, 10000);
@@ -1094,6 +1144,7 @@
       var deviceHint = selectionSource === 'default'
         ? '已为你带入上次设备，如果不是你本人，可以直接换设备。'
         : '发送给音控和成员的消息会分开显示，现场查看会更清楚。';
+      ensureDailyChatReset();
 
       setStageHtml([
         '<div class="cf-app cf-client-app">',
@@ -1107,7 +1158,6 @@
         '        <span class="cf-live-clock-icon">🕒</span>',
         '        <span class="cf-live-clock-main" data-cf-live-clock>--:--</span>',
         '        <span class="cf-live-clock-date" data-cf-live-date></span>',
-        '        <span class="cf-live-clock-week" data-cf-live-week></span>',
         '      </span>',
         '      <span class="cf-status">',
         '        <span class="cf-dot" id="cf-dot"></span>',
@@ -1133,10 +1183,13 @@
         '            <span class="cf-panel-title">发给音控</span>',
         '            <div class="cf-chat-panel-sub">快捷信息和手动补充都在这里，不会跟群聊混在一起。</div>',
         '          </div>',
-        '          <button class="cf-quick-toggle" id="cf-sound-quick-toggle" data-quick-target="sound" type="button" aria-expanded="false">',
-        '            <span class="cf-quick-toggle-label">快捷</span>',
-        '            <span class="cf-quick-arrow">⌄</span>',
-        '          </button>',
+        '          <div class="cf-chat-panel-actions">',
+        '            <button class="cf-quick-toggle" id="cf-sound-quick-toggle" data-quick-target="sound" type="button" aria-expanded="false">',
+        '              <span class="cf-quick-toggle-label">快捷</span>',
+        '              <span class="cf-quick-arrow">⌄</span>',
+        '            </button>',
+        '            <button class="cf-clear-btn" id="cf-client-clear-btn" type="button">清空</button>',
+        '          </div>',
         '        </div>',
         SHOW_CLIENT_LOG ? [
         '        <div class="cf-log cf-log-client cf-log-chat-thread" id="cf-client-log">',
@@ -1145,6 +1198,7 @@
         ].join('') : [
         '        <div class="cf-chat-muted">已关闭音控记录显示，但你仍然可以继续发送消息。</div>'
         ].join(''),
+        '        <div class="cf-chat-tools-row"><button class="cf-clear-btn cf-chat-clear-inline" id="cf-client-clear-inline-btn" type="button">清空记录</button></div>',
         '        <div class="cf-custom-area cf-chat-compose">',
         '          <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
         '          <button id="cf-custom-send" type="button">发送</button>',
@@ -1170,6 +1224,7 @@
         '        <div class="cf-log cf-log-member-chat cf-log-chat-thread" id="cf-member-chat-log">',
         '          <div class="cf-log-empty">成员群聊会显示在这里</div>',
         '        </div>',
+        '        <div class="cf-chat-tools-row"><button class="cf-clear-btn cf-chat-clear-inline" id="cf-member-chat-clear-inline-btn" type="button">清空记录</button></div>',
         '        <div class="cf-custom-area cf-member-chat-compose cf-chat-compose">',
         '          <input id="cf-member-chat-input" type="text" placeholder="给成员说一句…" maxlength="180">',
         '          <button id="cf-member-chat-send" type="button">发送</button>',
@@ -1307,25 +1362,17 @@
       }
 
 
-      var clearBtn = ROOT.querySelector('#cf-client-clear-btn');
-      if (clearBtn) {
+      ROOT.querySelectorAll('#cf-client-clear-btn, #cf-client-clear-inline-btn').forEach(function (clearBtn) {
         clearBtn.addEventListener('click', function () {
-          clientLog = [];
-          saveClientLog();
-          renderClientLog();
-          syncBroadcastPopup();
-          syncLauncherBadge();
+          clearClientHistory(true);
         });
-      }
+      });
 
-      var memberClearBtn = ROOT.querySelector('#cf-member-chat-clear-btn');
-      if (memberClearBtn) {
+      ROOT.querySelectorAll('#cf-member-chat-clear-btn, #cf-member-chat-clear-inline-btn').forEach(function (memberClearBtn) {
         memberClearBtn.addEventListener('click', function () {
-          memberChat = [];
-          saveMemberChat();
-          renderMemberChat();
+          clearMemberHistory(true);
         });
-      }
+      });
 
       renderMemberChat();
       renderClientLog();
@@ -1354,7 +1401,6 @@
         '        <span class="cf-live-clock-icon">🕒</span>',
         '        <span class="cf-live-clock-main" data-cf-live-clock>--:--</span>',
         '        <span class="cf-live-clock-date" data-cf-live-date></span>',
-        '        <span class="cf-live-clock-week" data-cf-live-week></span>',
         '      </span>',
         IS_FLOATING ? '' : '      <button class="cf-screen-btn" id="cf-fullscreen-btn" type="button">进入全屏</button>',
         '      <span class="cf-status">',
@@ -2070,6 +2116,14 @@
     function destroy() {
       destroyed = true;
       stopPing();
+      if (clockTimer) {
+        clearInterval(clockTimer);
+        clockTimer = null;
+      }
+      if (midnightResetTimer) {
+        clearTimeout(midnightResetTimer);
+        midnightResetTimer = null;
+      }
       clearTimeout(reconnectTimer);
       reconnectTimer = null;
       if (geomRaf) {
