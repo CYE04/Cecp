@@ -11,6 +11,473 @@ html.cf-intercom-open body {
   overscroll-behavior: none;
 }
 
+/* ============================================================
+   ▌ CECP — 成员端终版聊天布局
+   - 时间 / 在线恢复为正常小状态条
+   - 成员端改成微信式双聊天区
+   - 快捷信息改为一条一条点击
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app {
+  width: min(100%, 1120px) !important;
+  gap: 16px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header {
+  align-items: flex-start !important;
+  gap: 14px !important;
+  padding: 16px 18px !important;
+  border-radius: 22px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-copy {
+  gap: 6px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-title {
+  font-size: 1.2rem !important;
+  line-height: 1.15 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-sub {
+  font-size: 0.8rem !important;
+  line-height: 1.45 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-tools {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  width: auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-pill,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-height: 0 !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(157, 172, 209, 0.18) !important;
+  border-radius: 999px !important;
+  background: rgba(19, 25, 36, 0.9) !important;
+  box-shadow: none !important;
+  white-space: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-icon {
+  font-size: 0.92rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-main {
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: var(--cf-gold) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-date,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client #cf-status-label {
+  font-size: 0.72rem !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status {
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status .cf-dot {
+  width: 8px !important;
+  height: 8px !important;
+  flex: 0 0 8px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+  padding: 16px 18px !important;
+  border-radius: 22px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-device-row {
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-note {
+  margin-top: 12px !important;
+  font-size: 0.82rem !important;
+  line-height: 1.55 !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--single {
+  grid-template-columns: 1fr !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side {
+  gap: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 560px !important;
+  padding: 16px !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+    rgba(12, 17, 26, 0.94) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-copy {
+  min-width: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-sub {
+  margin-top: 4px !important;
+  font-size: 0.78rem !important;
+  line-height: 1.45 !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-height: 36px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(91, 163, 255, 0.24) !important;
+  background: rgba(91, 163, 255, 0.1) !important;
+  color: #d9ebff !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle-count {
+  color: var(--cf-muted) !important;
+  font-weight: 600 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-arrow {
+  transition: transform 0.18s ease !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle.open .cf-quick-arrow {
+  transform: rotate(180deg) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show {
+  position: relative !important;
+  inset: auto !important;
+  display: none !important;
+  margin: 0 0 12px !important;
+  padding: 10px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  border-radius: 18px !important;
+  background: rgba(11, 15, 23, 0.94) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown::before,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show::before {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show {
+  display: block !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown > .cf-cue-grid,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show > .cf-cue-grid,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 0 !important;
+  padding: 12px 14px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  background: rgba(22, 29, 43, 0.96) !important;
+  text-align: left !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:hover,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:active {
+  border-color: rgba(91, 163, 255, 0.34) !important;
+  background: rgba(28, 37, 55, 0.98) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: rgba(91, 163, 255, 0.12) !important;
+  flex: 0 0 38px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-label {
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: var(--cf-text) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-desc {
+  font-size: 0.76rem !important;
+  line-height: 1.45 !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  min-height: 320px !important;
+  padding: 8px !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(10, 14, 20, 0.85), rgba(10, 14, 20, 0.55)),
+    rgba(7, 10, 15, 0.92) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  width: fit-content !important;
+  max-width: min(100%, 88%) !important;
+  margin-right: auto !important;
+  padding: 12px 14px !important;
+  border-radius: 18px 18px 18px 8px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  background: rgba(20, 28, 40, 0.96) !important;
+  box-shadow: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item.is-outgoing {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  border-radius: 18px 18px 8px 18px !important;
+  border-color: rgba(91, 163, 255, 0.24) !important;
+  background: linear-gradient(180deg, rgba(91, 163, 255, 0.14), rgba(91, 163, 255, 0.08)), rgba(20, 28, 40, 0.98) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-icon {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-body {
+  width: 100% !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-meta-row {
+  margin-bottom: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-from {
+  margin-bottom: 0 !important;
+  padding: 6px 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chip,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-read-btn {
+  min-height: 28px !important;
+  padding: 0 9px !important;
+  font-size: 0.68rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-text,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-text {
+  font-size: 0.88rem !important;
+  line-height: 1.58 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-time,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-time {
+  align-self: flex-end !important;
+  font-size: 0.68rem !important;
+  color: var(--cf-muted-2) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg {
+  gap: 6px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-bubble {
+  max-width: min(100%, 88%) !important;
+  padding: 12px 14px !important;
+  border-radius: 18px 18px 18px 8px !important;
+  box-shadow: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg.is-mine .cf-room-bubble {
+  border-radius: 18px 18px 8px 18px !important;
+  background:
+    linear-gradient(180deg, rgba(91, 163, 255, 0.14), rgba(91, 163, 255, 0.08)),
+    rgba(20, 28, 40, 0.98) !important;
+  border-color: rgba(91, 163, 255, 0.24) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  margin-top: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input {
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  background: rgba(18, 24, 35, 0.94) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button {
+  min-width: 72px !important;
+  min-height: 44px !important;
+  padding: 0 16px !important;
+  border-radius: 999px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-muted {
+  padding: 14px !important;
+  border-radius: 16px !important;
+  border: 1px dashed rgba(157, 172, 209, 0.16) !important;
+  color: var(--cf-muted) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 900px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel {
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header {
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-tools {
+    justify-content: flex-start !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-pill,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status {
+    padding: 6px 10px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-device-row {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-head {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    z-index: 45 !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 24px 44px rgba(0, 0, 0, 0.36) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show > .cf-cue-grid {
+    max-height: min(52dvh, 420px) !important;
+    overflow-y: auto !important;
+    padding-right: 2px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread {
+    min-height: 240px !important;
+    max-height: 34dvh !important;
+  }
+}
+
+@media (max-width: 420px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-date {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-title {
+    font-size: 1.08rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-sub {
+    font-size: 0.76rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-sub {
+    font-size: 0.74rem !important;
+  }
+}
+
 html.cf-page-shell,
 body.cf-page-shell {
   margin: 0;
@@ -3643,5 +4110,472 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   :where(#cecp-root, [data-cecp-root]) .cf-name-input,
   :where(#cecp-root, [data-cecp-root]) .cf-custom-area input {
     caret-color: #6b4500;
+  }
+}
+
+/* ============================================================
+   ▌ CECP — 成员端终版聊天布局
+   - 时间 / 在线恢复为正常小状态条
+   - 成员端改成微信式双聊天区
+   - 快捷信息改为一条一条点击
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app {
+  width: min(100%, 1120px) !important;
+  gap: 16px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header {
+  align-items: flex-start !important;
+  gap: 14px !important;
+  padding: 16px 18px !important;
+  border-radius: 22px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-copy {
+  gap: 6px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-title {
+  font-size: 1.2rem !important;
+  line-height: 1.15 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-sub {
+  font-size: 0.8rem !important;
+  line-height: 1.45 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-tools {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  width: auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-pill,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-height: 0 !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(157, 172, 209, 0.18) !important;
+  border-radius: 999px !important;
+  background: rgba(19, 25, 36, 0.9) !important;
+  box-shadow: none !important;
+  white-space: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-icon {
+  font-size: 0.92rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-main {
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: var(--cf-gold) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-date,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client #cf-status-label {
+  font-size: 0.72rem !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status {
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status .cf-dot {
+  width: 8px !important;
+  height: 8px !important;
+  flex: 0 0 8px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+  padding: 16px 18px !important;
+  border-radius: 22px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-device-row {
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-note {
+  margin-top: 12px !important;
+  font-size: 0.82rem !important;
+  line-height: 1.55 !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--single {
+  grid-template-columns: 1fr !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side {
+  gap: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 560px !important;
+  padding: 16px !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+    rgba(12, 17, 26, 0.94) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-copy {
+  min-width: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-sub {
+  margin-top: 4px !important;
+  font-size: 0.78rem !important;
+  line-height: 1.45 !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-height: 36px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(91, 163, 255, 0.24) !important;
+  background: rgba(91, 163, 255, 0.1) !important;
+  color: #d9ebff !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle-count {
+  color: var(--cf-muted) !important;
+  font-weight: 600 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-arrow {
+  transition: transform 0.18s ease !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle.open .cf-quick-arrow {
+  transform: rotate(180deg) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show {
+  position: relative !important;
+  inset: auto !important;
+  display: none !important;
+  margin: 0 0 12px !important;
+  padding: 10px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  border-radius: 18px !important;
+  background: rgba(11, 15, 23, 0.94) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown::before,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show::before {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show {
+  display: block !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown > .cf-cue-grid,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show > .cf-cue-grid,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 0 !important;
+  padding: 12px 14px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  background: rgba(22, 29, 43, 0.96) !important;
+  text-align: left !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:hover,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:active {
+  border-color: rgba(91, 163, 255, 0.34) !important;
+  background: rgba(28, 37, 55, 0.98) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: rgba(91, 163, 255, 0.12) !important;
+  flex: 0 0 38px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-label {
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: var(--cf-text) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-desc {
+  font-size: 0.76rem !important;
+  line-height: 1.45 !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  min-height: 320px !important;
+  padding: 8px !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(10, 14, 20, 0.85), rgba(10, 14, 20, 0.55)),
+    rgba(7, 10, 15, 0.92) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  width: fit-content !important;
+  max-width: min(100%, 88%) !important;
+  margin-right: auto !important;
+  padding: 12px 14px !important;
+  border-radius: 18px 18px 18px 8px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  background: rgba(20, 28, 40, 0.96) !important;
+  box-shadow: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item.is-outgoing {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  border-radius: 18px 18px 8px 18px !important;
+  border-color: rgba(91, 163, 255, 0.24) !important;
+  background: linear-gradient(180deg, rgba(91, 163, 255, 0.14), rgba(91, 163, 255, 0.08)), rgba(20, 28, 40, 0.98) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-icon {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-body {
+  width: 100% !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-meta-row {
+  margin-bottom: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-from {
+  margin-bottom: 0 !important;
+  padding: 6px 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chip,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-read-btn {
+  min-height: 28px !important;
+  padding: 0 9px !important;
+  font-size: 0.68rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-text,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-text {
+  font-size: 0.88rem !important;
+  line-height: 1.58 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-time,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-time {
+  align-self: flex-end !important;
+  font-size: 0.68rem !important;
+  color: var(--cf-muted-2) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg {
+  gap: 6px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-bubble {
+  max-width: min(100%, 88%) !important;
+  padding: 12px 14px !important;
+  border-radius: 18px 18px 18px 8px !important;
+  box-shadow: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg.is-mine .cf-room-bubble {
+  border-radius: 18px 18px 8px 18px !important;
+  background:
+    linear-gradient(180deg, rgba(91, 163, 255, 0.14), rgba(91, 163, 255, 0.08)),
+    rgba(20, 28, 40, 0.98) !important;
+  border-color: rgba(91, 163, 255, 0.24) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  margin-top: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input {
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  background: rgba(18, 24, 35, 0.94) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button {
+  min-width: 72px !important;
+  min-height: 44px !important;
+  padding: 0 16px !important;
+  border-radius: 999px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-muted {
+  padding: 14px !important;
+  border-radius: 16px !important;
+  border: 1px dashed rgba(157, 172, 209, 0.16) !important;
+  color: var(--cf-muted) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 900px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel {
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header {
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-tools {
+    justify-content: flex-start !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-pill,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status {
+    padding: 6px 10px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-device-row {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-head {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    z-index: 45 !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 24px 44px rgba(0, 0, 0, 0.36) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show > .cf-cue-grid {
+    max-height: min(52dvh, 420px) !important;
+    overflow-y: auto !important;
+    padding-right: 2px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread {
+    min-height: 240px !important;
+    max-height: 34dvh !important;
+  }
+}
+
+@media (max-width: 420px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-date {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-title {
+    font-size: 1.08rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header-sub {
+    font-size: 0.76rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-sub {
+    font-size: 0.74rem !important;
   }
 }

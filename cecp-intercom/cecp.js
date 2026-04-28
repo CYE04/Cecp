@@ -953,6 +953,7 @@
       var personName = rememberedPerson || '';
 
       ROOT.classList.remove('cf-mode-operator');
+      ROOT.classList.remove('cf-mode-client');
 
       setStageHtml([
         '<div class="cf-setup-card">',
@@ -1070,32 +1071,20 @@
       ensureChrome();
 
       ROOT.classList.remove('cf-mode-operator');
+      ROOT.classList.add('cf-mode-client');
       var showMemberChat = ENABLE_MEMBER_CHAT;
-      var quickShortcutsCollapsed = shouldCollapseQuickShortcuts();
-      var quickShortcutsOpen = !quickShortcutsCollapsed;
-
-      var defaultNotice = selectionSource === 'default'
-        ? [
-            '  <div class="cf-device-note">',
-            '    <div class="cf-device-note-copy">当前先用默认设备 ',
-            renderIdentityPill(whoAmI, 'cf-device-note-pill'),
-            ' ，如果不是你，请重新选择设备。</div>',
-            '    <button class="cf-device-reset-btn" data-cf-old-reset="1" type="button">重新选设备</button>',
-            '  </div>'
-          ].join('')
-        : [
-            '  <div class="cf-device-note is-subtle">',
-            '    <div class="cf-device-note-copy">如果这次不是这个设备，可以随时重新选择。</div>',
-            '    <button class="cf-device-reset-btn" data-cf-old-reset="1" type="button">更换设备</button>',
-            '  </div>'
-          ].join('');
+      var quickShortcutsOpen = false;
+      var clientGridClass = showMemberChat ? 'cf-client-grid' : 'cf-client-grid cf-client-grid--single';
+      var deviceHint = selectionSource === 'default'
+        ? '已为你带入上次设备，如果不是你本人，可以直接换设备。'
+        : '发送给音控和成员的消息会分开显示，现场查看会更清楚。';
 
       setStageHtml([
         '<div class="cf-app cf-client-app">',
         '  <div class="cf-header">',
         '    <div class="cf-header-copy">',
         '      <span class="cf-title">CECP 敬拜团成员通道</span>',
-        '      <span class="cf-header-sub">舞台请求、成员沟通、广播提醒都集中在这里</span>',
+        '      <span class="cf-header-sub">像聊天一样分开处理音控请求和成员沟通</span>',
         '    </div>',
         '    <div class="cf-header-tools">',
         '      <span class="cf-live-clock-pill" title="当前时间">',
@@ -1117,70 +1106,71 @@
         '      </div>',
         '      <button class="cf-device-reset-btn cf-device-reset-main" id="cf-reset-device" type="button">换设备</button>',
         '    </div>',
-        '    <div class="cf-client-note">左边给音控组发舞台请求，右边保留成员沟通和广播记录，现场会更清楚也更顺手。</div>',
+        '    <div class="cf-client-note">', escapeHtml(deviceHint), '</div>',
         '  </div>',
-        '  <div class="cf-client-grid">',
+        '  <div class="', clientGridClass, '">',
         '    <div class="cf-client-main">',
-        '      <div class="cf-quick-head">',
-        '        <div>',
-        '          <div class="cf-section-label">消息快捷</div>',
-        '          <div class="cf-quick-sub">像游戏快捷消息一样，点开后选择要发给音控的提醒。</div>',
+        '      <div class="cf-panel cf-chat-panel cf-chat-panel-sound">',
+        '        <div class="cf-panel-title-row cf-chat-panel-head">',
+        '          <div class="cf-chat-panel-copy">',
+        '            <span class="cf-panel-title">发给音控</span>',
+        '            <div class="cf-chat-panel-sub">快捷信息和手动补充都在这里，不会跟群聊混在一起。</div>',
+        '          </div>',
+        '          <button class="cf-quick-toggle" id="cf-quick-toggle" type="button" aria-expanded="', quickShortcutsOpen ? 'true' : 'false', '">',
+        '            <span class="cf-quick-toggle-label">快捷信息</span>',
+        '            <span class="cf-quick-toggle-count">', String(CUES.length), ' 条</span>',
+        '            <span class="cf-quick-arrow">⌄</span>',
+        '          </button>',
         '        </div>',
-        '        <button class="cf-quick-toggle" id="cf-quick-toggle" type="button" aria-expanded="', quickShortcutsOpen ? 'true' : 'false', '">',
-        '          <span>', quickShortcutsOpen ? '收起快捷' : '消息快捷', '</span>',
-        '          <span class="cf-quick-arrow">⌄</span>',
-        '        </button>',
-        '      </div>',
-        '      <div class="cf-quick-dropdown', quickShortcutsOpen ? ' show' : '', '" id="cf-quick-dropdown">',
-        '        <div class="cf-cue-grid">',
+        '        <div class="cf-quick-dropdown', quickShortcutsOpen ? ' show' : '', '" id="cf-quick-dropdown">',
+        '          <div class="cf-cue-grid">',
         CUES.map(function (cue) {
           return [
             '<button class="cf-cue-btn" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
             '  <span class="cf-icon">', escapeHtml(cue.icon), '</span>',
-            '  <div>',
-            '    <div class="cf-cue-label">', escapeHtml(cue.label), '</div>',
-            '    <div class="cf-cue-desc">', escapeHtml(cue.desc), '</div>',
-            '  </div>',
+            '  <span class="cf-cue-copy">',
+            '    <span class="cf-cue-label">', escapeHtml(cue.label), '</span>',
+            '    <span class="cf-cue-desc">', escapeHtml(cue.desc), '</span>',
+            '  </span>',
             '</button>'
           ].join('');
         }).join(''),
+        '          </div>',
+        '        </div>',
+        SHOW_CLIENT_LOG ? [
+        '        <div class="cf-log cf-log-client cf-log-chat-thread" id="cf-client-log">',
+        '          <div class="cf-log-empty">你发出的请求和收到的广播会显示在这里</div>',
+        '        </div>'
+        ].join('') : [
+        '        <div class="cf-chat-muted">已关闭音控记录显示，但你仍然可以继续发送消息。</div>'
+        ].join(''),
+        '        <div class="cf-custom-area cf-chat-compose">',
+        '          <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
+        '          <button id="cf-custom-send" type="button">发送</button>',
         '        </div>',
         '      </div>',
-        '      <div class="cf-section-label">💬 发给音控组</div>',
-        '      <div class="cf-custom-area">',
-        '        <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
-        '        <button id="cf-custom-send" type="button">发送</button>',
-        '      </div>',
         '    </div>',
-        '    <div class="cf-client-side">',
         showMemberChat ? [
-          '      <div class="cf-panel cf-panel-member-chat">',
-          '        <div class="cf-panel-title-row">',
-          '          <span class="cf-panel-title">成员群聊</span>',
-          '          <button class="cf-clear-btn" id="cf-member-chat-clear-btn" type="button">清空</button>',
-          '        </div>',
-          '        <div class="cf-member-chat-note">成员之间可以直接沟通段落、预备和现场提醒，不会盖掉舞台请求。</div>',
-          '        <div class="cf-log cf-log-member-chat" id="cf-member-chat-log">',
-          '          <div class="cf-log-empty">成员群聊会显示在这里</div>',
-          '        </div>',
-          '        <div class="cf-custom-area cf-member-chat-compose">',
-          '          <input id="cf-member-chat-input" type="text" placeholder="给成员说一句…" maxlength="180">',
-          '          <button id="cf-member-chat-send" type="button">发送</button>',
-          '        </div>',
-          '      </div>'
+        '    <div class="cf-client-side">',
+        '      <div class="cf-panel cf-chat-panel cf-chat-panel-member">',
+        '        <div class="cf-panel-title-row cf-chat-panel-head">',
+        '          <div class="cf-chat-panel-copy">',
+        '            <span class="cf-panel-title">成员群聊</span>',
+        '            <div class="cf-chat-panel-sub">像微信聊天一样沟通段落、预备和现场提醒。</div>',
+        '          </div>',
+        '          <button class="cf-clear-btn" id="cf-member-chat-clear-btn" type="button">清空</button>',
+        '        </div>',
+        '        <div class="cf-log cf-log-member-chat cf-log-chat-thread" id="cf-member-chat-log">',
+        '          <div class="cf-log-empty">成员群聊会显示在这里</div>',
+        '        </div>',
+        '        <div class="cf-custom-area cf-member-chat-compose cf-chat-compose">',
+        '          <input id="cf-member-chat-input" type="text" placeholder="给成员说一句…" maxlength="180">',
+        '          <button id="cf-member-chat-send" type="button">发送</button>',
+        '        </div>',
+        '      </div>',
+        SHOW_CLIENT_LOG ? '' : '',
+        '    </div>'
         ].join('') : '',
-        SHOW_CLIENT_LOG ? [
-          '      <div class="cf-panel cf-panel-client-log">',
-          '        <div class="cf-panel-title-row">',
-          '          <span class="cf-panel-title">音控记录</span>',
-          '          <button class="cf-clear-btn" id="cf-client-clear-btn" type="button">清空</button>',
-          '        </div>',
-          '        <div class="cf-log cf-log-client" id="cf-client-log">',
-          '          <div class="cf-log-empty">你发出的请求和收到的广播会显示在这里</div>',
-          '        </div>',
-          '      </div>'
-        ].join('') : '',
-        '    </div>',
         '  </div>',
         '  <div class="cf-flash" id="cf-flash">发送成功 ✓</div>',
         '</div>'
@@ -1194,8 +1184,8 @@
         quickDropdown.classList.toggle('show', open);
         quickToggle.classList.toggle('open', open);
         quickToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        var label = quickToggle.querySelector('span');
-        if (label) label.textContent = open ? '收起快捷' : '消息快捷';
+        var label = quickToggle.querySelector('.cf-quick-toggle-label');
+        if (label) label.textContent = open ? '收起快捷' : '快捷信息';
       }
 
       if (quickToggle && quickDropdown) {
@@ -1220,7 +1210,7 @@
       ROOT.querySelectorAll('.cf-cue-btn').forEach(function (button) {
         button.addEventListener('click', function () {
           sendWorshipMsg(button.dataset.kind, button.dataset.msg);
-          if (shouldCollapseQuickShortcuts()) syncQuickDropdown(false);
+          if (shouldCollapseQuickShortcuts() || window.innerWidth <= 980) syncQuickDropdown(false);
         });
       });
 
@@ -1274,6 +1264,7 @@
     function renderOperator() {
       ensureChrome();
 
+      ROOT.classList.remove('cf-mode-client');
       ROOT.classList.add('cf-mode-operator');
 
       setStageHtml([
