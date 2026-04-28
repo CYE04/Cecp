@@ -452,19 +452,36 @@
       }).replace(/\//g, '.');
     }
 
+    function getWeekNumber(date) {
+      var d = new Date(date.getTime());
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+      var week1 = new Date(d.getFullYear(), 0, 4);
+      return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+    }
+
+    function formatLiveWeek() {
+      return '第' + getWeekNumber(new Date()) + '周';
+    }
+
     function syncLiveClock() {
       var clockEls = ROOT.querySelectorAll('[data-cf-live-clock]');
       var dateEls = ROOT.querySelectorAll('[data-cf-live-date]');
-      if (!clockEls.length && !dateEls.length) return;
+      var weekEls = ROOT.querySelectorAll('[data-cf-live-week]');
+      if (!clockEls.length && !dateEls.length && !weekEls.length) return;
 
       var time = formatLiveClock();
       var date = formatLiveDate();
+      var week = formatLiveWeek();
 
       clockEls.forEach(function (el) {
         el.textContent = time;
       });
       dateEls.forEach(function (el) {
         el.textContent = date;
+      });
+      weekEls.forEach(function (el) {
+        el.textContent = week;
       });
     }
 
@@ -1073,7 +1090,6 @@
       ROOT.classList.remove('cf-mode-operator');
       ROOT.classList.add('cf-mode-client');
       var showMemberChat = ENABLE_MEMBER_CHAT;
-      var quickShortcutsOpen = false;
       var clientGridClass = showMemberChat ? 'cf-client-grid' : 'cf-client-grid cf-client-grid--single';
       var deviceHint = selectionSource === 'default'
         ? '已为你带入上次设备，如果不是你本人，可以直接换设备。'
@@ -1091,6 +1107,7 @@
         '        <span class="cf-live-clock-icon">🕒</span>',
         '        <span class="cf-live-clock-main" data-cf-live-clock>--:--</span>',
         '        <span class="cf-live-clock-date" data-cf-live-date></span>',
+        '        <span class="cf-live-clock-week" data-cf-live-week></span>',
         '      </span>',
         '      <span class="cf-status">',
         '        <span class="cf-dot" id="cf-dot"></span>',
@@ -1116,26 +1133,10 @@
         '            <span class="cf-panel-title">发给音控</span>',
         '            <div class="cf-chat-panel-sub">快捷信息和手动补充都在这里，不会跟群聊混在一起。</div>',
         '          </div>',
-        '          <button class="cf-quick-toggle" id="cf-quick-toggle" type="button" aria-expanded="', quickShortcutsOpen ? 'true' : 'false', '">',
-        '            <span class="cf-quick-toggle-label">快捷信息</span>',
-        '            <span class="cf-quick-toggle-count">', String(CUES.length), ' 条</span>',
+        '          <button class="cf-quick-toggle" id="cf-sound-quick-toggle" data-quick-target="sound" type="button" aria-expanded="false">',
+        '            <span class="cf-quick-toggle-label">快捷</span>',
         '            <span class="cf-quick-arrow">⌄</span>',
         '          </button>',
-        '        </div>',
-        '        <div class="cf-quick-dropdown', quickShortcutsOpen ? ' show' : '', '" id="cf-quick-dropdown">',
-        '          <div class="cf-cue-grid">',
-        CUES.map(function (cue) {
-          return [
-            '<button class="cf-cue-btn" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
-            '  <span class="cf-icon">', escapeHtml(cue.icon), '</span>',
-            '  <span class="cf-cue-copy">',
-            '    <span class="cf-cue-label">', escapeHtml(cue.label), '</span>',
-            '    <span class="cf-cue-desc">', escapeHtml(cue.desc), '</span>',
-            '  </span>',
-            '</button>'
-          ].join('');
-        }).join(''),
-        '          </div>',
         '        </div>',
         SHOW_CLIENT_LOG ? [
         '        <div class="cf-log cf-log-client cf-log-chat-thread" id="cf-client-log">',
@@ -1158,7 +1159,13 @@
         '            <span class="cf-panel-title">成员群聊</span>',
         '            <div class="cf-chat-panel-sub">像微信聊天一样沟通段落、预备和现场提醒。</div>',
         '          </div>',
-        '          <button class="cf-clear-btn" id="cf-member-chat-clear-btn" type="button">清空</button>',
+        '          <div class="cf-chat-panel-actions">',
+        '            <button class="cf-quick-toggle" id="cf-team-quick-toggle" data-quick-target="team" type="button" aria-expanded="false">',
+        '              <span class="cf-quick-toggle-label">快捷</span>',
+        '              <span class="cf-quick-arrow">⌄</span>',
+        '            </button>',
+        '            <button class="cf-clear-btn" id="cf-member-chat-clear-btn" type="button">清空</button>',
+        '          </div>',
         '        </div>',
         '        <div class="cf-log cf-log-member-chat cf-log-chat-thread" id="cf-member-chat-log">',
         '          <div class="cf-log-empty">成员群聊会显示在这里</div>',
@@ -1172,26 +1179,88 @@
         '    </div>'
         ].join('') : '',
         '  </div>',
+        '  <div class="cf-quick-overlay" id="cf-quick-overlay" hidden>',
+        '    <button class="cf-quick-backdrop" id="cf-quick-backdrop" type="button" aria-label="关闭快捷信息"></button>',
+        '    <div class="cf-quick-sheet" role="dialog" aria-modal="true" aria-labelledby="cf-quick-sheet-title">',
+        '      <div class="cf-quick-sheet-head">',
+        '        <div class="cf-quick-sheet-copy">',
+        '          <div class="cf-quick-sheet-kicker">快捷信息</div>',
+        '          <div class="cf-quick-sheet-title" id="cf-quick-sheet-title">发送快捷信息</div>',
+        '        </div>',
+        '        <button class="cf-quick-close" id="cf-quick-close" type="button" aria-label="关闭快捷信息">×</button>',
+        '      </div>',
+        '      <div class="cf-quick-sheet-list">',
+        CUES.map(function (cue) {
+          return [
+            '<button class="cf-quick-item" type="button" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
+            '  <span class="cf-quick-item-icon">', escapeHtml(cue.icon), '</span>',
+            '  <span class="cf-quick-item-copy">',
+            '    <span class="cf-quick-item-label">', escapeHtml(cue.label), '</span>',
+            '    <span class="cf-quick-item-desc">', escapeHtml(cue.desc), '</span>',
+            '  </span>',
+            '</button>'
+          ].join('');
+        }).join(''),
+        '      </div>',
+        '    </div>',
+        '  </div>',
         '  <div class="cf-flash" id="cf-flash">发送成功 ✓</div>',
         '</div>'
       ].join(''));
 
-      var quickToggle = ROOT.querySelector('#cf-quick-toggle');
-      var quickDropdown = ROOT.querySelector('#cf-quick-dropdown');
+      var quickOverlay = ROOT.querySelector('#cf-quick-overlay');
+      var quickSheetTitle = ROOT.querySelector('#cf-quick-sheet-title');
+      var activeQuickTarget = '';
 
-      function syncQuickDropdown(open) {
-        if (!quickDropdown || !quickToggle) return;
-        quickDropdown.classList.toggle('show', open);
-        quickToggle.classList.toggle('open', open);
-        quickToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        var label = quickToggle.querySelector('.cf-quick-toggle-label');
-        if (label) label.textContent = open ? '收起快捷' : '快捷信息';
+      function syncQuickButtons(open, target) {
+        ROOT.querySelectorAll('[data-quick-target]').forEach(function (button) {
+          var match = !!open && button.getAttribute('data-quick-target') === target;
+          button.classList.toggle('open', match);
+          button.setAttribute('aria-expanded', match ? 'true' : 'false');
+        });
       }
 
-      if (quickToggle && quickDropdown) {
-        syncQuickDropdown(quickDropdown.classList.contains('show'));
-        quickToggle.addEventListener('click', function () {
-          syncQuickDropdown(!quickDropdown.classList.contains('show'));
+      function closeQuickOverlay() {
+        activeQuickTarget = '';
+        if (quickOverlay) {
+          quickOverlay.hidden = true;
+          quickOverlay.classList.remove('show');
+        }
+        syncQuickButtons(false, '');
+      }
+
+      function openQuickOverlay(target) {
+        activeQuickTarget = target === 'team' ? 'team' : 'sound';
+        if (quickSheetTitle) {
+          quickSheetTitle.textContent = activeQuickTarget === 'team'
+            ? '发给成员群聊'
+            : '发给音控';
+        }
+        if (quickOverlay) {
+          quickOverlay.hidden = false;
+          quickOverlay.classList.add('show');
+        }
+        syncQuickButtons(true, activeQuickTarget);
+      }
+
+      ROOT.querySelectorAll('[data-quick-target]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          var target = button.getAttribute('data-quick-target') || 'sound';
+          if (!quickOverlay) return;
+          if (!quickOverlay.hidden && activeQuickTarget === target) closeQuickOverlay();
+          else openQuickOverlay(target);
+        });
+      });
+
+      var quickBackdrop = ROOT.querySelector('#cf-quick-backdrop');
+      var quickClose = ROOT.querySelector('#cf-quick-close');
+      if (quickBackdrop) quickBackdrop.addEventListener('click', closeQuickOverlay);
+      if (quickClose) quickClose.addEventListener('click', closeQuickOverlay);
+
+      var quickSheet = ROOT.querySelector('.cf-quick-sheet');
+      if (quickSheet) {
+        quickSheet.addEventListener('click', function (event) {
+          event.stopPropagation();
         });
       }
 
@@ -1207,10 +1276,16 @@
         }
       }
 
-      ROOT.querySelectorAll('.cf-cue-btn').forEach(function (button) {
+      ROOT.querySelectorAll('.cf-quick-item').forEach(function (button) {
         button.addEventListener('click', function () {
-          sendWorshipMsg(button.dataset.kind, button.dataset.msg);
-          if (shouldCollapseQuickShortcuts() || window.innerWidth <= 980) syncQuickDropdown(false);
+          var msg = button.getAttribute('data-msg') || '';
+          var kind = button.getAttribute('data-kind') || 'custom';
+          if (activeQuickTarget === 'team') {
+            sendMemberChatText(msg, '成员快捷已发送 ✓');
+          } else {
+            sendWorshipMsg(kind, msg);
+          }
+          closeQuickOverlay();
         });
       });
 
@@ -1279,6 +1354,7 @@
         '        <span class="cf-live-clock-icon">🕒</span>',
         '        <span class="cf-live-clock-main" data-cf-live-clock>--:--</span>',
         '        <span class="cf-live-clock-date" data-cf-live-date></span>',
+        '        <span class="cf-live-clock-week" data-cf-live-week></span>',
         '      </span>',
         IS_FLOATING ? '' : '      <button class="cf-screen-btn" id="cf-fullscreen-btn" type="button">进入全屏</button>',
         '      <span class="cf-status">',

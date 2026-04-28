@@ -478,6 +478,207 @@ html.cf-intercom-open body {
   }
 }
 
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-week {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 20px !important;
+  padding: 0 8px !important;
+  border-radius: 999px !important;
+  background: rgba(243, 210, 131, 0.1) !important;
+  color: var(--cf-gold) !important;
+  font-size: 0.68rem !important;
+  line-height: 1 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle {
+  min-height: 31px !important;
+  padding: 0 10px !important;
+  gap: 4px !important;
+  font-size: 0.7rem !important;
+  border-color: rgba(157, 172, 209, 0.18) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--cf-text) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle .cf-quick-arrow {
+  font-size: 0.72rem !important;
+  color: var(--cf-muted) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 80 !important;
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-overlay.show {
+  display: block !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  border: 0 !important;
+  background: rgba(4, 7, 12, 0.72) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: max(12px, env(safe-area-inset-bottom)) !important;
+  transform: translateX(-50%) !important;
+  width: min(92vw, 420px) !important;
+  max-height: min(70dvh, 620px) !important;
+  padding: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  background: rgba(17, 20, 26, 0.94) !important;
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.42) !important;
+  overflow: hidden !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding-bottom: 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet-kicker {
+  color: var(--cf-muted) !important;
+  font-size: 0.68rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet-title {
+  color: var(--cf-text) !important;
+  font-size: 0.96rem !important;
+  font-weight: 700 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-close {
+  width: 32px !important;
+  height: 32px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: var(--cf-text) !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet-list {
+  display: grid !important;
+  gap: 6px !important;
+  max-height: min(58dvh, 520px) !important;
+  overflow-y: auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 8px 10px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--cf-text) !important;
+  text-align: left !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item:hover,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item:active {
+  background: rgba(255, 255, 255, 0.11) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  font-size: 0.84rem !important;
+  flex: 0 0 26px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item-label {
+  color: var(--cf-text) !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item-desc {
+  color: var(--cf-muted) !important;
+  font-size: 0.72rem !important;
+  line-height: 1.2 !important;
+}
+
+@media (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-week {
+    padding: 0 7px !important;
+    font-size: 0.64rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet {
+    width: calc(100vw - 16px) !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    padding: 10px !important;
+    border-radius: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet-list {
+    gap: 5px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item {
+    min-height: 38px !important;
+    padding: 7px 9px !important;
+    border-radius: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item-label {
+    font-size: 0.82rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item-desc {
+    font-size: 0.68rem !important;
+  }
+}
+
+@media (max-width: 420px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-date {
+    display: inline-flex !important;
+    font-size: 0.65rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-week {
+    font-size: 0.62rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-item-desc {
+    display: none !important;
+  }
+}
+
 html.cf-page-shell,
 body.cf-page-shell {
   margin: 0;
