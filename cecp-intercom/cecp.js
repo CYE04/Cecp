@@ -171,6 +171,8 @@
     var fullscreenChangeHandler = null;
     var destroyed = false;
     var pageShellApplied = false;
+    var AUTO_FULLSCREEN_ENABLED = ROOT.dataset.mobileFullscreen !== '0';
+    var HAS_EXPLICIT_WIDGET_FULLSCREEN = ROOT.hasAttribute('data-fullscreen');
     var _originalParent = null;
     var _originalNextSibling = null;
     var _hiddenBodyChildren = [];
@@ -178,6 +180,7 @@
     ROOT.__cecpMounted = true;
     if (FLOAT_RIGHT) ROOT.style.setProperty('--cf-float-right', FLOAT_RIGHT);
     if (FLOAT_BOTTOM) ROOT.style.setProperty('--cf-float-bottom', FLOAT_BOTTOM);
+    ensureMobileViewportMeta();
 
     function syncPageShell(active) {
       if (IS_FLOATING) return;
@@ -703,6 +706,72 @@
       return Math.max(min, Math.min(max, value));
     }
 
+    function getViewportMetrics() {
+      var docEl = document.documentElement;
+      var vv = window.visualViewport;
+      var width = Math.round(vv && vv.width ? vv.width : (window.innerWidth || (docEl && docEl.clientWidth) || 0));
+      var height = Math.round(vv && vv.height ? vv.height : (window.innerHeight || (docEl && docEl.clientHeight) || 0));
+      var scale = vv && vv.scale ? vv.scale : 1;
+      return {
+        width: width,
+        height: height,
+        scale: scale
+      };
+    }
+
+    function isLikelyMobileDevice() {
+      var ua = navigator.userAgent || '';
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return true;
+      if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
+      try {
+        if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return true;
+      } catch (err) {}
+      return false;
+    }
+
+    function ensureMobileViewportMeta() {
+      if (!isLikelyMobileDevice()) return;
+      var existing = document.querySelector('meta[name="viewport"]');
+      if (existing) {
+        var content = String(existing.getAttribute('content') || '').trim();
+        if (!/viewport-fit\s*=\s*cover/i.test(content)) {
+          existing.setAttribute('content', (content ? (content + ', ') : '') + 'viewport-fit=cover');
+        }
+        return;
+      }
+      var head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
+      if (!head) return;
+      var meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, initial-scale=1, viewport-fit=cover';
+      head.appendChild(meta);
+    }
+
+    function shouldUseFullscreenWidget(metrics) {
+      if (!IS_FLOATING) return false;
+      if (HAS_EXPLICIT_WIDGET_FULLSCREEN) return ROOT.hasAttribute('data-fullscreen');
+      if (!AUTO_FULLSCREEN_ENABLED) return false;
+      var info = metrics || getViewportMetrics();
+      if (!info.width || !info.height) return false;
+      if (info.width <= 700) return true;
+      return isLikelyMobileDevice() && info.height <= 720 && info.width <= 960;
+    }
+
+    function syncFloatingViewportMode(metrics) {
+      if (!IS_FLOATING) return false;
+      if (HAS_EXPLICIT_WIDGET_FULLSCREEN) return ROOT.hasAttribute('data-fullscreen');
+      var shouldFullscreen = shouldUseFullscreenWidget(metrics);
+      if (shouldFullscreen) ROOT.setAttribute('data-fullscreen', '1');
+      else ROOT.removeAttribute('data-fullscreen');
+      return shouldFullscreen;
+    }
+
+    function shouldCollapseQuickShortcuts(metrics) {
+      var info = metrics || getViewportMetrics();
+      if (!info.width || !info.height) return false;
+      return info.width <= 700 || (IS_FLOATING && isLikelyMobileDevice() && info.height <= 720);
+    }
+
     function scheduleFloatingGeometry() {
       if (!IS_FLOATING || destroyed || geomRaf) return;
       var defer = window.requestAnimationFrame || function (cb) {
@@ -723,6 +792,7 @@
       if (window.visualViewport) {
         viewportGeometryHandler = scheduleFloatingGeometry;
         window.visualViewport.addEventListener('resize', viewportGeometryHandler, { passive: true });
+        window.visualViewport.addEventListener('scroll', viewportGeometryHandler, { passive: true });
       }
       if (window.ResizeObserver && ANCHOR_EL && ANCHOR_EL.nodeType === 1) {
         geomObserver = new ResizeObserver(function () {
@@ -734,9 +804,10 @@
 
     function updateFloatingGeometry() {
       if (!IS_FLOATING || destroyed) return;
-      var vv = window.visualViewport;
-      var vw = Math.round(vv && vv.width ? vv.width : window.innerWidth);
-      var vh = Math.round(vv && vv.height ? vv.height : window.innerHeight);
+      var metrics = getViewportMetrics();
+      var vw = metrics.width;
+      var vh = metrics.height;
+      var useFullscreen = syncFloatingViewportMode(metrics);
       var isTiny = vw <= 390;
       var isCompact = vw <= 560 || vh <= 720;
       var baseRight = parsePx(FLOAT_RIGHT, isTiny ? 16 : (vw <= 720 ? 20 : 34));
@@ -760,19 +831,19 @@
       var bottom = Math.round(baseBottom);
       var launcher = isTiny ? 48 : (vw <= 560 ? 52 : (vw <= 900 ? 54 : 58));
       var availableWidth = Math.max(240, vw - right - 14);
-      var desiredWidth = isTiny ? (vw - 10) : (vw <= 560 ? vw - 16 : 372);
+      var desiredWidth = useFullscreen ? vw : (isTiny ? (vw - 10) : (vw <= 560 ? vw - 16 : 372));
       var minWidth = isTiny ? 240 : 272;
       var panelWidth = Math.round(Math.min(desiredWidth, availableWidth));
       panelWidth = Math.max(Math.min(minWidth, availableWidth), panelWidth);
-      var desiredHeight = vw <= 560 ? vh - (isTiny ? 20 : 24) : vh - 42;
-      var maxHeight = Math.round(Math.max(300, Math.min(vw <= 560 ? 560 : 720, desiredHeight)));
+      var desiredHeight = useFullscreen ? vh : (vw <= 560 ? vh - (isTiny ? 20 : 24) : vh - 42);
+      var maxHeight = Math.round(Math.max(300, Math.min(useFullscreen ? vh : (vw <= 560 ? 560 : 720), desiredHeight)));
 
       ROOT.style.setProperty('--cf-float-right-auto', right + 'px');
       ROOT.style.setProperty('--cf-float-bottom-auto', bottom + 'px');
       ROOT.style.setProperty('--cf-launcher-size', launcher + 'px');
       ROOT.style.setProperty('--cf-panel-width', panelWidth + 'px');
       ROOT.style.setProperty('--cf-panel-max-height', maxHeight + 'px');
-      ROOT.classList.toggle('cf-compact', isCompact);
+      ROOT.classList.toggle('cf-compact', isCompact || useFullscreen);
     }
 
     function getStageEl() {
@@ -1000,6 +1071,8 @@
 
       ROOT.classList.remove('cf-mode-operator');
       var showMemberChat = ENABLE_MEMBER_CHAT;
+      var quickShortcutsCollapsed = shouldCollapseQuickShortcuts();
+      var quickShortcutsOpen = !quickShortcutsCollapsed;
 
       var defaultNotice = selectionSource === 'default'
         ? [
@@ -1053,12 +1126,12 @@
         '          <div class="cf-section-label">消息快捷</div>',
         '          <div class="cf-quick-sub">像游戏快捷消息一样，点开后选择要发给音控的提醒。</div>',
         '        </div>',
-        '        <button class="cf-quick-toggle" id="cf-quick-toggle" type="button" aria-expanded="false">',
-        '          <span>消息快捷</span>',
+        '        <button class="cf-quick-toggle" id="cf-quick-toggle" type="button" aria-expanded="', quickShortcutsOpen ? 'true' : 'false', '">',
+        '          <span>', quickShortcutsOpen ? '收起快捷' : '消息快捷', '</span>',
         '          <span class="cf-quick-arrow">⌄</span>',
         '        </button>',
         '      </div>',
-        '      <div class="cf-quick-dropdown show" id="cf-quick-dropdown">',
+        '      <div class="cf-quick-dropdown', quickShortcutsOpen ? ' show' : '', '" id="cf-quick-dropdown">',
         '        <div class="cf-cue-grid">',
         CUES.map(function (cue) {
           return [
@@ -1115,13 +1188,20 @@
 
       var quickToggle = ROOT.querySelector('#cf-quick-toggle');
       var quickDropdown = ROOT.querySelector('#cf-quick-dropdown');
+
+      function syncQuickDropdown(open) {
+        if (!quickDropdown || !quickToggle) return;
+        quickDropdown.classList.toggle('show', open);
+        quickToggle.classList.toggle('open', open);
+        quickToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        var label = quickToggle.querySelector('span');
+        if (label) label.textContent = open ? '收起快捷' : '消息快捷';
+      }
+
       if (quickToggle && quickDropdown) {
+        syncQuickDropdown(quickDropdown.classList.contains('show'));
         quickToggle.addEventListener('click', function () {
-          var open = quickDropdown.classList.toggle('show');
-          quickToggle.classList.toggle('open', open);
-          quickToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-          var label = quickToggle.querySelector('span');
-          if (label) label.textContent = open ? '收起快捷' : '消息快捷';
+          syncQuickDropdown(!quickDropdown.classList.contains('show'));
         });
       }
 
@@ -1140,6 +1220,7 @@
       ROOT.querySelectorAll('.cf-cue-btn').forEach(function (button) {
         button.addEventListener('click', function () {
           sendWorshipMsg(button.dataset.kind, button.dataset.msg);
+          if (shouldCollapseQuickShortcuts()) syncQuickDropdown(false);
         });
       });
 
@@ -1936,6 +2017,7 @@
       }
       if (viewportGeometryHandler && window.visualViewport) {
         window.visualViewport.removeEventListener('resize', viewportGeometryHandler);
+        window.visualViewport.removeEventListener('scroll', viewportGeometryHandler);
         viewportGeometryHandler = null;
       }
       if (geomObserver) {

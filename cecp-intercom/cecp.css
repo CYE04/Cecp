@@ -3538,3 +3538,110 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     padding-inline: 9px !important;
   }
 }
+
+/* ============================================================
+   ▌ CECP — 手机浮窗稳定性 + 浅色模式对比度修复
+   ============================================================ */
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating .cf-widget-bar {
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+:where(#cecp-root[data-fullscreen], [data-cecp-root][data-fullscreen]).cf-layout-floating
+  .cf-widget-panel .cf-stage {
+  padding-left: max(14px, env(safe-area-inset-left));
+  padding-right: max(14px, env(safe-area-inset-right));
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+@media (prefers-color-scheme: light) {
+  :where(#cecp-root, [data-cecp-root]) {
+    --cf-muted: #4f473c;
+    --cf-muted-2: #6a6154;
+    --cf-gold: #8a5a00;
+    --cf-gold-soft: rgba(138, 90, 0, 0.12);
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-default,
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-gold {
+    --cf-accent-ink: #5b3a00;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-orange {
+    --cf-accent-ink: #5d2f00;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-green {
+    --cf-accent-ink: #0f5a38;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-purple {
+    --cf-accent-ink: #4f2b7a;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-yellow {
+    --cf-accent-ink: #624700;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-red {
+    --cf-accent-ink: #7d2015;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-blue {
+    --cf-accent-ink: #123f73;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-white {
+    --cf-accent-ink: #33404d;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-black {
+    --cf-accent-ink: #1f2937;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-tone-brown {
+    --cf-accent-ink: #5b3215;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-widget-kicker,
+  :where(#cecp-root, [data-cecp-root]) .cf-header-sub,
+  :where(#cecp-root, [data-cecp-root]) .cf-panel-title,
+  :where(#cecp-root, [data-cecp-root]) .cf-section-label,
+  :where(#cecp-root, [data-cecp-root]) .cf-stat-label,
+  :where(#cecp-root, [data-cecp-root]) .cf-badge-label,
+  :where(#cecp-root, [data-cecp-root]) .cf-setup-sub,
+  :where(#cecp-root, [data-cecp-root]) .cf-member-chat-note,
+  :where(#cecp-root, [data-cecp-root]) .cf-device-note-copy,
+  :where(#cecp-root, [data-cecp-root]) .cf-name-label,
+  :where(#cecp-root, [data-cecp-root]) .cf-name-hint,
+  :where(#cecp-root, [data-cecp-root]) .cf-log-chip,
+  :where(#cecp-root, [data-cecp-root]) #cf-status-label {
+    color: var(--cf-muted);
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-preset-sub,
+  :where(#cecp-root, [data-cecp-root]) .cf-cue-desc,
+  :where(#cecp-root, [data-cecp-root]) .cf-log-time,
+  :where(#cecp-root, [data-cecp-root]) .cf-room-time,
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-date,
+  :where(#cecp-root, [data-cecp-root]) .cf-name-input::placeholder {
+    color: var(--cf-muted-2);
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-log-chip-in,
+  :where(#cecp-root, [data-cecp-root]) .cf-log-chip-chat {
+    color: #1a5aa8;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-log-chip-bcast,
+  :where(#cecp-root, [data-cecp-root]) .cf-live-clock-main,
+  :where(#cecp-root, [data-cecp-root]) .cf-name-hint span {
+    color: #7b4f00;
+  }
+
+  :where(#cecp-root, [data-cecp-root]) .cf-name-input,
+  :where(#cecp-root, [data-cecp-root]) .cf-custom-area input {
+    caret-color: #6b4500;
+  }
+}
