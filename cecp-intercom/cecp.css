@@ -5783,3 +5783,163 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     border-radius: 18px !important;
   }
 }
+
+/* ============================================================
+   ▌ CECP — Mobile Two-Column Chat + WeChat-Style Bubbles
+   Patch: compact bubbles, side-by-side on all screen sizes
+   ============================================================ */
+
+/* ── 1. 手机两列并排（覆盖 900px 断到单列的规则） ── */
+@media (max-width: 900px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel {
+    min-height: 0 !important;
+    padding: 10px !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* ── 2. 微信风格：成员群聊气泡紧凑化 ── */
+
+/* 消息行 */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg {
+  gap: 3px !important;
+}
+
+/* 气泡本体 — padding 减半 */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-bubble {
+  padding: 5px 9px !important;
+  max-width: min(100%, 82%) !important;
+  border-radius: 12px 12px 12px 3px !important;
+}
+
+/* 自己发的气泡 */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg.is-mine .cf-room-bubble {
+  border-radius: 12px 12px 3px 12px !important;
+}
+
+/* 微信风格：自己发的消息隐藏头部 pill（不显示自己名字） */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg.is-mine .cf-room-msg-head {
+  display: none !important;
+}
+
+/* 气泡文字 */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-text {
+  font-size: 0.8rem !important;
+  line-height: 1.45 !important;
+}
+
+/* 时间戳 */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-time {
+  font-size: 0.6rem !important;
+}
+
+/* ── 3. 身份 pill（cf-room-from / cf-log-from）缩小至少一半 ── */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-from,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-from {
+  padding: 2px 7px !important;
+  gap: 5px !important;
+  border-radius: 999px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-from .cf-identity-icon,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-from .cf-identity-icon {
+  width: 12px !important;
+  font-size: 0.72rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-from .cf-identity-text,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-from .cf-identity-text {
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-from .cf-identity-swatch,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-from .cf-identity-swatch {
+  width: 7px !important;
+  height: 7px !important;
+  box-shadow: 0 0 0 2px var(--cf-accent-soft) !important;
+}
+
+/* ── 4. 音控面板 log-item 也减半 ── */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item {
+  padding: 6px 10px !important;
+  gap: 4px !important;
+  border-radius: 12px 12px 12px 3px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item.is-outgoing {
+  border-radius: 12px 12px 3px 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-text {
+  font-size: 0.8rem !important;
+  line-height: 1.45 !important;
+}
+
+/* ── 5. 手机上面板头部收紧（≤640px） ── */
+@media (max-width: 640px) {
+  /* 隐藏副标题，省出垂直空间 */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-sub {
+    display: none !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-head {
+    margin-bottom: 6px !important;
+    gap: 6px !important;
+  }
+
+  /* 快捷 / 清空按钮缩小 */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-clear-btn {
+    min-height: 26px !important;
+    padding: 0 7px !important;
+    font-size: 0.68rem !important;
+  }
+
+  /* 面板标题字号 */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-panel-title {
+    font-size: 0.84rem !important;
+  }
+
+  /* 输入框和发送按钮缩小 */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose input {
+    min-height: 34px !important;
+    font-size: 0.8rem !important;
+    padding: 0 10px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose button {
+    min-height: 34px !important;
+    min-width: 46px !important;
+    padding: 0 9px !important;
+    font-size: 0.78rem !important;
+  }
+
+  /* 聊天记录区最小高度 */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread {
+    min-height: 140px !important;
+  }
+
+  /* 清空记录按钮缩小 */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-clear-inline {
+    font-size: 0.64rem !important;
+    min-height: 24px !important;
+    padding: 0 8px !important;
+  }
+
+  /* 面板内边距收紧 */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel {
+    padding: 8px !important;
+  }
+
+  /* 聊天容器间距 */
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid {
+    gap: 6px !important;
+  }
+}
