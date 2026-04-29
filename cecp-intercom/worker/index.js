@@ -13,13 +13,19 @@
 //    WebSocket     -> Durable Object room
 // ============================================================
 
+const DAILY_RESET_STAMP_KEY = 'daily_reset_stamp';
+const DEFAULT_DAILY_RESET_TZ = 'Europe/Rome';
+
 export class WorshipRoom {
   constructor(state, env) {
     this.state = state;
     this.env = env;
+    this.resetTimeZone = String((env && env.DAILY_RESET_TZ) || DEFAULT_DAILY_RESET_TZ).trim() || DEFAULT_DAILY_RESET_TZ;
   }
 
   async fetch(request) {
+    await this._ensureDailyResetAlarm();
+
     const upgrade = request.headers.get('Upgrade');
 
     if (upgrade !== 'websocket') {
@@ -262,6 +268,11 @@ export class WorshipRoom {
     this._pushMemberList();
   }
 
+  async alarm() {
+    await this._runDailyReset();
+    await this._ensureDailyResetAlarm(true);
+  }
+
   // ── Helpers ────────────────────────────────────────────────
   _broadcast(payload, sender, targetRole, predicate) {
     const data = typeof payload === 'string' ? payload : JSON.stringify(payload);
@@ -309,6 +320,45 @@ export class WorshipRoom {
       names: takenNames,
       ts: Date.now(),
     }, null, 'client');
+  }
+
+  async _ensureDailyResetAlarm(force) {
+    const currentAlarm = await this.state.storage.getAlarm();
+    if (!force && currentAlarm != null && currentAlarm > Date.now() + 1000) return;
+    await this.state.storage.setAlarm(nextMidnightInTimeZone(this.resetTimeZone, Date.now()));
+  }
+
+  async _runDailyReset() {
+    const stamp = zonedDateStamp(this.resetTimeZone, new Date());
+    const lastStamp = await this.state.storage.get(DAILY_RESET_STAMP_KEY);
+    if (lastStamp === stamp) return;
+
+    await this.state.storage.put(DAILY_RESET_STAMP_KEY, stamp);
+
+    this._broadcast({
+      type: 'daily_reset',
+      reason: 'daily_reset',
+      ts: Date.now(),
+    });
+
+    await delay(60);
+
+    for (const ws of this.state.getWebSockets()) {
+      const meta = safeMeta(ws);
+      if (meta?.role === 'client') {
+        safeSend(ws, {
+          type: 'kicked',
+          reason: 'daily_reset',
+          ts: Date.now(),
+        });
+        try {
+          ws.close(1000, 'daily_reset');
+        } catch {}
+      }
+    }
+
+    await delay(80);
+    this._pushMemberList();
   }
 }
 
@@ -522,6 +572,90 @@ function cleanId(value, prefix) {
   const raw = String(value || '').trim();
   if (raw) return raw.slice(0, 120);
   return `${prefix || 'msg'}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function pad2(value) {
+  return String(value || 0).padStart(2, '0');
+}
+
+function getZonedParts(date, timeZone) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+
+  const map = {};
+  for (const part of parts) {
+    if (part.type !== 'literal') map[part.type] = part.value;
+  }
+
+  return {
+    year: Number(map.year || 0),
+    month: Number(map.month || 0),
+    day: Number(map.day || 0),
+    hour: Number(map.hour || 0),
+    minute: Number(map.minute || 0),
+    second: Number(map.second || 0),
+  };
+}
+
+function addDaysYmd(year, month, day, deltaDays) {
+  const date = new Date(Date.UTC(year, month - 1, day + (deltaDays || 0)));
+  return {
+    year: date.getUTCFullYear(),
+    month: date.getUTCMonth() + 1,
+    day: date.getUTCDate(),
+  };
+}
+
+function compareDateTimeParts(a, b) {
+  const keys = ['year', 'month', 'day', 'hour', 'minute', 'second'];
+  for (const key of keys) {
+    const diff = Number(a[key] || 0) - Number(b[key] || 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
+
+function zonedDateStamp(timeZone, date) {
+  const parts = getZonedParts(date || new Date(), timeZone);
+  return `${parts.year}-${pad2(parts.month)}-${pad2(parts.day)}`;
+}
+
+function nextMidnightInTimeZone(timeZone, nowMs) {
+  const now = Number(nowMs || Date.now());
+  const nowParts = getZonedParts(new Date(now), timeZone);
+  const nextDate = addDaysYmd(nowParts.year, nowParts.month, nowParts.day, 1);
+  const target = {
+    year: nextDate.year,
+    month: nextDate.month,
+    day: nextDate.day,
+    hour: 0,
+    minute: 0,
+    second: 0,
+  };
+
+  let low = now + 1000;
+  let high = now + 48 * 60 * 60 * 1000;
+
+  while (compareDateTimeParts(getZonedParts(new Date(high), timeZone), target) < 0) {
+    high += 12 * 60 * 60 * 1000;
+  }
+
+  while (high - low > 1000) {
+    const mid = Math.floor((low + high) / 2);
+    const parts = getZonedParts(new Date(mid), timeZone);
+    if (compareDateTimeParts(parts, target) >= 0) high = mid;
+    else low = mid + 1;
+  }
+
+  return high;
 }
 
 function delay(ms) {
