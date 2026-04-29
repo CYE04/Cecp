@@ -450,10 +450,11 @@
 
     function formatLiveDate() {
       return new Date().toLocaleDateString('zh-CN', {
+        year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         weekday: 'short'
-      }).replace(/\//g, '.');
+      }).replace(/\//g, ' / ');
     }
 
     function syncLiveClock() {
@@ -1490,9 +1491,7 @@
           '        <button class="cf-op-side-link" type="button" data-op-target="#cf-dashboard-broadcast"><span class="cf-op-side-icon">📣</span><span>广播中心</span></button>',
           '        <button class="cf-op-side-link" type="button" data-op-target="#cf-dashboard-quick"><span class="cf-op-side-icon">⚡</span><span>快捷信息</span></button>',
           '        <button class="cf-op-side-link" type="button" data-op-target="#cf-dashboard-members"><span class="cf-op-side-icon">⌁</span><span>在线设备</span></button>',
-          '        <button class="cf-op-side-link" type="button" data-op-target="#cf-dashboard-group"><span class="cf-op-side-icon">☰</span><span>成员群聊</span></button>',
-          '        <button class="cf-op-side-link" type="button" data-op-target="#cf-dashboard-group"><span class="cf-op-side-icon">✎</span><span>团队备注</span></button>',
-          '        <button class="cf-op-side-link" type="button" data-op-target="#cf-dashboard-history"><span class="cf-op-side-icon">⚙</span><span>设置</span></button>',
+          '        <button class="cf-op-side-link" type="button" data-op-target="#cf-dashboard-group"><span class="cf-op-side-icon">☰</span><span>团队聊天</span></button>',
           '      </nav>',
           '      <div class="cf-op-side-health">',
           '        <span class="cf-op-side-health-dot"></span>',
@@ -1510,11 +1509,11 @@
           '          <span class="cf-header-sub">Intercom Control Center</span>',
           '        </div>',
           '        <div class="cf-header-tools cf-header-tools-dashboard">',
-          '          <button class="cf-op-toolbar-chip" id="cf-date-chip" type="button">',
+          '          <span class="cf-live-clock-pill cf-live-clock-pill-dashboard" title="当前时间">',
           '            <span class="cf-op-toolbar-chip-icon">🗓</span>',
-          '            <span id="cf-date-chip-label">2026 / 主日聚会</span>',
-          '            <span class="cf-op-toolbar-chip-caret">⌄</span>',
-          '          </button>',
+          '            <span class="cf-live-clock-main" data-cf-live-clock>--:--:--</span>',
+          '            <span class="cf-live-clock-date" data-cf-live-date></span>',
+          '          </span>',
           '          <label class="cf-op-search">',
           '            <span class="cf-op-search-icon">⌕</span>',
           '            <input id="cf-operator-search" type="search" placeholder="搜索成员或信息…">',
@@ -1548,24 +1547,21 @@
           '          <div class="cf-stat-note">需要查看</div>',
           '        </div>',
           '        <div class="cf-stat-card cf-stat-alert">',
-          '          <div class="cf-stat-label">待处理事项</div>',
+          '          <div class="cf-stat-label">故障提醒</div>',
           '          <div class="cf-stat-value"><span id="cf-stat-issues">0</span><small> 项</small></div>',
-          '          <div class="cf-stat-note">请优先跟进</div>',
+          '          <div class="cf-stat-note">请优先处理</div>',
           '        </div>',
           '      </div>',
           '      <div class="cf-op-dashboard-grid">',
-          '        <div class="cf-panel cf-dashboard-stage" id="cf-dashboard-stage">',
+          '        <div class="cf-panel cf-panel-members cf-dashboard-members" id="cf-dashboard-members">',
           '          <div class="cf-panel-title-row">',
-          '            <div class="cf-op-heading-wrap">',
-          '              <span class="cf-panel-title">收到的信息</span>',
-          '              <span class="cf-op-count-pill" id="cf-stage-message-pill">0</span>',
-          '            </div>',
-          '            <button class="cf-clear-btn" id="cf-clear-stage-btn" type="button">清空</button>',
+          '            <span class="cf-panel-title" id="cf-member-title">在线设备</span>',
+          '            <button class="cf-clear-btn cf-kick-all-btn" id="cf-kick-all-btn" type="button">踢出全员</button>',
           '          </div>',
-          '          <div class="cf-log" id="cf-log">',
-          '            <div class="cf-log-empty">舞台请求会显示在这里</div>',
-          '          </div>',
-          '          <button class="cf-op-panel-foot" type="button" data-op-target="#cf-dashboard-stage">查看全部信息</button>',
+          '          <ul class="cf-member-list" id="cf-member-list">',
+          '            <li class="cf-member-empty">当前没有设备在线</li>',
+          '          </ul>',
+          '          <button class="cf-op-panel-foot" type="button" data-op-target="#cf-dashboard-members">查看全部设备</button>',
           '        </div>',
           '        <div class="cf-panel cf-dashboard-broadcast" id="cf-dashboard-broadcast">',
           '          <div class="cf-panel-title-row">',
@@ -1575,16 +1571,17 @@
           '            <textarea id="cf-bcast-input" placeholder="输入广播消息…" maxlength="120"></textarea>',
           '            <span class="cf-op-bcast-count"><span id="cf-bcast-count">0</span>/120</span>',
           '          </label>',
-          '          <div class="cf-section-label">选择接收对象</div>',
-          '          <div class="cf-op-targets">',
-          '            <button class="cf-op-target-chip is-active" type="button">全体</button>',
-          '            <button class="cf-op-target-chip" type="button">敬拜组</button>',
-          '            <button class="cf-op-target-chip" type="button">音控组</button>',
-          '            <button class="cf-op-target-chip cf-op-target-chip-add" type="button">+ 添加</button>',
-          '          </div>',
           '          <div class="cf-op-send-row">',
           '            <button class="cf-op-primary-btn" id="cf-bcast-send" type="button">发送广播</button>',
           '            <button class="cf-op-secondary-btn" id="cf-clear-bcast-log-btn" type="button">清空记录</button>',
+          '          </div>',
+          '          <div class="cf-op-bcast-log-wrap">',
+          '            <div class="cf-panel-title-row cf-op-subtitle-row">',
+          '              <span class="cf-panel-title">广播记录</span>',
+          '            </div>',
+          '            <div class="cf-log cf-bcast-log" id="cf-operator-bcast-log">',
+          '              <div class="cf-log-empty">广播通知记录会显示在这里</div>',
+          '            </div>',
           '          </div>',
           '        </div>',
           '        <div class="cf-panel cf-dashboard-quick" id="cf-dashboard-quick">',
@@ -1600,40 +1597,28 @@
           '          </div>',
           '          <button class="cf-op-panel-foot" type="button" data-op-target="#cf-dashboard-broadcast">管理快捷信息</button>',
           '        </div>',
-          '        <div class="cf-panel cf-panel-members cf-dashboard-members" id="cf-dashboard-members">',
+          '        <div class="cf-panel cf-dashboard-stage" id="cf-dashboard-stage">',
           '          <div class="cf-panel-title-row">',
-          '            <span class="cf-panel-title" id="cf-member-title">在线设备</span>',
-          '            <button class="cf-clear-btn cf-kick-all-btn" id="cf-kick-all-btn" type="button">踢出全员</button>',
+          '            <div class="cf-op-heading-wrap">',
+          '              <span class="cf-panel-title">收到的信息</span>',
+          '              <span class="cf-op-count-pill" id="cf-stage-message-pill">0</span>',
+          '            </div>',
+          '            <button class="cf-clear-btn" id="cf-clear-stage-btn" type="button">清空</button>',
           '          </div>',
-          '          <ul class="cf-member-list" id="cf-member-list">',
-          '            <li class="cf-member-empty">当前没有设备在线</li>',
-          '          </ul>',
-          '          <button class="cf-op-panel-foot" type="button" data-op-target="#cf-dashboard-members">查看全部设备</button>',
+          '          <div class="cf-log" id="cf-log">',
+          '            <div class="cf-log-empty">舞台请求会显示在这里</div>',
+          '          </div>',
+          '          <button class="cf-op-panel-foot" type="button" data-op-target="#cf-dashboard-stage">查看全部信息</button>',
           '        </div>',
           '        <div class="cf-panel cf-panel-log cf-dashboard-group" id="cf-dashboard-group">',
           '          <div class="cf-panel-title-row">',
-          '            <div class="cf-op-heading-wrap">',
-          '              <span class="cf-panel-title">团队备注</span>',
-          '              <span class="cf-op-heading-sub">同步成员群聊</span>',
-          '            </div>',
+          '            <span class="cf-panel-title">团队聊天</span>',
           '            <button class="cf-clear-btn" id="cf-clear-group-btn" type="button">清空</button>',
           '          </div>',
           '          <div class="cf-log" id="cf-operator-group-log">',
-          '            <div class="cf-log-empty">成员群聊会显示在这里</div>',
+          '            <div class="cf-log-empty">团队聊天会显示在这里</div>',
           '          </div>',
-          '          <button class="cf-op-panel-foot" type="button" data-op-target="#cf-dashboard-group">查看全部备注</button>',
-          '        </div>',
-          '        <div class="cf-panel cf-panel-log cf-dashboard-history" id="cf-dashboard-history">',
-          '          <div class="cf-panel-title-row">',
-          '            <div class="cf-op-heading-wrap">',
-          '              <span class="cf-panel-title">待办事项</span>',
-          '              <span class="cf-op-heading-sub">已发广播记录</span>',
-          '            </div>',
-          '          </div>',
-          '          <div class="cf-log cf-bcast-log" id="cf-operator-bcast-log">',
-          '            <div class="cf-log-empty">广播通知记录会显示在这里</div>',
-          '          </div>',
-          '          <button class="cf-op-panel-foot" type="button" data-op-target="#cf-dashboard-history">查看全部待办</button>',
+          '          <button class="cf-op-panel-foot" type="button" data-op-target="#cf-dashboard-group">查看全部聊天</button>',
           '        </div>',
           '      </div>',
           '      <div class="cf-flash" id="cf-flash">已广播 ✓</div>',
@@ -1652,8 +1637,6 @@
       });
       if (!IS_FLOATING) {
         var searchInput = ROOT.querySelector('#cf-operator-search');
-        var dateChip = ROOT.querySelector('#cf-date-chip');
-        var dateLabel = ROOT.querySelector('#cf-date-chip-label');
         var bcastInput = ROOT.querySelector('#cf-bcast-input');
         var bcastCount = ROOT.querySelector('#cf-bcast-count');
 
@@ -1669,15 +1652,6 @@
           });
         });
 
-        ROOT.querySelectorAll('.cf-op-target-chip').forEach(function (button) {
-          button.addEventListener('click', function () {
-            ROOT.querySelectorAll('.cf-op-target-chip').forEach(function (node) {
-              node.classList.remove('is-active');
-            });
-            button.classList.add('is-active');
-          });
-        });
-
         if (bcastInput && bcastCount) {
           var syncBcastCount = function () {
             bcastCount.textContent = String(bcastInput.value.length);
@@ -1688,14 +1662,6 @@
 
         if (searchInput) {
           searchInput.addEventListener('input', applyOperatorSearchFilter);
-        }
-
-        if (dateChip && dateLabel) {
-          dateChip.addEventListener('click', function () {
-            dateLabel.textContent = dateLabel.textContent === '2026 / 主日聚会'
-              ? '2026 / 排练安排'
-              : '2026 / 主日聚会';
-          });
         }
       }
       ROOT.querySelectorAll('.cf-bcast-preset').forEach(function (button) {
@@ -1855,7 +1821,7 @@
       if (!log) return;
 
       if (!memberChat.length) {
-        log.innerHTML = '<div class="cf-log-empty">成员群聊会显示在这里</div>';
+        log.innerHTML = '<div class="cf-log-empty">团队聊天会显示在这里</div>';
         return;
       }
 
