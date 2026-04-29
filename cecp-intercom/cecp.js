@@ -440,9 +440,7 @@
         ':',
         padTimePart(date.getMinutes(), 2),
         ':',
-        padTimePart(date.getSeconds(), 2),
-        '.',
-        padTimePart(date.getMilliseconds(), 3)
+        padTimePart(date.getSeconds(), 2)
       ].join('');
     }
 
@@ -542,7 +540,7 @@
       scheduleDailyChatReset();
       syncLiveClock();
       if (clockTimer) return;
-      clockTimer = setInterval(syncLiveClock, 50);
+      clockTimer = setInterval(syncLiveClock, 1000);
     }
 
     function clientLogKey() {
@@ -1149,35 +1147,9 @@
         ? '已为你带入上次设备，如果不是你本人，可以直接换设备。'
         : '发送给音控和成员的消息会分开显示，现场查看会更清楚。';
       ensureDailyChatReset();
-      var quickDockHtml = [
-        '      <div class="cf-quick-overlay cf-quick-overlay--dock" id="cf-quick-overlay" hidden>',
-        '        <div class="cf-quick-sheet cf-quick-sheet--dock" role="dialog" aria-modal="false" aria-labelledby="cf-quick-sheet-title">',
-        '          <div class="cf-quick-sheet-head">',
-        '            <div class="cf-quick-sheet-copy">',
-        '              <div class="cf-quick-sheet-kicker">快捷信息</div>',
-        '              <div class="cf-quick-sheet-title" id="cf-quick-sheet-title">发送快捷信息</div>',
-        '            </div>',
-        '            <button class="cf-quick-close" id="cf-quick-close" type="button" aria-label="关闭快捷信息">×</button>',
-        '          </div>',
-        '          <div class="cf-quick-sheet-list">',
-        CUES.map(function (cue) {
-          return [
-            '<button class="cf-quick-item" type="button" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
-            '  <span class="cf-quick-item-icon">', escapeHtml(cue.icon), '</span>',
-            '  <span class="cf-quick-item-copy">',
-            '    <span class="cf-quick-item-label">', escapeHtml(cue.label), '</span>',
-            '    <span class="cf-quick-item-desc">', escapeHtml(cue.desc), '</span>',
-            '  </span>',
-            '</button>'
-          ].join('');
-        }).join(''),
-        '          </div>',
-        '        </div>',
-        '      </div>'
-      ].join('');
 
       setStageHtml([
-        '<div class="cf-app cf-client-app cf-client-app--channel">',
+        '<div class="cf-app cf-client-app">',
         '  <div class="cf-header">',
         '    <div class="cf-header-copy">',
         '      <span class="cf-title">CECP 敬拜团成员通道</span>',
@@ -1205,9 +1177,9 @@
         '    </div>',
         '    <div class="cf-client-note">', escapeHtml(deviceHint), '</div>',
         '  </div>',
-        '  <div class="', clientGridClass, ' cf-client-grid--channel">',
+        '  <div class="', clientGridClass, '">',
         '    <div class="cf-client-main">',
-        '      <div class="cf-panel cf-chat-panel cf-chat-panel-sound cf-stage-panel">',
+        '      <div class="cf-panel cf-chat-panel cf-chat-panel-sound">',
         '        <div class="cf-panel-title-row cf-chat-panel-head">',
         '          <div class="cf-chat-panel-copy">',
         '            <span class="cf-panel-title">发给音控</span>',
@@ -1215,56 +1187,29 @@
         '          </div>',
         '          <div class="cf-chat-panel-actions">',
         '            <button class="cf-quick-toggle" id="cf-sound-quick-toggle" data-quick-target="sound" type="button" aria-expanded="false">',
-        '              <span class="cf-quick-toggle-label">快捷信息</span>',
+        '              <span class="cf-quick-toggle-label">快捷</span>',
         '              <span class="cf-quick-arrow">⌄</span>',
         '            </button>',
+        '            <button class="cf-clear-btn" id="cf-client-clear-btn" type="button">清空</button>',
         '          </div>',
         '        </div>',
-        '        <div class="cf-stage-panel-banner">',
-        '          <span class="cf-stage-panel-chip">当前设备</span>',
-                     renderIdentityPill(whoAmI, 'cf-stage-panel-identity'),
-        '        </div>',
-        '        <div class="cf-custom-area cf-chat-compose cf-chat-compose--stage">',
-        '          <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
-        '          <button id="cf-custom-send" type="button">发送</button>',
-        '        </div>',
         SHOW_CLIENT_LOG ? [
-        '        <div class="cf-stage-mini-row">',
-        '          <span class="cf-stage-mini-label">最近动态</span>',
-        '          <button class="cf-clear-btn cf-chat-clear-inline" id="cf-client-clear-inline-btn" type="button">清空记录</button>',
-        '        </div>',
-        '        <div class="cf-log cf-log-client cf-log-chat-thread cf-log-chat-thread--stage" id="cf-client-log">',
+        '        <div class="cf-log cf-log-client cf-log-chat-thread" id="cf-client-log">',
         '          <div class="cf-log-empty">你发出的请求和收到的广播会显示在这里</div>',
         '        </div>'
         ].join('') : [
         '        <div class="cf-chat-muted">已关闭音控记录显示，但你仍然可以继续发送消息。</div>'
         ].join(''),
+        '        <div class="cf-chat-tools-row"><button class="cf-clear-btn cf-chat-clear-inline" id="cf-client-clear-inline-btn" type="button">清空记录</button></div>',
+        '        <div class="cf-custom-area cf-chat-compose">',
+        '          <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
+        '          <button id="cf-custom-send" type="button">发送</button>',
+        '        </div>',
         '      </div>',
-        SHOW_CLIENT_LOG ? [
-        '      <div class="cf-client-secondary">',
-        '        <div class="cf-panel cf-client-preview-panel">',
-        '          <div class="cf-panel-title-row">',
-        '            <span class="cf-panel-title">最新广播</span>',
-        '          </div>',
-        '          <div class="cf-broadcast-preview" id="cf-client-broadcast-preview">',
-        '            <div class="cf-broadcast-empty">还没有收到广播通知</div>',
-        '          </div>',
-        '        </div>',
-        '        <div class="cf-panel cf-client-history-panel">',
-        '          <div class="cf-panel-title-row">',
-        '            <span class="cf-panel-title">最近广播</span>',
-        '          </div>',
-        '          <div class="cf-broadcast-history" id="cf-client-broadcast-history">',
-        '            <div class="cf-broadcast-empty">广播记录会显示在这里</div>',
-        '          </div>',
-        '        </div>',
-        '      </div>'
-        ].join('') : '',
-        showMemberChat ? '' : quickDockHtml,
         '    </div>',
         showMemberChat ? [
         '    <div class="cf-client-side">',
-        '      <div class="cf-panel cf-chat-panel cf-chat-panel-member cf-chat-panel-member--channel">',
+        '      <div class="cf-panel cf-chat-panel cf-chat-panel-member">',
         '        <div class="cf-panel-title-row cf-chat-panel-head">',
         '          <div class="cf-chat-panel-copy">',
         '            <span class="cf-panel-title">成员群聊</span>',
@@ -1272,26 +1217,48 @@
         '          </div>',
         '          <div class="cf-chat-panel-actions">',
         '            <button class="cf-quick-toggle" id="cf-team-quick-toggle" data-quick-target="team" type="button" aria-expanded="false">',
-        '              <span class="cf-quick-toggle-label">发给成员</span>',
+        '              <span class="cf-quick-toggle-label">快捷</span>',
         '              <span class="cf-quick-arrow">⌄</span>',
         '            </button>',
+        '            <button class="cf-clear-btn" id="cf-member-chat-clear-btn" type="button">清空</button>',
         '          </div>',
         '        </div>',
         '        <div class="cf-log cf-log-member-chat cf-log-chat-thread" id="cf-member-chat-log">',
         '          <div class="cf-log-empty">成员群聊会显示在这里</div>',
         '        </div>',
-        '        <div class="cf-stage-mini-row">',
-        '          <span class="cf-stage-mini-label">群聊记录</span>',
-        '          <button class="cf-clear-btn cf-chat-clear-inline" id="cf-member-chat-clear-inline-btn" type="button">清空记录</button>',
-        '        </div>',
+        '        <div class="cf-chat-tools-row"><button class="cf-clear-btn cf-chat-clear-inline" id="cf-member-chat-clear-inline-btn" type="button">清空记录</button></div>',
         '        <div class="cf-custom-area cf-member-chat-compose cf-chat-compose">',
         '          <input id="cf-member-chat-input" type="text" placeholder="给成员说一句…" maxlength="180">',
         '          <button id="cf-member-chat-send" type="button">发送</button>',
         '        </div>',
         '      </div>',
-                     quickDockHtml,
         '    </div>'
         ].join('') : '',
+        '  </div>',
+        '  <div class="cf-quick-overlay" id="cf-quick-overlay" hidden>',
+        '    <button class="cf-quick-backdrop" id="cf-quick-backdrop" type="button" aria-label="关闭快捷信息"></button>',
+        '    <div class="cf-quick-sheet" role="dialog" aria-modal="true" aria-labelledby="cf-quick-sheet-title">',
+        '      <div class="cf-quick-sheet-head">',
+        '        <div class="cf-quick-sheet-copy">',
+        '          <div class="cf-quick-sheet-kicker">快捷信息</div>',
+        '          <div class="cf-quick-sheet-title" id="cf-quick-sheet-title">发送快捷信息</div>',
+        '        </div>',
+        '        <button class="cf-quick-close" id="cf-quick-close" type="button" aria-label="关闭快捷信息">×</button>',
+        '      </div>',
+        '      <div class="cf-quick-sheet-list">',
+        CUES.map(function (cue) {
+          return [
+            '<button class="cf-quick-item" type="button" data-kind="', escapeHtml(cue.kind), '" data-msg="', escapeHtml(cue.label), '">',
+            '  <span class="cf-quick-item-icon">', escapeHtml(cue.icon), '</span>',
+            '  <span class="cf-quick-item-copy">',
+            '    <span class="cf-quick-item-label">', escapeHtml(cue.label), '</span>',
+            '    <span class="cf-quick-item-desc">', escapeHtml(cue.desc), '</span>',
+            '  </span>',
+            '</button>'
+          ].join('');
+        }).join(''),
+        '      </div>',
+        '    </div>',
         '  </div>',
         '  <div class="cf-flash" id="cf-flash">发送成功 ✓</div>',
         '</div>'
@@ -1395,7 +1362,6 @@
         });
       }
 
-
       ROOT.querySelectorAll('#cf-client-clear-btn, #cf-client-clear-inline-btn').forEach(function (clearBtn) {
         clearBtn.addEventListener('click', function () {
           clearClientHistory(true);
@@ -1414,7 +1380,6 @@
       syncLauncherBadge();
       setStatus(isOnline);
       startLiveClock();
-      if (quickOverlay) openQuickOverlay('sound');
       scheduleFloatingGeometry();
     }
 
@@ -1962,8 +1927,29 @@
         }
         /* 用 alert 给成员明确提示 */
         setTimeout(function () {
-          alert('你已被音控组踢出，请重新选择设备后再加入。');
+          if (msg.reason === 'daily_reset') {
+            alert('系统已在 00:00 自动重置，请重新选择设备后再加入。');
+          } else {
+            alert('你已被音控组踢出，请重新选择设备后再加入。');
+          }
         }, 100);
+        return;
+      }
+
+      if (msg.type === 'daily_reset') {
+        clearAllChatHistory(true);
+        operatorUnreadCount = 0;
+        if (role === 'operator') {
+          msgLog = [];
+          memberCount = 0;
+          takenDevices = [];
+          renderMembers([]);
+          renderOperatorLog();
+          renderOperatorGroupLog();
+          renderOperatorBroadcastLog();
+        }
+        syncBroadcastPopup();
+        syncLauncherBadge();
         return;
       }
 

@@ -5754,3 +5754,32 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     font-size: 0.74rem !important;
   }
 }
+
+/* ============================================================
+   ▌ CECP — Client UI Restore
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 18px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-badge-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  width: auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-device-main {
+  display: block !important;
+}
+
+@media (max-width: 640px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+}
