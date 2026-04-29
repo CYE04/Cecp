@@ -495,6 +495,511 @@ html.cf-intercom-open body {
   }
 }
 
+/* ============================================================
+   ▌ CECP — Final Mobile Overrides
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app--channel {
+  width: min(100%, 1480px) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+  grid-template-columns: minmax(420px, 0.92fr) minmax(480px, 1.08fr) !important;
+  gap: 18px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  min-height: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-badge-wrap {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  gap: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-device-main {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+  min-height: 180px !important;
+  max-height: 30vh !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+  min-height: 560px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+  min-height: 260px !important;
+  max-height: 38vh !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-app,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose input {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+@media (max-width: 820px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app--channel {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-secondary {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+    padding: 12px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-preview-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-history-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+    min-height: 180px !important;
+    max-height: 26vh !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+    min-height: 0 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+    min-height: 220px !important;
+    max-height: 32vh !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-app {
+    overflow-x: hidden !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    padding-inline: 14px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-bubble {
+    max-width: 100% !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-main {
+    font-size: 0.74rem !important;
+  }
+}
+
+/* ============================================================
+   ▌ CECP — Final Mobile Overrides
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app--channel {
+  width: min(100%, 1480px) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+  grid-template-columns: minmax(420px, 0.92fr) minmax(480px, 1.08fr) !important;
+  gap: 18px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  min-height: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-badge-wrap {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  gap: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-device-main {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+  min-height: 180px !important;
+  max-height: 30vh !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+  min-height: 560px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+  min-height: 260px !important;
+  max-height: 38vh !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-app,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose input {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+@media (max-width: 820px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app--channel {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-secondary {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+    padding: 12px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-preview-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-history-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+    min-height: 180px !important;
+    max-height: 26vh !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+    min-height: 0 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+    min-height: 220px !important;
+    max-height: 32vh !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-app {
+    overflow-x: hidden !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    padding-inline: 14px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-bubble {
+    max-width: 100% !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-main {
+    font-size: 0.74rem !important;
+  }
+}
+
+
+/* ============================================================
+   ▌ CECP — 手机端优先的通道布局收口
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 14px !important;
+  min-height: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-badge-wrap {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-device-main {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-badge-label {
+  margin: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-device-reset-main {
+  margin-left: auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+  min-height: 180px !important;
+  max-height: 30vh !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+  min-height: 560px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+  min-height: 260px !important;
+  max-height: 38vh !important;
+}
+
+@media (max-width: 820px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app--channel {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-secondary {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-secondary {
+    grid-template-columns: 1fr !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-preview-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-history-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+    padding: 12px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-note {
+    margin-top: 0 !important;
+    font-size: 0.78rem !important;
+    line-height: 1.5 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel-banner {
+    padding: 10px 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-head,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-mini-row,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-head,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history-main {
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+    gap: 8px !important;
+    margin-top: 10px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose input {
+    min-height: 42px !important;
+    font-size: 16px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose button {
+    min-width: 66px !important;
+    min-height: 42px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+    min-height: 180px !important;
+    max-height: 26vh !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+    min-height: 0 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+    min-height: 220px !important;
+    max-height: 32vh !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock .cf-quick-sheet-list {
+    max-height: 34vh !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-badge-wrap {
+    align-items: flex-start !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-device-reset-main {
+    margin-left: 0 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-main {
+    font-size: 0.74rem !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-text {
+    font-size: 0.94rem !important;
+  }
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-app,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose input {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+@media (max-width: 480px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-app {
+    overflow-x: hidden !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+    grid-template-columns: 1fr !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose button {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding-inline: 14px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-bubble {
+    max-width: 100% !important;
+  }
+}
+
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-actions {
   display: inline-flex !important;
   flex-direction: column !important;
@@ -3609,6 +4114,309 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 
 
 /* ============================================================
+   ▌ CECP — 敬拜通道布局（参考图版）
+   - 保留现有主题和快捷信息内容
+   - 成员端改为左侧发送 / 左下广播 / 右侧群聊 / 右下快捷信息
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app--channel {
+  width: min(100%, 1320px) !important;
+  gap: 18px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+  grid-template-columns: minmax(420px, 0.92fr) minmax(480px, 1.08fr) !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side {
+  display: grid !important;
+  gap: 18px !important;
+  min-width: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+  min-height: 0 !important;
+  padding: 18px !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
+    rgba(12, 17, 26, 0.94) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel {
+  gap: 14px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel-banner {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  padding: 12px 14px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  border-radius: 18px !important;
+  background: rgba(15, 21, 31, 0.88) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel-chip,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-mini-label,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 28px !important;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(91, 163, 255, 0.2) !important;
+  background: rgba(91, 163, 255, 0.1) !important;
+  color: #dcecff !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel-identity {
+  margin: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose--stage {
+  margin-top: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-mini-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-mini-label {
+  background: rgba(89, 214, 140, 0.1) !important;
+  border-color: rgba(89, 214, 140, 0.16) !important;
+  color: #d8ffe8 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+  min-height: 220px !important;
+  max-height: 280px !important;
+  padding: 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-secondary {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-preview-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-history-panel {
+  padding: 18px !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0)),
+    rgba(12, 17, 26, 0.94) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history {
+  min-height: 100% !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-card {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  min-height: 188px !important;
+  padding: 18px !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  background:
+    radial-gradient(circle at top right, rgba(91, 163, 255, 0.1), transparent 36%),
+    rgba(9, 13, 20, 0.94) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-head,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history-main {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-text {
+  font-size: 1.04rem !important;
+  line-height: 1.55 !important;
+  font-weight: 700 !important;
+  color: var(--cf-text) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-time,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history-time {
+  font-family: var(--cf-font-mono) !important;
+  font-size: 0.72rem !important;
+  color: var(--cf-muted-2) !important;
+  white-space: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-foot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-status,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history-state {
+  color: var(--cf-muted) !important;
+  font-size: 0.74rem !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history-item {
+  display: grid !important;
+  gap: 8px !important;
+  padding: 14px 16px !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  background: rgba(16, 22, 33, 0.94) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history-item.is-unread {
+  border-color: rgba(91, 163, 255, 0.3) !important;
+  background:
+    linear-gradient(180deg, rgba(91, 163, 255, 0.11), rgba(91, 163, 255, 0.02)),
+    rgba(16, 22, 33, 0.96) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history-text {
+  color: var(--cf-text) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.5 !important;
+  font-weight: 600 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-empty {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 160px !important;
+  padding: 18px !important;
+  border-radius: 18px !important;
+  border: 1px dashed rgba(157, 172, 209, 0.14) !important;
+  color: var(--cf-muted) !important;
+  text-align: center !important;
+  line-height: 1.6 !important;
+  background: rgba(11, 15, 23, 0.78) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+  min-height: 640px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+  min-height: 360px !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-overlay--dock {
+  position: static !important;
+  inset: auto !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  z-index: auto !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-overlay--dock[hidden] {
+  display: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock {
+  position: relative !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 18px !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.032), rgba(255, 255, 255, 0)),
+    rgba(12, 17, 26, 0.95) !important;
+  box-shadow: var(--cf-shadow-soft) !important;
+  transform: none !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock .cf-quick-sheet-head {
+  margin-bottom: 14px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock .cf-quick-sheet-list {
+  max-height: 470px !important;
+  overflow-y: auto !important;
+  padding-right: 2px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock .cf-quick-item {
+  min-height: 82px !important;
+  border-radius: 18px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-actions {
+  flex-wrap: wrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-main {
+  font-size: 0.82rem !important;
+  letter-spacing: -0.02em !important;
+}
+
+@media (max-width: 1160px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+    grid-template-columns: 1fr !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+    min-height: 280px !important;
+  }
+}
+
+@media (max-width: 780px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-secondary {
+    grid-template-columns: 1fr !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel-banner,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-mini-row,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-preview-head,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-broadcast-history-main {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-preview-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-history-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock .cf-quick-sheet-list {
+    max-height: 320px !important;
+  }
+}
+
+
+/* ============================================================
    ▌ CECP — 双通道发送 + 音控分栏 + 快捷消息直接显示
    ============================================================ */
 
@@ -4792,6 +5600,157 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   }
 
   :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-sub {
+    font-size: 0.74rem !important;
+  }
+}
+
+/* ============================================================
+   ▌ CECP — Final Mobile Overrides
+   ============================================================ */
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app--channel {
+  width: min(100%, 1480px) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+  grid-template-columns: minmax(420px, 0.92fr) minmax(480px, 1.08fr) !important;
+  gap: 18px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  min-height: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-badge-wrap {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  gap: 12px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero .cf-device-main {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+  min-height: 180px !important;
+  max-height: 30vh !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+  min-height: 560px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+  min-height: 260px !important;
+  max-height: 38vh !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-app,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose input {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+@media (max-width: 820px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app--channel {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-grid--channel {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-secondary {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-main,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-side {
+    gap: 12px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-hero {
+    padding: 12px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-stage-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-preview-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-history-panel,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-sheet--dock {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread--stage {
+    min-height: 180px !important;
+    max-height: 26vh !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel {
+    min-height: 0 !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-member--channel .cf-log-chat-thread {
+    min-height: 220px !important;
+    max-height: 32vh !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-app {
+    overflow-x: hidden !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    padding-inline: 14px !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item,
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-bubble {
+    max-width: 100% !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-main {
     font-size: 0.74rem !important;
   }
 }
