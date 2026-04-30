@@ -276,9 +276,17 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 /* ── Section dividers & misc ── */
 hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 .ym-section-title{font-size:1.3rem;font-weight:700;color:var(--ym-ink);margin:1.5rem 0 .8rem;display:flex;align-items:center;gap:8px}
+.ym-section-title.is-featured{font-size:1.52rem;font-weight:800;letter-spacing:.01em}
 .ym-block{background:var(--ym-card);border:1px solid var(--ym-border);border-radius:16px;padding:16px;margin-bottom:1rem;box-shadow:var(--ym-sh)}
+.ym-block.is-featured{border-color:var(--ym-border-md);box-shadow:var(--ym-sh-lg);padding:18px 20px}
 .ym-meta{font-size:14px;color:var(--ym-ink2);line-height:1.8}
+.ym-meta.is-featured{font-size:15.5px;line-height:1.95;color:var(--ym-ink);font-weight:500}
 .ym-meta strong{color:var(--ym-ink)}
+.ym-feature-copy{font-size:16px;line-height:2;color:var(--ym-ink);font-weight:500}
+.ym-meta-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin:0 0 8px}
+.ym-meta-row:last-child{margin-bottom:0}
+.ym-meta-label{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ym-ink2)}
+.ym-meta-value{font-size:18px;font-weight:700;color:var(--ym-ink)}
 .ppt-download-link{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:12px;background:var(--ym-ink);color:var(--ym-bg);text-decoration:none;font-size:14px;font-weight:600;transition:opacity .15s}
 .ppt-download-link:hover{opacity:.8}
 .ppt-empty,.replay-tip{color:var(--ym-ink2);font-size:14px;padding:20px 0}
@@ -916,15 +924,33 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   /* ══════════════ Hero ══════════════ */
   function buildHero() {
-    var navItems = [
-      {label:'📅 聚会流程', href:'#ym-flow'},
-      {label:'🎧 本周诗歌', href:'#ym-songs'},
-      {label:'🎼 歌谱',     href:'#ym-score'},
-      {label:'📖 信息分享', href:'#ym-message'},
-      {label:'📺 直播回放', href:'#ym-replay'},
-      {label:'📑 讲员PPT',  href:'#ym-ppt'},
-      {label:'🎮 游戏活动', href:'#ym-game'},
-    ];
+    var navGroups = {
+      flow: [
+        {label:'📅 聚会流程', href:'#ym-flow'},
+      ],
+      songs: [
+        {label:'🎧 本周诗歌', href:'#ym-songs'},
+        {label:'🎼 歌谱', href:'#ym-score'},
+      ],
+      message: [
+        {label:'📖 信息分享', href:'#ym-message'},
+      ],
+      ppt: [
+        {label:'📑 讲员PPT', href:'#ym-ppt'},
+      ],
+      replay: [
+        {label:'📺 直播回放', href:'#ym-replay'},
+      ],
+      game: [
+        {label:'🎮 游戏活动', href:'#ym-game'},
+      ],
+    };
+    var navItems = [];
+    getSectionOrder().forEach(function(section){
+      (navGroups[section] || []).forEach(function(item){
+        navItems.push(item);
+      });
+    });
     var navDiv = el('div', {class:'ym-nav'});
     navItems.forEach(function(item){
       var btn = el('button', {class:'ym-nav-btn', text:item.label});
@@ -2100,66 +2126,117 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function hr(){ return el('hr',{class:'ym-hr'}); }
 
   /* ══════════════ Section title ══════════════ */
-  function secTitle(txt){ return el('h2',{class:'ym-section-title',text:txt}); }
+  function secTitle(txt, cls){ return el('h2',{class:'ym-section-title'+(cls?' '+cls:''),text:txt}); }
+
+  function getSectionOrder() {
+    var defaults = ['flow', 'songs', 'message', 'ppt', 'replay', 'game', 'action'];
+    var raw = Array.isArray(C.sectionOrder) ? C.sectionOrder : [];
+    var seen = {};
+    var order = [];
+
+    raw.forEach(function(name){
+      var key = String(name || '').toLowerCase();
+      if (key === 'schedule') key = 'flow';
+      if (!defaults.includes(key) || seen[key]) return;
+      seen[key] = true;
+      order.push(key);
+    });
+
+    defaults.forEach(function(key){
+      if (!seen[key]) order.push(key);
+    });
+
+    return order;
+  }
+
+  function buildFlowSection() {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(anchor('ym-flow'));
+    frag.appendChild(buildSchedule());
+    return frag;
+  }
+
+  function buildSongsSection() {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(anchor('ym-songs'));
+    frag.appendChild(secTitle('🎵 诗歌敬拜'));
+    var roster = buildRoster();
+    if (roster) frag.appendChild(roster);
+    frag.appendChild(buildSongs());
+    frag.appendChild(anchor('ym-score'));
+    return frag;
+  }
+
+  function buildMessageSection() {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(anchor('ym-message'));
+    frag.appendChild(secTitle('📖 圣经分享', 'is-featured'));
+    var metaDiv = div('ym-block is-featured');
+    metaDiv.innerHTML =
+      '<div class="ym-meta is-featured">' +
+        '<div class="ym-meta-row"><span class="ym-meta-label">讲员</span><span class="ym-meta-value">' + (C.speaker||'—') + '</span></div>' +
+        '<div class="ym-meta-row"><span class="ym-meta-label">主题</span><span class="ym-meta-value">' + (C.topic||'—') + '</span></div>' +
+      '</div>';
+    frag.appendChild(metaDiv);
+    frag.appendChild(buildBible());
+    return frag;
+  }
+
+  function buildPptSection() {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(anchor('ym-ppt'));
+    frag.appendChild(secTitle('📑 讲员 PPT'));
+    frag.appendChild(buildPPT());
+    return frag;
+  }
+
+  function buildReplaySection() {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(anchor('ym-replay'));
+    frag.appendChild(secTitle('📺 直播回放'));
+    frag.appendChild(buildReplay());
+    return frag;
+  }
+
+  function buildGameSection() {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(anchor('ym-game'));
+    frag.appendChild(secTitle('🎮 游戏活动', 'is-featured'));
+    var gameDiv = div('ym-block is-featured');
+    gameDiv.appendChild(el('p',{class:'ym-feature-copy',text:C.gameText}));
+    frag.appendChild(gameDiv);
+    return frag;
+  }
+
+  function buildActionSection() {
+    var act = div('ym-action');
+    act.innerHTML = '<strong>🙋 行动邀请</strong><br>欢迎邀请你身边的青年朋友一起来参加聚会。<br>如果你对敬拜、乐器或其他服事有感动，我们很欢迎你加入，也可以随时联系同工。<br><strong>一起服事，一起成长，我们等你！</strong>';
+    return act;
+  }
 
   /* ══════════════ Assemble page ══════════════ */
   function buildPage() {
     var frag = document.createDocumentFragment();
+    var sectionBuilders = {
+      flow: buildFlowSection,
+      songs: buildSongsSection,
+      message: buildMessageSection,
+      ppt: buildPptSection,
+      replay: buildReplaySection,
+      game: buildGameSection,
+      action: buildActionSection,
+    };
+    var sectionOrder = getSectionOrder();
 
     frag.appendChild(buildHero());
     frag.appendChild(hr());
 
-    // Schedule
-    frag.appendChild(anchor('ym-flow'));
-    frag.appendChild(buildSchedule());
-    frag.appendChild(hr());
-
-    // Songs
-    frag.appendChild(anchor('ym-songs'));
-    frag.appendChild(secTitle('🎵 诗歌敬拜'));
-
-    // Roster
-    var roster = buildRoster();
-    if(roster) frag.appendChild(roster);
-
-    frag.appendChild(buildSongs());
-    frag.appendChild(hr());
-
-    // Score (scroll target just before last song card)
-    frag.appendChild(anchor('ym-score'));
-    frag.appendChild(hr());
-
-    // Message
-    frag.appendChild(anchor('ym-message'));
-    frag.appendChild(secTitle('📖 圣经分享'));
-    var metaDiv = div('ym-block');
-    metaDiv.innerHTML = '<div class="ym-meta"><strong>讲员：</strong>'+(C.speaker||'—')+'<br><strong>主题：</strong>'+(C.topic||'—')+'</div>';
-    frag.appendChild(metaDiv);
-    frag.appendChild(buildBible());
-    frag.appendChild(hr());
-
-    // PPT
-    frag.appendChild(anchor('ym-ppt'));
-    frag.appendChild(secTitle('📑 讲员 PPT'));
-    frag.appendChild(buildPPT());
-    frag.appendChild(hr());
-
-    // Replay
-    frag.appendChild(anchor('ym-replay'));
-    frag.appendChild(secTitle('📺 直播回放'));
-    frag.appendChild(buildReplay());
-    frag.appendChild(hr());
-
-    // Game
-    frag.appendChild(anchor('ym-game'));
-    frag.appendChild(secTitle('🎮 游戏活动'));
-    frag.appendChild(el('p',{class:'ym-meta',text:C.gameText}));
-    frag.appendChild(hr());
-
-    // Action
-    var act = div('ym-action');
-    act.innerHTML = '<strong>🙋 行动邀请</strong><br>欢迎邀请你身边的青年朋友一起来参加聚会。<br>如果你对敬拜、乐器或其他服事有感动，我们很欢迎你加入，也可以随时联系同工。<br><strong>一起服事，一起成长，我们等你！</strong>';
-    frag.appendChild(act);
+    sectionOrder.forEach(function(section, index){
+      var builder = sectionBuilders[section];
+      if (!builder) return;
+      frag.appendChild(builder());
+      if (index < sectionOrder.length - 1) frag.appendChild(hr());
+    });
 
     // Ring Coach Tour trigger
     frag.appendChild(el('div',{id:'rt5-enable'}));
