@@ -1,0 +1,34 @@
+{
+  "week": "2026年4月 第二周",
+  "time": "每周日 12:00 – 13:30",
+  "sheetName": "030526",
+  "gameText": "本周游戏活动叫 【圣经迷踪】 欢迎大家先来看看游戏规则哦 ",
+  "pptUrl": "https://drive.cecp.it/d/s/183PWJnQkfw6atIETb45M4BsZuQGugdC/44raE52pOOoZPzJmZc28SuyJeKK-0eSe-L7mgoC8vKQ0",
+  "pptLabel": "圣经迷踪",
+  "bibleRef": "gldqs 13 12",
+  "speaker": null,
+  "topic": null,
+  "replayUrl": null,
+  "schedule": [
+    {
+      "time": "12:00 – 12:30",
+      "event": "诗歌敬拜",
+      "emoji": "🎶"
+    },
+    {
+      "time": "12:30 – 13:30",
+      "event": "圣经分享",
+      "emoji": "📖"
+    },
+    {
+      "time": "13:30",
+      "event": "祷告 & 结束",
+      "emoji": "🙏"
+    }
+  ],
+  "songs": [
+    "xindeshijiangyaochengjiu",
+    "jingbaidexin",
+    "woyuanweiniqu"
+  ]
+}
