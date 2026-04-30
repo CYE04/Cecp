@@ -1,6 +1,9 @@
 {
   "week": "2026年1月 第一周",
   "time": "每周日 12:00 – 13:30",
+  {
+  "sectionOrder": ["flow", "songs", "game", "ppt", "message", "replay", "action"]
+}
   "sheetName": "030526",
   "gameText": "本周游戏活动叫 【圣经迷踪】 欢迎大家先来看看游戏规则哦 ",
   "pptUrl": "https://drive.cecp.it/d/s/183PWJnQkfw6atIETb45M4BsZuQGugdC/44raE52pOOoZPzJmZc28SuyJeKK-0eSe-L7mgoC8vKQ0",
