@@ -1,7 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
-  const ML_VER='2026.04.18.1';
+  const ML_VER='2026.05.01.1';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -1026,7 +1026,7 @@
     const explicitYear=cleanText(song.albumYear);
     if(explicitAlbum){
       return {
-        album:explicitYear && !explicitAlbum.includes(explicitYear) ? `${explicitAlbum} (${explicitYear})` : explicitAlbum,
+        album:cleanText(explicitAlbum.replace(/\s*[（(]\d{4}[）)]\s*$/,'')),
         albumYear:explicitYear
       };
     }
@@ -1046,7 +1046,6 @@
     }
 
     if(album){
-      if(year && !album.includes(year)) album=`${album} (${year})`;
       return {album,albumYear:year};
     }
     return {album:'',albumYear:year};
@@ -1196,7 +1195,7 @@
             <section class="ml-group">
               <div class="ml-group-head">
                 <div>
-                  <div class="ml-group-kicker">专辑 / 年份</div>
+                  <div class="ml-group-kicker">专辑</div>
                   <div class="ml-group-title">${name}</div>
                 </div>
                 <div class="ml-group-count">${items.length} 首</div>
