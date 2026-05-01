@@ -1022,7 +1022,6 @@
   }
   function parseAlbumInfo(song){
     const sub=cleanText(song.sub);
-    const source=cleanText(song.artist||song.source);
     const explicitAlbum=cleanText(song.album);
     const explicitYear=cleanText(song.albumYear);
     if(explicitAlbum){
@@ -1041,30 +1040,6 @@
       year=m[2]||'';
     }
 
-    if(!album){
-      m=sub.match(/专辑\s+(.+?)\s+(20\d{2})(?=\s|$)/i);
-      if(m){
-        album=cleanText(m[1]);
-        year=m[2]||'';
-      }
-    }
-
-    if(!album){
-      m=sub.match(/^([^【《（(]+?)\s*[【《（(](20\d{2})[】》）)]/);
-      if(m){
-        const raw=cleanText(m[1])
-          .replace(new RegExp(`^${escapeRegExp(source)}`),'')
-          .replace(/^(?:儿童)?专辑\s*/,'')
-          .trim();
-        if(raw && raw!==source){
-          album=raw;
-          year=m[2]||'';
-        }else{
-          year=m[2]||'';
-        }
-      }
-    }
-
     if(!year){
       m=sub.match(/[（(【《]?(20\d{2})[）)】》]?/);
       if(m) year=m[1]||'';
@@ -1074,8 +1049,7 @@
       if(year && !album.includes(year)) album=`${album} (${year})`;
       return {album,albumYear:year};
     }
-    if(year) return {album:year,albumYear:year};
-    return {album:'',albumYear:''};
+    return {album:'',albumYear:year};
   }
   function getAlbumBase(song){
     const album=cleanText(song.album);
