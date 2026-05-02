@@ -5900,3 +5900,212 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     gap: 6px !important;
   }
 }
+/* ============================================================
+   ▌ CECP — 参考式成员端布局 (Reference-style client layout)
+   ▌ 左侧：设备标识 + 快捷信息按钮 + 自定义发送
+   ▌ 右侧：统一沟通频道（音控请求 + 广播 + 群聊）
+   ============================================================ */
+
+/* Root / app shell */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-app {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+/* Header stays full-width at top */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header {
+  flex: 0 0 auto !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid rgba(157, 172, 209, 0.1) !important;
+}
+
+/* Body: side-by-side */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-body {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: row !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* ── Left column: controls ───────────────────────── */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-controls-col {
+  flex: 0 0 340px !important;
+  max-width: 340px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  padding: 16px 16px 20px !important;
+  overflow-y: auto !important;
+  border-right: 1px solid rgba(157, 172, 209, 0.1) !important;
+}
+
+/* Device hero inside left col */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-controls-col .cf-client-hero {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  padding: 14px !important;
+  border-radius: 18px !important;
+  background: rgba(22, 29, 43, 0.96) !important;
+  border: 1px solid rgba(157, 172, 209, 0.13) !important;
+}
+
+/* Section label */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-section-label {
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: var(--cf-muted) !important;
+  margin-bottom: 6px !important;
+}
+
+/* Cue grid: 2-column in left col */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-grid-inline {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 7px !important;
+}
+
+/* Cue button */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  padding: 10px 12px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(157, 172, 209, 0.13) !important;
+  background: rgba(22, 29, 43, 0.96) !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: all 0.13s ease !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:hover {
+  border-color: rgba(91, 143, 255, 0.35) !important;
+  background: rgba(91, 143, 255, 0.1) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:active {
+  transform: scale(0.97) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-icon {
+  font-size: 1.1rem !important;
+  flex-shrink: 0 !important;
+  margin-top: 1px !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-label {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: var(--cf-text) !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-desc {
+  font-size: 0.66rem !important;
+  color: var(--cf-muted) !important;
+  line-height: 1.35 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Custom section */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-custom-section {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* ── Right column: unified chat ──────────────────── */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-col {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* Unified panel */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-unified-panel {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 16px !important;
+  gap: 10px !important;
+  min-height: 0 !important;
+}
+
+/* Unified chat thread */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client #cf-unified-chat {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  min-height: 0 !important;
+  padding: 4px 2px !important;
+}
+
+/* Chat panel header inside unified panel */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-unified-panel .cf-chat-panel-head {
+  flex: 0 0 auto !important;
+  margin-bottom: 0 !important;
+}
+
+/* Member chat compose inside unified panel */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-unified-panel .cf-member-chat-compose {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 8px !important;
+}
+
+/* ── Responsive: stack on narrow screens ─────────── */
+@media (max-width: 700px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-client-body {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-controls-col {
+    flex: 0 0 auto !important;
+    max-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(157, 172, 209, 0.1) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-grid-inline {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-col {
+    flex: 1 1 auto !important;
+    min-height: 320px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-grid-inline {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-controls-col {
+    padding: 12px !important;
+    gap: 12px !important;
+  }
+}
