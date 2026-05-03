@@ -4486,7 +4486,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 
 .cf-op-layout {
   display: grid;
-  grid-template-columns: minmax(260px, .85fr) minmax(360px, 1.25fr) minmax(340px, 1fr) minmax(340px, 1fr);
+  grid-template-columns: minmax(260px, .85fr) minmax(420px, 1.7fr) minmax(340px, 1fr);
   gap: 14px;
   align-items: stretch;
 }
@@ -4495,8 +4495,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   min-width: 0;
 }
 
-.cf-panel-stage-log,
-.cf-panel-group-log,
+.cf-panel-comms-log,
 .cf-panel-broadcast-log {
   min-height: 430px;
 }
@@ -4515,8 +4514,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   min-height: 180px;
 }
 
-.cf-panel-group-log .cf-log,
-.cf-panel-stage-log .cf-log {
+.cf-panel-comms-log .cf-log {
   min-height: 340px;
 }
 
@@ -4526,7 +4524,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   }
 
   .cf-panel-broadcast-log,
-  .cf-panel-group-log {
+  .cf-panel-comms-log {
     min-height: 360px;
   }
 }
@@ -5902,7 +5900,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 }
 /* ============================================================
    ▌ CECP — 参考式成员端布局 (Reference-style client layout)
-   ▌ 左侧：设备标识 + 快捷信息按钮 + 自定义发送
+   ▌ 左侧：设备标识 + 快捷信息按钮
    ▌ 右侧：统一沟通频道（音控请求 + 广播 + 群聊）
    ============================================================ */
 

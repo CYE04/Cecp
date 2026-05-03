@@ -963,11 +963,11 @@
     function ensureStageReadyForOpen() {
       if (!IS_FLOATING) return;
       if (MODE === 'operator') {
-        if (!ROOT.querySelector('#cf-log')) renderOperator();
+        if (!ROOT.querySelector('#cf-operator-comms-log')) renderOperator();
         return;
       }
       if (whoAmI) {
-        if (!ROOT.querySelector('#cf-custom-send')) renderClient();
+        if (!ROOT.querySelector('#cf-unified-chat')) renderClient();
         return;
       }
       if (!ROOT.querySelector('#cf-join-btn')) renderSetup();
@@ -1196,15 +1196,6 @@
         '        </div>',
         '      </div>',
 
-        //     Custom message → audio operator
-        '      <div class="cf-custom-section">',
-        '        <div class="cf-section-label">发给音控（自定义）</div>',
-        '        <div class="cf-custom-area cf-chat-compose">',
-        '          <input id="cf-custom-input" type="text" placeholder="例如：主歌前帮我多一点钢琴…" maxlength="120">',
-        '          <button id="cf-custom-send" type="button">发送</button>',
-        '        </div>',
-        '      </div>',
-
         '    </div>',  // end .cf-controls-col
 
         //   Right column — unified chat
@@ -1213,7 +1204,7 @@
         '        <div class="cf-chat-panel-head">',
         '          <div class="cf-chat-panel-copy">',
         '            <span class="cf-panel-title">沟通频道</span>',
-        '            <div class="cf-chat-panel-sub">快捷信息、自定义请求和成员群聊统一显示在这里。</div>',
+        '            <div class="cf-chat-panel-sub">快捷信息、音控消息和成员群聊统一显示在这里。</div>',
         '          </div>',
         '          <button class="cf-clear-btn" id="cf-unified-clear" type="button">清空</button>',
         '        </div>',
@@ -1221,7 +1212,7 @@
         '          <div class="cf-log-empty">发出的请求、收到的广播和群聊会显示在这里</div>',
         '        </div>',
         '        <div class="cf-custom-area cf-member-chat-compose">',
-        '          <input id="cf-member-chat-input" type="text" placeholder="给成员说一句…" maxlength="180">',
+        '          <input id="cf-member-chat-input" type="text" placeholder="发消息…" maxlength="180">',
         '          <button id="cf-member-chat-send" type="button">发送</button>',
         '        </div>',
         '      </div>',
@@ -1240,12 +1231,6 @@
           var msg  = button.getAttribute('data-msg')  || '';
           sendWorshipMsg(kind, msg);
         });
-      });
-
-      // Bind custom send
-      ROOT.querySelector('#cf-custom-send').addEventListener('click', sendCustom);
-      ROOT.querySelector('#cf-custom-input').addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') sendCustom();
       });
 
       // Bind reset device
@@ -1294,7 +1279,7 @@
         '  <div class="cf-header">',
         '    <div class="cf-header-copy">',
         '      <span class="cf-title">CECP 音控台</span>',
-        '      <span class="cf-header-sub">舞台请求、群聊信息、广播通知分开显示</span>',
+        '      <span class="cf-header-sub">舞台请求和群聊消息统一显示，广播通知单独发送</span>',
         '    </div>',
         '    <div class="cf-header-tools">',
         '      <span class="cf-live-clock-pill" title="当前时间">',
@@ -1315,7 +1300,7 @@
         '      <div class="cf-stat-value" id="cf-stat-members">0</div>',
         '    </div>',
         '    <div class="cf-stat-card">',
-        '      <div class="cf-stat-label">舞台请求</div>',
+        '      <div class="cf-stat-label">沟通消息</div>',
         '      <div class="cf-stat-value" id="cf-stat-messages">0</div>',
         '    </div>',
         '    <div class="cf-stat-card cf-stat-alert">',
@@ -1333,22 +1318,13 @@
         '        <li class="cf-member-empty">当前没有设备在线</li>',
         '      </ul>',
         '    </div>',
-        '    <div class="cf-panel cf-panel-log cf-panel-stage-log">',
+        '    <div class="cf-panel cf-panel-log cf-panel-comms-log">',
         '      <div class="cf-panel-title-row">',
-        '        <span class="cf-panel-title">🎛️ 发给音控</span>',
-        '        <button class="cf-clear-btn" id="cf-clear-stage-btn" type="button">清空</button>',
+        '        <span class="cf-panel-title">沟通频道</span>',
+        '        <button class="cf-clear-btn" id="cf-clear-comms-btn" type="button">清空</button>',
         '      </div>',
-        '      <div class="cf-log" id="cf-log">',
-        '        <div class="cf-log-empty">舞台请求会显示在这里</div>',
-        '      </div>',
-        '    </div>',
-        '    <div class="cf-panel cf-panel-log cf-panel-group-log">',
-        '      <div class="cf-panel-title-row">',
-        '        <span class="cf-panel-title">🗨️ 群聊信息</span>',
-        '        <button class="cf-clear-btn" id="cf-clear-group-btn" type="button">清空</button>',
-        '      </div>',
-        '      <div class="cf-log" id="cf-operator-group-log">',
-        '        <div class="cf-log-empty">成员群聊会显示在这里</div>',
+        '      <div class="cf-log" id="cf-operator-comms-log">',
+        '        <div class="cf-log-empty">舞台请求和成员群聊会显示在这里</div>',
         '      </div>',
         '    </div>',
         '    <div class="cf-panel cf-panel-bcast cf-panel-broadcast-log">',
@@ -1386,18 +1362,11 @@
         });
       });
 
-      ROOT.querySelector('#cf-clear-stage-btn').addEventListener('click', function () {
+      ROOT.querySelector('#cf-clear-comms-btn').addEventListener('click', function () {
         msgLog = msgLog.filter(function (item) {
-          return item.kind === 'member_chat' || item.kind === 'broadcast';
+          return item.kind === 'broadcast';
         });
         renderOperatorLog();
-      });
-
-      ROOT.querySelector('#cf-clear-group-btn').addEventListener('click', function () {
-        msgLog = msgLog.filter(function (item) {
-          return item.kind !== 'member_chat';
-        });
-        renderOperatorGroupLog();
       });
 
       ROOT.querySelector('#cf-clear-bcast-log-btn').addEventListener('click', function () {
@@ -1425,7 +1394,6 @@
       }
 
       renderOperatorLog();
-      renderOperatorGroupLog();
       renderOperatorBroadcastLog();
       updateOperatorStats();
       setStatus(isOnline);
@@ -1516,7 +1484,7 @@
       var messagesEl = ROOT.querySelector('#cf-stat-messages');
       var issuesEl = ROOT.querySelector('#cf-stat-issues');
       var stageMessages = msgLog.filter(function (item) {
-        return item.kind !== 'member_chat' && item.kind !== 'broadcast';
+        return item.kind !== 'broadcast';
       });
       var issueCount = stageMessages.filter(function (item) { return item.kind === 'issue'; }).length;
 
@@ -1555,15 +1523,15 @@
     }
 
     function renderOperatorLog() {
-      var log = ROOT.querySelector('#cf-log');
+      var log = ROOT.querySelector('#cf-operator-comms-log');
       if (!log) return;
 
       var items = msgLog.filter(function (item) {
-        return item.kind !== 'member_chat' && item.kind !== 'broadcast';
+        return item.kind !== 'broadcast';
       });
 
       if (!items.length) {
-        log.innerHTML = '<div class="cf-log-empty">舞台请求会显示在这里</div>';
+        log.innerHTML = '<div class="cf-log-empty">舞台请求和成员群聊会显示在这里</div>';
         updateOperatorStats();
         return;
       }
@@ -1571,13 +1539,19 @@
       log.innerHTML = items.map(function (item) {
         var icon = KIND_ICONS[item.kind] || '💬';
         var extraClass = item.kind === 'issue' ? ' cf-log-issue' : '';
+        if (item.kind === 'member_chat') {
+          icon = '🗨️';
+          extraClass += ' cf-log-chat';
+        }
+        var chipLabel = item.kind === 'member_chat' ? '群聊' : '发给音控';
+        var chipClass = item.kind === 'member_chat' ? ' cf-log-chip-chat' : '';
         return [
           '<div class="cf-log-item', extraClass, '">',
           '  <span class="cf-log-icon">', escapeHtml(icon), '</span>',
           '  <div class="cf-log-body">',
           '    <div class="cf-log-meta-row">',
           renderIdentityPill(item.from, 'cf-log-from'),
-          '<span class="cf-log-chip">发给音控</span>',
+          '<span class="cf-log-chip', chipClass, '">', chipLabel, '</span>',
           '    </div>',
           '    <span class="cf-log-text">', escapeHtml(item.text), '</span>',
           '  </div>',
@@ -1587,37 +1561,6 @@
       }).join('');
 
       updateOperatorStats();
-    }
-
-    function renderOperatorGroupLog() {
-      var log = ROOT.querySelector('#cf-operator-group-log');
-      if (!log) return;
-
-      var items = msgLog.filter(function (item) {
-        return item.kind === 'member_chat';
-      });
-
-      if (!items.length) {
-        log.innerHTML = '<div class="cf-log-empty">成员群聊会显示在这里</div>';
-        return;
-      }
-
-      log.innerHTML = items.map(function (item) {
-        return [
-          '<div class="cf-log-item cf-log-chat">',
-          '  <span class="cf-log-icon">🗨️</span>',
-          '  <div class="cf-log-body">',
-          '    <div class="cf-log-meta-row">',
-          renderIdentityPill(item.from, 'cf-log-from'),
-          '<span class="cf-log-chip cf-log-chip-chat">群聊</span>',
-          '    </div>',
-          '    <span class="cf-log-text">', escapeHtml(item.text), '</span>',
-          '  </div>',
-          '  <span class="cf-log-time">', escapeHtml(formatTime(item.ts)), '</span>',
-          '</div>'
-        ].join('');
-      }).join('');
-
     }
 
     function renderOperatorBroadcastLog() {
@@ -1800,7 +1743,6 @@
           takenDevices = [];
           renderMembers([]);
           renderOperatorLog();
-          renderOperatorGroupLog();
           renderOperatorBroadcastLog();
         }
         syncBroadcastPopup();
@@ -1882,7 +1824,7 @@
             ts: msg.ts || Date.now()
           });
           if (msgLog.length > 80) msgLog.pop();
-          renderOperatorGroupLog();
+          renderOperatorLog();
         }
         return;
       }
@@ -1926,19 +1868,11 @@
       flashEl('cf-flash', '发送成功 ✓');
     }
 
-    function sendCustom() {
-      var input = ROOT.querySelector('#cf-custom-input');
-      var text = input && input.value ? input.value.trim() : '';
-      if (!text) return;
-      sendWorshipMsg('custom', text);
-      if (input) input.value = '';
-    }
-
     function sendMemberChatText(text, successText) {
       text = String(text || '').trim();
       if (!text) return;
       if (!wsReady()) {
-        flashEl('cf-flash', '当前离线，暂时无法发送群聊', true);
+        flashEl('cf-flash', '当前离线，暂时无法发送消息', true);
         return;
       }
       var id = nowId('member');
@@ -1949,14 +1883,14 @@
         text: text,
         ts: Date.now()
       });
-      flashEl('cf-flash', successText || '成员群聊已发送 ✓');
+      flashEl('cf-flash', successText || '消息已发送 ✓');
     }
 
     function sendMemberChatFromInput(selector) {
       var input = ROOT.querySelector(selector || '#cf-member-chat-input');
       var text = input && input.value ? input.value.trim() : '';
       if (!text) return;
-      sendMemberChatText(text, '成员群聊已发送 ✓');
+      sendMemberChatText(text, '消息已发送 ✓');
       if (input) input.value = '';
     }
 
