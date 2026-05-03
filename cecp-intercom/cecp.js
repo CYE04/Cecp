@@ -1194,6 +1194,10 @@
           ].join('');
         }).join(''),
         '        </div>',
+        '        <div class="cf-custom-area cf-stage-message-compose">',
+        '          <input id="cf-stage-msg-input" type="text" placeholder="输入要发给音控的信息…" maxlength="120">',
+        '          <button id="cf-stage-msg-send" type="button">发送</button>',
+        '        </div>',
         '      </div>',
 
         '    </div>',  // end .cf-controls-col
@@ -1210,10 +1214,6 @@
         '        </div>',
         '        <div class="cf-log cf-log-chat-thread" id="cf-unified-chat">',
         '          <div class="cf-log-empty">发出的请求、收到的广播和群聊会显示在这里</div>',
-        '        </div>',
-        '        <div class="cf-custom-area cf-member-chat-compose">',
-        '          <input id="cf-member-chat-input" type="text" placeholder="发消息…" maxlength="180">',
-        '          <button id="cf-member-chat-send" type="button">发送</button>',
         '        </div>',
         '      </div>',
         '    </div>',  // end .cf-chat-col
@@ -1233,20 +1233,26 @@
         });
       });
 
+      // Bind manual stage message under quick cues
+      var stageMsgBtn = ROOT.querySelector('#cf-stage-msg-send');
+      var stageMsgInput = ROOT.querySelector('#cf-stage-msg-input');
+      if (stageMsgBtn && stageMsgInput) {
+        var sendStageMessage = function () {
+          var msg = stageMsgInput.value ? stageMsgInput.value.trim() : '';
+          if (!msg) return;
+          sendWorshipMsg('custom', msg);
+          stageMsgInput.value = '';
+        };
+        stageMsgBtn.addEventListener('click', sendStageMessage);
+        stageMsgInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') sendStageMessage();
+        });
+      }
+
       // Bind reset device
       ROOT.querySelectorAll('#cf-reset-device, [data-cf-old-reset="1"]').forEach(function (btn) {
         btn.addEventListener('click', resetDeviceSelection);
       });
-
-      // Bind member chat send
-      var memberSendBtn = ROOT.querySelector('#cf-member-chat-send');
-      var memberInput   = ROOT.querySelector('#cf-member-chat-input');
-      if (memberSendBtn && memberInput) {
-        memberSendBtn.addEventListener('click', sendMemberChat);
-        memberInput.addEventListener('keydown', function (event) {
-          if (event.key === 'Enter') sendMemberChat();
-        });
-      }
 
       // Bind clear
       ROOT.querySelector('#cf-unified-clear').addEventListener('click', function () {
@@ -1866,36 +1872,6 @@
         read: true
       });
       flashEl('cf-flash', '发送成功 ✓');
-    }
-
-    function sendMemberChatText(text, successText) {
-      text = String(text || '').trim();
-      if (!text) return;
-      if (!wsReady()) {
-        flashEl('cf-flash', '当前离线，暂时无法发送消息', true);
-        return;
-      }
-      var id = nowId('member');
-      ws.send(JSON.stringify({ type: 'member_chat', id: id, text: text }));
-      appendMemberChat({
-        id: id,
-        from: whoAmI,
-        text: text,
-        ts: Date.now()
-      });
-      flashEl('cf-flash', successText || '消息已发送 ✓');
-    }
-
-    function sendMemberChatFromInput(selector) {
-      var input = ROOT.querySelector(selector || '#cf-member-chat-input');
-      var text = input && input.value ? input.value.trim() : '';
-      if (!text) return;
-      sendMemberChatText(text, '消息已发送 ✓');
-      if (input) input.value = '';
-    }
-
-    function sendMemberChat() {
-      sendMemberChatFromInput('#cf-member-chat-input');
     }
 
     function sendBroadcast() {

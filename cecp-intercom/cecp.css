@@ -6030,6 +6030,10 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   flex-direction: column !important;
 }
 
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-section .cf-stage-message-compose {
+  margin-top: 12px !important;
+}
+
 /* ── Right column: unified chat ──────────────────── */
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-col {
   flex: 1 1 auto !important;
@@ -6064,13 +6068,6 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-unified-panel .cf-chat-panel-head {
   flex: 0 0 auto !important;
   margin-bottom: 0 !important;
-}
-
-/* Member chat compose inside unified panel */
-:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-unified-panel .cf-member-chat-compose {
-  flex: 0 0 auto !important;
-  display: flex !important;
-  gap: 8px !important;
 }
 
 /* ── Responsive: stack on narrow screens ─────────── */
