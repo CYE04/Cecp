@@ -1369,17 +1369,24 @@
       });
 
       ROOT.querySelector('#cf-clear-comms-btn').addEventListener('click', function () {
-        msgLog = msgLog.filter(function (item) {
-          return item.kind === 'broadcast';
-        });
+        msgLog = msgLog.reduce(function (next, item) {
+          if (item.kind === 'broadcast') {
+            item.hiddenFromComms = true;
+            next.push(item);
+          }
+          return next;
+        }, []);
         renderOperatorLog();
+        updateOperatorStats();
       });
 
       ROOT.querySelector('#cf-clear-bcast-log-btn').addEventListener('click', function () {
         msgLog = msgLog.filter(function (item) {
           return item.kind !== 'broadcast';
         });
+        renderOperatorLog();
         renderOperatorBroadcastLog();
+        updateOperatorStats();
       });
 
       var kickAllBtn = ROOT.querySelector('#cf-kick-all-btn');
@@ -1490,7 +1497,7 @@
       var messagesEl = ROOT.querySelector('#cf-stat-messages');
       var issuesEl = ROOT.querySelector('#cf-stat-issues');
       var stageMessages = msgLog.filter(function (item) {
-        return item.kind !== 'broadcast';
+        return !item.hiddenFromComms;
       });
       var issueCount = stageMessages.filter(function (item) { return item.kind === 'issue'; }).length;
 
@@ -1533,11 +1540,11 @@
       if (!log) return;
 
       var items = msgLog.filter(function (item) {
-        return item.kind !== 'broadcast';
+        return !item.hiddenFromComms;
       });
 
       if (!items.length) {
-        log.innerHTML = '<div class="cf-log-empty">舞台请求和成员群聊会显示在这里</div>';
+        log.innerHTML = '<div class="cf-log-empty">舞台请求、成员群聊和广播会显示在这里</div>';
         updateOperatorStats();
         return;
       }
@@ -1548,9 +1555,16 @@
         if (item.kind === 'member_chat') {
           icon = '🗨️';
           extraClass += ' cf-log-chat';
+        } else if (item.kind === 'broadcast') {
+          icon = '📢';
+          extraClass += ' cf-log-broadcast';
         }
-        var chipLabel = item.kind === 'member_chat' ? '群聊' : '发给音控';
-        var chipClass = item.kind === 'member_chat' ? ' cf-log-chip-chat' : '';
+        var chipLabel = item.kind === 'member_chat'
+          ? '群聊'
+          : (item.kind === 'broadcast' ? '广播通知' : '发给音控');
+        var chipClass = item.kind === 'member_chat'
+          ? ' cf-log-chip-chat'
+          : (item.kind === 'broadcast' ? ' cf-log-chip-bcast' : '');
         return [
           '<div class="cf-log-item', extraClass, '">',
           '  <span class="cf-log-icon">', escapeHtml(icon), '</span>',
@@ -1891,6 +1905,7 @@
         ts: Date.now()
       });
       if (msgLog.length > 80) msgLog.pop();
+      renderOperatorLog();
       renderOperatorBroadcastLog();
       updateOperatorStats();
       if (input) input.value = '';

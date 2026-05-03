@@ -60,9 +60,9 @@ html.cf-intercom-open body {
   gap: 6px !important;
   min-height: 0 !important;
   padding: 8px 12px !important;
-  border: 1px solid rgba(157, 172, 209, 0.18) !important;
+  border: 1px solid var(--cf-border) !important;
   border-radius: 999px !important;
-  background: rgba(19, 25, 36, 0.9) !important;
+  background: var(--cf-surface-soft) !important;
   box-shadow: none !important;
   white-space: nowrap !important;
 }
@@ -131,9 +131,7 @@ html.cf-intercom-open body {
   min-height: 560px !important;
   padding: 16px !important;
   border-radius: 24px !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-    rgba(12, 17, 26, 0.94) !important;
+  background: var(--cf-surface-strong) !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel-head {
@@ -163,9 +161,9 @@ html.cf-intercom-open body {
   min-height: 36px !important;
   padding: 0 12px !important;
   border-radius: 999px !important;
-  border: 1px solid rgba(91, 163, 255, 0.24) !important;
-  background: rgba(91, 163, 255, 0.1) !important;
-  color: #d9ebff !important;
+  border: 1px solid var(--cf-border-strong) !important;
+  background: var(--cf-blue-soft) !important;
+  color: var(--cf-blue) !important;
   font-size: 0.76rem !important;
   font-weight: 700 !important;
   box-shadow: none !important;
@@ -191,9 +189,9 @@ html.cf-intercom-open body {
   display: none !important;
   margin: 0 0 12px !important;
   padding: 10px !important;
-  border: 1px solid rgba(157, 172, 209, 0.14) !important;
+  border: 1px solid var(--cf-border) !important;
   border-radius: 18px !important;
-  background: rgba(11, 15, 23, 0.94) !important;
+  background: var(--cf-surface-strong) !important;
   box-shadow: none !important;
   transform: none !important;
   opacity: 1 !important;
@@ -226,8 +224,8 @@ html.cf-intercom-open body {
   min-height: 0 !important;
   padding: 12px 14px !important;
   border-radius: 16px !important;
-  border: 1px solid rgba(157, 172, 209, 0.14) !important;
-  background: rgba(22, 29, 43, 0.96) !important;
+  border: 1px solid var(--cf-border) !important;
+  background: var(--cf-surface-soft) !important;
   text-align: left !important;
   transform: none !important;
   box-shadow: none !important;
@@ -235,15 +233,15 @@ html.cf-intercom-open body {
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:hover,
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:active {
-  border-color: rgba(91, 163, 255, 0.34) !important;
-  background: rgba(28, 37, 55, 0.98) !important;
+  border-color: var(--cf-blue) !important;
+  background: var(--cf-blue-soft) !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-icon {
   width: 38px !important;
   height: 38px !important;
   border-radius: 12px !important;
-  background: rgba(91, 163, 255, 0.12) !important;
+  background: var(--cf-blue-soft) !important;
   flex: 0 0 38px !important;
 }
 
@@ -274,9 +272,7 @@ html.cf-intercom-open body {
   min-height: 320px !important;
   padding: 8px !important;
   border-radius: 18px !important;
-  background:
-    linear-gradient(180deg, rgba(10, 14, 20, 0.85), rgba(10, 14, 20, 0.55)),
-    rgba(7, 10, 15, 0.92) !important;
+  background: color-mix(in srgb, var(--cf-surface-soft) 84%, var(--cf-bg-deep)) !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item {
@@ -289,8 +285,8 @@ html.cf-intercom-open body {
   margin-right: auto !important;
   padding: 12px 14px !important;
   border-radius: 18px 18px 18px 8px !important;
-  border: 1px solid rgba(157, 172, 209, 0.14) !important;
-  background: rgba(20, 28, 40, 0.96) !important;
+  border: 1px solid var(--cf-border) !important;
+  background: var(--cf-surface-soft) !important;
   box-shadow: none !important;
 }
 
@@ -298,8 +294,8 @@ html.cf-intercom-open body {
   margin-left: auto !important;
   margin-right: 0 !important;
   border-radius: 18px 18px 8px 18px !important;
-  border-color: rgba(91, 163, 255, 0.24) !important;
-  background: linear-gradient(180deg, rgba(91, 163, 255, 0.14), rgba(91, 163, 255, 0.08)), rgba(20, 28, 40, 0.98) !important;
+  border-color: var(--cf-blue) !important;
+  background: var(--cf-blue-soft) !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-icon {
@@ -352,10 +348,8 @@ html.cf-intercom-open body {
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg.is-mine .cf-room-bubble {
   border-radius: 18px 18px 8px 18px !important;
-  background:
-    linear-gradient(180deg, rgba(91, 163, 255, 0.14), rgba(91, 163, 255, 0.08)),
-    rgba(20, 28, 40, 0.98) !important;
-  border-color: rgba(91, 163, 255, 0.24) !important;
+  background: var(--cf-blue-soft) !important;
+  border-color: var(--cf-blue) !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose {
@@ -385,7 +379,7 @@ html.cf-intercom-open body {
   min-height: 44px !important;
   padding: 0 14px !important;
   border-radius: 999px !important;
-  background: rgba(18, 24, 35, 0.94) !important;
+  background: var(--cf-surface-soft) !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose button {
@@ -398,7 +392,7 @@ html.cf-intercom-open body {
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-muted {
   padding: 14px !important;
   border-radius: 16px !important;
-  border: 1px dashed rgba(157, 172, 209, 0.16) !important;
+  border: 1px dashed var(--cf-border) !important;
   color: var(--cf-muted) !important;
   font-size: 0.8rem !important;
   line-height: 1.5 !important;
@@ -3348,6 +3342,42 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   :where(#cecp-root,[data-cecp-root]){--cf-bg:#f5f3ef;--cf-bg-deep:#edeae4;--cf-surface:rgba(255,255,255,.92);--cf-surface-strong:rgba(255,255,255,.98);--cf-surface-soft:rgba(250,249,247,.96);--cf-border:#e4e0d8;--cf-border-strong:rgba(120,106,82,.24);--cf-text:#1a1916;--cf-muted:#6b6660;--cf-muted-2:#9e9990;--cf-gold:#c9922a;--cf-gold-soft:#f5e6cc;--cf-green:#3a7d5e;--cf-green-soft:#d4ede3;--cf-blue:#2e6da4;--cf-blue-soft:#d5e8f5;--cf-red:#c0392b;--cf-red-soft:#fde8e6;--cf-shadow:0 20px 50px rgba(34,27,14,.11);--cf-shadow-soft:0 4px 24px rgba(34,27,14,.09)}
   :where(#cecp-root,[data-cecp-root]).cf-layout-page{background:radial-gradient(circle at 7% 0%,rgba(201,146,42,.15),transparent 30%),radial-gradient(circle at 92% 8%,rgba(46,109,164,.10),transparent 31%),radial-gradient(circle at 50% 100%,rgba(58,125,94,.08),transparent 34%),linear-gradient(180deg,#faf8f3 0%,#f5f3ef 46%,#edeae4 100%)!important}
 }
+:where(html.dark, html[data-theme="dark"], html[data-color-mode="dark"], body.dark, body[data-theme="dark"], body[data-color-mode="dark"]) :where(#cecp-root,[data-cecp-root]),
+:where(#cecp-root,[data-cecp-root]).cf-theme-dark,
+:where(#cecp-root,[data-cecp-root])[data-theme="dark"],
+:where(#cecp-root,[data-cecp-root])[data-color-mode="dark"]{color-scheme:dark;--cf-bg:#090b12;--cf-bg-deep:#05060a;--cf-surface:rgba(16,20,30,.88);--cf-surface-strong:rgba(13,17,25,.96);--cf-surface-soft:rgba(24,30,43,.94);--cf-border:rgba(157,172,209,.15);--cf-border-strong:rgba(157,172,209,.24);--cf-text:#edf1ff;--cf-muted:#9aa6c2;--cf-muted-2:#68738b;--cf-gold:#f3d283;--cf-gold-soft:rgba(243,210,131,.16);--cf-green:#59d68c;--cf-green-soft:rgba(89,214,140,.14);--cf-blue:#5ba3ff;--cf-blue-soft:rgba(91,163,255,.14);--cf-red:#ff6a6a;--cf-red-soft:rgba(255,106,106,.13);--cf-shadow:0 30px 60px rgba(0,0,0,.40);--cf-shadow-soft:0 18px 38px rgba(0,0,0,.26)}
+:where(html.light, html[data-theme="light"], html[data-color-mode="light"], body.light, body[data-theme="light"], body[data-color-mode="light"]) :where(#cecp-root,[data-cecp-root]),
+:where(#cecp-root,[data-cecp-root]).cf-theme-light,
+:where(#cecp-root,[data-cecp-root])[data-theme="light"],
+:where(#cecp-root,[data-cecp-root])[data-color-mode="light"]{color-scheme:light;--cf-bg:#f5f3ef;--cf-bg-deep:#edeae4;--cf-surface:rgba(255,255,255,.92);--cf-surface-strong:rgba(255,255,255,.98);--cf-surface-soft:rgba(250,249,247,.96);--cf-border:#e4e0d8;--cf-border-strong:rgba(120,106,82,.24);--cf-text:#1a1916;--cf-muted:#6b6660;--cf-muted-2:#9e9990;--cf-gold:#c9922a;--cf-gold-soft:#f5e6cc;--cf-green:#3a7d5e;--cf-green-soft:#d4ede3;--cf-blue:#2e6da4;--cf-blue-soft:#d5e8f5;--cf-red:#c0392b;--cf-red-soft:#fde8e6;--cf-shadow:0 20px 50px rgba(34,27,14,.11);--cf-shadow-soft:0 4px 24px rgba(34,27,14,.09)}
+:where(html.dark, html[data-theme="dark"], html[data-color-mode="dark"], body.dark, body[data-theme="dark"], body[data-color-mode="dark"]) :where(#cecp-root,[data-cecp-root]).cf-layout-page,
+:where(#cecp-root,[data-cecp-root]).cf-theme-dark.cf-layout-page,
+:where(#cecp-root,[data-cecp-root])[data-theme="dark"].cf-layout-page,
+:where(#cecp-root,[data-cecp-root])[data-color-mode="dark"].cf-layout-page{background:radial-gradient(circle at 10% 0%,rgba(255,156,70,.18),transparent 31%),radial-gradient(circle at 95% 6%,rgba(91,163,255,.16),transparent 30%),radial-gradient(circle at 52% 100%,rgba(89,214,140,.10),transparent 34%),linear-gradient(180deg,#111827 0%,#090b12 48%,#05060a 100%)!important}
+:where(html.light, html[data-theme="light"], html[data-color-mode="light"], body.light, body[data-theme="light"], body[data-color-mode="light"]) :where(#cecp-root,[data-cecp-root]).cf-layout-page,
+:where(#cecp-root,[data-cecp-root]).cf-theme-light.cf-layout-page,
+:where(#cecp-root,[data-cecp-root])[data-theme="light"].cf-layout-page,
+:where(#cecp-root,[data-cecp-root])[data-color-mode="light"].cf-layout-page{background:radial-gradient(circle at 7% 0%,rgba(201,146,42,.15),transparent 30%),radial-gradient(circle at 92% 8%,rgba(46,109,164,.10),transparent 31%),radial-gradient(circle at 50% 100%,rgba(58,125,94,.08),transparent 34%),linear-gradient(180deg,#faf8f3 0%,#f5f3ef 46%,#edeae4 100%)!important}
+:where(html.dark, html[data-theme="dark"], html[data-color-mode="dark"], body.dark, body[data-theme="dark"], body[data-color-mode="dark"]) :where(html.cf-page-shell,body.cf-page-shell){background:#090b12!important}
+:where(html.light, html[data-theme="light"], html[data-color-mode="light"], body.light, body[data-theme="light"], body[data-color-mode="light"]) :where(html.cf-page-shell,body.cf-page-shell){background:#f5f3ef!important}
+html.cf-page-shell.dark,
+html.dark body.cf-page-shell,
+html[data-theme="dark"] body.cf-page-shell,
+html[data-color-mode="dark"] body.cf-page-shell,
+html.cf-page-shell[data-theme="dark"],
+html.cf-page-shell[data-color-mode="dark"],
+body.cf-page-shell.dark,
+body.cf-page-shell[data-theme="dark"],
+body.cf-page-shell[data-color-mode="dark"]{background:#090b12!important}
+html.cf-page-shell.light,
+html.light body.cf-page-shell,
+html[data-theme="light"] body.cf-page-shell,
+html[data-color-mode="light"] body.cf-page-shell,
+html.cf-page-shell[data-theme="light"],
+html.cf-page-shell[data-color-mode="light"],
+body.cf-page-shell.light,
+body.cf-page-shell[data-theme="light"],
+body.cf-page-shell[data-color-mode="light"]{background:#f5f3ef!important}
 :where(#cecp-root,[data-cecp-root]).cf-layout-page .cf-app{padding:clamp(18px,2.3vw,32px) clamp(16px,3vw,34px) calc(30px + env(safe-area-inset-bottom));gap:18px}
 :where(#cecp-root,[data-cecp-root]).cf-layout-page .cf-op{width:min(100%,1480px)}
 .cf-header{position:sticky;top:0;z-index:8;border-radius:var(--cf-dash-radius);padding:16px 20px;background:var(--cf-surface-strong);border:1px solid var(--cf-border);box-shadow:var(--cf-shadow-soft);backdrop-filter:blur(18px) saturate(1.08)}
@@ -5919,7 +5949,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-header {
   flex: 0 0 auto !important;
   border-radius: 0 !important;
-  border-bottom: 1px solid rgba(157, 172, 209, 0.1) !important;
+  border-bottom: 1px solid var(--cf-border) !important;
 }
 
 /* Body: side-by-side */
@@ -5940,7 +5970,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   gap: 16px !important;
   padding: 16px 16px 20px !important;
   overflow-y: auto !important;
-  border-right: 1px solid rgba(157, 172, 209, 0.1) !important;
+  border-right: 1px solid var(--cf-border) !important;
 }
 
 /* Device hero inside left col */
@@ -5950,8 +5980,8 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   gap: 10px !important;
   padding: 14px !important;
   border-radius: 18px !important;
-  background: rgba(22, 29, 43, 0.96) !important;
-  border: 1px solid rgba(157, 172, 209, 0.13) !important;
+  background: var(--cf-surface-strong) !important;
+  border: 1px solid var(--cf-border) !important;
 }
 
 /* Section label */
@@ -5978,16 +6008,16 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
   gap: 8px !important;
   padding: 10px 12px !important;
   border-radius: 14px !important;
-  border: 1px solid rgba(157, 172, 209, 0.13) !important;
-  background: rgba(22, 29, 43, 0.96) !important;
+  border: 1px solid var(--cf-border) !important;
+  background: var(--cf-surface-soft) !important;
   text-align: left !important;
   cursor: pointer !important;
   transition: all 0.13s ease !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:hover {
-  border-color: rgba(91, 143, 255, 0.35) !important;
-  background: rgba(91, 143, 255, 0.1) !important;
+  border-color: var(--cf-blue) !important;
+  background: var(--cf-blue-soft) !important;
 }
 
 :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:active {
@@ -6081,7 +6111,7 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     flex: 0 0 auto !important;
     max-width: 100% !important;
     border-right: none !important;
-    border-bottom: 1px solid rgba(157, 172, 209, 0.1) !important;
+    border-bottom: 1px solid var(--cf-border) !important;
   }
 
   :where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-grid-inline {
@@ -6103,4 +6133,68 @@ body.ym-lb-open :where(#cecp-root, [data-cecp-root]).cf-layout-floating {
     padding: 12px !important;
     gap: 12px !important;
   }
+}
+
+/* Theme-safe overrides for the current client layout. Earlier legacy blocks
+   contain fixed dark rgba values; keep this last so theme variables win. */
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-live-clock-pill,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-status {
+  border-color: var(--cf-border) !important;
+  background: var(--cf-surface-soft) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-panel,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-dropdown.show {
+  border-color: var(--cf-border) !important;
+  background: var(--cf-surface-strong) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn {
+  border-color: var(--cf-border) !important;
+  background: var(--cf-surface-soft) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:hover,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-cue-btn:active {
+  border-color: var(--cf-blue) !important;
+  background: var(--cf-blue-soft) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-quick-toggle {
+  border-color: var(--cf-border-strong) !important;
+  background: var(--cf-blue-soft) !important;
+  color: var(--cf-blue) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-icon {
+  background: var(--cf-blue-soft) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-chat-thread {
+  background: color-mix(in srgb, var(--cf-surface-soft) 84%, var(--cf-bg-deep)) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-bubble {
+  border-color: var(--cf-border) !important;
+  background: var(--cf-surface-soft) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-log-item.is-outgoing,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-room-msg.is-mine .cf-room-bubble {
+  border-color: var(--cf-blue) !important;
+  background: var(--cf-blue-soft) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-compose input,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-member-chat-compose input,
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-custom-area input {
+  background: var(--cf-surface-soft) !important;
+  border-color: var(--cf-border) !important;
+  color: var(--cf-text) !important;
+}
+
+:where(#cecp-root, [data-cecp-root]).cf-mode-client .cf-chat-muted {
+  border-color: var(--cf-border) !important;
 }
