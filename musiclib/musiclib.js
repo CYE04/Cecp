@@ -737,9 +737,9 @@
       setStyle(d,'transform','none');
     });
     scope.querySelectorAll('.jp-aug').forEach(a=>{
-      setStyle(a,'top','-0.16em');
-      setStyle(a,'transform','none');
-      setStyle(a,'right','-0.35em');
+      setStyle(a,'top','50%');
+      setStyle(a,'transform','translateY(-50%)');
+      setStyle(a,'right','-0.46em');
       setStyle(a,'line-height','1');
       setStyle(a,'display','inline-block');
     });
@@ -855,7 +855,7 @@
     scope.querySelectorAll('.jp-aug').forEach(a=>{
       a.style.position='absolute';
       a.style.top='50%';
-      a.style.right='-0.42em';
+      a.style.right='-0.46em';
       a.style.transform='translateY(-50%)';
       a.style.lineHeight='1';
       a.style.display='inline-block';
@@ -1384,9 +1384,20 @@
   function styleJpAugEl(el){
     if(!el)return;
     el.style.position='absolute';
-    el.style.right='-0.42em';
+    el.style.right='-0.46em';
     el.style.top='50%';
     el.style.transform='translateY(-50%)';
+    el.style.pointerEvents='none';
+  }
+  function styleJpAccEl(el){
+    if(!el)return;
+    el.style.position='absolute';
+    el.style.left='-0.32em';
+    el.style.top='-0.08em';
+    el.style.transform='none';
+    el.style.fontSize='12px';
+    el.style.fontWeight='700';
+    el.style.lineHeight='1';
     el.style.pointerEvents='none';
   }
   function styleJpDashLineEl(el){
@@ -1469,10 +1480,15 @@
     if(num.indexOf('\u00b7')>-1){isDot=true;num=num.replace(/\u00b7/g,'');}
     const hm=num.match(/^(.+?)('+)$/);if(hm){isHigh=hm[2].length;num=hm[1];}
     const lm=num.match(/^(.+?)(,+)$/);if(lm){isLow=lm[2].length;num=lm[1];}
-    var w=document.createElement('span');w.className='jp-wrap';
+    var acc='';
+    const am=num.match(/^([#b\u266f\u266d\u266e=])([0-7])$/);
+    if(am){acc=am[1]==='#'?'\u266f':am[1]==='b'?'\u266d':am[1]==='='?'\u266e':am[1];num=am[2];}
+    var w=document.createElement('span');w.className='jp-wrap'+(acc?' has-acc':'');
+    if(acc)w.style.minWidth='1.35em';
     var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isHigh>=2?2:isHigh);w.appendChild(td);
     var lw2=document.createElement('span');lw2.className='jp-lines-wrap';
     var numRow=document.createElement('span');numRow.className='jp-num-row';
+    if(acc){var ac=document.createElement('span');ac.className='jp-acc';ac.textContent=acc;styleJpAccEl(ac);numRow.appendChild(ac);}
     var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;styleJpNumEl(ns2);numRow.appendChild(ns2);
     if(isDot){var dot=document.createElement('span');dot.className='jp-aug';dot.textContent='·';styleJpAugEl(dot);ns2.appendChild(dot);}
     lw2.appendChild(numRow);

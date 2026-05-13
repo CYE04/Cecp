@@ -196,11 +196,11 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em}.jp-plain-sym.is-dash{position:relative;top:-0.12em}.jp-plain-bot{height:16px}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
-.jp-dot-top{height:12px;justify-content:flex-end}.jp-dot-bot{height:12px;justify-content:flex-start}
+.jp-dot-top{height:8px;justify-content:flex-end}.jp-dot-bot{height:8px;justify-content:flex-start}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em}
-.jp-aug{position:absolute;right:-0.42em;top:-0.17em;font-size:10px;line-height:1;pointer-events:none}
+.jp-aug{position:absolute;right:-0.46em;top:50%;transform:translateY(-50%);font-size:10px;line-height:1;pointer-events:none}
 .jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ym-ink);pointer-events:none;z-index:1}
 .jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ym-ink);pointer-events:none;z-index:1}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:26px}
@@ -694,10 +694,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     });
     var augs=scope.querySelectorAll('.jp-aug');
     Array.prototype.forEach.call(augs,function(a){
-      setStyle(a,'top','-0.16em');
-      setStyle(a,'transform','none');
-      setStyle(a,'right','-0.35em');
+      setStyle(a,'top','50%');
+      setStyle(a,'transform','translateY(-50%)');
+      setStyle(a,'right','-0.46em');
       setStyle(a,'line-height','1');
+      setStyle(a,'display','inline-block');
+    });
+    var accs=scope.querySelectorAll('.jp-acc');
+    Array.prototype.forEach.call(accs,function(a){
+      styleJpAccEl(a);
       setStyle(a,'display','inline-block');
     });
 
@@ -821,9 +826,14 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     Array.prototype.forEach.call(augs,function(a){
       a.style.position='absolute';
       a.style.top='50%';
-      a.style.right='-0.42em';
+      a.style.right='-0.46em';
       a.style.transform='translateY(-50%)';
       a.style.lineHeight='1';
+      a.style.display='inline-block';
+    });
+    var accs=scope.querySelectorAll('.jp-acc');
+    Array.prototype.forEach.call(accs,function(a){
+      styleJpAccEl(a);
       a.style.display='inline-block';
     });
   }
@@ -1180,9 +1190,20 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function styleJpAugEl(el){
     if(!el)return;
     el.style.position='absolute';
-    el.style.right='-0.42em';
+    el.style.right='-0.46em';
     el.style.top='50%';
     el.style.transform='translateY(-50%)';
+    el.style.pointerEvents='none';
+  }
+  function styleJpAccEl(el){
+    if(!el)return;
+    el.style.position='absolute';
+    el.style.left='-0.32em';
+    el.style.top='-0.08em';
+    el.style.transform='none';
+    el.style.fontSize='12px';
+    el.style.fontWeight='700';
+    el.style.lineHeight='1';
     el.style.pointerEvents='none';
   }
   function styleJpDashLineEl(el){
@@ -1266,10 +1287,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     if(num.indexOf('\u00b7')>-1){isDot=true;num=num.replace(/\u00b7/g,'');}
     var hm=num.match(/^(.+?)('+)$/);if(hm){isHigh=hm[2].length;num=hm[1];}
     var lm=num.match(/^(.+?)(,+)$/);if(lm){isLow=lm[2].length;num=lm[1];}
-    var w=document.createElement('span');w.className='jp-wrap';
+    var acc='';
+    var am=num.match(/^([#b\u266f\u266d\u266e=])([0-7])$/);
+    if(am){acc=am[1]==='#'?'\u266f':am[1]==='b'?'\u266d':am[1]==='='?'\u266e':am[1];num=am[2];}
+    var w=document.createElement('span');w.className='jp-wrap'+(acc?' has-acc':'');
+    if(acc)w.style.minWidth='1.35em';
     var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isHigh>=2?2:isHigh);w.appendChild(td);
     var lw2=document.createElement('span');lw2.className='jp-lines-wrap';
     var numRow=document.createElement('span');numRow.className='jp-num-row';
+    if(acc){var ac=document.createElement('span');ac.className='jp-acc';ac.textContent=acc;styleJpAccEl(ac);numRow.appendChild(ac);}
     var ns2=document.createElement('span');ns2.className='jp-num';ns2.textContent=num;styleJpNumEl(ns2);numRow.appendChild(ns2);
     if(isDot){var dt=document.createElement('span');dt.className='jp-aug';dt.textContent='·';styleJpAugEl(dt);ns2.appendChild(dt);}
     lw2.appendChild(numRow);

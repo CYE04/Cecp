@@ -744,7 +744,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
           <div class="kbd-group">
             <div class="kbd-label">临时记号</div>
             <div class="kbd-row">
-              <button class="kbd-btn" id="acc-sharp" onclick="setAccidental('#')" style="padding:6px 10px;">♯ 升<span class="shortcut">S</span></button>
+              <button class="kbd-btn" id="acc-sharp" onclick="setAccidental('#')" style="padding:6px 10px;">♯ 升<span class="shortcut">K</span></button>
               <button class="kbd-btn" id="acc-flat" onclick="setAccidental('b')" style="padding:6px 10px;">♭ 降<span class="shortcut">J</span></button>
               <button class="kbd-btn" id="acc-natural" onclick="setAccidental('=')" style="padding:6px 10px;">♮ 还原<span class="shortcut">H</span></button>
               <button class="kbd-btn" onclick="setAccidental('')" style="padding:6px 8px;">清除</button>
@@ -2222,7 +2222,7 @@ document.addEventListener('keydown',function(e){
     return;
   }
   if(curSi<0)return;
-  if(k==='#'||k==='s'||k==='S'){e.preventDefault();setAccidental('#');return;}
+  if(k==='#'||k==='k'||k==='K'){e.preventDefault();setAccidental('#');return;}
   if(k==='j'||k==='J'){e.preventDefault();setAccidental('b');return;}
   if(k==='='||k==='h'||k==='H'){e.preventDefault();setAccidental('=');return;}
   if(/^[0-7]$/.test(k)){e.preventDefault();inputNote(parseInt(k));return;}
@@ -2235,7 +2235,7 @@ document.addEventListener('keydown',function(e){
   if(k==='ArrowUp'){e.preventDefault();var os=['low2','low1','mid','high1','high2'];var i=os.indexOf(oct);if(i<os.length-1)setOct(os[i+1]);return;}
   if(k==='ArrowDown'){e.preventDefault();var os=['low2','low1','mid','high1','high2'];var i=os.indexOf(oct);if(i>0)setOct(os[i-1]);return;}
   if(k===','){e.preventDefault();toggleDot();return;}
-  if(k==='['){e.preventDefault();toggleSlur();return;}
+  if(k==='[' || k==='s' || k==='S'){e.preventDefault();toggleSlur();return;}
   if(k===']'){e.preventDefault();toggleXSlur();return;}
   if(k==='x' || k==='X'){e.preventDefault();closeXSlur();return;}
   if(k==='f' || k==='F'){e.preventDefault();toggleFermata();return;}
