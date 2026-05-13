@@ -195,8 +195,8 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em}.jp-plain-sym.is-dash{position:relative;top:-0.12em}.jp-plain-bot{height:16px}
-.jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
-.jp-dot-top{height:8px;justify-content:flex-end}.jp-dot-bot{height:8px;justify-content:flex-start}
+.jp-dot-top,.jp-dot-bot{width:1em;font-size:8px;line-height:.6;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
+.jp-dot-top{height:10px;justify-content:flex-end}.jp-dot-bot{height:10px;justify-content:flex-start}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em}
@@ -209,8 +209,8 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-dual{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;line-height:1;margin:0 .04em}
 .jp-dual-top,.jp-dual-bot{display:inline-flex;align-items:flex-end}
 .jp-dual-top{margin-bottom:-2px}
-.jp-dual-top .jp-dot-bot{height:7px}
-.jp-dual-bot .jp-dot-top{height:7px}
+.jp-dual-top .jp-dot-bot{height:9px}
+.jp-dual-bot .jp-dot-top{height:9px}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
 .jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
