@@ -1839,7 +1839,7 @@ function styleJpDashLineEl(el){
 function styleJpAccEl(el){
   if(!el)return;
   el.style.position='absolute';
-  el.style.left='-0.22em';
+  el.style.left='-0.32em';
   el.style.top='-0.08em';
   el.style.transform='none';
   el.style.fontSize='12px';
@@ -1926,10 +1926,10 @@ function parseJpToken(tok,opts){
   var hm=num.match(/^(.+?)('+)$/);if(hm){isH=hm[2].length;num=hm[1];}
   var lm=num.match(/^(.+?)(,+)$/);if(lm){isL=lm[2].length;num=lm[1];}
   var acc='';
-  var am=num.match(/^([#\u266f\u266d\u266e=])([0-7])$/);
+  var am=num.match(/^([#b\u266f\u266d\u266e=])([0-7])$/);
   if(am){acc=am[1]==='#'?'\u266f':am[1]==='b'?'\u266d':am[1]==='='?'\u266e':am[1];num=am[2];}
   var w=document.createElement('span');w.className='jp-wrap'+(acc?' has-acc':'');
-  if(acc)w.style.minWidth='1.25em';
+  if(acc)w.style.minWidth='1.35em';
   var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isH>=2?2:isH);w.appendChild(td);
   var lw=document.createElement('span');lw.className='jp-lines-wrap';
   var nr=document.createElement('span');nr.className='jp-num-row';
