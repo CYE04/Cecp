@@ -1792,6 +1792,17 @@ function styleJpAugEl(el){
   el.style.transform='translateY(-50%)';
   el.style.pointerEvents='none';
 }
+function styleJpAccEl(el){
+  if(!el)return;
+  el.style.position='absolute';
+  el.style.left='-0.44em';
+  el.style.top='50%';
+  el.style.transform='translateY(-50%)';
+  el.style.fontSize='15px';
+  el.style.fontWeight='700';
+  el.style.lineHeight='1';
+  el.style.pointerEvents='none';
+}
 function makeJpUnderlineLine(level){
   var ln=document.createElement('span');
   ln.className=level===2?'jp-u2-line':'jp-u1-line';
@@ -1870,10 +1881,15 @@ function parseJpToken(tok,opts){
   if(num.indexOf('·')>-1){isDot=true;num=num.replace(/·/g,'');}
   var hm=num.match(/^(.+?)('+)$/);if(hm){isH=hm[2].length;num=hm[1];}
   var lm=num.match(/^(.+?)(,+)$/);if(lm){isL=lm[2].length;num=lm[1];}
-  var w=document.createElement('span');w.className='jp-wrap';
+  var acc='';
+  var am=num.match(/^([#\u266f\u266d\u266e=])([0-7])$/);
+  if(am){acc=am[1]==='\u266f'?'#':am[1]==='\u266d'?'b':am[1]==='='?'\u266e':am[1];num=am[2];}
+  var w=document.createElement('span');w.className='jp-wrap'+(acc?' has-acc':'');
+  if(acc)w.style.minWidth='1.45em';
   var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isH>=2?2:isH);w.appendChild(td);
   var lw=document.createElement('span');lw.className='jp-lines-wrap';
   var nr=document.createElement('span');nr.className='jp-num-row';
+  if(acc){var ac=document.createElement('span');ac.className='jp-acc';ac.textContent=acc;styleJpAccEl(ac);nr.appendChild(ac);}
   var ns=document.createElement('span');ns.className='jp-num';ns.textContent=num;styleJpNumEl(ns);nr.appendChild(ns);
   if(isDot){var ag=document.createElement('span');ag.className='jp-aug';ag.textContent='·';styleJpAugEl(ag);ns.appendChild(ag);}
   lw.appendChild(nr);
