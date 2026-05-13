@@ -451,11 +451,11 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 .jp-plain-top{height:12px;}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;}.jp-plain-sym.is-dash{position:relative;top:-0.12em;}.jp-plain-bot{height:16px;}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;}
-.jp-dot-top{height:12px;justify-content:flex-end;}.jp-dot-bot{height:12px;justify-content:flex-start;}
+.jp-dot-top{height:8px;justify-content:flex-end;}.jp-dot-bot{height:8px;justify-content:flex-start;}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px;}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em;}
-.jp-aug{position:absolute;right:-0.42em;top:-0.17em;font-size:10px;line-height:1;pointer-events:none;}
+.jp-aug{position:absolute;right:-0.46em;top:50%;transform:translateY(-50%);font-size:10px;line-height:1;pointer-events:none;}
 .jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
 .jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
@@ -742,6 +742,15 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
             </div>
           </div>
           <div class="kbd-group">
+            <div class="kbd-label">临时记号</div>
+            <div class="kbd-row">
+              <button class="kbd-btn" id="acc-sharp" onclick="setAccidental('#')" style="padding:6px 10px;"># 升<span class="shortcut">#</span></button>
+              <button class="kbd-btn" id="acc-flat" onclick="setAccidental('b')" style="padding:6px 10px;">b 降<span class="shortcut">V</span></button>
+              <button class="kbd-btn" id="acc-natural" onclick="setAccidental('=')" style="padding:6px 10px;">♮ 还原<span class="shortcut">= / N</span></button>
+              <button class="kbd-btn" onclick="setAccidental('')" style="padding:6px 8px;">清除</button>
+            </div>
+          </div>
+          <div class="kbd-group">
             <div class="kbd-label">线条与结构</div>
             <div class="kbd-row">
               <button class="kbd-btn" onclick="appendTok('|')" style="padding:6px 8px;">| 小节线<span class="shortcut">B</span></button>
@@ -909,6 +918,7 @@ var selA=-1, selB=-1;
 var oct='mid', dur='quarter', dotOn=false, fermataOn=false, slurOn=false, xslurOn=false, tupletOn=0;
 var dualDur='quarter', dualDot=false, dualFermata=false;
 var inlineDualTop='1', inlineDualBot='5';
+var accidental='';
 var inputMode='insert';
 var tokClipboard=[]; // 存 token 数组
 var segClipboard=null; // 存整格子
@@ -1227,10 +1237,12 @@ function insertToks(tokArr){
 
 function inputNote(n){
   var tok=buildTok(n);
+  if(n!==0 && accidental) accidental='';
   var extra=[];
   if(n!==0 && dur==='whole'){extra=['-','-','-'];}
   else if(n!==0 && dur==='half'){extra=['-'];}
   insertToks([tok,...extra]);
+  syncAccidentalUI();
 }
 
 function deleteSelected(){
@@ -1407,6 +1419,17 @@ function setDur(d){
   ['whole','half','quarter','eighth','16th'].forEach(function(x){document.getElementById('dur-'+x).classList.toggle('on',x===d);});
   updateInputState();
 }
+function syncAccidentalUI(){
+  var ids={ '#':'acc-sharp', b:'acc-flat', '=':'acc-natural' };
+  Object.keys(ids).forEach(function(k){
+    var btn=document.getElementById(ids[k]);
+    if(btn)btn.classList.toggle('on',accidental===k);
+  });
+}
+function setAccidental(v){
+  accidental=accidental===v?'':v;
+  syncAccidentalUI();
+}
 function syncToggleUI(){
   var dotBtn=document.getElementById('dot-btn');
   if(dotBtn){
@@ -1454,6 +1477,7 @@ function toggleTuplet(n){
 function buildTok(n){
   var s=''+n;
   if(n!==0){
+    if(accidental)s=accidental+s;
     if(oct==='high1')s+="'";else if(oct==='high2')s+="''";
     else if(oct==='low1')s+=',';else if(oct==='low2')s+=',,';
   }
@@ -1763,8 +1787,16 @@ function makeJpPlain(sym){
   s.style.width='1em';
   s.style.height='1em';
   if(sym==='-'){
+    s.style.fontSize='19px';
     s.style.position='relative';
     s.style.top='-0.12em';
+    s.style.lineHeight='1';
+    s.style.overflow='visible';
+    s.textContent='';
+    var dashLine=document.createElement('span');
+    dashLine.className='jp-dash-line';
+    styleJpDashLineEl(dashLine);
+    s.appendChild(dashLine);
   }
   var b=document.createElement('span');b.className='jp-plain-bot';pl.appendChild(b);
   return pl;
@@ -1787,9 +1819,21 @@ function styleJpNumEl(el){
 function styleJpAugEl(el){
   if(!el)return;
   el.style.position='absolute';
-  el.style.right='-0.42em';
+  el.style.right='-0.46em';
   el.style.top='50%';
   el.style.transform='translateY(-50%)';
+  el.style.pointerEvents='none';
+}
+function styleJpDashLineEl(el){
+  if(!el)return;
+  el.style.position='absolute';
+  el.style.left='0.08em';
+  el.style.right='0.08em';
+  el.style.top='50%';
+  el.style.height='2px';
+  el.style.transform='translateY(-50%)';
+  el.style.background='currentColor';
+  el.style.borderRadius='2px';
   el.style.pointerEvents='none';
 }
 function styleJpAccEl(el){
@@ -2178,6 +2222,9 @@ document.addEventListener('keydown',function(e){
     return;
   }
   if(curSi<0)return;
+  if(k==='#'){e.preventDefault();setAccidental('#');return;}
+  if(k==='v'||k==='V'){e.preventDefault();setAccidental('b');return;}
+  if(k==='='||k==='n'||k==='N'){e.preventDefault();setAccidental('=');return;}
   if(/^[0-7]$/.test(k)){e.preventDefault();inputNote(parseInt(k));return;}
   if(k===' '){e.preventDefault();appendTok(buildSpacerTok());return;}
   if(k==='\\\\' || k==='-'){e.preventDefault();inputSpecial('-');return;}
@@ -2379,6 +2426,7 @@ function updateInputState(){
   }
   var clip=document.getElementById('is-clip');
   if(clip)clip.textContent=segClipboard?'整格':(tokClipboard.length?tokClipboard.length+' 项':'空');
+  syncAccidentalUI();
 }
 
 // scoreImg 变更时刷新预览
@@ -2408,6 +2456,7 @@ Object.assign(window, {
   setOct: setOct,
   setDur: setDur,
   setInputMode: setInputMode,
+  setAccidental: setAccidental,
   inputNote: inputNote,
   inputSpecial: inputSpecial,
   appendTok: appendTok,
