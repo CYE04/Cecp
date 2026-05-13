@@ -744,9 +744,9 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
           <div class="kbd-group">
             <div class="kbd-label">临时记号</div>
             <div class="kbd-row">
-              <button class="kbd-btn" id="acc-sharp" onclick="setAccidental('#')" style="padding:6px 10px;"># 升<span class="shortcut">#</span></button>
-              <button class="kbd-btn" id="acc-flat" onclick="setAccidental('b')" style="padding:6px 10px;">b 降<span class="shortcut">V</span></button>
-              <button class="kbd-btn" id="acc-natural" onclick="setAccidental('=')" style="padding:6px 10px;">♮ 还原<span class="shortcut">= / N</span></button>
+              <button class="kbd-btn" id="acc-sharp" onclick="setAccidental('#')" style="padding:6px 10px;">♯ 升<span class="shortcut">S</span></button>
+              <button class="kbd-btn" id="acc-flat" onclick="setAccidental('b')" style="padding:6px 10px;">♭ 降<span class="shortcut">J</span></button>
+              <button class="kbd-btn" id="acc-natural" onclick="setAccidental('=')" style="padding:6px 10px;">♮ 还原<span class="shortcut">H</span></button>
               <button class="kbd-btn" onclick="setAccidental('')" style="padding:6px 8px;">清除</button>
             </div>
           </div>
@@ -1839,10 +1839,10 @@ function styleJpDashLineEl(el){
 function styleJpAccEl(el){
   if(!el)return;
   el.style.position='absolute';
-  el.style.left='-0.44em';
-  el.style.top='50%';
-  el.style.transform='translateY(-50%)';
-  el.style.fontSize='15px';
+  el.style.left='-0.22em';
+  el.style.top='-0.08em';
+  el.style.transform='none';
+  el.style.fontSize='12px';
   el.style.fontWeight='700';
   el.style.lineHeight='1';
   el.style.pointerEvents='none';
@@ -1927,9 +1927,9 @@ function parseJpToken(tok,opts){
   var lm=num.match(/^(.+?)(,+)$/);if(lm){isL=lm[2].length;num=lm[1];}
   var acc='';
   var am=num.match(/^([#\u266f\u266d\u266e=])([0-7])$/);
-  if(am){acc=am[1]==='\u266f'?'#':am[1]==='\u266d'?'b':am[1]==='='?'\u266e':am[1];num=am[2];}
+  if(am){acc=am[1]==='#'?'\u266f':am[1]==='b'?'\u266d':am[1]==='='?'\u266e':am[1];num=am[2];}
   var w=document.createElement('span');w.className='jp-wrap'+(acc?' has-acc':'');
-  if(acc)w.style.minWidth='1.45em';
+  if(acc)w.style.minWidth='1.25em';
   var td=document.createElement('span');td.className='jp-dot-top';setDots(td,isH>=2?2:isH);w.appendChild(td);
   var lw=document.createElement('span');lw.className='jp-lines-wrap';
   var nr=document.createElement('span');nr.className='jp-num-row';
@@ -2222,9 +2222,9 @@ document.addEventListener('keydown',function(e){
     return;
   }
   if(curSi<0)return;
-  if(k==='#'){e.preventDefault();setAccidental('#');return;}
-  if(k==='v'||k==='V'){e.preventDefault();setAccidental('b');return;}
-  if(k==='='||k==='n'||k==='N'){e.preventDefault();setAccidental('=');return;}
+  if(k==='#'||k==='s'||k==='S'){e.preventDefault();setAccidental('#');return;}
+  if(k==='j'||k==='J'){e.preventDefault();setAccidental('b');return;}
+  if(k==='='||k==='h'||k==='H'){e.preventDefault();setAccidental('=');return;}
   if(/^[0-7]$/.test(k)){e.preventDefault();inputNote(parseInt(k));return;}
   if(k===' '){e.preventDefault();appendTok(buildSpacerTok());return;}
   if(k==='\\\\' || k==='-'){e.preventDefault();inputSpecial('-');return;}
@@ -2235,7 +2235,7 @@ document.addEventListener('keydown',function(e){
   if(k==='ArrowUp'){e.preventDefault();var os=['low2','low1','mid','high1','high2'];var i=os.indexOf(oct);if(i<os.length-1)setOct(os[i+1]);return;}
   if(k==='ArrowDown'){e.preventDefault();var os=['low2','low1','mid','high1','high2'];var i=os.indexOf(oct);if(i>0)setOct(os[i-1]);return;}
   if(k===','){e.preventDefault();toggleDot();return;}
-  if(k==='[' || k==='s' || k==='S'){e.preventDefault();toggleSlur();return;}
+  if(k==='['){e.preventDefault();toggleSlur();return;}
   if(k===']'){e.preventDefault();toggleXSlur();return;}
   if(k==='x' || k==='X'){e.preventDefault();closeXSlur();return;}
   if(k==='f' || k==='F'){e.preventDefault();toggleFermata();return;}
@@ -2938,7 +2938,7 @@ const tutStepsJF = [
     items: [
       '点击音符下方输入对应歌词',
       '点击音符上方输入和弦标记（如 C, Am, G7）',
-      '支持升号 # 与降号 ♭'
+      '支持临时记号 ♯ / ♭ / ♮'
     ]
   },
   {
