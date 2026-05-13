@@ -1827,10 +1827,10 @@ function styleJpAugEl(el){
 function styleJpDashLineEl(el){
   if(!el)return;
   el.style.position='absolute';
-  el.style.left='0.08em';
-  el.style.right='0.08em';
+  el.style.left='0.22em';
+  el.style.right='0.22em';
   el.style.top='50%';
-  el.style.height='2px';
+  el.style.height='1.5px';
   el.style.transform='translateY(-50%)';
   el.style.background='currentColor';
   el.style.borderRadius='2px';
