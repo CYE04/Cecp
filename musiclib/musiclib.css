@@ -2451,7 +2451,27 @@ html.ml-fullscreen body.ml-fullscreen #music-library #ml-list.is-grouped{
 html.ml-fullscreen body.ml-fullscreen #music-library .ml-group{
   margin-left:auto;
   margin-right:auto;
-  padding:clamp(16px,1.8vw,24px) !important;
+  padding:clamp(24px,2.3vw,34px) clamp(22px,2.4vw,36px) clamp(28px,2.8vw,42px) !important;
+}
+html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-head{
+  align-items:center !important;
+  padding:clamp(4px,.6vw,10px) clamp(2px,.5vw,8px) clamp(18px,1.8vw,28px) !important;
+  margin-bottom:0 !important;
+}
+html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-head > div:first-child{
+  min-width:0;
+  padding-right:18px;
+}
+html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-kicker{
+  margin-bottom:clamp(8px,.8vw,12px) !important;
+}
+html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-count{
+  flex-shrink:0;
+  margin-right:clamp(0px,.8vw,10px);
+  padding:8px 13px !important;
+}
+html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
+  padding-top:clamp(2px,.5vw,8px);
 }
 
 @media (max-width:900px){
@@ -2469,6 +2489,12 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group{
   html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
     gap:14px !important;
   }
+  html.ml-fullscreen body.ml-fullscreen #music-library .ml-group{
+    padding:20px 16px 24px !important;
+  }
+  html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-head{
+    padding:4px 2px 18px !important;
+  }
 }
 
 @media (max-width:640px){
@@ -2483,6 +2509,18 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group{
     gap:10px !important;
   }
   html.ml-fullscreen body.ml-fullscreen #music-library .ml-group{
-    padding:12px !important;
+    padding:16px 12px 20px !important;
+  }
+  html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-head{
+    align-items:flex-start !important;
+    padding-bottom:14px !important;
+    gap:10px !important;
+  }
+  html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-title{
+    font-size:24px;
+  }
+  html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-count{
+    margin-right:0;
+    padding:6px 10px !important;
   }
 }
