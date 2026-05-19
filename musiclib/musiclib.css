@@ -2374,3 +2374,47 @@ html,body,#music-library{
     color:var(--text);
   }
 }
+
+/* ---- Host Sidebar Override For Music Library ---- */
+html.ml-fullscreen,
+html.ml-fullscreen body.ml-fullscreen{
+  width:100% !important;
+  max-width:100vw !important;
+  overflow-x:hidden !important;
+}
+html.ml-fullscreen body.ml-fullscreen #header-menu,
+html.ml-fullscreen body.ml-fullscreen > aside,
+html.ml-fullscreen body.ml-fullscreen > footer,
+html.ml-fullscreen body.ml-fullscreen :is(aside,.sidebar,[class*="sidebar"],[class*="side-bar"],[class*="aside"],[id*="sidebar"],[id*="side-bar"],[id*="aside"]):not(#music-library):not(#music-library *),
+html.ml-fullscreen body.ml-fullscreen .cecp-side-col,
+html.ml-fullscreen body.ml-fullscreen .cecp-sidebar,
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > aside,
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > .sidebar,
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > [class*="sidebar"],
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > [class*="side-bar"],
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > [class*="aside"],
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > [id*="sidebar"],
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > [id*="side-bar"],
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > [id*="aside"]{
+  display:none !important;
+}
+html.ml-fullscreen body.ml-fullscreen section.mx-auto{
+  display:block !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  width:100% !important;
+  max-width:100vw !important;
+  margin:0 !important;
+  padding:0 !important;
+  gap:0 !important;
+}
+html.ml-fullscreen body.ml-fullscreen section.mx-auto > *,
+html.ml-fullscreen body.ml-fullscreen main,
+html.ml-fullscreen body.ml-fullscreen #content,
+html.ml-fullscreen body.ml-fullscreen .content,
+html.ml-fullscreen body.ml-fullscreen .content-area{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
