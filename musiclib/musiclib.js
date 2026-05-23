@@ -4,6 +4,14 @@
   const ML_VER='2026.05.23.1';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
+  const LOGO_SRC=(function(){
+    try{
+      const cur=document.currentScript && document.currentScript.src ? new URL(document.currentScript.src, location.href) : null;
+      return cur ? new URL('olive-fellowship-logo.png', cur.href).href : 'musiclib/olive-fellowship-logo.png';
+    }catch(_){
+      return 'musiclib/olive-fellowship-logo.png';
+    }
+  })();
   const WECHAT='CYuen_290104';
   const SOURCE_RULES=[
     {name:'赞美之泉',patterns:['赞美之泉','stream of praise']},
@@ -53,7 +61,7 @@
     <div id="ml-header">
       <div id="ml-nav">
         <div id="ml-brand">
-          <span class="ml-brand-dot"></span>
+          <span class="ml-brand-dot"><img src="${LOGO_SRC}" alt="橄榄树团契"></span>
           <span class="ml-brand-name">诗歌库</span>
         </div>
         <div id="ml-nav-actions">
@@ -65,15 +73,15 @@
         <h1 id="ml-title">诗歌库</h1>
         <div id="ml-subtitle">精选敬拜诗歌集合，含歌词、简谱、移调与音频练习。</div>
       </div>
-      <section id="ml-worship-picks" class="ml-reveal" aria-label="每日推荐 Worship Picks">
+      <section id="ml-worship-picks" class="ml-reveal" aria-label="每日推荐">
         <div id="ml-wp-glow" aria-hidden="true"></div>
         <div id="ml-wp-bg" aria-hidden="true"></div>
         <div id="ml-wp-shell">
           <div id="ml-wp-hero">
             <div class="ml-wp-eyebrow">今日推荐</div>
-            <div id="ml-wp-subtitle">Daily Worship Pick</div>
+            <div id="ml-wp-subtitle">今天推荐的三首诗歌</div>
             <h2 id="ml-wp-title">正在预备今日敬拜推荐</h2>
-            <div id="ml-wp-artist">Worship Picks</div>
+            <div id="ml-wp-artist">今日推荐</div>
             <p id="ml-wp-lyric">愿今天的第一首歌，把心安静带到神面前。</p>
             <div id="ml-wp-tags"></div>
             <div id="ml-wp-actions">
@@ -89,7 +97,7 @@
           </div>
           <div id="ml-wp-side">
             <div id="ml-wp-greeting">
-              <span id="ml-wp-greeting-main">Peace for today</span>
+              <span id="ml-wp-greeting-main">今日平安</span>
               <strong id="ml-wp-greeting-sub">正在读取今日时间</strong>
             </div>
             <div id="ml-wp-list"></div>
@@ -1200,10 +1208,12 @@
     return song.sub||'愿这首歌帮助你安静、敬拜与祷告。';
   }
   function getWorshipTags(song,index){
-    const base=['适合安静时聆听','适合晨更','适合敬拜祷告'];
-    const tempo=Number(song.bpm||0);
-    const extra=tempo&&tempo<=74?'慢速默想':tempo>=96?'明亮敬拜':'温柔敬拜';
-    return [base[index%base.length],extra,song.origKey?'调性 '+song.origKey:'今日同行'];
+    return [
+      `今日第 ${index+1} 首`,
+      song.origKey?`调性 ${song.origKey}`:'',
+      song.bpm?`速度 ${song.bpm}`:'',
+      song.mp3?'有音频':''
+    ].filter(Boolean);
   }
   function setWorshipHero(song,index){
     const section=$('ml-worship-picks');
@@ -1211,7 +1221,7 @@
     section.dataset.activeId=song.id;
     section.style.setProperty('--wp-cover',song.cover?`url("${String(song.cover).replace(/"/g,'\\"')}")`:'none');
     $('ml-wp-title').textContent=song.title||'今日敬拜推荐';
-    $('ml-wp-artist').textContent=song.displayArtist||song.artist||song.source||'Worship';
+    $('ml-wp-artist').textContent=song.displayArtist||song.artist||song.source||'诗歌';
     $('ml-wp-lyric').textContent=getSongLyricHighlight(song);
     $('ml-wp-tags').innerHTML=getWorshipTags(song,index).map(t=>`<span>${t}</span>`).join('');
     $('ml-wp-play').disabled=!song.mp3;
@@ -1231,11 +1241,11 @@
       <button class="ml-wp-card${index===0?' active':''} ml-reveal is-visible" type="button" data-id="${song.id}">
         <span class="ml-wp-card-cover">${song.cover?`<img src="${song.cover}" alt="" loading="lazy">`:'<span>♪</span>'}</span>
         <span class="ml-wp-card-copy">
-          <span class="ml-wp-card-kicker">Pick 0${index+1}</span>
-          <strong>${song.title||'Untitled'}</strong>
-          <small>${song.displayArtist||song.artist||song.source||'Worship'}</small>
+          <span class="ml-wp-card-kicker">推荐 0${index+1}</span>
+          <strong>${song.title||'未命名诗歌'}</strong>
+          <small>${song.displayArtist||song.artist||song.source||'诗歌'}</small>
         </span>
-        <span class="ml-wp-card-tag">${getWorshipTags(song,index)[0]}</span>
+        <span class="ml-wp-card-tag">${song.origKey?`调性 ${song.origKey}`:(song.bpm?`速度 ${song.bpm}`:'今日推荐')}</span>
       </button>
     `).join('');
     list.querySelectorAll('.ml-wp-card[data-id]').forEach((btn,index)=>{
@@ -1295,7 +1305,7 @@
     if(!main||!sub) return;
     const now=new Date();
     const h=now.getHours();
-    const greeting=h<5?'夜深平安':h<11?'早安，适合晨更':h<17?'午后安静片刻':h<21?'晚上好，预备敬拜':'夜晚安静聆听';
+    const greeting=h<5?'夜深平安':h<11?'早安，今日推荐已更新':h<17?'午后平安':h<21?'晚上好，今日推荐已更新':'夜晚平安';
     main.textContent=greeting;
     sub.textContent=now.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+' · 正在同步今日天气';
     loadWorshipWeather().then(text=>{

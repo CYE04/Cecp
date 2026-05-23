@@ -1201,10 +1201,17 @@ html,body,#music-library{
 }
 #ml-brand{display:inline-flex;align-items:center;gap:10px;}
 .ml-brand-dot{
-  width:24px;height:24px;border-radius:50%;
-  background:linear-gradient(135deg,#9e82ff,#f4cc67);
-  box-shadow:0 0 24px rgba(227,191,66,.28);
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(248,243,226,.9);
+  border:1px solid rgba(232,199,101,.28);
+  box-shadow:0 0 24px rgba(227,191,66,.2);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  flex-shrink:0;
 }
+.ml-brand-dot img{width:34px;height:34px;object-fit:contain;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18));}
 .ml-brand-name{font-size:24px;font-weight:700;letter-spacing:-.2px;}
 #ml-nav-tabs{display:none!important;}
 .ml-nav-tab{
@@ -2641,9 +2648,9 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
 #music-library .ml-wp-eyebrow,
 #music-library #ml-wp-subtitle,
 #music-library .ml-wp-card-kicker{
-  font-family:'DM Mono','Space Mono',monospace;
-  letter-spacing:.14em;
-  text-transform:uppercase;
+  font-family:'Noto Sans SC',sans-serif;
+  letter-spacing:0;
+  text-transform:none;
 }
 #music-library .ml-wp-eyebrow{
   width:max-content;
@@ -2660,7 +2667,8 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
 #music-library #ml-wp-subtitle{
   margin-bottom:18px;
   color:var(--wp-soft);
-  font-size:11px;
+  font-size:13px;
+  font-weight:700;
 }
 #music-library #ml-wp-title{
   max-width:780px;
@@ -2855,7 +2863,8 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
 }
 #music-library .ml-wp-card-kicker{
   color:rgba(232,199,101,.82);
-  font-size:10px;
+  font-size:12px;
+  font-weight:700;
 }
 #music-library .ml-wp-card-copy strong{
   color:var(--wp-ink);
