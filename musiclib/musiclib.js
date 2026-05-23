@@ -1,7 +1,7 @@
 /* ✦ Designed & Built by YuEn © 2025–2026 ✦ */
 /* CECP Music Library v3.3 */
 (function(){
-  const ML_VER='2026.05.19.3';
+  const ML_VER='2026.05.23.1';
   const GITHUB_API='https://api.github.com/repos/CYE04/Cecp/contents/songs';
   const RAW_BASE='https://raw.githubusercontent.com/CYE04/Cecp/main/songs/';
   const WECHAT='CYuen_290104';
@@ -47,6 +47,7 @@
   let _audioCtx=null,_metroTimer=null,_metroNext=0,_metroRunning=false,_metroBpm=72;
   let _themeObserver=null;
   let _detailStatePushed=false;
+  let _revealObserver=null,_weatherCache=null;
 
   root.innerHTML=`
     <div id="ml-header">
@@ -64,6 +65,37 @@
         <h1 id="ml-title">诗歌库</h1>
         <div id="ml-subtitle">精选敬拜诗歌集合，含歌词、简谱、移调与音频练习。</div>
       </div>
+      <section id="ml-worship-picks" class="ml-reveal" aria-label="每日推荐 Worship Picks">
+        <div id="ml-wp-glow" aria-hidden="true"></div>
+        <div id="ml-wp-bg" aria-hidden="true"></div>
+        <div id="ml-wp-shell">
+          <div id="ml-wp-hero">
+            <div class="ml-wp-eyebrow">今日推荐</div>
+            <div id="ml-wp-subtitle">Daily Worship Pick</div>
+            <h2 id="ml-wp-title">正在预备今日敬拜推荐</h2>
+            <div id="ml-wp-artist">Worship Picks</div>
+            <p id="ml-wp-lyric">愿今天的第一首歌，把心安静带到神面前。</p>
+            <div id="ml-wp-tags"></div>
+            <div id="ml-wp-actions">
+              <button id="ml-wp-play" class="ml-wp-action is-primary" type="button" disabled>
+                <span class="ml-wp-action-icon">▶</span>
+                <span>快速播放</span>
+              </button>
+              <button id="ml-wp-open" class="ml-wp-action" type="button" disabled>
+                <span class="ml-wp-action-icon">↗</span>
+                <span>打开详情</span>
+              </button>
+            </div>
+          </div>
+          <div id="ml-wp-side">
+            <div id="ml-wp-greeting">
+              <span id="ml-wp-greeting-main">Peace for today</span>
+              <strong id="ml-wp-greeting-sub">正在读取今日时间</strong>
+            </div>
+            <div id="ml-wp-list"></div>
+          </div>
+        </div>
+      </section>
       <div id="ml-search-row">
         <div id="ml-search-wrap">
           <span id="ml-search-icon">⌕</span>
@@ -277,6 +309,9 @@
   $('ml-search').addEventListener('input',e=>{query=e.target.value.trim();render();});
   $('ml-back').addEventListener('click',closeDetail);
   $('ml-nav-search')?.addEventListener('click',()=>{$('ml-search')?.focus();});
+  bindWorshipPicksEffects();
+  updateWorshipGreeting();
+  setInterval(updateWorshipGreeting,60000);
   $('ml-nav-theme')?.addEventListener('click',()=>{
     const rootEl=document.documentElement;
     if(!rootEl) return;
@@ -993,6 +1028,7 @@
       songs=all.filter(Boolean).map(enrichSong);
       $('ml-loading').style.display='none';
       $('ml-count').textContent=songs.length+' 首';
+      renderWorshipPicks();
       render();
       openSongFromUrl();
     }catch(e){
@@ -1099,6 +1135,202 @@
     const details=getSongSubDetails(song);
     if(details) meta.push(details);
     return meta.join(' · ');
+  }
+  function getWorshipDayKey(){
+    try{
+      return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    }catch(_){
+      return new Date().toISOString().slice(0,10);
+    }
+  }
+  function hashString(str){
+    let h=2166136261;
+    for(let i=0;i<str.length;i++){
+      h^=str.charCodeAt(i);
+      h=Math.imul(h,16777619);
+    }
+    return h>>>0;
+  }
+  function seededRandom(seed){
+    let t=seed>>>0;
+    return function(){
+      t+=0x6D2B79F5;
+      let r=Math.imul(t^(t>>>15),1|t);
+      r^=r+Math.imul(r^(r>>>7),61|r);
+      return ((r^(r>>>14))>>>0)/4294967296;
+    };
+  }
+  function getDailyWorshipPicks(){
+    const day=getWorshipDayKey();
+    const cacheKey='cecp:musiclib:worship-picks:'+day;
+    const usable=songs.filter(s=>s&&s.id&&s.title).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+    if(!usable.length) return {day,picks:[]};
+    try{
+      const cached=JSON.parse(localStorage.getItem(cacheKey)||'null');
+      if(cached&&cached.day===day&&Array.isArray(cached.ids)){
+        const picks=cached.ids.map(id=>usable.find(s=>s.id===id)).filter(Boolean);
+        if(picks.length) return {day,picks:picks.slice(0,Math.min(3,usable.length))};
+      }
+    }catch(_){}
+
+    const rand=seededRandom(hashString('CECP-WORSHIP-PICKS:'+day));
+    const pool=usable.slice();
+    for(let i=pool.length-1;i>0;i--){
+      const j=Math.floor(rand()*(i+1));
+      const tmp=pool[i]; pool[i]=pool[j]; pool[j]=tmp;
+    }
+    const picks=pool.slice(0,Math.min(3,pool.length));
+    try{
+      Object.keys(localStorage).forEach(key=>{
+        if(key.startsWith('cecp:musiclib:worship-picks:')&&!key.endsWith(day)) localStorage.removeItem(key);
+      });
+      localStorage.setItem(cacheKey,JSON.stringify({day,ids:picks.map(s=>s.id),savedAt:Date.now()}));
+    }catch(_){}
+    return {day,picks};
+  }
+  function getSongLyricHighlight(song){
+    for(const sec of song.sections||[]){
+      for(const line of sec.lines||[]){
+        const arr=Array.isArray(line)?line:(line.line||[]);
+        const text=arr.map(c=>cleanText(c.lyric||c.lyric2||'')).join('');
+        const cleaned=cleanText(text.replace(/[ㅤ|，,。.!！?？、]/g,' '));
+        if(cleaned&&cleaned.length>=6) return cleaned.length>34?cleaned.slice(0,34)+'…':cleaned;
+      }
+    }
+    return song.sub||'愿这首歌帮助你安静、敬拜与祷告。';
+  }
+  function getWorshipTags(song,index){
+    const base=['适合安静时聆听','适合晨更','适合敬拜祷告'];
+    const tempo=Number(song.bpm||0);
+    const extra=tempo&&tempo<=74?'慢速默想':tempo>=96?'明亮敬拜':'温柔敬拜';
+    return [base[index%base.length],extra,song.origKey?'调性 '+song.origKey:'今日同行'];
+  }
+  function setWorshipHero(song,index){
+    const section=$('ml-worship-picks');
+    if(!section||!song) return;
+    section.dataset.activeId=song.id;
+    section.style.setProperty('--wp-cover',song.cover?`url("${String(song.cover).replace(/"/g,'\\"')}")`:'none');
+    $('ml-wp-title').textContent=song.title||'今日敬拜推荐';
+    $('ml-wp-artist').textContent=song.displayArtist||song.artist||song.source||'Worship';
+    $('ml-wp-lyric').textContent=getSongLyricHighlight(song);
+    $('ml-wp-tags').innerHTML=getWorshipTags(song,index).map(t=>`<span>${t}</span>`).join('');
+    $('ml-wp-play').disabled=!song.mp3;
+    $('ml-wp-open').disabled=false;
+  }
+  function renderWorshipPicks(){
+    const box=$('ml-worship-picks'),list=$('ml-wp-list');
+    if(!box||!list) return;
+    const {day,picks}=getDailyWorshipPicks();
+    box.dataset.day=day;
+    if(!picks.length){
+      list.innerHTML='<div class="ml-wp-card is-empty">今日推荐正在载入</div>';
+      return;
+    }
+    setWorshipHero(picks[0],0);
+    list.innerHTML=picks.map((song,index)=>`
+      <button class="ml-wp-card${index===0?' active':''} ml-reveal is-visible" type="button" data-id="${song.id}">
+        <span class="ml-wp-card-cover">${song.cover?`<img src="${song.cover}" alt="" loading="lazy">`:'<span>♪</span>'}</span>
+        <span class="ml-wp-card-copy">
+          <span class="ml-wp-card-kicker">Pick 0${index+1}</span>
+          <strong>${song.title||'Untitled'}</strong>
+          <small>${song.displayArtist||song.artist||song.source||'Worship'}</small>
+        </span>
+        <span class="ml-wp-card-tag">${getWorshipTags(song,index)[0]}</span>
+      </button>
+    `).join('');
+    list.querySelectorAll('.ml-wp-card[data-id]').forEach((btn,index)=>{
+      btn.addEventListener('click',()=>{
+        const song=picks.find(s=>s.id===btn.dataset.id);
+        if(!song) return;
+        list.querySelectorAll('.ml-wp-card').forEach(el=>el.classList.remove('active'));
+        btn.classList.add('active');
+        setWorshipHero(song,index);
+      });
+    });
+    if($('ml-wp-play')) $('ml-wp-play').onclick=()=>{
+      const song=songs.find(s=>s.id===box.dataset.activeId);
+      if(song) playWorshipPick(song);
+    };
+    if($('ml-wp-open')) $('ml-wp-open').onclick=()=>{
+      const song=songs.find(s=>s.id===box.dataset.activeId);
+      if(song) openDetail(song);
+    };
+    observeRevealItems();
+  }
+  function playWorshipPick(song){
+    if(!song||!song.mp3) return;
+    _mpBind();
+    if(!_mpSongs.length) _mpSongs=songs.filter(s=>s.mp3);
+    let idx=_mpSongs.findIndex(x=>x.id===song.id);
+    if(idx<0){ _mpSongs=[song].concat(_mpSongs); idx=0; }
+    _mpPlayIdx(idx,true);
+  }
+  function bindWorshipPicksEffects(){
+    const box=$('ml-worship-picks');
+    if(!box) return;
+    box.addEventListener('pointermove',e=>{
+      const r=box.getBoundingClientRect();
+      box.style.setProperty('--wp-mx',((e.clientX-r.left)/Math.max(r.width,1)*100).toFixed(2)+'%');
+      box.style.setProperty('--wp-my',((e.clientY-r.top)/Math.max(r.height,1)*100).toFixed(2)+'%');
+    });
+    observeRevealItems();
+  }
+  function observeRevealItems(){
+    const items=root.querySelectorAll('.ml-reveal:not(.is-visible)');
+    if(!items.length) return;
+    if(!_revealObserver){
+      _revealObserver=new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            entry.target.classList.add('is-visible');
+            _revealObserver.unobserve(entry.target);
+          }
+        });
+      },{threshold:.16,rootMargin:'0px 0px -6% 0px'});
+    }
+    items.forEach(el=>_revealObserver.observe(el));
+  }
+  function updateWorshipGreeting(){
+    const main=$('ml-wp-greeting-main'),sub=$('ml-wp-greeting-sub');
+    if(!main||!sub) return;
+    const now=new Date();
+    const h=now.getHours();
+    const greeting=h<5?'夜深平安':h<11?'早安，适合晨更':h<17?'午后安静片刻':h<21?'晚上好，预备敬拜':'夜晚安静聆听';
+    main.textContent=greeting;
+    sub.textContent=now.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+' · 正在同步今日天气';
+    loadWorshipWeather().then(text=>{
+      if(text) sub.textContent=now.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+' · '+text;
+    }).catch(()=>{ sub.textContent=now.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+' · 安静敬拜日'; });
+  }
+  async function loadWorshipWeather(){
+    const now=Date.now();
+    if(_weatherCache&&now-_weatherCache.at<30*60*1000) return _weatherCache.text;
+    const pos=await new Promise(resolve=>{
+      if(!navigator.geolocation) return resolve({lat:45.4064,lon:11.8768});
+      navigator.geolocation.getCurrentPosition(
+        p=>resolve({lat:p.coords.latitude,lon:p.coords.longitude}),
+        ()=>resolve({lat:45.4064,lon:11.8768}),
+        {maximumAge:60*60*1000,timeout:1800}
+      );
+    });
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${pos.lat.toFixed(3)}&longitude=${pos.lon.toFixed(3)}&current=temperature_2m,weather_code&timezone=auto`;
+    const data=await fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():null);
+    const cur=data&&data.current;
+    if(!cur) return '';
+    const label=weatherCodeLabel(cur.weather_code);
+    const text=`${label} ${Math.round(cur.temperature_2m)}°C`;
+    _weatherCache={at:now,text};
+    return text;
+  }
+  function weatherCodeLabel(code){
+    code=Number(code);
+    if(code===0) return '晴朗';
+    if([1,2,3].includes(code)) return '多云';
+    if([45,48].includes(code)) return '有雾';
+    if((code>=51&&code<=67)||(code>=80&&code<=82)) return '有雨';
+    if(code>=71&&code<=77) return '有雪';
+    if(code>=95) return '雷雨';
+    return '今日天气';
   }
   function enrichSong(song){
     const source=detectSongSource(song);
@@ -1261,6 +1493,7 @@
         el.appendChild(playBtn);
       });
     }
+    observeRevealItems();
   }
 
   function cardHTML(s,q){
@@ -1274,7 +1507,7 @@
       s.timeSign?`<span class="ml-song-tag">${s.timeSign}</span>`:'',
       s.mp3?`<span class="ml-song-tag">音频</span>`:''
     ].filter(Boolean).join('');
-    return`<div class="ml-song-card" data-id="${s.id}">
+    return`<div class="ml-song-card ml-reveal" data-id="${s.id}">
       <div class="ml-card-art">${cover}</div>
       <div class="ml-card-body">
         <div class="ml-song-overline">${hi(overline,q)}</div>

@@ -1218,10 +1218,10 @@ html,body,#music-library{
 }
 #ml-hero{
   margin:18px 0 14px;
-  min-height:236px;
+  min-height:158px;
   border-radius:22px;
   border:1px solid var(--border);
-  padding:30px 32px;
+  padding:22px 30px;
   background:
     linear-gradient(90deg,rgba(10,14,27,.95) 0%,rgba(10,14,27,.72) 50%,rgba(10,14,27,.82) 100%),
     radial-gradient(circle at 0% 0%,rgba(227,191,66,.22),transparent 26%),
@@ -1237,12 +1237,12 @@ html,body,#music-library{
 }
 #ml-hero-kicker{display:none!important;}
 #ml-title{
-  font-size:62px;
-  line-height:.96;
+  font-size:clamp(34px,4vw,48px);
+  line-height:1.02;
   font-family:'Noto Sans SC',sans-serif;
-  margin-bottom:14px;
+  margin-bottom:10px;
 }
-#ml-subtitle{max-width:580px;color:var(--text2);font-size:21px;line-height:1.6;margin-bottom:0;}
+#ml-subtitle{max-width:540px;color:var(--text2);font-size:16px;line-height:1.55;margin-bottom:0;}
 
 #ml-search-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;}
 #ml-search-wrap{max-width:none;position:relative;}
@@ -2435,8 +2435,8 @@ html.ml-fullscreen body.ml-fullscreen #music-library > #ml-header{
   padding:0 clamp(10px,1.5vw,22px) clamp(18px,2vw,26px) !important;
 }
 html.ml-fullscreen body.ml-fullscreen #music-library #ml-hero{
-  margin-top:clamp(18px,2.2vw,30px) !important;
-  margin-bottom:clamp(18px,2vw,26px) !important;
+  margin-top:clamp(14px,1.6vw,22px) !important;
+  margin-bottom:clamp(14px,1.6vw,22px) !important;
 }
 html.ml-fullscreen body.ml-fullscreen #music-library > #ml-list-stage{
   padding:clamp(22px,2.4vw,34px) clamp(10px,1.5vw,22px) clamp(36px,4vw,60px) !important;
@@ -2523,4 +2523,478 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
     margin-right:0;
     padding:6px 10px !important;
   }
+  #music-library #ml-hero{
+    min-height:124px;
+    padding:18px 20px;
+    border-radius:18px;
+  }
+  #music-library #ml-title{
+    font-size:34px;
+    margin-bottom:8px;
+  }
+  #music-library #ml-subtitle{
+    font-size:14px;
+    line-height:1.55;
+  }
+}
+
+/* ===== Daily Worship Picks ===== */
+#music-library #ml-worship-picks{
+  --wp-ink:#f7f3e8;
+  --wp-muted:rgba(247,243,232,.72);
+  --wp-soft:rgba(247,243,232,.46);
+  --wp-line:rgba(255,255,255,.14);
+  --wp-line-strong:rgba(255,255,255,.24);
+  --wp-gold:#e8c765;
+  --wp-blue:#0a1530;
+  --wp-panel:rgba(10,16,31,.56);
+  --wp-panel-strong:rgba(9,14,27,.72);
+  --wp-shadow:0 28px 90px rgba(0,0,0,.42),0 1px 0 rgba(255,255,255,.06) inset;
+  --wp-cover:none;
+  --wp-mx:50%;
+  --wp-my:45%;
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid var(--wp-line);
+  border-radius:24px;
+  min-height:520px;
+  margin:0 0 18px;
+  color:var(--wp-ink);
+  background:
+    radial-gradient(circle at 12% 8%,rgba(232,199,101,.25),transparent 28%),
+    radial-gradient(circle at 84% 22%,rgba(65,108,210,.22),transparent 36%),
+    linear-gradient(135deg,#070b16 0%,#0b1732 48%,#060915 100%);
+  box-shadow:var(--wp-shadow);
+}
+#music-library #ml-worship-picks::before,
+#music-library #ml-worship-picks::after{
+  content:'';
+  position:absolute;
+  inset:-35%;
+  z-index:-2;
+  pointer-events:none;
+}
+#music-library #ml-worship-picks::before{
+  background-image:var(--wp-cover);
+  background-size:cover;
+  background-position:center;
+  filter:blur(46px) saturate(1.25) brightness(.55);
+  opacity:.58;
+  transform:scale(1.08);
+}
+#music-library #ml-worship-picks::after{
+  z-index:-1;
+  background:
+    linear-gradient(115deg,transparent 8%,rgba(255,255,255,.08) 24%,transparent 40%),
+    linear-gradient(180deg,rgba(5,8,17,.46),rgba(5,8,17,.82));
+  animation:ml-wp-flow 18s ease-in-out infinite alternate;
+}
+#music-library #ml-wp-glow{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at var(--wp-mx) var(--wp-my),rgba(232,199,101,.24),transparent 22%),
+    radial-gradient(circle at calc(var(--wp-mx) + 12%) calc(var(--wp-my) + 8%),rgba(91,123,221,.16),transparent 28%);
+  opacity:.82;
+  transition:opacity .2s ease;
+}
+#music-library #ml-wp-bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.08) 0 1px,transparent 1px 100%),
+    linear-gradient(180deg,rgba(255,255,255,.07) 0 1px,transparent 1px 100%);
+  background-size:72px 72px;
+  mask-image:radial-gradient(circle at 72% 40%,black,transparent 58%);
+  opacity:.13;
+}
+#music-library #ml-wp-shell{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:minmax(0,1.14fr) minmax(320px,.86fr);
+  gap:18px;
+  min-height:520px;
+  padding:18px;
+}
+#music-library #ml-wp-hero,
+#music-library #ml-wp-side{
+  border:1px solid var(--wp-line);
+  background:linear-gradient(180deg,var(--wp-panel),rgba(8,13,26,.38));
+  backdrop-filter:blur(26px) saturate(1.25);
+  -webkit-backdrop-filter:blur(26px) saturate(1.25);
+  box-shadow:0 18px 50px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.08) inset;
+}
+#music-library #ml-wp-hero{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  min-height:484px;
+  border-radius:18px;
+  padding:26px;
+}
+#music-library .ml-wp-eyebrow,
+#music-library #ml-wp-subtitle,
+#music-library .ml-wp-card-kicker{
+  font-family:'DM Mono','Space Mono',monospace;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+#music-library .ml-wp-eyebrow{
+  width:max-content;
+  max-width:100%;
+  margin-bottom:10px;
+  padding:8px 11px;
+  border:1px solid rgba(232,199,101,.34);
+  border-radius:999px;
+  background:rgba(232,199,101,.12);
+  color:var(--wp-gold);
+  font-size:11px;
+  font-weight:700;
+}
+#music-library #ml-wp-subtitle{
+  margin-bottom:18px;
+  color:var(--wp-soft);
+  font-size:11px;
+}
+#music-library #ml-wp-title{
+  max-width:780px;
+  margin:0 0 10px;
+  color:var(--wp-ink);
+  font-family:'Noto Sans SC',sans-serif;
+  font-size:56px;
+  line-height:1.02;
+  font-weight:700;
+  letter-spacing:0;
+}
+#music-library #ml-wp-artist{
+  margin-bottom:18px;
+  color:var(--wp-muted);
+  font-size:18px;
+  font-weight:600;
+}
+#music-library #ml-wp-lyric{
+  max-width:650px;
+  margin:0;
+  color:rgba(255,255,255,.82);
+  font-family:'Noto Serif SC',serif;
+  font-size:22px;
+  line-height:1.65;
+}
+#music-library #ml-wp-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:22px;
+}
+#music-library #ml-wp-tags span,
+#music-library .ml-wp-card-tag{
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;
+  padding:0 11px;
+  background:rgba(255,255,255,.08);
+  color:rgba(255,255,255,.78);
+  font-size:12px;
+  font-weight:600;
+  white-space:nowrap;
+}
+#music-library #ml-wp-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:26px;
+}
+#music-library .ml-wp-action{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  min-height:46px;
+  border:1px solid var(--wp-line-strong);
+  border-radius:999px;
+  padding:0 18px;
+  background:rgba(255,255,255,.08);
+  color:var(--wp-ink);
+  font-family:inherit;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+#music-library .ml-wp-action:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.13);
+  border-color:rgba(255,255,255,.32);
+}
+#music-library .ml-wp-action:focus-visible{
+  outline:3px solid rgba(232,199,101,.45);
+  outline-offset:3px;
+}
+#music-library .ml-wp-action:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+}
+#music-library .ml-wp-action.is-primary{
+  border-color:rgba(232,199,101,.58);
+  background:linear-gradient(135deg,#f3d67a,#c99834);
+  color:#121111;
+  box-shadow:0 14px 34px rgba(232,199,101,.24);
+}
+#music-library .ml-wp-action-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:rgba(255,255,255,.22);
+  font-size:11px;
+}
+#music-library #ml-wp-side{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  border-radius:18px;
+  padding:14px;
+}
+#music-library #ml-wp-greeting{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  gap:8px;
+  min-height:118px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:14px;
+  padding:17px;
+  background:
+    radial-gradient(circle at 0% 0%,rgba(232,199,101,.18),transparent 48%),
+    rgba(255,255,255,.055);
+}
+#music-library #ml-wp-greeting-main{
+  color:var(--wp-gold);
+  font-size:13px;
+  font-weight:800;
+}
+#music-library #ml-wp-greeting-sub{
+  color:var(--wp-ink);
+  font-size:24px;
+  line-height:1.22;
+  font-weight:700;
+}
+#music-library #ml-wp-list{
+  display:grid;
+  gap:10px;
+}
+#music-library .ml-wp-card{
+  display:grid;
+  grid-template-columns:72px minmax(0,1fr) auto;
+  align-items:center;
+  gap:13px;
+  width:100%;
+  min-height:94px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:14px;
+  padding:10px;
+  background:rgba(255,255,255,.06);
+  color:var(--wp-ink);
+  font-family:inherit;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.16);
+  transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease;
+}
+#music-library .ml-wp-card:hover,
+#music-library .ml-wp-card.active{
+  transform:translateY(-3px) scale(1.012);
+  border-color:rgba(232,199,101,.38);
+  background:rgba(255,255,255,.105);
+  box-shadow:0 18px 42px rgba(0,0,0,.26);
+}
+#music-library .ml-wp-card:focus-visible{
+  outline:3px solid rgba(232,199,101,.45);
+  outline-offset:3px;
+}
+#music-library .ml-wp-card-cover{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:72px;
+  height:72px;
+  overflow:hidden;
+  border-radius:10px;
+  background:linear-gradient(135deg,rgba(232,199,101,.22),rgba(85,114,210,.14));
+  color:var(--wp-gold);
+  font-weight:800;
+}
+#music-library .ml-wp-card-cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+#music-library .ml-wp-card-copy{
+  display:grid;
+  gap:5px;
+  min-width:0;
+}
+#music-library .ml-wp-card-copy strong,
+#music-library .ml-wp-card-copy small,
+#music-library .ml-wp-card-kicker{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+#music-library .ml-wp-card-kicker{
+  color:rgba(232,199,101,.82);
+  font-size:10px;
+}
+#music-library .ml-wp-card-copy strong{
+  color:var(--wp-ink);
+  font-size:18px;
+  line-height:1.15;
+}
+#music-library .ml-wp-card-copy small{
+  color:var(--wp-muted);
+  font-size:13px;
+}
+#music-library .ml-wp-card-tag{
+  max-width:132px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#music-library .ml-reveal{
+  opacity:0;
+  transform:translateY(18px);
+  transition:opacity .55s ease,transform .55s ease;
+}
+#music-library .ml-reveal.is-visible{
+  opacity:1;
+  transform:none;
+}
+
+@keyframes ml-wp-flow{
+  0%{transform:translate3d(-2%,0,0) rotate(0deg);opacity:.72;}
+  100%{transform:translate3d(4%,2%,0) rotate(2deg);opacity:.94;}
+}
+
+@media (prefers-color-scheme:light){
+  #music-library #ml-worship-picks{
+    --wp-ink:#172033;
+    --wp-muted:rgba(23,32,51,.72);
+    --wp-soft:rgba(23,32,51,.52);
+    --wp-line:rgba(23,32,51,.12);
+    --wp-line-strong:rgba(23,32,51,.22);
+    --wp-panel:rgba(255,255,255,.62);
+    --wp-panel-strong:rgba(255,255,255,.78);
+    --wp-shadow:0 24px 70px rgba(42,48,67,.16),0 1px 0 rgba(255,255,255,.72) inset;
+    background:
+      radial-gradient(circle at 12% 8%,rgba(203,151,45,.20),transparent 30%),
+      radial-gradient(circle at 86% 22%,rgba(80,118,196,.18),transparent 36%),
+      linear-gradient(135deg,#f8fafc 0%,#e9eef7 48%,#f7f0df 100%);
+  }
+  #music-library #ml-worship-picks::before{
+    filter:blur(48px) saturate(1.16) brightness(1.05);
+    opacity:.34;
+  }
+  #music-library #ml-worship-picks::after{
+    background:
+      linear-gradient(115deg,transparent 8%,rgba(255,255,255,.34) 24%,transparent 40%),
+      linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.64));
+  }
+  #music-library #ml-wp-hero,
+  #music-library #ml-wp-side{
+    background:linear-gradient(180deg,var(--wp-panel),rgba(255,255,255,.42));
+    box-shadow:0 18px 50px rgba(42,48,67,.12),0 1px 0 rgba(255,255,255,.76) inset;
+  }
+  #music-library #ml-wp-lyric{color:rgba(23,32,51,.78);}
+  #music-library #ml-wp-tags span,
+  #music-library .ml-wp-card-tag{
+    background:rgba(23,32,51,.06);
+    border-color:rgba(23,32,51,.10);
+    color:rgba(23,32,51,.68);
+  }
+  #music-library .ml-wp-action{
+    background:rgba(255,255,255,.52);
+    color:var(--wp-ink);
+  }
+  #music-library #ml-wp-greeting,
+  #music-library .ml-wp-card{
+    background:rgba(255,255,255,.48);
+    border-color:rgba(23,32,51,.10);
+  }
+}
+
+@media (min-width:1500px){
+  html.ml-fullscreen body.ml-fullscreen #music-library > #ml-header{
+    width:min(100%,1560px) !important;
+  }
+  #music-library #ml-worship-picks,
+  #music-library #ml-wp-shell{
+    min-height:600px;
+  }
+  #music-library #ml-wp-hero{min-height:564px;padding:36px;}
+  #music-library #ml-wp-title{font-size:68px;}
+  #music-library #ml-wp-lyric{font-size:24px;}
+}
+
+@media (max-width:980px){
+  #music-library #ml-worship-picks{min-height:auto;border-radius:20px;}
+  #music-library #ml-wp-shell{
+    grid-template-columns:1fr;
+    min-height:auto;
+    padding:14px;
+  }
+  #music-library #ml-wp-hero{min-height:430px;}
+  #music-library #ml-wp-side{display:grid;grid-template-columns:1fr;gap:12px;}
+  #music-library #ml-wp-title{font-size:44px;}
+  #music-library #ml-wp-lyric{font-size:20px;}
+}
+
+@media (max-width:640px){
+  #music-library #ml-worship-picks{
+    border-radius:18px;
+    margin-bottom:14px;
+  }
+  #music-library #ml-wp-shell{padding:10px;gap:10px;}
+  #music-library #ml-wp-hero{
+    min-height:420px;
+    border-radius:14px;
+    padding:20px 16px;
+  }
+  #music-library #ml-wp-title{font-size:34px;line-height:1.08;}
+  #music-library #ml-wp-artist{font-size:15px;margin-bottom:14px;}
+  #music-library #ml-wp-lyric{font-size:18px;line-height:1.58;}
+  #music-library #ml-wp-actions{display:grid;grid-template-columns:1fr;gap:8px;}
+  #music-library .ml-wp-action{width:100%;min-height:44px;}
+  #music-library #ml-wp-side{padding:10px;border-radius:14px;}
+  #music-library #ml-wp-greeting{min-height:98px;padding:14px;border-radius:12px;}
+  #music-library #ml-wp-greeting-sub{font-size:20px;}
+  #music-library .ml-wp-card{
+    grid-template-columns:58px minmax(0,1fr);
+    min-height:82px;
+    border-radius:12px;
+  }
+  #music-library .ml-wp-card-cover{width:58px;height:58px;border-radius:8px;}
+  #music-library .ml-wp-card-copy strong{font-size:16px;}
+  #music-library .ml-wp-card-tag{grid-column:2;justify-self:start;max-width:100%;min-height:24px;font-size:11px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #music-library #ml-worship-picks::after,
+  #music-library .ml-reveal,
+  #music-library .ml-wp-card,
+  #music-library .ml-wp-action{
+    animation:none !important;
+    transition:none !important;
+  }
+  #music-library .ml-reveal{opacity:1;transform:none;}
 }
