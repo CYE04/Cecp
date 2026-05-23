@@ -1201,17 +1201,17 @@ html,body,#music-library{
 }
 #ml-brand{display:inline-flex;align-items:center;gap:10px;}
 .ml-brand-dot{
-  width:38px;height:38px;border-radius:50%;
-  background:rgba(248,243,226,.9);
-  border:1px solid rgba(232,199,101,.28);
-  box-shadow:0 0 24px rgba(227,191,66,.2);
+  width:66px;height:42px;border-radius:10px;
+  background:rgba(248,243,226,.08);
+  border:1px solid rgba(232,199,101,.22);
+  box-shadow:0 0 24px rgba(227,191,66,.14);
   display:inline-flex;
   align-items:center;
   justify-content:center;
   overflow:hidden;
   flex-shrink:0;
 }
-.ml-brand-dot img{width:34px;height:34px;object-fit:contain;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18));}
+.ml-brand-dot img{width:62px;height:38px;object-fit:contain;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18));}
 .ml-brand-name{font-size:24px;font-weight:700;letter-spacing:-.2px;}
 #ml-nav-tabs{display:none!important;}
 .ml-nav-tab{
@@ -2994,14 +2994,227 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
   }
   #music-library .ml-wp-card-cover{width:58px;height:58px;border-radius:8px;}
   #music-library .ml-wp-card-copy strong{font-size:16px;}
-  #music-library .ml-wp-card-tag{grid-column:2;justify-self:start;max-width:100%;min-height:24px;font-size:11px;}
+#music-library .ml-wp-card-tag{grid-column:2;justify-self:start;max-width:100%;min-height:24px;font-size:11px;}
+}
+
+/* ===== Floating Now Playing Bar ===== */
+#music-library #ml-nowbar{
+  position:fixed;
+  left:50%;
+  bottom:max(18px,env(safe-area-inset-bottom));
+  z-index:850;
+  width:min(900px,calc(100vw - 36px));
+  min-height:86px;
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr) auto;
+  gap:14px;
+  align-items:center;
+  padding:12px 16px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;
+  background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.44));
+  box-shadow:0 18px 70px rgba(0,0,0,.34),0 1px 0 rgba(255,255,255,.65) inset;
+  backdrop-filter:blur(28px) saturate(1.35);
+  -webkit-backdrop-filter:blur(28px) saturate(1.35);
+  color:#111827;
+  transform:translate(-50%,150%);
+  opacity:0;
+  pointer-events:none;
+  overflow:hidden;
+  transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .24s ease;
+}
+#music-library #ml-nowbar.is-visible{
+  transform:translate(-50%,0);
+  opacity:1;
+  pointer-events:auto;
+}
+#music-library #ml-nowbar-bg{
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:
+    radial-gradient(circle at 10% 30%,rgba(255,109,194,.30),transparent 24%),
+    radial-gradient(circle at 34% 24%,rgba(245,207,94,.26),transparent 20%),
+    radial-gradient(circle at 80% 60%,rgba(91,122,220,.18),transparent 24%);
+  opacity:.9;
+  pointer-events:none;
+}
+#music-library #ml-nowbar-cover{
+  width:62px;
+  height:62px;
+  border-radius:18px;
+  overflow:hidden;
+  background:rgba(17,24,39,.1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:rgba(17,24,39,.48);
+  border:1px solid rgba(255,255,255,.5);
+  box-shadow:0 10px 24px rgba(15,23,42,.18);
+}
+#music-library #ml-nowbar-cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+#music-library #ml-nowbar-main{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+#music-library #ml-nowbar-title{
+  font-size:16px;
+  font-weight:800;
+  line-height:1.15;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#music-library #ml-nowbar-artist{
+  font-size:12px;
+  color:rgba(17,24,39,.62);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#music-library #ml-nowbar-lyric{
+  margin-top:2px;
+  font-family:'Noto Serif SC',serif;
+  font-size:14px;
+  line-height:1.35;
+  color:rgba(17,24,39,.78);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#music-library #ml-nowbar-progress{
+  height:4px;
+  width:100%;
+  max-width:460px;
+  margin-top:5px;
+  border-radius:999px;
+  background:rgba(17,24,39,.12);
+  overflow:hidden;
+  cursor:pointer;
+}
+#music-library #ml-nowbar-fill{
+  width:0%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#111827,#d3a52b);
+}
+#music-library #ml-nowbar-controls{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+#music-library .ml-nowbar-btn{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:1px solid rgba(17,24,39,.10);
+  background:rgba(255,255,255,.38);
+  color:rgba(17,24,39,.78);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  padding:0;
+  transition:transform .16s ease,background .16s ease,color .16s ease;
+}
+#music-library .ml-nowbar-btn:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.62);
+  color:#111827;
+}
+#music-library .ml-nowbar-btn.is-main{
+  width:52px;
+  height:52px;
+  background:rgba(17,24,39,.88);
+  color:#fff;
+  box-shadow:0 10px 24px rgba(15,23,42,.24);
+}
+#music-library #ml-nowbar.is-playing .ml-nowbar-btn.is-main{
+  background:#111827;
+}
+#music-library .ml-nowbar-btn svg{display:block;}
+
+@media (prefers-color-scheme:dark){
+  #music-library #ml-nowbar{
+    border-color:rgba(255,255,255,.18);
+    background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.08));
+    color:#f8fafc;
+    box-shadow:0 18px 80px rgba(0,0,0,.48),0 1px 0 rgba(255,255,255,.16) inset;
+  }
+  #music-library #ml-nowbar-cover{
+    background:rgba(255,255,255,.08);
+    color:rgba(255,255,255,.52);
+    border-color:rgba(255,255,255,.18);
+  }
+  #music-library #ml-nowbar-artist{color:rgba(248,250,252,.58);}
+  #music-library #ml-nowbar-lyric{color:rgba(248,250,252,.82);}
+  #music-library #ml-nowbar-progress{background:rgba(255,255,255,.16);}
+  #music-library #ml-nowbar-fill{background:linear-gradient(90deg,#fff,#e3bf42);}
+  #music-library .ml-nowbar-btn{
+    border-color:rgba(255,255,255,.12);
+    background:rgba(255,255,255,.08);
+    color:rgba(255,255,255,.78);
+  }
+  #music-library .ml-nowbar-btn:hover{
+    background:rgba(255,255,255,.16);
+    color:#fff;
+  }
+  #music-library .ml-nowbar-btn.is-main{
+    background:#f3d36e;
+    color:#111;
+  }
+  #music-library #ml-nowbar.is-playing .ml-nowbar-btn.is-main{
+    background:#f3d36e;
+  }
+}
+
+@media (max-width:720px){
+  #music-library #ml-nowbar{
+    width:calc(100vw - 18px);
+    min-height:76px;
+    grid-template-columns:52px minmax(0,1fr) auto;
+    gap:10px;
+    padding:10px 11px;
+    border-radius:30px;
+  }
+  #music-library #ml-nowbar-cover{
+    width:52px;
+    height:52px;
+    border-radius:15px;
+  }
+  #music-library #ml-nowbar-title{font-size:14px;}
+  #music-library #ml-nowbar-artist{display:none;}
+  #music-library #ml-nowbar-lyric{font-size:12px;line-height:1.25;}
+  #music-library #ml-nowbar-progress{max-width:none;margin-top:4px;}
+  #music-library #ml-nowbar-controls{gap:5px;}
+  #music-library .ml-nowbar-btn{
+    width:36px;
+    height:36px;
+  }
+  #music-library .ml-nowbar-btn.is-main{
+    width:44px;
+    height:44px;
+  }
+  #music-library #ml-nowbar-prev,
+  #music-library #ml-nowbar-next{
+    display:none;
+  }
 }
 
 @media (prefers-reduced-motion:reduce){
   #music-library #ml-worship-picks::after,
   #music-library .ml-reveal,
   #music-library .ml-wp-card,
-  #music-library .ml-wp-action{
+  #music-library .ml-wp-action,
+  #music-library #ml-nowbar,
+  #music-library .ml-nowbar-btn{
     animation:none !important;
     transition:none !important;
   }

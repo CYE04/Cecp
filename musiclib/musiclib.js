@@ -247,6 +247,30 @@
         </div>
       </div>
     </div>
+    <div id="ml-nowbar" aria-label="正在播放">
+      <div id="ml-nowbar-bg" aria-hidden="true"></div>
+      <div id="ml-nowbar-cover"><span>♪</span></div>
+      <div id="ml-nowbar-main">
+        <div id="ml-nowbar-title">正在播放</div>
+        <div id="ml-nowbar-artist"></div>
+        <div id="ml-nowbar-lyric">歌词将在播放时显示</div>
+        <div id="ml-nowbar-progress"><div id="ml-nowbar-fill"></div></div>
+      </div>
+      <div id="ml-nowbar-controls">
+        <button class="ml-nowbar-btn" id="ml-nowbar-prev" type="button" aria-label="上一首">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1zm3.2 5.65 7.1-4.8A.43.43 0 0 1 17 7.2v9.6a.43.43 0 0 1-.7.35L9.2 12.35a.43.43 0 0 1 0-.7z"/></svg>
+        </button>
+        <button class="ml-nowbar-btn is-main" id="ml-nowbar-playpause" type="button" aria-label="播放或暂停">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+        </button>
+        <button class="ml-nowbar-btn" id="ml-nowbar-next" type="button" aria-label="下一首">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6a1 1 0 0 0-1 1v10a1 1 0 1 0 2 0V7a1 1 0 0 0-1-1zm-3.2 5.65-7.1-4.8A.43.43 0 0 0 7 7.2v9.6a.43.43 0 0 0 .7.35l7.1-4.8a.43.43 0 0 0 0-.7z"/></svg>
+        </button>
+        <button class="ml-nowbar-btn" id="ml-nowbar-expand" type="button" aria-label="打开歌词">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+        </button>
+      </div>
+    </div>
     <div id="ml-lightbox">
       <button id="ml-lightbox-close">✕</button>
       <img id="ml-lightbox-img" src="" alt="">
@@ -1966,15 +1990,18 @@
     const el=$('ml-mp-cover');
     const xl=$('ml-player-cover');
     const dl=$('ml-player-dock-cover');
+    const nb=$('ml-nowbar-cover');
     if(!el) return;
     if(src){
       el.innerHTML=`<img src="${src}" alt="">`;
       if(xl) xl.innerHTML=`<img src="${src}" alt="">`;
       if(dl) dl.innerHTML=`<img src="${src}" alt="">`;
+      if(nb) nb.innerHTML=`<img src="${src}" alt="">`;
     }else{
       el.innerHTML='<span>♪</span>';
       if(xl) xl.innerHTML='<span>♪</span>';
       if(dl) dl.innerHTML='<span>♪</span>';
+      if(nb) nb.innerHTML='<span>♪</span>';
     }
   }
   function _mpSetExpanded(open){
@@ -2056,6 +2083,17 @@
         : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`;
     }
     if(stage) stage.classList.toggle('playing', !!isPlaying);
+    const nowbar=$('ml-nowbar');
+    const nbtn=$('ml-nowbar-playpause');
+    if(nowbar){
+      nowbar.classList.toggle('is-playing',!!isPlaying);
+      if(_mpAudio&&_mpAudio.src) nowbar.classList.add('is-visible');
+    }
+    if(nbtn){
+      nbtn.innerHTML=isPlaying
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5h3v14H8zm5 0h3v14h-3z"/></svg>`
+        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`;
+    }
   }
   function _mpParseLrc(text){
     const arr=[];
@@ -2075,6 +2113,8 @@
       inner.innerHTML='';
       if(!_mpLrc.length){
         inner.innerHTML=`<div class="${lineClass}">暂无歌词</div>`;
+        const nbLyric=$('ml-nowbar-lyric');
+        if(nbLyric) nbLyric.textContent='暂无歌词';
         return;
       }
       _mpLrc.forEach((it,i)=>{
@@ -2091,6 +2131,8 @@
     paint('ml-mp-lrc-inner','ml-mp-lrc-panel','ml-mp-lrc-line');
     paint('ml-player-lyrics-inner','ml-player-lyrics','ml-player-lrc-line');
     _mpLrcIdx=0;
+    const nbLyric=$('ml-nowbar-lyric');
+    if(nbLyric) nbLyric.textContent=_mpLrc[0]?.tx || '歌词将在播放时显示';
   }
   function _mpSyncLrc(cur){
     if(!_mpLrc.length) return;
@@ -2112,6 +2154,8 @@
     }
     sync('ml-mp-lrc-inner','ml-mp-lrc-panel');
     sync('ml-player-lyrics-inner','ml-player-lyrics');
+    const nbLyric=$('ml-nowbar-lyric');
+    if(nbLyric) nbLyric.textContent=_mpLrc[idx]?.tx || '…';
   }
   function _mpBind(){
     if(_mpAudio) return;
@@ -2130,6 +2174,7 @@
       const dur=_mpAudio.duration||0;
       $('ml-mp-fill').style.width=dur?((_mpAudio.currentTime/dur)*100)+'%':'0%';
       const xf=$('ml-player-fill'); if(xf) xf.style.width=dur?((_mpAudio.currentTime/dur)*100)+'%':'0%';
+      const nf=$('ml-nowbar-fill'); if(nf) nf.style.width=dur?((_mpAudio.currentTime/dur)*100)+'%':'0%';
       _mpSyncLrc(_mpAudio.currentTime);
     });
     _mpAudio.addEventListener('play',()=>_mpSetPlayUI(true));
@@ -2153,10 +2198,17 @@
       if(_mpAudio.paused) _mpAudio.play().catch(()=>{});
       else _mpAudio.pause();
     });
+    $('ml-nowbar-playpause')?.addEventListener('click',()=>{
+      if(!_mpAudio.src) return;
+      if(_mpAudio.paused) _mpAudio.play().catch(()=>{});
+      else _mpAudio.pause();
+    });
     $('ml-mp-prev')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx-1,true));
     $('ml-mp-next')?.addEventListener('click',()=>_mpPlayIdx(_mpNextIdxFrom(_mpIdx),true));
     $('ml-player-prev')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx-1,true));
     $('ml-player-next')?.addEventListener('click',()=>_mpPlayIdx(_mpNextIdxFrom(_mpIdx),true));
+    $('ml-nowbar-prev')?.addEventListener('click',()=>_mpPlayIdx(_mpIdx-1,true));
+    $('ml-nowbar-next')?.addEventListener('click',()=>_mpPlayIdx(_mpNextIdxFrom(_mpIdx),true));
     $('ml-mp-seek-back')?.addEventListener('click',()=>{
       if(!_mpAudio.src) return;
       _mpAudio.currentTime=Math.max(0, (_mpAudio.currentTime||0)-15);
@@ -2199,6 +2251,13 @@
       const p=Math.max(0, Math.min(1, (e.clientX-r.left)/r.width));
       _mpAudio.currentTime=_mpAudio.duration*p;
     });
+    $('ml-nowbar-progress')?.addEventListener('click',e=>{
+      if(!_mpAudio.src || !_mpAudio.duration) return;
+      const r=e.currentTarget.getBoundingClientRect();
+      const p=Math.max(0, Math.min(1, (e.clientX-r.left)/r.width));
+      _mpAudio.currentTime=_mpAudio.duration*p;
+    });
+    $('ml-nowbar-expand')?.addEventListener('click',()=>_mpSetExpanded(true));
     $('ml-miniplayer')?.addEventListener('click',e=>{
       if(e.target.closest('.pl-btn, .pl-progress-wrap, .pl-vol-wrap, #ml-mp-expand, .pl-vol')) return;
       _mpSetExpanded(true);
@@ -2277,12 +2336,16 @@
     if(!s) return;
     const mini=$('ml-miniplayer');
     if(mini) mini.classList.add('has-mp3');
+    const nowbar=$('ml-nowbar');
+    if(nowbar) nowbar.classList.add('is-visible');
     $('ml-mp-title').textContent=s.title||'';
     $('ml-mp-artist').textContent=s.artist||'';
     const xt=$('ml-player-title'); if(xt) xt.textContent=s.title||'';
     const xa=$('ml-player-artist'); if(xa) xa.textContent=s.artist||'';
     const dt=$('ml-player-dock-title'); if(dt) dt.textContent=s.title||'';
     const da=$('ml-player-dock-artist'); if(da) da.textContent=s.artist||'';
+    const nt=$('ml-nowbar-title'); if(nt) nt.textContent=s.title||'';
+    const na=$('ml-nowbar-artist'); if(na) na.textContent=s.artist||s.source||'诗歌';
     const xk=$('ml-player-key'); if(xk) xk.textContent='调: '+(s.origKey||'—');
     const xb=$('ml-player-bpm'); if(xb) xb.textContent='速度: '+(s.bpm||'—');
     const xnt=$('ml-player-now-title'); if(xnt) xnt.textContent=s.title||'正在播放';
@@ -2295,6 +2358,7 @@
     const xcur=$('ml-player-cur'); if(xcur) xcur.textContent='0:00';
     const xdur=$('ml-player-dur'); if(xdur) xdur.textContent='0:00';
     const xfill=$('ml-player-fill'); if(xfill) xfill.style.width='0%';
+    const nfill=$('ml-nowbar-fill'); if(nfill) nfill.style.width='0%';
     _mpLrc=[]; _mpLrcIdx=-1; _mpRenderLrc();
     _mpRenderQueue();
     if(s.lrc){
