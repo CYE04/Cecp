@@ -2707,7 +2707,9 @@
       lbDiv.style.marginBottom='';
       lbDiv.style.padding='8px 18px 16px 8px';
       lbDiv.style.boxSizing='border-box';
-      if(lbDiv.parentElement)lbDiv.parentElement.style.overflow='hidden';
+      if(lbDiv.parentElement){
+        lbDiv.parentElement.style.overflow=window.matchMedia&&window.matchMedia('(max-width: 760px)').matches ? 'auto' : 'hidden';
+      }
     };
     const normalizePreviewRowHeights=()=>{
       lbDiv.querySelectorAll('.prev-row').forEach(row=>{
@@ -2808,12 +2810,6 @@
       yt.innerHTML='<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>';
       toolsRow.appendChild(yt);
     }
-    if(s.lrc){
-      const lrc=document.createElement('a');lrc.className='sw-pill';
-      lrc.href=s.lrc;lrc.target='_blank';
-      lrc.style.cssText='font-size:12px;padding:5px 12px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;';
-      lrc.textContent='📝 LRC';toolsRow.appendChild(lrc);
-    }
     if(toolsRow.children.length){tools.appendChild(toolsRow);rightCol.appendChild(tools);}
 
     rightCol.appendChild(createMetronome(s.bpm || 72));
@@ -2896,6 +2892,13 @@
 
       const natural=measureNaturalScore();
       if(!natural)return;
+
+      lbDiv.style.transform='';
+      lbDiv.style.transformOrigin='';
+      lbDiv.style.width=natural.width+'px';
+      lbDiv.style.marginBottom='18px';
+      if(parent)parent.style.overflow='auto';
+      return;
 
       const availableWidth=parent.clientWidth||natural.width;
       if(!availableWidth)return;
