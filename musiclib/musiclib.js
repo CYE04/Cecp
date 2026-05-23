@@ -146,7 +146,6 @@
           <div id="ml-mp-lrc-panel">
             <div id="ml-mp-lrc-inner"></div>
           </div>
-          <div class="ml-mp-spectrum" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
         </div>
       <div class="pl-song-row">
         <div class="pl-info">
@@ -1992,7 +1991,6 @@
     const xl=$('ml-player-cover');
     const dl=$('ml-player-dock-cover');
     const nb=$('ml-nowbar-cover');
-    _mpApplySongAtmosphere(src);
     if(!el) return;
     if(src){
       el.innerHTML=`<img src="${src}" alt="">`;
@@ -2005,45 +2003,6 @@
       if(dl) dl.innerHTML='<span>♪</span>';
       if(nb) nb.innerHTML='<span>♪</span>';
     }
-  }
-  function _mpApplySongAtmosphere(src){
-    const rb=root && root.style;
-    if(!rb) return;
-    if(!src){
-      rb.removeProperty('--ml-song-cover');
-      rb.removeProperty('--ml-song-accent');
-      rb.removeProperty('--ml-song-accent-soft');
-      rb.removeProperty('--ml-song-accent-deep');
-      return;
-    }
-    rb.setProperty('--ml-song-cover', `url("${String(src).replace(/"/g,'%22')}")`);
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    img.onload=function(){
-      try{
-        const c=document.createElement('canvas');
-        const size=36;
-        c.width=size;c.height=size;
-        const ctx=c.getContext('2d',{willReadFrequently:true});
-        ctx.drawImage(img,0,0,size,size);
-        const data=ctx.getImageData(0,0,size,size).data;
-        let r=0,g=0,b=0,n=0;
-        for(let i=0;i<data.length;i+=16){
-          const a=data[i+3];
-          if(a<80) continue;
-          const rr=data[i],gg=data[i+1],bb=data[i+2];
-          const mx=Math.max(rr,gg,bb),mn=Math.min(rr,gg,bb);
-          if(mx<28 || (mx-mn)<12) continue;
-          r+=rr;g+=gg;b+=bb;n++;
-        }
-        if(!n) return;
-        r=Math.round(r/n);g=Math.round(g/n);b=Math.round(b/n);
-        rb.setProperty('--ml-song-accent', `rgb(${r},${g},${b})`);
-        rb.setProperty('--ml-song-accent-soft', `rgba(${r},${g},${b},.28)`);
-        rb.setProperty('--ml-song-accent-deep', `rgba(${Math.max(0,r-38)},${Math.max(0,g-38)},${Math.max(0,b-38)},.72)`);
-      }catch(_){}
-    };
-    img.src=src;
   }
   function _mpSetExpanded(open){
     const pv=$('ml-player-view');
@@ -2124,8 +2083,6 @@
         : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>`;
     }
     if(stage) stage.classList.toggle('playing', !!isPlaying);
-    const mini=$('ml-miniplayer');
-    if(mini) mini.classList.toggle('is-playing', !!isPlaying);
     const nowbar=$('ml-nowbar');
     const nbtn=$('ml-nowbar-playpause');
     if(nowbar){
@@ -2172,7 +2129,6 @@
       if(panel) panel.scrollTop=0;
     }
     paint('ml-mp-lrc-inner','ml-mp-lrc-panel','ml-mp-lrc-line');
-    paint('ml-detail-lrc-inner','ml-detail-lrc-panel','ml-detail-lrc-line');
     paint('ml-player-lyrics-inner','ml-player-lyrics','ml-player-lrc-line');
     _mpLrcIdx=0;
     const nbLyric=$('ml-nowbar-lyric');
@@ -2197,7 +2153,6 @@
       }
     }
     sync('ml-mp-lrc-inner','ml-mp-lrc-panel');
-    sync('ml-detail-lrc-inner','ml-detail-lrc-panel');
     sync('ml-player-lyrics-inner','ml-player-lyrics');
     const nbLyric=$('ml-nowbar-lyric');
     if(nbLyric) nbLyric.textContent=_mpLrc[idx]?.tx || '…';
@@ -2611,21 +2566,7 @@
     }
     $('ml-detail-title').textContent=s.title||'';
     const body=$('ml-detail-body');
-    const preservedMini=document.getElementById('ml-miniplayer');
-    if(preservedMini && preservedMini.parentElement) preservedMini.parentElement.removeChild(preservedMini);
     body.innerHTML='';
-    const detailGrid=document.createElement('div');
-    detailGrid.className='ml-detail-grid';
-    const leftCol=document.createElement('div');
-    leftCol.className='ml-detail-left';
-    const rightCol=document.createElement('div');
-    rightCol.className='ml-detail-right';
-    detailGrid.appendChild(leftCol);
-    detailGrid.appendChild(rightCol);
-    body.appendChild(detailGrid);
-    const miniPlayer=preservedMini || document.getElementById('ml-miniplayer');
-    if(miniPlayer) leftCol.appendChild(miniPlayer);
-    _mpRenderLrc();
 
     const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
     let curKey=s.origKey||'C';
@@ -2672,7 +2613,7 @@
     const panelInner=document.createElement('div');panelInner.className='sw-panel-inner';
     panelInner.appendChild(ksDiv);panelInner.appendChild(capoEl);panelInner.appendChild(lbDiv);
     const panel=document.createElement('div');panel.className='sw-panel';panel.appendChild(panelInner);wrap.appendChild(panel);
-    rightCol.appendChild(wrap);
+    body.appendChild(wrap);
 
     let fitRaf=0;
     const getViewportBox=()=>{
@@ -2707,9 +2648,7 @@
       lbDiv.style.marginBottom='';
       lbDiv.style.padding='8px 18px 16px 8px';
       lbDiv.style.boxSizing='border-box';
-      if(lbDiv.parentElement){
-        lbDiv.parentElement.style.overflow=window.matchMedia&&window.matchMedia('(max-width: 760px)').matches ? 'auto' : 'hidden';
-      }
+      if(lbDiv.parentElement)lbDiv.parentElement.style.overflow='hidden';
     };
     const normalizePreviewRowHeights=()=>{
       lbDiv.querySelectorAll('.prev-row').forEach(row=>{
@@ -2810,9 +2749,15 @@
       yt.innerHTML='<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>';
       toolsRow.appendChild(yt);
     }
-    if(toolsRow.children.length){tools.appendChild(toolsRow);rightCol.appendChild(tools);}
+    if(s.lrc){
+      const lrc=document.createElement('a');lrc.className='sw-pill';
+      lrc.href=s.lrc;lrc.target='_blank';
+      lrc.style.cssText='font-size:12px;padding:5px 12px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;';
+      lrc.textContent='📝 LRC';toolsRow.appendChild(lrc);
+    }
+    if(toolsRow.children.length){tools.appendChild(toolsRow);body.appendChild(tools);}
 
-    rightCol.appendChild(createMetronome(s.bpm || 72));
+    body.appendChild(createMetronome(s.bpm || 72));
 
     let scoreKeyBadge=null;
     if(s.scoreImg){
@@ -2824,7 +2769,7 @@
       const img=document.createElement('img');img.src=s.scoreImg;img.loading='lazy';img.alt='简谱';
       img.addEventListener('click',()=>openLightbox(s.scoreImg));
       scoreDiv.appendChild(scoreTop);scoreDiv.appendChild(img);
-      rightCol.appendChild(scoreDiv);
+      body.appendChild(scoreDiv);
     }
 
     function renderScore(){
@@ -2892,13 +2837,6 @@
 
       const natural=measureNaturalScore();
       if(!natural)return;
-
-      lbDiv.style.transform='';
-      lbDiv.style.transformOrigin='';
-      lbDiv.style.width=natural.width+'px';
-      lbDiv.style.marginBottom='18px';
-      if(parent)parent.style.overflow='auto';
-      return;
 
       const availableWidth=parent.clientWidth||natural.width;
       if(!availableWidth)return;
