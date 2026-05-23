@@ -1950,6 +1950,17 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         '@media(prefers-color-scheme:dark){.ym-pl{background:linear-gradient(180deg,rgba(18,20,28,.82),rgba(12,14,20,.72));box-shadow:0 32px 96px rgba(0,0,0,.42),0 1px 0 rgba(255,255,255,.10) inset;}.ym-pl::before{opacity:.24}.ym-pl-info,.ym-pl-prog-wrap,.ym-pl-controls,.ym-pl-vol-wrap{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.10);}}',
         '@media(max-width:640px){.ym-pl{border-radius:24px;padding:14px;}.ym-pl-stage{min-height:72vh;}.ym-pl-cover-wrap,.ym-pl-stage.playing .ym-pl-cover-wrap{width:min(76vw,300px);}.ym-pl-lrc-panel,.ym-pl-stage.playing .ym-pl-lrc-panel{height:32vh;}.ym-pl-lrc-line{font-size:clamp(19px,6.2vw,28px);}.ym-pl-lrc-line.active{font-size:clamp(24px,7.8vw,36px);}.ym-pl-vol-wrap{display:none;}}',
         '@media(prefers-reduced-motion:reduce){.ym-pl-stage.playing .ym-pl-cover,.ym-pl-stage.playing .ym-pl-spectrum i{animation:none!important;}}',
+        '.ym-pl{border-radius:22px;padding:14px;gap:10px;}',
+        '.ym-pl-stage{min-height:0;height:auto;display:grid;grid-template-columns:132px minmax(0,1fr);align-items:center;gap:14px;}',
+        '.ym-pl-cover-wrap,.ym-pl-stage.playing .ym-pl-cover-wrap{width:132px;margin:0;}',
+        '.ym-pl-cover,.ym-pl-cover img{border-radius:18px;}',
+        '.ym-pl-lrc-panel,.ym-pl-stage.playing .ym-pl-lrc-panel{height:168px;}',
+        '.ym-pl-lrc-inner{padding:72px 0 84px;}',
+        '.ym-pl-lrc-line{font-size:clamp(14px,2.6vw,18px);line-height:1.52;padding:4px 6px;text-align:left;}',
+        '.ym-pl-lrc-line.active{font-size:clamp(16px,3vw,21px);transform:translateX(4px) scale(1.02);}',
+        '.ym-pl-spectrum{grid-column:1/-1;height:18px;margin-top:-3px;}',
+        '.ym-pl-stage.playing .ym-pl-spectrum i{animation-duration:1.15s;}',
+        '@media(max-width:640px){.ym-pl{border-radius:20px;padding:12px;gap:9px;}.ym-pl-stage{min-height:0;grid-template-columns:88px minmax(0,1fr);gap:11px;}.ym-pl-cover-wrap,.ym-pl-stage.playing .ym-pl-cover-wrap{width:88px;}.ym-pl-cover,.ym-pl-cover img{border-radius:16px;}.ym-pl-lrc-panel,.ym-pl-stage.playing .ym-pl-lrc-panel{height:138px;}.ym-pl-lrc-inner{padding:58px 0 72px;}.ym-pl-lrc-line{font-size:14px;line-height:1.45;padding:3px 4px;text-align:left;}.ym-pl-lrc-line.active{font-size:17px;transform:translateX(3px) scale(1.015);}.ym-pl-spectrum{height:14px;}.ym-pl-info{padding:10px 12px;}.ym-pl-prog-wrap{padding:10px 8px;}.ym-pl-controls{padding:5px;}.ym-pl-btn{width:34px;height:34px;}.ym-pl-pp{width:40px!important;height:40px!important;}}',
       ].join('');
       document.head.appendChild(s);
     }
