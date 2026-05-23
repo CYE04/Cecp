@@ -2618,18 +2618,13 @@
     detailGrid.className='ml-detail-grid';
     const leftCol=document.createElement('div');
     leftCol.className='ml-detail-left';
-    const lyricCol=document.createElement('section');
-    lyricCol.className='ml-detail-center';
-    lyricCol.innerHTML='<div class="ml-detail-lrc-head"><span>Lyrics</span><button id="ml-detail-fullscreen" type="button">全屏歌词</button></div><div class="ml-detail-mobile-cover" aria-hidden="true"></div><div id="ml-detail-lrc-panel"><div id="ml-detail-lrc-inner"></div></div>';
     const rightCol=document.createElement('div');
     rightCol.className='ml-detail-right';
     detailGrid.appendChild(leftCol);
-    detailGrid.appendChild(lyricCol);
     detailGrid.appendChild(rightCol);
     body.appendChild(detailGrid);
     const miniPlayer=preservedMini || document.getElementById('ml-miniplayer');
     if(miniPlayer) leftCol.appendChild(miniPlayer);
-    $('ml-detail-fullscreen')?.addEventListener('click',()=>_mpSetExpanded(true));
     _mpRenderLrc();
 
     const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];

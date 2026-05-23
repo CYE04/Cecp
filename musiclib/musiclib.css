@@ -3261,7 +3261,7 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
 }
 #music-library .ml-detail-grid{
   display:grid;
-  grid-template-columns:minmax(260px,330px) minmax(340px,1fr) minmax(320px,420px);
+  grid-template-columns:minmax(260px,340px) minmax(0,1fr);
   gap:18px;
   align-items:start;
 }
@@ -3271,16 +3271,7 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
   top:82px;
   min-width:0;
 }
-#music-library .ml-detail-center{
-  min-height:calc(100dvh - 112px);
-  border:1px solid color-mix(in srgb,var(--border-md) 80%, transparent);
-  border-radius:28px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--bg2) 72%, transparent),color-mix(in srgb,var(--bg2) 45%, transparent));
-  box-shadow:0 28px 90px rgba(0,0,0,.20),0 1px 0 rgba(255,255,255,.16) inset;
-  backdrop-filter:blur(30px) saturate(150%);
-  -webkit-backdrop-filter:blur(30px) saturate(150%);
-  overflow:hidden;
-}
+#music-library .ml-detail-center{display:none;}
 #music-library .ml-detail-lrc-head{
   height:56px;
   display:flex;
@@ -3545,7 +3536,12 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
     top:auto;
     width:100%;
   }
-  #music-library .ml-detail-left{order:1;}
+  #music-library .ml-detail-left{
+    order:2;
+    height:0;
+    min-height:0;
+    overflow:visible;
+  }
   #music-library .ml-detail-center{
     order:2;
     width:100%;
@@ -3564,7 +3560,7 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
     box-shadow:0 22px 70px rgba(0,0,0,.32),0 0 0 1px rgba(255,255,255,.16) inset;
   }
   #music-library .ml-detail-right{
-    order:3;
+    order:1;
     display:flex;
     flex-direction:column;
   }
@@ -3611,7 +3607,7 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
 
 /* ---- Practice Tool Refinement ---- */
 #music-library .ml-detail-grid{
-  grid-template-columns:minmax(240px,300px) minmax(360px,1fr) minmax(360px,460px);
+  grid-template-columns:minmax(240px,320px) minmax(0,1fr);
   gap:16px;
 }
 #music-library .ml-detail-left,
@@ -3667,10 +3663,7 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
 #music-library .pl-vol-wrap{
   border-radius:16px;
 }
-#music-library .ml-detail-center{
-  min-height:calc(100dvh - 104px);
-  border-radius:24px;
-}
+#music-library .ml-detail-center{display:none;}
 #music-library #ml-detail-lrc-panel{
   height:calc(100dvh - 160px);
 }
@@ -3690,6 +3683,9 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
   overflow:auto;
   scrollbar-width:thin;
   padding-right:2px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:14px;
 }
 #music-library .ml-detail-right::-webkit-scrollbar{width:6px;}
 #music-library .ml-detail-right::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:999px;}
@@ -3807,15 +3803,12 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
 }
 @media (max-width:760px){
   #music-library #ml-detail-body{
-    padding:8px 10px calc(102px + env(safe-area-inset-bottom));
+    padding:8px 10px calc(118px + env(safe-area-inset-bottom));
   }
   #music-library .ml-detail-grid{
     gap:10px;
   }
-  #music-library .ml-detail-center{
-    min-height:0;
-    border-radius:22px;
-  }
+  #music-library .ml-detail-center{display:none;}
   #music-library .ml-detail-lrc-head{
     height:48px;
     padding:0 14px;
@@ -3826,7 +3819,7 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
     margin:12px auto 0;
   }
   #music-library #ml-detail-lrc-panel{
-    height:min(58vh,430px);
+    height:min(42vh,320px);
   }
   #music-library #ml-detail-lrc-inner{
     gap:14px;
@@ -3840,8 +3833,8 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
     left:8px;
     right:8px;
     width:calc(100vw - 16px);
-    border-radius:22px 22px 0 0;
-    padding:8px 10px max(8px, env(safe-area-inset-bottom));
+    border-radius:20px 20px 0 0;
+    padding:8px 10px max(7px, env(safe-area-inset-bottom));
   }
   #music-library #ml-mp-stage{
     display:none;
@@ -3854,15 +3847,16 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
     font-size:11px;
   }
   #music-library .pl-controls{
-    gap:3px;
+    gap:2px;
+    padding:2px 0;
   }
   #music-library .pl-btn{
-    width:32px;
-    height:32px;
+    width:30px;
+    height:30px;
   }
   #music-library .pl-playpause{
-    width:38px!important;
-    height:38px!important;
+    width:36px!important;
+    height:36px!important;
   }
   #music-library .ml-detail-right{
     gap:10px;
