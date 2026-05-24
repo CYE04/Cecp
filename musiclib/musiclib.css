@@ -3219,6 +3219,13 @@ html.ml-fullscreen body.ml-fullscreen #music-library .ml-group-grid{
   box-shadow:0 22px 80px rgba(0,0,0,.24);
 }
 
+#music-library #ml-miniplayer{
+  width:calc(100% - clamp(20px,6vw,112px));
+  max-width:none;
+  margin-left:auto;
+  margin-right:auto;
+}
+
 @media (prefers-reduced-motion:reduce){
   #music-library #ml-worship-picks::after,
   #music-library .ml-reveal,
