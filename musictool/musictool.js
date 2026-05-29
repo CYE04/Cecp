@@ -611,12 +611,12 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   <div class="dot"></div>
   <div class="topbar-title">简谱编辑器 <span>v3.1</span></div>
   <div class="topbar-tabs">
-    <button class="top-tab" onclick="openImport()">导入</button>
-    <button class="top-tab" onclick="openBulkLyric()" title="批量填歌词">⌨ 填歌词</button>
-    <button class="top-tab" onclick="openCheck()" title="检查音符与歌词数量">⚑ 检查</button>
-    <button class="top-tab on" onclick="switchTop('preview',this)">预览</button>
-    <button class="top-tab" onclick="switchTop('tools',this);runToolCheck()">工具</button>
-    <button class="top-tab" onclick="switchTop('code',this)">代码</button>
+    <button class="top-tab" data-action="import" type="button">导入</button>
+    <button class="top-tab" data-action="bulk-lyric" type="button" title="批量填歌词">⌨ 填歌词</button>
+    <button class="top-tab" data-action="check" type="button" title="检查音符与歌词数量">⚑ 检查</button>
+    <button class="top-tab on" data-top-tab="preview" type="button">预览</button>
+    <button class="top-tab" data-top-tab="tools" type="button">工具</button>
+    <button class="top-tab" data-top-tab="code" type="button">代码</button>
   </div>
 </div>
 
@@ -684,11 +684,11 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
       <div class="tool-card">
         <div class="tool-title">检查与整理</div>
         <div class="tool-row">
-          <button class="tool-btn main" onclick="runToolCheck()">重新检查</button>
-          <button class="tool-btn" onclick="formatScoreData()">整理格式</button>
-          <button class="tool-btn" onclick="playCurrentLine()">播放当前行</button>
-          <button class="tool-btn" onclick="playWholeSong()">播放整首</button>
-          <button class="tool-btn" onclick="stopToolPlayback()">停止</button>
+          <button class="tool-btn main" data-tool-action="check" type="button">重新检查</button>
+          <button class="tool-btn" data-tool-action="format" type="button">整理格式</button>
+          <button class="tool-btn" data-tool-action="play-line" type="button">播放当前行</button>
+          <button class="tool-btn" data-tool-action="play-song" type="button">播放整首</button>
+          <button class="tool-btn" data-tool-action="stop" type="button">停止</button>
         </div>
         <div id="toolCheckOut" class="tool-output"></div>
       </div>
@@ -699,7 +699,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
           <input id="tool-from-key" value="C" style="width:58px;">
           <span style="font-size:10px;color:var(--ink3);">目标</span>
           <input id="tool-to-key" value="D" style="width:58px;">
-          <button class="tool-btn main" onclick="previewTranspose()">预览</button>
+          <button class="tool-btn main" data-tool-action="transpose" type="button">预览</button>
         </div>
         <div id="toolTransposeOut" class="tool-output tool-preview-box"></div>
       </div>
@@ -1046,10 +1046,10 @@ function trChordToken(raw,st,useFlat){
   var m=raw.match(/^([A-G](?:#|b)?)([^A-G]*)(.*)$/);
   if(m&&m[1]&&!m[3]){
     var rest=m[2]||'';
-    rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,function(_,bass){return '/'+trKeyName(bass,st,useFlat);});
+    rest=rest.replace(/\\/\\s*([A-G](?:#|b)?)/g,function(_,bass){return '/'+trKeyName(bass,st,useFlat);});
     return trKeyName(m[1],st,useFlat)+rest;
   }
-  return raw.replace(/(^|[^A-Za-z#b])([A-G](?:#|b)?)(maj|min|dim|aug|sus|add|m(?!aj)|[0-9+\-#b°øº⁰¹²³⁴⁵⁶⁷⁸⁹]*)(\/\s*([A-G](?:#|b)?))?(?=$|[^A-Za-z#b])/g,function(_,lead,root,suf,bassPart,bassRoot){
+  return raw.replace(/(^|[^A-Za-z#b])([A-G](?:#|b)?)(maj|min|dim|aug|sus|add|m(?!aj)|[0-9+\\-#b°øº⁰¹²³⁴⁵⁶⁷⁸⁹]*)(\\/\\s*([A-G](?:#|b)?))?(?=$|[^A-Za-z#b])/g,function(_,lead,root,suf,bassPart,bassRoot){
     var out=trKeyName(root,st,useFlat)+(suf||'');
     if(bassPart)out+='/'+trKeyName(bassRoot,st,useFlat);
     return lead+out;
@@ -1057,20 +1057,20 @@ function trChordToken(raw,st,useFlat){
 }
 function trChordText(ch,st,useFlat){
   if(!ch)return ch;
-  return String(ch).split(/([ \t\u3164]+)/).map(function(part){
-    return /[^\s\u3164]/.test(part)?trChordToken(part,st,useFlat):part;
+  return String(ch).split(/([ \\t\\u3164]+)/).map(function(part){
+    return /[^\\s\\u3164]/.test(part)?trChordToken(part,st,useFlat):part;
   }).join('');
 }
 function chordLooksSuspicious(ch){
   var s=String(ch||'').trim();
   if(!s)return false;
-  var cleaned=s.replace(/(^|[^A-Za-z#b])([A-G](?:#|b)?)(maj|min|dim|aug|sus|add|m(?!aj)|[0-9+\-#b°øº⁰¹²³⁴⁵⁶⁷⁸⁹]*)(\/\s*([A-G](?:#|b)?))?(?=$|[^A-Za-z#b])/g,' ');
-  return /(^|[^A-Za-z])[H-Z](?:#|b)?(?:m|maj|min|sus|dim|aug|add|\d|\/|$)/.test(cleaned);
+  var cleaned=s.replace(/(^|[^A-Za-z#b])([A-G](?:#|b)?)(maj|min|dim|aug|sus|add|m(?!aj)|[0-9+\\-#b°øº⁰¹²³⁴⁵⁶⁷⁸⁹]*)(\\/\\s*([A-G](?:#|b)?))?(?=$|[^A-Za-z#b])/g,' ');
+  return /(^|[^A-Za-z])[H-Z](?:#|b)?(?:m|maj|min|sus|dim|aug|add|\\d|\\/|$)/.test(cleaned);
 }
 function resolveMediaUrl(value,base){
   var v=String(value||'').trim();
   if(!v)return '';
-  if(/^(https?:)?\/\//i.test(v)||/^data:/i.test(v)||v.charAt(0)==='/')return v;
+  if(/^(https?:)?\\/\\//i.test(v)||/^data:/i.test(v)||v.charAt(0)==='/')return v;
   return base+encodeURI(v).replace(/#/g,'%23');
 }
 
@@ -2279,7 +2279,42 @@ function copyFullJson(){
 function switchTop(name,btn){
   document.querySelectorAll('.top-tab').forEach(function(t){t.classList.remove('on');});
   document.querySelectorAll('.top-panel').forEach(function(p){p.classList.remove('on');});
-  btn.classList.add('on');document.getElementById('top-'+name).classList.add('on');
+  var targetBtn=btn||document.querySelector('.top-tab[data-top-tab="'+name+'"]');
+  if(targetBtn)targetBtn.classList.add('on');
+  var panel=document.getElementById('top-'+name);
+  if(panel)panel.classList.add('on');
+  if(name==='tools')runToolCheck();
+}
+function bindTopbarActions(){
+  var bar=document.querySelector('.topbar-tabs');
+  if(!bar||bar.__bound)return;
+  bar.__bound=true;
+  bar.addEventListener('click',function(e){
+    var btn=e.target.closest('button');
+    if(!btn)return;
+    var tab=btn.getAttribute('data-top-tab');
+    var action=btn.getAttribute('data-action');
+    if(tab){switchTop(tab,btn);return;}
+    if(action==='import')openImport();
+    else if(action==='bulk-lyric')openBulkLyric();
+    else if(action==='check')openCheck();
+  });
+}
+function bindToolActions(){
+  var panel=document.getElementById('top-tools');
+  if(!panel||panel.__bound)return;
+  panel.__bound=true;
+  panel.addEventListener('click',function(e){
+    var btn=e.target.closest('button[data-tool-action]');
+    if(!btn)return;
+    var action=btn.getAttribute('data-tool-action');
+    if(action==='check')runToolCheck();
+    else if(action==='format')formatScoreData();
+    else if(action==='play-line')playCurrentLine();
+    else if(action==='play-song')playWholeSong();
+    else if(action==='stop')stopToolPlayback();
+    else if(action==='transpose')previewTranspose();
+  });
 }
 
 /* ════════════════════════════════════════
@@ -2477,7 +2512,7 @@ function collectToolIssues(){
           if(countOpen(n,'(')!==countOpen(n,')'))issues.push({kind:'warn',text:loc+'：圆括号可能未配对'});
           if(countOpen(n,'([')!==countOpen(n,'])'))issues.push({kind:'warn',text:loc+'：跨线连音 ([ / ]) 可能未配对'});
           if(countOpen(n,'{3')+countOpen(n,'{5')!==countOpen(n,'}'))issues.push({kind:'warn',text:loc+'：连音组 {3/{5 可能未闭合'});
-          if(/\[v/.test(n)&&n.indexOf(']v')<0)issues.push({kind:'warn',text:loc+'：房子线开始后没有在同格结束，可确认后续格是否有 ]v'});
+          if(/\\[v/.test(n)&&n.indexOf(']v')<0)issues.push({kind:'warn',text:loc+'：房子线开始后没有在同格结束，可确认后续格是否有 ]v'});
           if(/[｜／]/.test(n))issues.push({kind:'warn',text:loc+'：含全角符号，点“整理格式”可统一'});
           if(n&&/[|]/.test(n)===false&&n.split(/\s+/).length>=6)issues.push({kind:'warn',text:loc+'：这一格音符较长但没有小节线，建议确认'});
         }
@@ -2712,6 +2747,8 @@ Object.assign(window, {
 });
 
 /* 初始化 */
+bindTopbarActions();
+bindToolActions();
 refreshTupletBtns();
 renderEditor();
 updateInputState();
