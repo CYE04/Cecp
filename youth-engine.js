@@ -113,9 +113,9 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 #ymModal button.primary{background:var(--yt);color:var(--yb);border-color:transparent}
 
 /* ── Hero ── */
-.ym-hero{position:relative;isolation:isolate;overflow:hidden;max-width:960px;width:100%;min-width:0;margin:0 auto 2rem;padding:2.35rem 1.7rem 2.45rem;border-radius:28px;text-align:center;background:linear-gradient(145deg,var(--ym-glass),var(--ym-panel-2));border:1px solid var(--ym-line);box-shadow:var(--ym-elev);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.ym-hero::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:radial-gradient(circle at 16% 12%,color-mix(in srgb,var(--ym-brand) 28%,transparent),transparent 30%),radial-gradient(circle at 86% 16%,color-mix(in srgb,var(--ym-brand3) 24%,transparent),transparent 24%),radial-gradient(circle at 50% 105%,color-mix(in srgb,var(--ym-brand2) 24%,transparent),transparent 35%);animation:ym-ambient 12s ease-in-out infinite alternate}
-.ym-hero::after{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(110deg,transparent 0%,rgba(255,255,255,.20) 42%,transparent 62%),linear-gradient(180deg,rgba(255,255,255,.18),transparent 45%);transform:translateX(-120%);animation:ym-sheen 7s ease-in-out infinite}
+.ym-hero{position:relative;isolation:isolate;overflow:hidden;max-width:960px;width:100%;min-width:0;margin:0 auto 2rem;padding:2.35rem 1.7rem 2.45rem;border-radius:28px;text-align:center;background:linear-gradient(180deg,var(--ym-glass),var(--ym-panel-2));border:1px solid var(--ym-line);box-shadow:var(--ym-elev);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.ym-hero::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:radial-gradient(ellipse at 50% -18%,color-mix(in srgb,var(--ym-brand) 14%,transparent),transparent 48%),radial-gradient(ellipse at 50% 112%,color-mix(in srgb,var(--ym-brand2) 10%,transparent),transparent 50%),linear-gradient(180deg,rgba(255,255,255,.18),transparent 48%,rgba(255,255,255,.10));animation:ym-ambient 12s ease-in-out infinite alternate}
+.ym-hero::after{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 42%);pointer-events:none}
 @keyframes ym-ambient{from{transform:translate3d(-1.5%,0,0) rotate(-2deg)}to{transform:translate3d(1.5%,1%,0) rotate(2deg)}}
 @keyframes ym-sheen{0%,38%{transform:translateX(-120%)}56%,100%{transform:translateX(120%)}}
 .ym-hero h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;color:var(--ym-ink);margin:0 0 .4rem;letter-spacing:-.01em;line-height:1.24;overflow-wrap:anywhere}
@@ -129,7 +129,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 /* ── Schedule ── */
 .ym-flow{width:100%;max-width:1100px;min-width:0;margin:1rem auto;font-family:system-ui,-apple-system,"PingFang SC",sans-serif;color:var(--ym-ink)}
 .ym-flow .card{position:relative;overflow:hidden;max-width:100%;min-width:0;border:1px solid var(--ym-line);border-radius:clamp(16px,2.4vw,22px);background:linear-gradient(180deg,var(--ym-panel),var(--ym-panel-2));box-shadow:var(--ym-elev)}
-.ym-flow .card::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at 10% 0%,color-mix(in srgb,var(--ym-brand) 24%,transparent),transparent 34%),linear-gradient(120deg,transparent,rgba(255,255,255,.10),transparent);pointer-events:none}
+.ym-flow .card::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse at 50% -14%,color-mix(in srgb,var(--ym-brand) 13%,transparent),transparent 46%),linear-gradient(180deg,rgba(255,255,255,.12),transparent 50%);pointer-events:none}
 .ym-flow .head{padding:clamp(14px,2.2vw,20px);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .ym-flow .icon{font-size:clamp(38px,6.3vw,70px);line-height:1;filter:drop-shadow(0 10px 18px rgba(0,0,0,.18))}
 .ym-flow .title{min-width:0;margin:0;font-weight:900;font-size:clamp(32px,6vw,58px);line-height:1.12;overflow-wrap:anywhere}
@@ -312,7 +312,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 .ym-section-title::after{content:'';height:1px;flex:1;min-width:32px;background:linear-gradient(90deg,var(--ym-line),transparent)}
 .ym-section-title.is-featured{font-size:1.52rem;font-weight:800;letter-spacing:.01em}
 .ym-block{max-width:100%;min-width:0;background:linear-gradient(180deg,var(--ym-panel),var(--ym-panel-2));border:1px solid var(--ym-line);border-radius:16px;padding:16px;margin-bottom:1rem;box-shadow:var(--ym-sh)}
-.ym-block.is-featured{border-color:var(--ym-border-md);box-shadow:var(--ym-elev);padding:18px 20px;background:radial-gradient(circle at 12% 0%,color-mix(in srgb,var(--ym-brand3) 22%,transparent),transparent 34%),radial-gradient(circle at 94% 12%,color-mix(in srgb,var(--ym-brand) 18%,transparent),transparent 28%),linear-gradient(180deg,var(--ym-panel),var(--ym-panel-2))}
+.ym-block.is-featured{border-color:var(--ym-border-md);box-shadow:var(--ym-elev);padding:18px 20px;background:radial-gradient(ellipse at 50% -12%,color-mix(in srgb,var(--ym-brand3) 12%,transparent),transparent 46%),linear-gradient(180deg,var(--ym-panel),var(--ym-panel-2))}
 .ym-meta{font-size:14px;color:var(--ym-ink2);line-height:1.8}
 .ym-meta.is-featured{font-size:15.5px;line-height:1.95;color:var(--ym-ink);font-weight:500}
 .ym-meta strong{color:var(--ym-ink)}
