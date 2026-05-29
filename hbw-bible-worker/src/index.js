@@ -3,6 +3,23 @@
 // In-memory cache for R2 JSON (warm across requests on same isolate)
 const MEM = globalThis.__HBW_R2_MEM__ || (globalThis.__HBW_R2_MEM__ = new Map());
 
+const BOOK_USFM = [
+  "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1SA", "2SA",
+  "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "JOB", "PSA", "PRO",
+  "ECC", "SNG", "ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO",
+  "OBA", "JON", "MIC", "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL", "MAT",
+  "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP",
+  "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE",
+  "2PE", "1JN", "2JN", "3JN", "JUD", "REV",
+];
+
+const YV_TRANSLATIONS = {
+  CCB: { bibleId: "36", name: "当代圣经 (简体)" },
+  RCUVSS: { bibleId: "140", name: "和合本修订版 (简体)" },
+  NR06: { bibleId: "122", name: "Nuova Riveduta 2006 (Italiano)" },
+  ESV: { bibleId: "59", name: "English Standard Version" },
+};
+
 function corsHeaders(req) {
   return {
     "Access-Control-Allow-Origin": "*",
@@ -54,6 +71,14 @@ function parseVerses(param) {
 
 function getR2(env) {
   return env.BIBLES || env.bibles || null;
+}
+
+function getYouVersionAppKey(env) {
+  return env.YVP_APP_KEY || env.YV_APP_KEY || env.YVP_KEY || env.YV_KEY || null;
+}
+
+function getUsfmBook(book) {
+  return BOOK_USFM[book - 1] || null;
 }
 
 /** Try multiple key patterns so file naming doesn't break */
@@ -161,10 +186,178 @@ function buildWholeChapter(chapterData, max = 300) {
   return verses;
 }
 
+function decodeEntities(str) {
+  return String(str)
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
+}
+
+function normalizeYvText(raw, verseNum) {
+  return decodeEntities(raw || "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/[\u0000-\u001f\u007f-\u009f]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(new RegExp(`^\\s*[^\\d]{0,40}\\d+[:：.]${verseNum}\\s*`), "")
+    .replace(new RegExp(`^\\s*(?:[^\\d\\s]+\\s+)?${verseNum}\\s*`), "")
+    .trim();
+}
+
+async function fetchYouVersionJson(env, path) {
+  const appKey = getYouVersionAppKey(env);
+  if (!appKey) throw new Error("Missing env.YVP_APP_KEY for YouVersion");
+
+  const res = await fetch(`https://api.youversion.com${path}`, {
+    method: "GET",
+    headers: {
+      "X-YVP-App-Key": appKey,
+      "accept": "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`YouVersion ${res.status}: ${body.slice(0, 200)}`);
+  }
+
+  return res.json();
+}
+
+function verseNumberFromYvItem(item) {
+  const raw =
+    item?.verse ||
+    item?.verse_id ||
+    item?.id ||
+    item?.title ||
+    item?.passage_id ||
+    "";
+  const match = String(raw).match(/(?:^|\.)(\d+)$/);
+  const n = match ? Number(match[1]) : Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function textFromYvItem(item, verseNum) {
+  const raw =
+    item?.text ||
+    item?.content ||
+    item?.body ||
+    item?.html ||
+    item?.formatted_text ||
+    item?.usfm ||
+    "";
+  const text = normalizeYvText(raw, verseNum);
+  return text || null;
+}
+
+function parseYvVerseCollection(payload) {
+  const list = Array.isArray(payload?.data) ? payload.data : [];
+  const verses = [];
+
+  for (const item of list) {
+    const verse = verseNumberFromYvItem(item);
+    if (!verse) continue;
+    const text = textFromYvItem(item, verse);
+    if (!text) continue;
+    verses.push({ verse, text });
+  }
+
+  return verses.sort((a, b) => a.verse - b.verse);
+}
+
+async function fetchYvChapterByVerse(env, bibleId, bookUsfm, chapter) {
+  const chapterPayload = await fetchYouVersionJson(
+    env,
+    `/v1/bibles/${bibleId}/books/${bookUsfm}/chapters/${chapter}`
+  );
+  const chapterData = chapterPayload?.data || chapterPayload;
+  const verseRefs = Array.isArray(chapterData?.verses) ? chapterData.verses : [];
+  const verseNums = verseRefs
+    .map(verseNumberFromYvItem)
+    .filter(n => Number.isFinite(n) && n > 0)
+    .sort((a, b) => a - b);
+
+  const uniqueVerseNums = Array.from(new Set(verseNums));
+  const out = [];
+  for (const verse of uniqueVerseNums) {
+    const passage = `${bookUsfm}.${chapter}.${verse}`;
+    const payload = await fetchYouVersionJson(
+      env,
+      `/v1/bibles/${bibleId}/passages/${passage}?format=text&include_headings=false&include_notes=false`
+    );
+    const text = normalizeYvText(payload?.content || payload?.data?.content || "", verse);
+    if (text) out.push({ verse, text });
+  }
+  return out;
+}
+
+async function loadCachedYouVersionChapter(env, translation, book, chapter) {
+  const r2 = getR2(env);
+  if (!r2) throw new Error("R2 binding missing (need env.BIBLES or env.bibles)");
+
+  const bookUsfm = getUsfmBook(book);
+  if (!bookUsfm) throw new Error("Invalid book for YouVersion");
+
+  const config = YV_TRANSLATIONS[translation];
+  if (!config) throw new Error(`Unsupported YouVersion cached translation: ${translation}`);
+
+  const bibleId = String(
+    env[`${translation}_BIBLE_ID`] ||
+    env[`YV_${translation}_BIBLE_ID`] ||
+    config.bibleId
+  ).trim();
+  const key = `cache/${translation}/${book}/${chapter}.json`;
+  const memKey = `YV:${translation}:${book}:${chapter}`;
+
+  if (MEM.has(memKey)) {
+    return { ok: true, source: "memory", cacheKey: key, data: MEM.get(memKey) };
+  }
+
+  const cached = await r2.get(key);
+  if (cached) {
+    const data = await cached.json();
+    MEM.set(memKey, data);
+    return { ok: true, source: "r2", cacheKey: key, data };
+  }
+
+  const collectionPayload = await fetchYouVersionJson(
+    env,
+    `/v1/bibles/${bibleId}/books/${bookUsfm}/chapters/${chapter}/verses`
+  );
+  let data = parseYvVerseCollection(collectionPayload);
+
+  if (!data.length) {
+    data = await fetchYvChapterByVerse(env, bibleId, bookUsfm, chapter);
+  }
+
+  if (!data.length) {
+    throw new Error("YouVersion returned no verse text for this chapter");
+  }
+
+  await r2.put(key, JSON.stringify(data), {
+    httpMetadata: { contentType: "application/json; charset=utf-8" },
+    customMetadata: {
+      translation,
+      bibleId,
+      book: String(book),
+      chapter: String(chapter),
+      bookUsfm,
+    },
+  });
+  MEM.set(memKey, data);
+
+  return { ok: true, source: "youversion", cacheKey: key, bibleId, bookUsfm, data };
+}
+
 // ===== YouVersion proxy =====
 // Requires env.YVP_APP_KEY secret (or aliases below)
 async function proxyYouVersion(request, env, pathAfterV1) {
-  const appKey = env.YVP_APP_KEY || env.YV_APP_KEY || env.YVP_KEY || env.YV_KEY;
+  const appKey = getYouVersionAppKey(env);
   if (!appKey) {
     return json(
       { ok: false, error: "Missing env.YVP_APP_KEY for YouVersion proxy" },
@@ -212,7 +405,8 @@ export default {
         "OK.\n\nTry:\n" +
           "/health\n" +
           "/versions\n" +
-          "/?translations=CUNPSS,NR06&book=1&chapter=1&verses=1-2,5,9-11\n" +
+          "/?translations=CCB,RCUVSS,NR06,ESV&book=1&chapter=1&verses=1-2,5,9-11\n" +
+          "/_cache/warm?translation=CCB&book=1&chapter=1\n" +
           "/_r2/list\n" +
           "/_r2/get/bible_CUNPSS.json\n" +
           "/v1/bibles/36/passages/GEN.1.1?format=text\n",
@@ -251,7 +445,12 @@ export default {
           default: "CUNPSS",
           versions: [
             { code: "CUNPSS", name: "和合本 (简体)", source: "r2" },
-            { code: "NR06", name: "Nuova Riveduta 2006", source: "r2" },
+            ...Object.entries(YV_TRANSLATIONS).map(([code, v]) => ({
+              code,
+              name: v.name,
+              source: "youversion-cache",
+              bibleId: v.bibleId,
+            })),
             { code: "YV:<id>", name: "YouVersion via /v1 proxy", source: "youversion" },
           ],
         },
@@ -279,6 +478,50 @@ export default {
         200,
         { ...corsHeaders(request), "cache-control": "no-store" }
       );
+    }
+
+    // ===== cache warm: fetch one YouVersion chapter and store it in R2 =====
+    if (path === "/_cache/warm") {
+      const translation = String(url.searchParams.get("translation") || "CCB").trim().toUpperCase();
+      const book = Number(url.searchParams.get("book"));
+      const chapter = Number(url.searchParams.get("chapter") || 1);
+
+      if (!YV_TRANSLATIONS[translation]) {
+        return json(
+          { ok: false, error: "Unsupported cached translation", supported: Object.keys(YV_TRANSLATIONS) },
+          400,
+          corsHeaders(request)
+        );
+      }
+      if (!Number.isFinite(book) || book < 1 || book > 66) {
+        return json({ ok: false, error: "Invalid book (1-66)" }, 400, corsHeaders(request));
+      }
+      if (!Number.isFinite(chapter) || chapter <= 0) {
+        return json({ ok: false, error: "Invalid chapter" }, 400, corsHeaders(request));
+      }
+
+      try {
+        const loaded = await loadCachedYouVersionChapter(env, translation, book, chapter);
+        return json(
+          {
+            ok: true,
+            translation,
+            book,
+            chapter,
+            source: loaded.source,
+            cacheKey: loaded.cacheKey,
+            count: loaded.data.length,
+          },
+          200,
+          { ...corsHeaders(request), "cache-control": "no-store" }
+        );
+      } catch (err) {
+        return json(
+          { ok: false, error: err?.message || String(err) },
+          502,
+          { ...corsHeaders(request), "cache-control": "no-store" }
+        );
+      }
     }
 
     // ===== debug: get R2 =====
@@ -330,10 +573,31 @@ export default {
     const debug = {};
 
     for (const t of translations) {
-      // Only R2 translations served here (CUNPSS/NR06).
-      if (!["CUNPSS", "NR06"].includes(t)) {
+      if (YV_TRANSLATIONS[t]) {
+        try {
+          const loaded = await loadCachedYouVersionChapter(env, t, book, chapter);
+          const result = versesList.length
+            ? loaded.data.filter(v => versesList.includes(v.verse))
+            : loaded.data;
+          dataOut[t] = result;
+          debug[t] = {
+            ok: true,
+            source: loaded.source,
+            cacheKey: loaded.cacheKey,
+            bibleId: loaded.bibleId || YV_TRANSLATIONS[t].bibleId,
+            count: result.length,
+          };
+        } catch (err) {
+          dataOut[t] = [];
+          debug[t] = { ok: false, error: err?.message || String(err) };
+        }
+        continue;
+      }
+
+      // Only CUNPSS is served from a whole local R2 JSON file by default.
+      if (!["CUNPSS"].includes(t)) {
         dataOut[t] = [];
-        debug[t] = { ok: false, error: "Unsupported here (use YouVersion via /v1 proxy if YV:...)" };
+        debug[t] = { ok: false, error: "Unsupported translation" };
         continue;
       }
 
