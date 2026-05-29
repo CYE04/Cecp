@@ -511,6 +511,22 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .lyfill-ok{flex:1;padding:8px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;}
 .lyfill-ok:hover{opacity:.85;}
 .lyfill-cancel{padding:8px 16px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--ink2);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;}
+.tool-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;height:100%;}
+.tool-card{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.025);padding:12px;min-height:0;overflow:auto;}
+.tool-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;font-family:'Space Mono',monospace;}
+.tool-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+.tool-row input,.tool-row select{background:var(--panel2);border:1px solid var(--border);border-radius:5px;color:var(--ink);font-family:'Space Mono',monospace;font-size:11px;padding:6px 8px;outline:none;}
+.tool-row input:focus,.tool-row select:focus{border-color:var(--accent);}
+.tool-btn{padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:rgba(255,255,255,0.035);color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;}
+.tool-btn:hover{border-color:var(--accent);color:#fff;}
+.tool-btn.main{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tool-output{font-family:'Space Mono',monospace;font-size:10px;line-height:1.7;color:var(--ink2);white-space:pre-wrap;}
+.tool-issue{padding:6px 8px;border-radius:7px;margin-bottom:5px;border:1px solid var(--border);background:rgba(255,255,255,0.025);}
+.tool-issue.warn{border-color:rgba(240,192,64,.35);color:#f0c040;}
+.tool-issue.ok{border-color:rgba(106,242,168,.25);color:var(--green);}
+.tool-issue.bad{border-color:rgba(242,124,106,.35);color:var(--red);}
+.tool-preview-box{border:1px solid var(--border);border-radius:9px;background:rgba(0,0,0,.16);padding:10px;max-height:260px;overflow:auto;}
+.inp-chord.warn{border-color:rgba(240,192,64,.8)!important;box-shadow:0 0 0 1px rgba(240,192,64,.15);}
 
 /* ── 检查状态 modal ── */
 .check-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
@@ -570,6 +586,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 @media (max-width: 1100px){
   .bottom-area{grid-template-columns:1fr;grid-template-rows:minmax(320px,1fr) minmax(320px,1fr);}
   .kbd-toolbar{grid-template-columns:1fr;}
+  .tool-grid{grid-template-columns:1fr;}
   .kbd-main{grid-template-columns:1fr;}
   .kbd-actions{grid-template-columns:repeat(3,minmax(0,1fr));}
   .kbd-func-grid{grid-template-columns:1fr;}
@@ -598,6 +615,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
     <button class="top-tab" onclick="openBulkLyric()" title="批量填歌词">⌨ 填歌词</button>
     <button class="top-tab" onclick="openCheck()" title="检查音符与歌词数量">⚑ 检查</button>
     <button class="top-tab on" onclick="switchTop('preview',this)">预览</button>
+    <button class="top-tab" onclick="switchTop('tools',this);runToolCheck()">工具</button>
     <button class="top-tab" onclick="switchTop('code',this)">代码</button>
   </div>
 </div>
@@ -642,20 +660,49 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
       <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">YouTube 链接
         <input id="meta-youtube" placeholder="https://youtu.be/..." style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
       </label>
-      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">封面图 cover <span style="color:var(--ink3);font-weight:normal;">（图片 URL）</span>
-        <input id="meta-cover" placeholder="https://..." style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">MP3 <span style="color:var(--ink3);font-weight:normal;">（可填 URL 或文件名）</span>
+        <input id="meta-mp3" placeholder="https://... 或 song.mp3" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
       </label>
-      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">歌词文件 lrc <span style="color:var(--ink3);font-weight:normal;">（.lrc 文件 URL）</span>
-        <input id="meta-lrc" placeholder="https://..." style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">封面图 cover <span style="color:var(--ink3);font-weight:normal;">（默认 https://cecpadua.github.io/resouces/covers/）</span>
+        <input id="meta-cover" placeholder="song.jpg 或完整 URL" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
       </label>
-      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">乐谱图 scoreImg <span style="color:var(--ink3);font-weight:normal;">（图片 URL）</span>
-        <input id="meta-scoreimg" placeholder="https://..." style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">歌词文件 lrc <span style="color:var(--ink3);font-weight:normal;">（默认 https://cecpadua.github.io/resouces/lyrics/）</span>
+        <input id="meta-lrc" placeholder="song.lrc 或完整 URL" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
+      </label>
+      <label style="grid-column:1/-1;font-size:9px;color:var(--ink2);font-family:'Space Mono',monospace;letter-spacing:1px;">乐谱图 scoreImg <span style="color:var(--ink3);font-weight:normal;">（默认 https://cecpadua.github.io/resouces/scoreIMG/）</span>
+        <input id="meta-scoreimg" placeholder="songC.jpg 或完整 URL" style="width:100%;margin-top:3px;padding:5px 7px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--ink);font-size:11px;font-family:'Space Mono',monospace;">
       </label>
     </div>
     <div class="code-box" id="codeBox"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">
       <button class="copy-btn" onclick="copyCode()" style="margin-top:0;">复制 sections 数组</button>
       <button class="copy-btn" onclick="copyFullJson()" style="margin-top:0;background:var(--accent);border-color:var(--accent);color:#fff;">复制完整 JSON 文件</button>
+    </div>
+  </div>
+  <div class="top-panel" id="top-tools">
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-title">检查与整理</div>
+        <div class="tool-row">
+          <button class="tool-btn main" onclick="runToolCheck()">重新检查</button>
+          <button class="tool-btn" onclick="formatScoreData()">整理格式</button>
+          <button class="tool-btn" onclick="playCurrentLine()">播放当前行</button>
+          <button class="tool-btn" onclick="playWholeSong()">播放整首</button>
+          <button class="tool-btn" onclick="stopToolPlayback()">停止</button>
+        </div>
+        <div id="toolCheckOut" class="tool-output"></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-title">试移调</div>
+        <div class="tool-row">
+          <span style="font-size:10px;color:var(--ink3);">原调</span>
+          <input id="tool-from-key" value="C" style="width:58px;">
+          <span style="font-size:10px;color:var(--ink3);">目标</span>
+          <input id="tool-to-key" value="D" style="width:58px;">
+          <button class="tool-btn main" onclick="previewTranspose()">预览</button>
+        </div>
+        <div id="toolTransposeOut" class="tool-output tool-preview-box"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -955,7 +1002,7 @@ function getSelRange(){
   return{lo:Math.min(selA,selB),hi:Math.max(selA,selB)};
 }
 function clearSel(){selA=-1;selB=-1;}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function normalizeTimeSignValue(sig){
   var m=String(sig||'').trim().replace(/\\s+/g,'').replace(/\uFF0F/g,'/').match(/^(\\d{1,2})\\/(\\d{1,2})$/);
   return m?(m[1]+'/'+m[2]):'';
@@ -980,6 +1027,51 @@ function setSegInlineTimeSign(seg,raw){
   seg.timeSign=normalizeTimeSignValue(trimmed)||trimmed;
   delete seg.ts;
   delete seg.meter;
+}
+var NOTE_MAP={C:0,'B#':0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,Fb:4,'E#':5,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11,Cb:11};
+var NOTES_SHARP=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+var NOTES_FLAT=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+var FLAT_KEYS={F:1,Bb:1,Eb:1,Ab:1,Db:1,Gb:1,Cb:1};
+function parseKeyName(key){
+  var m=String(key||'').trim().match(/^([A-G](?:#|b)?)(.*)$/);
+  return m?{root:m[1],suf:m[2]||''}:{root:'C',suf:''};
+}
+function trKeyName(key,st,useFlat){
+  var p=parseKeyName(key),n=NOTE_MAP[p.root];
+  if(n===undefined)return key;
+  return (useFlat?NOTES_FLAT:NOTES_SHARP)[(n+st+120)%12]+p.suf;
+}
+function trChordToken(raw,st,useFlat){
+  raw=String(raw||'');
+  var m=raw.match(/^([A-G](?:#|b)?)([^A-G]*)(.*)$/);
+  if(m&&m[1]&&!m[3]){
+    var rest=m[2]||'';
+    rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,function(_,bass){return '/'+trKeyName(bass,st,useFlat);});
+    return trKeyName(m[1],st,useFlat)+rest;
+  }
+  return raw.replace(/(^|[^A-Za-z#b])([A-G](?:#|b)?)(maj|min|dim|aug|sus|add|m(?!aj)|[0-9+\-#b°øº⁰¹²³⁴⁵⁶⁷⁸⁹]*)(\/\s*([A-G](?:#|b)?))?(?=$|[^A-Za-z#b])/g,function(_,lead,root,suf,bassPart,bassRoot){
+    var out=trKeyName(root,st,useFlat)+(suf||'');
+    if(bassPart)out+='/'+trKeyName(bassRoot,st,useFlat);
+    return lead+out;
+  });
+}
+function trChordText(ch,st,useFlat){
+  if(!ch)return ch;
+  return String(ch).split(/([ \t\u3164]+)/).map(function(part){
+    return /[^\s\u3164]/.test(part)?trChordToken(part,st,useFlat):part;
+  }).join('');
+}
+function chordLooksSuspicious(ch){
+  var s=String(ch||'').trim();
+  if(!s)return false;
+  var cleaned=s.replace(/(^|[^A-Za-z#b])([A-G](?:#|b)?)(maj|min|dim|aug|sus|add|m(?!aj)|[0-9+\-#b°øº⁰¹²³⁴⁵⁶⁷⁸⁹]*)(\/\s*([A-G](?:#|b)?))?(?=$|[^A-Za-z#b])/g,' ');
+  return /(^|[^A-Za-z])[H-Z](?:#|b)?(?:m|maj|min|sus|dim|aug|add|\d|\/|$)/.test(cleaned);
+}
+function resolveMediaUrl(value,base){
+  var v=String(value||'').trim();
+  if(!v)return '';
+  if(/^(https?:)?\/\//i.test(v)||/^data:/i.test(v)||v.charAt(0)==='/')return v;
+  return base+encodeURI(v).replace(/#/g,'%23');
 }
 
 /* ════════════════════════════════════════
@@ -1567,7 +1659,8 @@ function renderEditor(){
 
         // 和弦
         var tdC=document.createElement('td');
-        var inpC=document.createElement('input');inpC.className='inp-chord';inpC.value=seg.chord||'';
+        var inpC=document.createElement('input');inpC.className='inp-chord'+(chordLooksSuspicious(seg.chord)?' warn':'');inpC.value=seg.chord||'';
+        if(chordLooksSuspicious(seg.chord))inpC.title='这个和弦可能无法识别，导出仍会保留原文';
         inpC.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].chord=this.value;renderPreview();};})(si,li,gi);
         tdC.appendChild(inpC);tr.appendChild(tdC);
 
@@ -2034,7 +2127,7 @@ function renderPreview(){
   var inner=document.createElement('div');inner.className='prev-inner';
 
   // scoreImg 预览
-  var scoreUrl=(document.getElementById('meta-scoreimg')&&document.getElementById('meta-scoreimg').value)||'';
+  var scoreUrl=resolveMediaUrl((document.getElementById('meta-scoreimg')&&document.getElementById('meta-scoreimg').value)||'','https://cecpadua.github.io/resouces/scoreIMG/');
   if(scoreUrl){
     var si=document.createElement('div');si.style.cssText='margin-bottom:12px;';
     var img=document.createElement('img');img.src=scoreUrl;
@@ -2150,11 +2243,11 @@ function copyFullJson(){
     origKey:document.getElementById('meta-key').value||'C',
     timeSign:normalizeTimeSignValue((document.getElementById('meta-timesign')||{}).value)||'4/4',
     bpm:bpm,
-    mp3:'',
-    cover:document.getElementById('meta-cover').value||'',
-    lrc:document.getElementById('meta-lrc').value||'',
+    mp3:(document.getElementById('meta-mp3')||{}).value||'',
+    cover:resolveMediaUrl(document.getElementById('meta-cover').value||'','https://cecpadua.github.io/resouces/covers/'),
+    lrc:resolveMediaUrl(document.getElementById('meta-lrc').value||'','https://cecpadua.github.io/resouces/lyrics/'),
     youtube:document.getElementById('meta-youtube').value||'',
-    scoreImg:document.getElementById('meta-scoreimg').value||''
+    scoreImg:resolveMediaUrl(document.getElementById('meta-scoreimg').value||'','https://cecpadua.github.io/resouces/scoreIMG/')
   };
 
   // Build JSON string manually to embed sections as raw JSON (already valid)
@@ -2356,34 +2449,163 @@ setTimeout(function(){
 },0);
 
 /* ════════════════════════════════════════
+   工具：检查 / 格式化 / 试移调 / 试听
+════════════════════════════════════════ */
+function eachSeg(fn){
+  data.forEach(function(sec,si){
+    (sec.lines||[]).forEach(function(line,li){
+      (line.segs||[]).forEach(function(seg,gi){fn(seg,line,sec,si,li,gi);});
+    });
+  });
+}
+function escapeRegExpText(s){
+  return String(s||'').split('').map(function(ch){
+    return '. * + ? ^ $ { } ( ) | [ ] \\\\'.indexOf(ch)>=0?'\\\\'+ch:ch;
+  }).join('');
+}
+function countOpen(str,needle){return (String(str||'').match(new RegExp(escapeRegExpText(needle),'g'))||[]).length;}
+function collectToolIssues(){
+  var issues=[],totalN=0,totalL=0;
+  data.forEach(function(sec,si){
+    var noteCount=0,lyricCount=0;
+    (sec.lines||[]).forEach(function(line,li){
+      (line.segs||[]).forEach(function(seg,gi){
+        var loc=(sec.name||('段落 '+(si+1)))+' / 行 '+(li+1)+' / 格 '+(gi+1);
+        var n=String(seg.n||'').trim();
+        if(n){noteCount++;totalN++;if(seg.lyric&&String(seg.lyric).trim()){lyricCount++;totalL++;}}
+        if(n){
+          if(countOpen(n,'(')!==countOpen(n,')'))issues.push({kind:'warn',text:loc+'：圆括号可能未配对'});
+          if(countOpen(n,'([')!==countOpen(n,'])'))issues.push({kind:'warn',text:loc+'：跨线连音 ([ / ]) 可能未配对'});
+          if(countOpen(n,'{3')+countOpen(n,'{5')!==countOpen(n,'}'))issues.push({kind:'warn',text:loc+'：连音组 {3/{5 可能未闭合'});
+          if(/\[v/.test(n)&&n.indexOf(']v')<0)issues.push({kind:'warn',text:loc+'：房子线开始后没有在同格结束，可确认后续格是否有 ]v'});
+          if(/[｜／]/.test(n))issues.push({kind:'warn',text:loc+'：含全角符号，点“整理格式”可统一'});
+          if(n&&/[|]/.test(n)===false&&n.split(/\s+/).length>=6)issues.push({kind:'warn',text:loc+'：这一格音符较长但没有小节线，建议确认'});
+        }
+        if(chordLooksSuspicious(seg.chord))issues.push({kind:'bad',text:loc+'：和弦 “'+seg.chord+'” 可能写错'});
+      });
+    });
+    if(noteCount!==lyricCount)issues.push({kind:'warn',text:(sec.name||('段落 '+(si+1)))+'：歌词 '+lyricCount+' / 音符格 '+noteCount});
+  });
+  issues.unshift({kind:(totalN===totalL?'ok':'warn'),text:'合计：歌词 '+totalL+' / 音符格 '+totalN+(totalN===totalL?'，匹配':'，有未填歌词')});
+  if(issues.length===1&&issues[0].kind==='ok')issues.push({kind:'ok',text:'结构检查没有发现明显问题'});
+  return issues;
+}
+function renderToolIssues(targetId){
+  var out=document.getElementById(targetId||'toolCheckOut');
+  if(!out)return;
+  var issues=collectToolIssues();
+  out.innerHTML=issues.map(function(it){return '<div class="tool-issue '+it.kind+'">'+esc(it.text)+'</div>';}).join('');
+}
+function runToolCheck(){renderToolIssues('toolCheckOut');}
+function normalizeNText(n){
+  return String(n||'').replace(/｜/g,'|').replace(/／/g,'/').replace(/\s+/g,' ').trim();
+}
+function formatScoreData(){
+  saveUndo();
+  eachSeg(function(seg){
+    seg.chord=String(seg.chord||'').replace(/\s+/g,' ').trim();
+    seg.n=normalizeNText(seg.n);
+    ['lyric','lyric2','lyric3','lyric4'].forEach(function(k){if(seg[k]!=null)seg[k]=String(seg[k]).trim();});
+  });
+  renderEditor();
+  runToolCheck();
+}
+function previewTranspose(){
+  var from=parseKeyName((document.getElementById('tool-from-key')||{}).value||'C');
+  var to=parseKeyName((document.getElementById('tool-to-key')||{}).value||'C');
+  var a=NOTE_MAP[from.root],b=NOTE_MAP[to.root];
+  var out=document.getElementById('toolTransposeOut');
+  if(a===undefined||b===undefined){out.textContent='调名无法识别';return;}
+  var st=(b-a+12)%12,useFlat=!!FLAT_KEYS[to.root],lines=[];
+  eachSeg(function(seg,line,sec,si,li,gi){
+    if(seg.chord&&String(seg.chord).trim()){
+      lines.push((sec.name||('段落 '+(si+1)))+' L'+(li+1)+'-'+(gi+1)+': '+seg.chord+'  =>  '+trChordText(seg.chord,st,useFlat));
+    }
+  });
+  out.textContent=lines.length?lines.join('\\n'):'当前没有和弦可预览';
+}
+var toolAudioCtx=null,toolPlayTimers=[];
+function stopToolPlayback(){
+  toolPlayTimers.forEach(function(t){clearTimeout(t);});
+  toolPlayTimers=[];
+}
+function getToolAudioCtx(){
+  var AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return null;
+  if(!toolAudioCtx)toolAudioCtx=new AC();
+  if(toolAudioCtx.resume)toolAudioCtx.resume();
+  return toolAudioCtx;
+}
+function tokenToMidi(tok,key){
+  tok=String(tok||'').trim();
+  if(!tok||tok==='sp'||tok.indexOf('|')>=0||tok==='-'||tok==='('||tok===')'||tok==='{'||tok==='}')return null;
+  var m=tok.match(/^([#b=]?)([0-7])([,']*)(?:[·_^]*)/);
+  if(!m||m[2]==='0')return null;
+  var degree=parseInt(m[2],10),scale=[0,0,2,4,5,7,9,11];
+  var base=NOTE_MAP[parseKeyName(key||'C').root];if(base===undefined)base=0;
+  var semi=scale[degree]+base+60;
+  if(m[1]==='#')semi++; else if(m[1]==='b')semi--;
+  for(var i=0;i<m[3].length;i++){semi+=m[3][i]==="'"?12:-12;}
+  return semi;
+}
+function tokDuration(tok,bpm){
+  var beat=60/(bpm||72),s=String(tok||'');
+  var d=s.indexOf('__')>=0?beat/4:(s.indexOf('_')>=0?beat/2:beat);
+  if(s.indexOf('·')>=0)d*=1.5;
+  if(s==='-')d=beat;
+  return Math.max(.08,d);
+}
+function playMidi(midi,when,dur){
+  var ac=getToolAudioCtx();if(!ac||midi==null)return;
+  var osc=ac.createOscillator(),gain=ac.createGain();
+  osc.type='sine';
+  osc.frequency.value=440*Math.pow(2,(midi-69)/12);
+  gain.gain.setValueAtTime(0.0001,when);
+  gain.gain.exponentialRampToValueAtTime(0.12,when+0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001,when+Math.max(0.05,dur*.86));
+  osc.connect(gain);gain.connect(ac.destination);
+  osc.start(when);osc.stop(when+dur);
+}
+function collectPlayTokens(scopeLine){
+  var items=[];
+  eachSeg(function(seg,line,sec,si,li,gi){
+    if(scopeLine&&!(si===curSi&&li===curLi))return;
+    String(seg.n||'').split(/\s+/).forEach(function(tok){if(tok)items.push(tok);});
+  });
+  return items;
+}
+function playTokens(tokens){
+  stopToolPlayback();
+  var ac=getToolAudioCtx();if(!ac)return;
+  var bpm=parseInt((document.getElementById('meta-bpm')||{}).value,10)||72;
+  var key=(document.getElementById('meta-key')||{}).value||'C';
+  var t=ac.currentTime+0.06;
+  tokens.forEach(function(tok){
+    var dur=tokDuration(tok,bpm),midi=tokenToMidi(tok,key);
+    if(midi!=null)playMidi(midi,t,Math.min(dur,1.2));
+    t+=dur;
+  });
+}
+function playCurrentLine(){
+  if(curSi<0){runToolCheck();return;}
+  playTokens(collectPlayTokens(true));
+}
+function playWholeSong(){playTokens(collectPlayTokens(false));}
+
+/* ════════════════════════════════════════
    检查状态（音符 / 歌词 对照）
 ════════════════════════════════════════ */
 function openCheck(){
   var content=document.getElementById('checkContent');
   content.innerHTML='';
-  var totalN=0,totalL=0;
-  data.forEach(function(sec){
-    var noteCount=0,lyricCount=0;
-    sec.lines.forEach(function(line){
-      line.segs.forEach(function(seg){
-        if(seg.n&&seg.n.trim()){
-          noteCount++;
-          if(seg.lyric&&seg.lyric.trim())lyricCount++;
-        }
-      });
-    });
-    totalN+=noteCount;totalL+=lyricCount;
-    var row=document.createElement('div');row.className='check-row';
-    var nm=document.createElement('span');nm.className='check-sec-name';nm.textContent=sec.name||'（无名）';row.appendChild(nm);
-    var nums=document.createElement('span');
-    nums.className='check-nums '+(lyricCount===noteCount?'check-ok':'check-warn');
-    nums.textContent='歌词 '+lyricCount+' / 音符 '+noteCount+(lyricCount===noteCount?' ✓':' ⚠');
+  collectToolIssues().forEach(function(it){
+    var row=document.createElement('div');
+    row.className='check-row';
+    var nm=document.createElement('span');nm.className='check-sec-name';nm.textContent=it.text;row.appendChild(nm);
+    var nums=document.createElement('span');nums.className='check-nums '+(it.kind==='ok'?'check-ok':(it.kind==='bad'?'check-warn':'check-warn'));
+    nums.textContent=it.kind==='ok'?'✓':'⚠';
     row.appendChild(nums);content.appendChild(row);
   });
-  var tot=document.createElement('div');tot.className='check-total';
-  var cls=totalL===totalN?'check-ok':'check-warn';
-  tot.innerHTML='合计：歌词 <span class="'+cls+'">'+totalL+'</span> / 音符 '+totalN+(totalL===totalN?' &nbsp;<span class="check-ok">✓ 全部匹配</span>':' &nbsp;<span class="check-warn">⚠ 有未填歌词</span>');
-  content.appendChild(tot);
   document.getElementById('checkOverlay').classList.add('open');
 }
 function closeCheck(){
@@ -2480,7 +2702,13 @@ Object.assign(window, {
   clearN: clearN,
   copySeg: copySeg,
   pasteSeg: pasteSeg,
-  pasteSegReplace: pasteSegReplace
+  pasteSegReplace: pasteSegReplace,
+  runToolCheck: runToolCheck,
+  formatScoreData: formatScoreData,
+  previewTranspose: previewTranspose,
+  playCurrentLine: playCurrentLine,
+  playWholeSong: playWholeSong,
+  stopToolPlayback: stopToolPlayback
 });
 
 /* 初始化 */
