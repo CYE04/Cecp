@@ -1823,6 +1823,10 @@
   const NOTES_FLAT =['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
   const FLAT_KEYS=new Set(['F','Bb','Eb','Ab','Db','Gb','Cb']);
   const USE_FLAT_MINOR_ROOTS=new Set(['D','G','C','F','Bb','Eb']);
+  const KEY_SET_FLAT=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+  const KEY_SET_SHARP=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const ENHARMONIC_FLAT={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb'};
+  const ENHARMONIC_SHARP={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
   function parseKeyName(key){
     const k=(key||'').trim();
     if(!k)return {root:'C',suf:''};
@@ -1837,6 +1841,7 @@
   }
   function trKeyName(key,st,useFlat){
     const {root,suf}=parseKeyName(key);
+    if(NOTE_MAP[root]===undefined)return key;
     const n=(NOTE_MAP[root]+st+120)%12;
     const flat=(useFlat!==undefined)?useFlat:needFlat(root,suf);
     const nr=flat?NOTES_FLAT[n]:NOTES_SHARP[n];
@@ -1934,11 +1939,18 @@
     }
   }
   function trChordToken(ch,st,useFlat){
-    const m=String(ch||'').trim().match(/^([A-G](?:#|b)?)(.*)$/);
-    if(!m)return ch;
-    let rest=m[2]||'';
-    rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,(a,b)=>'/'+trBass(b,st,useFlat));
-    return trKeyName(m[1],st,useFlat)+rest;
+    const raw=String(ch||'');
+    const m=raw.match(/^([A-G](?:#|b)?)([^A-G]*)(.*)$/);
+    if(m && m[1] && !m[3]){
+      let rest=m[2]||'';
+      rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,(a,b)=>'/'+trBass(b,st,useFlat));
+      return trKeyName(m[1],st,useFlat)+rest;
+    }
+    return raw.replace(/(^|[^A-Za-z#b])([A-G](?:#|b)?)(maj|min|dim|aug|sus|add|m(?!aj)|[0-9+\-#b°øº⁰¹²³⁴⁵⁶⁷⁸⁹]*)(\/\s*([A-G](?:#|b)?))?(?=$|[^A-Za-z#b])/g,function(_,lead,root,suf,bassPart,bassRoot){
+      let out=trKeyName(root,st,useFlat)+(suf||'');
+      if(bassPart)out+='/'+trBass(bassRoot,st,useFlat);
+      return lead+out;
+    });
   }
   function resizeChordGap(gap,len){
     const chars=[...String(gap||'')].map(ch=>ch==='\u3164'?'\u3000':ch);
@@ -1970,6 +1982,7 @@
     const {root:targetRoot,suf:targetSuf}=parseKeyName(target);
     const {root:origRoot}=parseKeyName(orig);
     const t=NOTE_MAP[targetRoot], o=NOTE_MAP[origRoot];
+    if(t===undefined||o===undefined)return {st:0,capo:0,playKey:target};
     const st=(t-o+12)%12;
     let best=null;
     ['C','D','E','F','G','A','B'].forEach(function(pk){
@@ -1977,6 +1990,18 @@
       if(c<=7 && (!best || c<best.capo)) best={playKey:pk+targetSuf,capo:c};
     });
     return {st, capo:best?best.capo:0, playKey:best?best.playKey:target};
+  }
+  function stepKeyName(key,delta,useFlat){
+    const parsed=parseKeyName(key);
+    const n=NOTE_MAP[parsed.root];
+    if(n===undefined)return key;
+    const roots=useFlat?NOTES_FLAT:NOTES_SHARP;
+    return roots[(n+delta+120)%12]+parsed.suf;
+  }
+  function enharmonicKeyName(key,useFlat){
+    const parsed=parseKeyName(key);
+    const root=useFlat?(ENHARMONIC_FLAT[parsed.root]||parsed.root):(ENHARMONIC_SHARP[parsed.root]||parsed.root);
+    return root+parsed.suf;
   }
 
   let _mpAudio=null,_mpSongs=[],_mpIdx=-1,_mpLoop=false,_mpShuffle=false,_mpLrc=[],_mpLrcIdx=-1,_mpCoverFallback='',_mpExpanded=false,_mpSideMode='song',_mpSideCollapsed=false;
@@ -2568,8 +2593,8 @@
     const body=$('ml-detail-body');
     body.innerHTML='';
 
-    const KEYS=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
     let curKey=s.origKey||'C';
+    let preferFlat=FLAT_KEYS.has(parseKeyName(curKey).root);
 
     const wrap=document.createElement('div');wrap.className='sw-wrap';
     const kPill=document.createElement('span');kPill.className='sw-pill sw-kpill';kPill.textContent='1 = '+curKey;
@@ -2609,7 +2634,8 @@
 
     const ksDiv=document.createElement('div');ksDiv.className='sw-ks';
     const slabel=document.createElement('div');slabel.className='sw-slabel';slabel.textContent='目标调';
-    ksDiv.appendChild(slabel);ksDiv.appendChild(kg);
+    const quickKeys=document.createElement('div');quickKeys.className='sw-kg sw-key-actions';
+    ksDiv.appendChild(slabel);ksDiv.appendChild(quickKeys);ksDiv.appendChild(kg);
     const panelInner=document.createElement('div');panelInner.className='sw-panel-inner';
     panelInner.appendChild(ksDiv);panelInner.appendChild(capoEl);panelInner.appendChild(lbDiv);
     const panel=document.createElement('div');panel.className='sw-panel';panel.appendChild(panelInner);wrap.appendChild(panel);
@@ -2689,16 +2715,44 @@
       scheduleFitRows();
     });
 
-    KEYS.forEach(k=>{
+    function setCurrentKey(nextKey,flatMode){
+      if(flatMode!==undefined)preferFlat=flatMode;
+      curKey=nextKey;
+      renderKeyButtons();
+      renderScore();
+    }
+    function addQuickKey(label,handler){
       const b=document.createElement('button');
-      b.className='sw-kb'+(k===curKey?' on':'');b.textContent=k;
-      b.addEventListener('click',()=>{
-        curKey=k;
-        kg.querySelectorAll('.sw-kb').forEach(x=>x.classList.remove('on'));
-        b.classList.add('on');renderScore();
-      });
-      kg.appendChild(b);
+      b.className='sw-kb';
+      b.type='button';
+      b.textContent=label;
+      b.addEventListener('click',handler);
+      quickKeys.appendChild(b);
+      return b;
+    }
+    addQuickKey('-1',()=>setCurrentKey(stepKeyName(curKey,-1,preferFlat)));
+    addQuickKey('原调',()=>setCurrentKey(s.origKey||'C',FLAT_KEYS.has(parseKeyName(s.origKey||'C').root)));
+    addQuickKey('+1',()=>setCurrentKey(stepKeyName(curKey,1,preferFlat)));
+    const enharmBtn=addQuickKey(preferFlat?'♭':'#',()=>{
+      preferFlat=!preferFlat;
+      curKey=enharmonicKeyName(curKey,preferFlat);
+      enharmBtn.textContent=preferFlat?'♭':'#';
+      setCurrentKey(curKey,preferFlat);
     });
+    function renderKeyButtons(){
+      kg.innerHTML='';
+      const keys=preferFlat?KEY_SET_FLAT:KEY_SET_SHARP;
+      keys.forEach(k=>{
+        const b=document.createElement('button');
+        b.className='sw-kb'+(k===curKey?' on':'');
+        b.type='button';
+        b.textContent=k;
+        b.addEventListener('click',()=>setCurrentKey(k,preferFlat));
+        kg.appendChild(b);
+      });
+      enharmBtn.textContent=preferFlat?'♭':'#';
+    }
+    renderKeyButtons();
 
     const tools=document.createElement('div');tools.className='sw-tools';
     const toolsRow=document.createElement('div');toolsRow.className='sw-tools-row';
@@ -2773,7 +2827,7 @@
     }
 
     function renderScore(){
-      const info=calcCapo(curKey,s.origKey||'C'),st=info.st,useFlat=FLAT_KEYS.has(curKey);
+      const info=calcCapo(curKey,s.origKey||'C'),st=info.st,useFlat=preferFlat;
       kPill.textContent='1 = '+curKey;
       if(scoreKeyBadge)scoreKeyBadge.textContent='1 = '+curKey;
       if(curKey===(s.origKey||'C')){
