@@ -1,0 +1,7 @@
+name = "REPLACE_WITH_YOUR_EXISTING_WORKER_NAME"
+main = "src/index.js"
+compatibility_date = "2026-05-29"
+
+[[r2_buckets]]
+binding = "BIBLES"
+bucket_name = "REPLACE_WITH_YOUR_R2_BUCKET_NAME"
