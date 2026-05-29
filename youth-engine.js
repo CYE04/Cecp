@@ -1434,6 +1434,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   var FLT={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb'};
   var FLAT_KEYS={F:1,Bb:1,Eb:1,Ab:1,Db:1,Gb:1,Cb:1};
   var USE_FLAT_MINOR_ROOTS={D:1,G:1,C:1,F:1,Bb:1,Eb:1};
+  var KEY_SET_FLAT=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+  var KEY_SET_SHARP=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  var ENHARMONIC_FLAT={'C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#':'Bb'};
+  var ENHARMONIC_SHARP={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
   function nIdx(n){return CHR.indexOf(ENH[n]||n);}
   function parseKeyName(key){
     var k=(key||'').trim();
@@ -1542,11 +1546,18 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     }
   }
   function trChordToken(token,st,useFlat){
-    var m=String(token||'').trim().match(/^([A-G](?:#|b)?)(.*)$/);
-    if(!m)return token;
-    var rest=m[2]||'';
-    rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,function(_,bass){return '/'+trBass(bass,st,useFlat);});
-    return trKeyName(m[1],st,useFlat)+rest;
+    var raw=String(token||'');
+    var m=raw.match(/^([A-G](?:#|b)?)([^A-G]*)(.*)$/);
+    if(m&&m[1]&&!m[3]){
+      var rest=m[2]||'';
+      rest=rest.replace(/\/\s*([A-G](?:#|b)?)/g,function(_,bass){return '/'+trBass(bass,st,useFlat);});
+      return trKeyName(m[1],st,useFlat)+rest;
+    }
+    return raw.replace(/(^|[^A-Za-z#b])([A-G](?:#|b)?)(maj|min|dim|aug|sus|add|m(?!aj)|[0-9+\-#b°øº⁰¹²³⁴⁵⁶⁷⁸⁹]*)(\/\s*([A-G](?:#|b)?))?(?=$|[^A-Za-z#b])/g,function(_,lead,root,suf,bassPart,bassRoot){
+      var out=trKeyName(root,st,useFlat)+(suf||'');
+      if(bassPart)out+='/'+trBass(bassRoot,st,useFlat);
+      return lead+out;
+    });
   }
   function resizeChordGap(gap,len){
     var chars=[...String(gap||'')].map(function(ch){return ch==='\u3164'?'\u3000':ch;});
@@ -1575,19 +1586,32 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   }
   function calcCapo(t,o){
     var target=parseKeyName(t),orig=parseKeyName(o);
-    var st=(nIdx(target.root)-nIdx(orig.root)+12)%12,best=null;
+    var ti=nIdx(target.root),oi=nIdx(orig.root);
+    if(ti<0||oi<0)return{st:0,capo:0,playKey:t};
+    var st=(ti-oi+12)%12,best=null;
     ['C','D','E','F','G','A','B'].forEach(function(pk){
       var c=(nIdx(target.root)-nIdx(pk)+12)%12;
       if(c<=7&&(!best||c<best.capo))best={playKey:pk+target.suf,capo:c};
     });
     return{st:st,capo:best?best.capo:0,playKey:best?best.playKey:t};
   }
+  function stepKeyName(key,delta,useFlat){
+    var parsed=parseKeyName(key),i=nIdx(parsed.root);
+    if(i<0)return key;
+    var roots=useFlat?['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B']:CHR;
+    return roots[(i+delta+120)%12]+parsed.suf;
+  }
+  function enharmonicKeyName(key,useFlat){
+    var parsed=parseKeyName(key);
+    var root=useFlat?(ENHARMONIC_FLAT[parsed.root]||parsed.root):(ENHARMONIC_SHARP[parsed.root]||parsed.root);
+    return root+parsed.suf;
+  }
 
   /* ══════════════ Song card ══════════════ */
   function buildSongCard(song) {
     var wrap = el('div', {class:'sw-wrap ym-reveal', id:'song-'+song.id});
-    var curKey = song.origKey;
-    var KEYS   = ['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+    var curKey = song.origKey||'C';
+    var preferFlat = !!FLAT_KEYS[parseKeyName(curKey).root];
 
     /* header */
     var kPill = el('span',{class:'sw-pill sw-kpill',text:'1 = '+curKey});
@@ -1686,6 +1710,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
     /* transpose panel */
     var kg     = div('sw-kg');
+    var quickKeys = div('sw-kg sw-key-actions');
     var capoEl = div('sw-capo plain',[
       el('div',{style:'font-size:15px;flex-shrink:0',text:'🎸'}),
       el('div',{style:'flex:1'},[
@@ -1695,19 +1720,42 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       el('div',{class:'sw-capo-n'}),
     ]);
     var lbDiv  = div('sw-lb');
-    var panelInner = div('sw-panel-inner',[div('sw-ks',[el('div',{class:'sw-slabel',text:'目标调'}),kg]),capoEl,lbDiv]);
+    var panelInner = div('sw-panel-inner',[div('sw-ks',[el('div',{class:'sw-slabel',text:'目标调'}),quickKeys,kg]),capoEl,lbDiv]);
     var panel  = div('sw-panel',[panelInner]);
     wrap.appendChild(panel);
 
-    KEYS.forEach(function(k){
-      var b = el('button',{class:'sw-kb'+(k===curKey?' on':''),text:k});
-      b.addEventListener('click',function(){
-        curKey=k;
-        kg.querySelectorAll('.sw-kb').forEach(function(x){x.classList.remove('on')});
-        b.classList.add('on'); renderScore();
-      });
-      kg.appendChild(b);
+    function setCurrentKey(nextKey,flatMode){
+      if(flatMode!==undefined)preferFlat=flatMode;
+      curKey=nextKey;
+      renderKeyButtons();
+      renderScore();
+    }
+    function addQuickKey(label,handler){
+      var b=el('button',{class:'sw-kb',type:'button',text:label});
+      b.addEventListener('click',handler);
+      quickKeys.appendChild(b);
+      return b;
+    }
+    addQuickKey('-1',function(){setCurrentKey(stepKeyName(curKey,-1,preferFlat));});
+    addQuickKey('原调',function(){setCurrentKey(song.origKey||'C',!!FLAT_KEYS[parseKeyName(song.origKey||'C').root]);});
+    addQuickKey('+1',function(){setCurrentKey(stepKeyName(curKey,1,preferFlat));});
+    var enharmBtn=addQuickKey(preferFlat?'♭':'#',function(){
+      preferFlat=!preferFlat;
+      curKey=enharmonicKeyName(curKey,preferFlat);
+      enharmBtn.textContent=preferFlat?'♭':'#';
+      setCurrentKey(curKey,preferFlat);
     });
+    function renderKeyButtons(){
+      kg.innerHTML='';
+      var keys=preferFlat?KEY_SET_FLAT:KEY_SET_SHARP;
+      keys.forEach(function(k){
+        var b = el('button',{class:'sw-kb'+(k===curKey?' on':''),type:'button',text:k});
+        b.addEventListener('click',function(){setCurrentKey(k,preferFlat);});
+        kg.appendChild(b);
+      });
+      enharmBtn.textContent=preferFlat?'♭':'#';
+    }
+    renderKeyButtons();
 
     /* tools row */
     var exportBtn = el('button',{class:'sw-export-btn',type:'button','aria-label':'下载图片'});
@@ -1741,11 +1789,11 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
     /* jianpu render */
     function renderScore(){
-      var info = calcCapo(curKey, song.origKey), st = info.st, useFlat = !!FLAT_KEYS[curKey];
+      var info = calcCapo(curKey, song.origKey||'C'), st = info.st, useFlat = preferFlat;
       kPill.textContent = '1 = ' + curKey;
       scoreKeyBadge.textContent = '1 = ' + curKey;
 
-      if(curKey === song.origKey){
+      if(curKey === (song.origKey||'C')){
         capoEl.className='sw-capo plain';
         capoEl.querySelector('.sw-capo-t').textContent='原调演奏';
         capoEl.querySelector('.sw-capo-s').textContent='不需要变调夹';
