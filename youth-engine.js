@@ -65,15 +65,15 @@ window.YouthEngine = {};
 }
 @media(prefers-color-scheme:dark){
   :root{
-    --ym-bg:#09111f;--ym-card:rgba(255,255,255,.08);--ym-ink:rgba(255,255,255,.95);--ym-ink2:rgba(222,234,255,.76);--ym-ink3:rgba(205,220,255,.48);
-    --ym-border:rgba(138,164,214,.22);--ym-border-md:rgba(139,184,255,.34);--ym-soft:rgba(99,124,174,.16);
+    --ym-bg:#100f1f;--ym-card:rgba(255,255,255,.08);--ym-ink:rgba(255,255,255,.95);--ym-ink2:rgba(239,232,255,.80);--ym-ink3:rgba(230,216,255,.52);
+    --ym-border:rgba(196,151,255,.24);--ym-border-md:rgba(255,196,87,.38);--ym-soft:rgba(140,92,190,.16);
     --ym-sh:0 2px 8px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
     --ym-sh-lg:0 8px 40px rgba(0,0,0,.54),0 2px 8px rgba(0,0,0,.34);
-    --ym-glow:rgba(89,132,255,.36);--ym-warm:rgba(251,191,36,.24);--ym-mint:rgba(45,212,191,.28);
-    --ym-page:#09111f;--ym-panel:#132036;--ym-panel-2:#0f1a2d;--ym-glass:rgba(24,38,62,.90);
-    --ym-elev:0 28px 90px rgba(0,0,0,.42),0 1px 0 rgba(255,255,255,.08) inset;
-    --ym-chip:rgba(67,91,139,.38);--ym-chip-hover:rgba(76,112,174,.56);--ym-line:rgba(144,178,236,.22);
-    --ym-brand:#8db0ff;--ym-brand2:#41e2d5;--ym-brand3:#ffd166;
+    --ym-glow:rgba(167,139,250,.38);--ym-warm:rgba(255,190,80,.32);--ym-mint:rgba(52,211,153,.30);
+    --ym-page:#100f1f;--ym-panel:#231b38;--ym-panel-2:#17172b;--ym-glass:rgba(34,27,54,.92);
+    --ym-elev:0 28px 90px rgba(0,0,0,.44),0 1px 0 rgba(255,255,255,.12) inset;
+    --ym-chip:rgba(111,79,154,.42);--ym-chip-hover:rgba(136,91,173,.56);--ym-line:rgba(212,169,255,.26);
+    --ym-brand:#c084fc;--ym-brand2:#34d399;--ym-brand3:#fbbf24;
     --ym-on-brand:#06111f;
     --ym-capo:#fb923c;--ym-capo-bg:rgba(251,146,60,.1);--ym-capo-ln:rgba(251,146,60,.22);
     --yb:#161616;--yt:rgba(255,255,255,.92);--ym:rgba(255,255,255,.70);--ybr:rgba(255,255,255,.15);--ysh:rgba(0,0,0,.65);--ybk:rgba(0,0,0,.80);
@@ -346,12 +346,13 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 .ym-song-panel{display:none}
 .ym-song-panel.active{display:block;min-width:0}
 @media(prefers-color-scheme:dark){
-  .ym-hero{background:linear-gradient(180deg,rgba(31,49,80,.94),rgba(16,29,50,.94));border-color:rgba(148,184,255,.28)}
-  .ym-hero::before{background:radial-gradient(ellipse at 50% -18%,rgba(141,176,255,.24),transparent 50%),radial-gradient(ellipse at 50% 112%,rgba(65,226,213,.18),transparent 52%),linear-gradient(180deg,rgba(255,255,255,.08),transparent 48%,rgba(65,226,213,.06))}
-  .ym-flow .card,.ym-song-tabs,.ym-block,.sw-panel-inner,.sw-score,.wr-card{background:linear-gradient(180deg,rgba(25,39,64,.96),rgba(14,26,46,.96));border-color:rgba(142,177,238,.24)}
-  .ym-flow .item,.ym-song-tab,.ym-nav-btn,.sw-tools-row,.wr-section{background:rgba(75,102,156,.34);border-color:rgba(150,188,255,.24)}
-  .ym-flow .item:hover,.ym-song-tab:hover,.ym-nav-btn:hover,.wr-section:hover{background:rgba(88,124,190,.48)}
-  .ym-section-title::after{background:linear-gradient(90deg,rgba(141,176,255,.34),transparent)}
+  .ym-hero{background:linear-gradient(180deg,rgba(47,35,75,.96),rgba(22,28,46,.96));border-color:rgba(211,169,255,.34)}
+  .ym-hero::before{background:radial-gradient(ellipse at 50% -18%,rgba(192,132,252,.24),transparent 48%),radial-gradient(ellipse at 50% 112%,rgba(52,211,153,.20),transparent 50%),linear-gradient(180deg,rgba(251,191,36,.08),transparent 46%,rgba(244,114,182,.08))}
+  .ym-flow .card,.ym-song-tabs,.ym-block,.sw-panel-inner,.sw-score,.wr-card{background:linear-gradient(180deg,rgba(43,34,68,.98),rgba(18,28,45,.98));border-color:rgba(211,169,255,.26)}
+  .ym-flow .item,.ym-song-tab,.ym-nav-btn,.sw-tools-row,.wr-section{background:linear-gradient(180deg,rgba(117,84,154,.42),rgba(32,91,85,.30));border-color:rgba(244,190,255,.26)}
+  .ym-flow .item:hover,.ym-song-tab:hover,.ym-nav-btn:hover,.wr-section:hover{background:linear-gradient(180deg,rgba(143,96,174,.54),rgba(44,126,108,.42))}
+  .ym-song-tab.active,.ym-nav-btn.active{background:linear-gradient(135deg,#c084fc,#34d399 56%,#fbbf24);color:#111827;box-shadow:0 14px 34px rgba(192,132,252,.22)}
+  .ym-section-title::after{background:linear-gradient(90deg,rgba(192,132,252,.42),rgba(52,211,153,.28),rgba(251,191,36,.16),transparent)}
 }
 @media(max-width:640px){
   .ym-hero{padding:1.75rem 1rem 1.9rem;border-radius:24px}
