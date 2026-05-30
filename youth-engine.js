@@ -869,13 +869,12 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     sheet.className='ym-export-sheet';
     sheet.style.cssText=[
       'position:relative',
-      'display:inline-block',
-      'width:max-content',
-      'min-width:720px',
-      'padding:28px 30px 30px',
+      'width:2000px',
+      'height:2828px',
+      'padding:110px 125px 120px',
       'background:#fff',
       'color:#111',
-      'overflow:visible',
+      'overflow:hidden',
       'box-sizing:border-box',
       'font-family:"Noto Serif SC","Songti SC","PingFang SC",serif'
     ].join(';');
@@ -883,14 +882,14 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var style=document.createElement('style');
     style.textContent=[
       '.ym-export-sheet,.ym-export-sheet *{box-sizing:border-box!important;color:#111!important;border-color:#111!important;text-shadow:none!important;-webkit-text-fill-color:#111!important;box-shadow:none!important;}',
-      '.ym-export-watermark{position:absolute!important;left:50%!important;top:50%!important;width:72%!important;max-width:900px!important;transform:translate(-50%,-50%)!important;opacity:.075!important;pointer-events:none!important;z-index:0!important;}',
+      '.ym-export-watermark{position:absolute!important;left:50%!important;top:50%!important;width:1180px!important;max-width:68%!important;transform:translate(-50%,-50%)!important;opacity:.055!important;pointer-events:none!important;z-index:0!important;}',
       '.ym-export-content{position:relative!important;z-index:1!important;width:100%!important;text-align:center!important;}',
       '.ym-export-head{display:grid!important;grid-template-columns:minmax(160px,1fr) auto minmax(160px,1fr)!important;align-items:start!important;gap:20px!important;margin:0 0 24px!important;}',
       '.ym-export-left,.ym-export-right{font-size:15px!important;line-height:1.5!important;font-weight:600!important;white-space:pre-line!important;font-family:"DM Mono","Space Mono",monospace!important;}',
       '.ym-export-right{text-align:right!important;opacity:.72!important;}',
       '.ym-export-title{text-align:center!important;font-size:28px!important;line-height:1.18!important;font-weight:900!important;margin:0!important;}',
       '.ym-export-subtitle{text-align:center!important;font-size:15px!important;line-height:1.45!important;margin-top:8px!important;font-weight:500!important;opacity:.82!important;}',
-      '.ym-export-score{width:100%!important;overflow:visible!important;background:transparent!important;display:flex!important;justify-content:center!important;}',
+      '.ym-export-score{width:100%!important;overflow:hidden!important;background:transparent!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;}',
       '.ym-export-score .sw-lb{background:transparent!important;border:0!important;box-shadow:none!important;margin-left:auto!important;margin-right:auto!important;}',
       '.ym-export-score .sw-lsec-name::after{background:transparent!important;}',
       '.ym-export-score .p-lyric2,.ym-export-score .p-lyric3,.ym-export-score .p-lyric4{opacity:1!important;}',
@@ -939,9 +938,17 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     host.appendChild(sheet);
     mount.appendChild(host);
 
-    var naturalW=Math.max(720,Math.ceil(clone.scrollWidth||panelInner.scrollWidth||0)+60);
-    sheet.style.width=naturalW+'px';
+    var availableW=2000-250;
+    var headerH=Math.ceil(head.getBoundingClientRect().height||head.offsetHeight||0);
+    var availableH=Math.max(1,2828-110-120-headerH-24);
+    var naturalW=Math.max(1,Math.ceil(clone.scrollWidth||panelInner.scrollWidth||0));
+    var naturalH=Math.max(1,Math.ceil(clone.scrollHeight||panelInner.scrollHeight||0));
+    var scale=Math.min(1,availableW/naturalW,availableH/naturalH);
+    score.style.height=availableH+'px';
+    clone.style.width=naturalW+'px';
     clone.style.display='inline-block';
+    clone.style.transform='scale('+scale+')';
+    clone.style.transformOrigin='top center';
 
     return {
       node:sheet,

@@ -882,13 +882,12 @@
     sheet.className='ml-export-sheet';
     sheet.style.cssText=[
       'position:relative',
-      'display:inline-block',
-      'width:max-content',
-      'min-width:720px',
-      'padding:28px 30px 30px',
+      'width:2000px',
+      'height:2828px',
+      'padding:110px 125px 120px',
       'background:#fff',
       'color:#111',
-      'overflow:visible',
+      'overflow:hidden',
       'box-sizing:border-box',
       'font-family:"Noto Serif SC","Songti SC","PingFang SC",serif'
     ].join(';');
@@ -896,14 +895,14 @@
     const style=document.createElement('style');
     style.textContent=[
       '.ml-export-sheet,.ml-export-sheet *{box-sizing:border-box!important;color:#111!important;border-color:#111!important;text-shadow:none!important;-webkit-text-fill-color:#111!important;box-shadow:none!important;}',
-      '.ml-export-watermark{position:absolute!important;left:50%!important;top:50%!important;width:72%!important;max-width:900px!important;transform:translate(-50%,-50%)!important;opacity:.075!important;pointer-events:none!important;z-index:0!important;}',
+      '.ml-export-watermark{position:absolute!important;left:50%!important;top:50%!important;width:1180px!important;max-width:68%!important;transform:translate(-50%,-50%)!important;opacity:.055!important;pointer-events:none!important;z-index:0!important;}',
       '.ml-export-content{position:relative!important;z-index:1!important;width:100%!important;text-align:center!important;}',
       '.ml-export-head{display:grid!important;grid-template-columns:minmax(160px,1fr) auto minmax(160px,1fr)!important;align-items:start!important;gap:20px!important;margin:0 0 24px!important;}',
       '.ml-export-left,.ml-export-right{font-size:15px!important;line-height:1.5!important;font-weight:600!important;white-space:pre-line!important;font-family:"DM Mono","Space Mono",monospace!important;}',
       '.ml-export-right{text-align:right!important;opacity:.72!important;}',
       '.ml-export-title{text-align:center!important;font-size:28px!important;line-height:1.18!important;font-weight:900!important;margin:0!important;}',
       '.ml-export-subtitle{text-align:center!important;font-size:15px!important;line-height:1.45!important;margin-top:8px!important;font-weight:500!important;opacity:.82!important;}',
-      '.ml-export-score{width:100%!important;overflow:visible!important;background:transparent!important;display:flex!important;justify-content:center!important;}',
+      '.ml-export-score{width:100%!important;overflow:hidden!important;background:transparent!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;}',
       '.ml-export-score .sw-lb{background:transparent!important;border:0!important;box-shadow:none!important;margin-left:auto!important;margin-right:auto!important;}',
       '.ml-export-score .sw-lsec-name::after{background:transparent!important;}',
       '.ml-export-score .p-lyric2,.ml-export-score .p-lyric3,.ml-export-score .p-lyric4{opacity:1!important;}',
@@ -952,9 +951,17 @@
     host.appendChild(sheet);
     mount.appendChild(host);
 
-    const naturalW=Math.max(720,Math.ceil(clone.scrollWidth||panelInner.scrollWidth||0)+60);
-    sheet.style.width=naturalW+'px';
+    const availableW=2000-250;
+    const headerH=Math.ceil(head.getBoundingClientRect().height||head.offsetHeight||0);
+    const availableH=Math.max(1,2828-110-120-headerH-24);
+    const naturalW=Math.max(1,Math.ceil(clone.scrollWidth||panelInner.scrollWidth||0));
+    const naturalH=Math.max(1,Math.ceil(clone.scrollHeight||panelInner.scrollHeight||0));
+    const scale=Math.min(1,availableW/naturalW,availableH/naturalH);
+    score.style.height=availableH+'px';
+    clone.style.width=naturalW+'px';
     clone.style.display='inline-block';
+    clone.style.transform='scale('+scale+')';
+    clone.style.transformOrigin='top center';
 
     return {
       node:sheet,
