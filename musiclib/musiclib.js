@@ -862,116 +862,88 @@
     };
   }
 
-  function waitForNodeImages(node){
-    if(!node) return Promise.resolve();
-    const imgs=Array.from(node.querySelectorAll('img'));
-    const pending=imgs.filter(img=>!img.complete||!img.naturalWidth);
-    if(!pending.length) return Promise.resolve();
-    return Promise.all(pending.map(img=>new Promise(resolve=>{
-      img.addEventListener('load',resolve,{once:true});
-      img.addEventListener('error',resolve,{once:true});
-    })));
+  function loadImageForExport(src){
+    return new Promise(resolve=>{
+      if(!src){ resolve(null); return; }
+      const img=new Image();
+      img.crossOrigin='anonymous';
+      img.onload=()=>resolve(img);
+      img.onerror=()=>resolve(null);
+      img.src=src;
+    });
   }
 
-  function buildSongExportSheet(panelInner,opt={}){
-    const mount=document.body || document.documentElement;
-    const host=document.createElement('div');
-    host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
+  function blobToImage(blob){
+    return new Promise((resolve,reject)=>{
+      const url=URL.createObjectURL(blob);
+      const img=new Image();
+      img.onload=()=>{ URL.revokeObjectURL(url); resolve(img); };
+      img.onerror=err=>{ URL.revokeObjectURL(url); reject(err); };
+      img.src=url;
+    });
+  }
 
-    const sheet=document.createElement('div');
-    sheet.className='ml-export-sheet';
-    sheet.style.cssText=[
-      'position:relative',
-      'width:2000px',
-      'height:2828px',
-      'padding:110px 125px 120px',
-      'background:#fff',
-      'color:#111',
-      'overflow:hidden',
-      'box-sizing:border-box',
-      'font-family:"Noto Serif SC","Songti SC","PingFang SC",serif'
-    ].join(';');
+  function makeExportTextBlack(scope){
+    if(!scope||!scope.querySelectorAll) return;
+    const nodes=[scope].concat(Array.from(scope.querySelectorAll('*')));
+    nodes.forEach(n=>{
+      if(!n.style) return;
+      n.style.setProperty('color','#111','important');
+      n.style.setProperty('-webkit-text-fill-color','#111','important');
+      n.style.setProperty('border-color','#111','important');
+      n.style.setProperty('text-shadow','none','important');
+    });
+    scope.querySelectorAll('.jp-u1-line,.jp-u2-line,.jp-dash-line').forEach(n=>{
+      n.style.setProperty('background','#111','important');
+    });
+  }
 
-    const style=document.createElement('style');
-    style.textContent=[
-      '.ml-export-sheet,.ml-export-sheet *{box-sizing:border-box!important;color:#111!important;border-color:#111!important;text-shadow:none!important;-webkit-text-fill-color:#111!important;box-shadow:none!important;}',
-      '.ml-export-watermark{position:absolute!important;left:50%!important;top:50%!important;width:1180px!important;max-width:68%!important;transform:translate(-50%,-50%)!important;opacity:.045!important;pointer-events:none!important;z-index:0!important;}',
-      '.ml-export-content{position:relative!important;z-index:1!important;width:100%!important;text-align:center!important;}',
-      '.ml-export-head{display:grid!important;grid-template-columns:minmax(160px,1fr) auto minmax(160px,1fr)!important;align-items:start!important;gap:20px!important;margin:0 0 24px!important;}',
-      '.ml-export-left,.ml-export-right{font-size:15px!important;line-height:1.5!important;font-weight:600!important;white-space:pre-line!important;font-family:"DM Mono","Space Mono",monospace!important;}',
-      '.ml-export-right{text-align:right!important;opacity:.72!important;}',
-      '.ml-export-title{text-align:center!important;font-size:28px!important;line-height:1.18!important;font-weight:900!important;margin:0!important;}',
-      '.ml-export-subtitle{text-align:center!important;font-size:15px!important;line-height:1.45!important;margin-top:8px!important;font-weight:500!important;opacity:.82!important;}',
-      '.ml-export-score{width:100%!important;overflow:hidden!important;background:transparent!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;}',
-      '.ml-export-score .sw-lb{background:transparent!important;border:0!important;box-shadow:none!important;margin-left:auto!important;margin-right:auto!important;}',
-      '.ml-export-score .sw-lsec-name::after{background:transparent!important;}',
-      '.ml-export-score .p-lyric2,.ml-export-score .p-lyric3,.ml-export-score .p-lyric4{opacity:1!important;}',
-      '.ml-export-score .jp-u1-line,.ml-export-score .jp-u2-line{background:#111!important;}',
-      '.ml-export-score .jp-slur::before,.ml-export-score .jp-slur-open::before,.ml-export-score .jp-slur-close::before,.ml-export-score .jp-tuplet-br,.ml-export-score .jp-volta::before,.ml-export-score .prev-volta::before{border-color:#111!important;}',
-      '.ml-export-score .jp-tuplet-num{background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;}'
-    ].join('\n');
-    sheet.appendChild(style);
+  function composeA4SongImage(scoreBlob,opt={}){
+    return Promise.all([blobToImage(scoreBlob),loadImageForExport(LOGO_SRC)]).then(([scoreImg,logoImg])=>{
+      const W=2000,H=2828;
+      const canvas=document.createElement('canvas');
+      canvas.width=W; canvas.height=H;
+      const ctx=canvas.getContext('2d');
+      if(!ctx) throw new Error('canvas unavailable');
+      ctx.fillStyle='#fff';
+      ctx.fillRect(0,0,W,H);
 
-    const watermark=document.createElement('img');
-    watermark.className='ml-export-watermark';
-    watermark.src=LOGO_SRC;
-    watermark.alt='';
-    sheet.appendChild(watermark);
+      if(logoImg){
+        const logoW=1180;
+        const logoH=logoW*(logoImg.naturalHeight||logoImg.height)/(logoImg.naturalWidth||logoImg.width);
+        ctx.save();
+        ctx.globalAlpha=0.045;
+        ctx.drawImage(logoImg,(W-logoW)/2,(H-logoH)/2,logoW,logoH);
+        ctx.restore();
+      }
 
-    const content=document.createElement('div');
-    content.className='ml-export-content';
+      const song=opt.song||{};
+      const title=song.title||opt.title||'';
+      const subtitle=[song.artist,song.sub].filter(Boolean).join('  ');
+      const leftLines=[song.bpm?'♪ = '+song.bpm:'','1= '+(opt.key||song.origKey||'C')+'  '+(song.timeSign||'4/4')].filter(Boolean);
 
-    const meta=opt.song||{};
-    const leftLines=[
-      meta.bpm ? '♪ = '+meta.bpm : '',
-      '1= '+(opt.key||meta.origKey||'C')+'   '+(meta.timeSign||'4/4')
-    ].filter(Boolean);
-    const title=meta.title||opt.title||'未命名诗歌';
-    const subtitle=[meta.artist,meta.sub].filter(Boolean).join('  ');
+      ctx.fillStyle='#111';
+      ctx.textBaseline='top';
+      ctx.font='600 24px "DM Mono","Space Mono",monospace';
+      leftLines.forEach((line,i)=>ctx.fillText(line,260,130+i*34));
+      ctx.textAlign='center';
+      ctx.font='900 38px "Noto Serif SC","Songti SC","PingFang SC",serif';
+      ctx.fillText(title,W/2,128);
+      if(subtitle){
+        ctx.font='500 22px "Noto Serif SC","Songti SC","PingFang SC",serif';
+        ctx.fillText(subtitle,W/2,182);
+      }
+      ctx.textAlign='left';
 
-    const head=document.createElement('div');
-    head.className='ml-export-head';
-    head.innerHTML=[
-      '<div class="ml-export-left">'+esc(leftLines.join('\n'))+'</div>',
-      '<div><div class="ml-export-title">'+esc(title)+'</div>'+(subtitle?'<div class="ml-export-subtitle">'+esc(subtitle)+'</div>':'')+'</div>',
-      '<div class="ml-export-right"></div>'
-    ].join('');
-    content.appendChild(head);
-
-    const score=document.createElement('div');
-    score.className='ml-export-score';
-    const clone=panelInner.cloneNode(true);
-    clone.style.width='max-content';
-    clone.style.maxWidth='none';
-    clone.style.margin='0';
-    clone.style.marginBottom='0';
-    clone.style.height='auto';
-    clone.style.transform='none';
-    clone.style.transformOrigin='top center';
-    score.appendChild(clone);
-    content.appendChild(score);
-    sheet.appendChild(content);
-    host.appendChild(sheet);
-    mount.appendChild(host);
-
-    const availableW=2000-250;
-    const headerH=Math.ceil(head.getBoundingClientRect().height||head.offsetHeight||0);
-    const availableH=Math.max(1,2828-110-120-headerH-24);
-    const naturalRect=clone.getBoundingClientRect();
-    const naturalW=Math.max(1,Math.ceil(naturalRect.width||clone.scrollWidth||panelInner.scrollWidth||0));
-    const naturalH=Math.max(1,Math.ceil(naturalRect.height||clone.scrollHeight||panelInner.scrollHeight||0));
-    const scale=Math.min(2.35,availableW/naturalW,availableH/naturalH);
-    score.style.height=availableH+'px';
-    clone.style.width=naturalW+'px';
-    clone.style.display='inline-block';
-    clone.style.transform='scale('+scale+')';
-    clone.style.transformOrigin='top center';
-
-    return {
-      node:sheet,
-      score:clone,
-      cleanup:()=>host.remove()
-    };
+      const area={x:150,y:250,w:1700,h:2460};
+      const scale=Math.min(area.w/scoreImg.width,area.h/scoreImg.height);
+      const drawW=scoreImg.width*scale;
+      const drawH=scoreImg.height*scale;
+      const drawX=area.x+(area.w-drawW)/2;
+      const drawY=area.y;
+      ctx.drawImage(scoreImg,drawX,drawY,drawW,drawH);
+      return canvasToPngBlob(canvas);
+    });
   }
 
   function normalizeExportNotation(scope){
@@ -1057,19 +1029,20 @@
 
   function exportTransposePanel(panelInner,opt={}){
     if(!panelInner) return Promise.reject(new Error('panel missing'));
-    const bg=opt.bgColor||'#ffffff';
+    const bg=resolveExportBackground(panelInner,opt.bgColor);
     const waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
       .then(()=>{
-        const snap=opt.song ? buildSongExportSheet(panelInner,opt) : buildExportClone(panelInner,{tight:!!opt.tight});
+        const snap=buildExportClone(panelInner,{tight:!!opt.tight});
         if(opt.hideTransposeOptions){
           const keyZone=snap.node.querySelector('.sw-ks');
           if(keyZone) keyZone.remove();
         }
-        normalizeExportNotation(snap.score||snap.node);
+        normalizeExportNotation(snap.node);
+        if(opt.a4) makeExportTextBlack(snap.node);
         return waitPaint2()
-          .then(()=>waitForNodeImages(snap.node))
           .then(()=>nodeToPngBlobRobust(snap.node,bg))
+          .then(blob=>opt.a4?composeA4SongImage(blob,opt):blob)
           .finally(()=>snap.cleanup());
       })
       .then(blob=>{
@@ -2901,6 +2874,8 @@
         title:s.title||'transpose',
         key:curKey,
         song:s,
+        a4:true,
+        bgColor:'#ffffff',
         tight:true,
         width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
       }).then(()=>{
