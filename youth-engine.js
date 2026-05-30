@@ -861,7 +861,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   function buildSongExportSheet(panelInner,opt){
     opt=opt||{};
-    var mount=(panelInner&&panelInner.closest&&panelInner.closest('#ym-root')) || document.body;
+    var mount=document.body || document.documentElement;
     var host=document.createElement('div');
     host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
 
@@ -882,7 +882,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var style=document.createElement('style');
     style.textContent=[
       '.ym-export-sheet,.ym-export-sheet *{box-sizing:border-box!important;color:#111!important;border-color:#111!important;text-shadow:none!important;-webkit-text-fill-color:#111!important;box-shadow:none!important;}',
-      '.ym-export-watermark{position:absolute!important;left:50%!important;top:50%!important;width:1180px!important;max-width:68%!important;transform:translate(-50%,-50%)!important;opacity:.055!important;pointer-events:none!important;z-index:0!important;}',
+      '.ym-export-watermark{position:absolute!important;left:50%!important;top:50%!important;width:1180px!important;max-width:68%!important;transform:translate(-50%,-50%)!important;opacity:.045!important;pointer-events:none!important;z-index:0!important;}',
       '.ym-export-content{position:relative!important;z-index:1!important;width:100%!important;text-align:center!important;}',
       '.ym-export-head{display:grid!important;grid-template-columns:minmax(160px,1fr) auto minmax(160px,1fr)!important;align-items:start!important;gap:20px!important;margin:0 0 24px!important;}',
       '.ym-export-left,.ym-export-right{font-size:15px!important;line-height:1.5!important;font-weight:600!important;white-space:pre-line!important;font-family:"DM Mono","Space Mono",monospace!important;}',
@@ -928,10 +928,13 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var score=document.createElement('div');
     score.className='ym-export-score';
     var clone=panelInner.cloneNode(true);
-    clone.style.width='auto';
+    clone.style.width='max-content';
     clone.style.maxWidth='none';
     clone.style.margin='0';
+    clone.style.marginBottom='0';
+    clone.style.height='auto';
     clone.style.transform='none';
+    clone.style.transformOrigin='top center';
     score.appendChild(clone);
     content.appendChild(score);
     sheet.appendChild(content);
@@ -941,9 +944,10 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var availableW=2000-250;
     var headerH=Math.ceil(head.getBoundingClientRect().height||head.offsetHeight||0);
     var availableH=Math.max(1,2828-110-120-headerH-24);
-    var naturalW=Math.max(1,Math.ceil(clone.scrollWidth||panelInner.scrollWidth||0));
-    var naturalH=Math.max(1,Math.ceil(clone.scrollHeight||panelInner.scrollHeight||0));
-    var scale=Math.min(1,availableW/naturalW,availableH/naturalH);
+    var naturalRect=clone.getBoundingClientRect();
+    var naturalW=Math.max(1,Math.ceil(naturalRect.width||clone.scrollWidth||panelInner.scrollWidth||0));
+    var naturalH=Math.max(1,Math.ceil(naturalRect.height||clone.scrollHeight||panelInner.scrollHeight||0));
+    var scale=Math.min(2.35,availableW/naturalW,availableH/naturalH);
     score.style.height=availableH+'px';
     clone.style.width=naturalW+'px';
     clone.style.display='inline-block';
