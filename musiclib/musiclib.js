@@ -459,6 +459,14 @@
       .slice(0,80) || 'song';
   }
 
+  function esc(s){
+    return String(s==null?'':s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
   let _h2cPromise=null;
   function loadHtml2Canvas(){
     if(window.html2canvas) return Promise.resolve(window.html2canvas);
@@ -854,6 +862,106 @@
     };
   }
 
+  function waitForNodeImages(node){
+    if(!node) return Promise.resolve();
+    const imgs=Array.from(node.querySelectorAll('img'));
+    const pending=imgs.filter(img=>!img.complete||!img.naturalWidth);
+    if(!pending.length) return Promise.resolve();
+    return Promise.all(pending.map(img=>new Promise(resolve=>{
+      img.addEventListener('load',resolve,{once:true});
+      img.addEventListener('error',resolve,{once:true});
+    })));
+  }
+
+  function buildSongExportSheet(panelInner,opt={}){
+    const mount=(panelInner&&panelInner.closest&&panelInner.closest('#music-library')) || document.body;
+    const host=document.createElement('div');
+    host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
+
+    const sheet=document.createElement('div');
+    sheet.className='ml-export-sheet';
+    sheet.style.cssText=[
+      'position:relative',
+      'display:inline-block',
+      'width:max-content',
+      'min-width:720px',
+      'padding:28px 30px 30px',
+      'background:#fff',
+      'color:#111',
+      'overflow:visible',
+      'box-sizing:border-box',
+      'font-family:"Noto Serif SC","Songti SC","PingFang SC",serif'
+    ].join(';');
+
+    const style=document.createElement('style');
+    style.textContent=[
+      '.ml-export-sheet,.ml-export-sheet *{box-sizing:border-box!important;color:#111!important;border-color:#111!important;text-shadow:none!important;-webkit-text-fill-color:#111!important;box-shadow:none!important;}',
+      '.ml-export-watermark{position:absolute!important;left:50%!important;top:54%!important;width:72%!important;max-width:900px!important;transform:translate(-50%,-50%)!important;opacity:.075!important;pointer-events:none!important;z-index:0!important;}',
+      '.ml-export-content{position:relative!important;z-index:1!important;}',
+      '.ml-export-head{display:grid!important;grid-template-columns:minmax(160px,1fr) auto minmax(160px,1fr)!important;align-items:start!important;gap:20px!important;margin:0 0 24px!important;}',
+      '.ml-export-left,.ml-export-right{font-size:15px!important;line-height:1.5!important;font-weight:600!important;white-space:pre-line!important;font-family:"DM Mono","Space Mono",monospace!important;}',
+      '.ml-export-right{text-align:right!important;opacity:.72!important;}',
+      '.ml-export-title{text-align:center!important;font-size:28px!important;line-height:1.18!important;font-weight:900!important;margin:0!important;}',
+      '.ml-export-subtitle{text-align:center!important;font-size:15px!important;line-height:1.45!important;margin-top:8px!important;font-weight:500!important;opacity:.82!important;}',
+      '.ml-export-score{width:100%!important;overflow:visible!important;background:transparent!important;}',
+      '.ml-export-score .sw-lb{background:transparent!important;border:0!important;box-shadow:none!important;}',
+      '.ml-export-score .sw-lsec-name::after{background:transparent!important;}',
+      '.ml-export-score .p-lyric2,.ml-export-score .p-lyric3,.ml-export-score .p-lyric4{opacity:1!important;}',
+      '.ml-export-score .jp-u1-line,.ml-export-score .jp-u2-line{background:#111!important;}',
+      '.ml-export-score .jp-slur::before,.ml-export-score .jp-slur-open::before,.ml-export-score .jp-slur-close::before,.ml-export-score .jp-tuplet-br,.ml-export-score .jp-volta::before,.ml-export-score .prev-volta::before{border-color:#111!important;}',
+      '.ml-export-score .jp-tuplet-num{background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;}'
+    ].join('\n');
+    sheet.appendChild(style);
+
+    const watermark=document.createElement('img');
+    watermark.className='ml-export-watermark';
+    watermark.src=LOGO_SRC;
+    watermark.alt='';
+    sheet.appendChild(watermark);
+
+    const content=document.createElement('div');
+    content.className='ml-export-content';
+
+    const meta=opt.song||{};
+    const leftLines=[
+      meta.bpm ? '♪ = '+meta.bpm : '',
+      '1= '+(opt.key||meta.origKey||'C')+'   '+(meta.timeSign||'4/4')
+    ].filter(Boolean);
+    const title=meta.title||opt.title||'未命名诗歌';
+    const subtitle=[meta.artist,meta.sub].filter(Boolean).join('  ');
+
+    const head=document.createElement('div');
+    head.className='ml-export-head';
+    head.innerHTML=[
+      '<div class="ml-export-left">'+esc(leftLines.join('\n'))+'</div>',
+      '<div><div class="ml-export-title">'+esc(title)+'</div>'+(subtitle?'<div class="ml-export-subtitle">'+esc(subtitle)+'</div>':'')+'</div>',
+      '<div class="ml-export-right"></div>'
+    ].join('');
+    content.appendChild(head);
+
+    const score=document.createElement('div');
+    score.className='ml-export-score';
+    const clone=panelInner.cloneNode(true);
+    clone.style.width='auto';
+    clone.style.maxWidth='none';
+    clone.style.margin='0';
+    clone.style.transform='none';
+    score.appendChild(clone);
+    content.appendChild(score);
+    sheet.appendChild(content);
+    host.appendChild(sheet);
+    mount.appendChild(host);
+
+    const naturalW=Math.max(720,Math.ceil(clone.scrollWidth||panelInner.scrollWidth||0)+60);
+    sheet.style.width=naturalW+'px';
+
+    return {
+      node:sheet,
+      score:clone,
+      cleanup:()=>host.remove()
+    };
+  }
+
   function normalizeExportNotation(scope){
     if(!scope||!scope.querySelectorAll) return;
     scope.querySelectorAll('.jp-lines-wrap').forEach(wrap=>{
@@ -937,17 +1045,18 @@
 
   function exportTransposePanel(panelInner,opt={}){
     if(!panelInner) return Promise.reject(new Error('panel missing'));
-    const bg=resolveExportBackground(panelInner,opt.bgColor);
+    const bg=opt.bgColor||'#ffffff';
     const waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
       .then(()=>{
-        const snap=buildExportClone(panelInner,{tight:!!opt.tight});
+        const snap=opt.song ? buildSongExportSheet(panelInner,opt) : buildExportClone(panelInner,{tight:!!opt.tight});
         if(opt.hideTransposeOptions){
           const keyZone=snap.node.querySelector('.sw-ks');
           if(keyZone) keyZone.remove();
         }
-        normalizeExportNotation(snap.node);
+        normalizeExportNotation(snap.score||snap.node);
         return waitPaint2()
+          .then(()=>waitForNodeImages(snap.node))
           .then(()=>nodeToPngBlobRobust(snap.node,bg))
           .finally(()=>snap.cleanup());
       })
@@ -2778,7 +2887,8 @@
       exportBtn.textContent='生成中...';
       exportTransposePanel(lbDiv,{
         title:s.title||'transpose',
-        key:'1='+curKey,
+        key:curKey,
+        song:s,
         tight:true,
         width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
       }).then(()=>{

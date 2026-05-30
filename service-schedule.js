@@ -9,6 +9,14 @@
   if (!EL) return;
 
   var API = (EL.dataset.api || '').trim();
+  var LOGO_SRC = (function () {
+    try {
+      var cur = document.currentScript && document.currentScript.src ? new URL(document.currentScript.src, location.href) : null;
+      return cur ? new URL('musiclib/olive-fellowship-logo.png', cur.href).href : 'musiclib/olive-fellowship-logo.png';
+    } catch (_) {
+      return 'musiclib/olive-fellowship-logo.png';
+    }
+  })();
 
   var TYPE_ORDER = ['青年团契', '主日下午', '主日晚上', '祷告会'];
   var WEEK_ORDER = ['第一周', '第二周', '第三周', '第四周', '第五周'];
@@ -235,15 +243,21 @@
 }
 .cec-export-frame{
   position:relative;overflow:hidden;
-  background:
-    radial-gradient(circle at top left, rgba(83,130,255,.16), transparent 28%),
-    radial-gradient(circle at top right, rgba(51,180,109,.12), transparent 24%),
-    linear-gradient(180deg,#eef4ff 0%,#f6f8fc 100%);
+  background:#ffffff;
+}
+.cec-export-frame,
+.cec-export-frame *{
+  color:#111111!important;
+  text-shadow:none!important;
+  -webkit-text-fill-color:#111111!important;
+}
+.cec-export-watermark{
+  position:absolute;left:50%;top:52%;width:72%;max-width:960px;
+  transform:translate(-50%,-50%);opacity:.075;pointer-events:none;z-index:0;
 }
 .cec-export-stage{
-  position:absolute;inset:22px;padding:18px;border-radius:28px;overflow:hidden;
-  background:transparent;border:1px solid rgba(217,226,240,.45);
-  box-shadow:0 18px 48px rgba(32,45,70,.10);
+  position:absolute;inset:22px;padding:18px;border-radius:0;overflow:hidden;
+  background:transparent;border:0;box-shadow:none;z-index:1;
 }
 .cec-export-frame.is-r16x9 .cec-export-stage{inset:18px;padding:14px}
 .cec-export-viewport{
@@ -266,16 +280,16 @@
   --cec-ref:#1a7a3c;
   --cec-npfx:#7a5500;
   width:max-content;max-width:none;min-width:0;padding:0;
-  border-radius:22px;border:1px solid #d8e1ee;
+  border-radius:0;border:0;
   background:#ffffff;
-  box-shadow:0 10px 28px rgba(29,41,57,.08);
+  box-shadow:none;
   color:var(--cec-ink);
   font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
 }
 .cec-export-head{
   display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;
   margin:0;padding:18px 22px 16px;
-  background:linear-gradient(135deg,#fbfdff 0%,#f2f6ff 100%);
+  background:#ffffff;
   border-bottom:1px solid #dde5f2;
 }
 .cec-export-head-left{display:flex;flex-direction:column;gap:8px}
@@ -308,14 +322,14 @@
 }
 .cec-export-panel{
   display:flex;flex-direction:column;overflow:hidden;border:1px solid #e2e8f3;
-  border-radius:18px;background:#ffffff;box-shadow:0 8px 22px rgba(32,45,70,.06);
+  border-radius:0;background:#ffffff;box-shadow:none;
 }
 .cec-export-section{
   margin-top:0;border:none;border-radius:0;overflow:hidden;background:var(--cec-bg2);
 }
 .cec-export-label{
   display:flex;align-items:center;gap:10px;padding:11px 14px 10px;
-  border-bottom:1px solid #e2e8f3;background:#fcfdff;
+  border-bottom:1px solid #e2e8f3;background:#ffffff;
   font-size:15px;font-weight:900;color:var(--cec-ink);
 }
 .cec-export-empty{
@@ -1112,6 +1126,13 @@
     frame.style.width = preset.width + 'px';
     frame.style.height = preset.height + 'px';
 
+    var watermark = document.createElement('img');
+    watermark.className = 'cec-export-watermark';
+    watermark.src = LOGO_SRC;
+    watermark.alt = '';
+    watermark.setAttribute('aria-hidden', 'true');
+    frame.appendChild(watermark);
+
     var stage = document.createElement('div');
     stage.className = 'cec-export-stage';
 
@@ -1384,7 +1405,7 @@
     if (!types || !types.length) return Promise.reject(new Error('no export types'));
 
     var preset = getExportRatioPreset(ratioKey);
-    var bg = '#eef4ff';
+    var bg = '#ffffff';
     var waitFonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
 
     return waitFonts.then(function () {

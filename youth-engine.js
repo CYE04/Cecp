@@ -13,6 +13,14 @@
 
 /* ══════════ GitHub Pages 基础路径 ══════════ */
 var YM_BASE = 'https://cye04.github.io/Cecp';
+var YM_LOGO_SRC = (function () {
+  try {
+    var cur = document.currentScript && document.currentScript.src ? new URL(document.currentScript.src, location.href) : null;
+    return cur ? new URL('musiclib/olive-fellowship-logo.png', cur.href).href : 'musiclib/olive-fellowship-logo.png';
+  } catch (_) {
+    return 'musiclib/olive-fellowship-logo.png';
+  }
+})();
 
 window.YouthEngine = {};
 
@@ -413,6 +421,14 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       .replace(/\s+/g,'_')
       .replace(/\.+$/,'')
       .slice(0,80) || 'song';
+  }
+
+  function escapeHtml(s){
+    return String(s==null?'':s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
   }
 
   var _h2cPromise=null;
@@ -830,6 +846,109 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     };
   }
 
+  function waitForNodeImages(node){
+    if(!node) return Promise.resolve();
+    var imgs=Array.prototype.slice.call(node.querySelectorAll('img'));
+    var pending=imgs.filter(function(img){ return !img.complete || !img.naturalWidth; });
+    if(!pending.length) return Promise.resolve();
+    return Promise.all(pending.map(function(img){
+      return new Promise(function(resolve){
+        img.addEventListener('load',resolve,{once:true});
+        img.addEventListener('error',resolve,{once:true});
+      });
+    }));
+  }
+
+  function buildSongExportSheet(panelInner,opt){
+    opt=opt||{};
+    var mount=(panelInner&&panelInner.closest&&panelInner.closest('#ym-root')) || document.body;
+    var host=document.createElement('div');
+    host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
+
+    var sheet=document.createElement('div');
+    sheet.className='ym-export-sheet';
+    sheet.style.cssText=[
+      'position:relative',
+      'display:inline-block',
+      'width:max-content',
+      'min-width:720px',
+      'padding:28px 30px 30px',
+      'background:#fff',
+      'color:#111',
+      'overflow:visible',
+      'box-sizing:border-box',
+      'font-family:"Noto Serif SC","Songti SC","PingFang SC",serif'
+    ].join(';');
+
+    var style=document.createElement('style');
+    style.textContent=[
+      '.ym-export-sheet,.ym-export-sheet *{box-sizing:border-box!important;color:#111!important;border-color:#111!important;text-shadow:none!important;-webkit-text-fill-color:#111!important;box-shadow:none!important;}',
+      '.ym-export-watermark{position:absolute!important;left:50%!important;top:54%!important;width:72%!important;max-width:900px!important;transform:translate(-50%,-50%)!important;opacity:.075!important;pointer-events:none!important;z-index:0!important;}',
+      '.ym-export-content{position:relative!important;z-index:1!important;}',
+      '.ym-export-head{display:grid!important;grid-template-columns:minmax(160px,1fr) auto minmax(160px,1fr)!important;align-items:start!important;gap:20px!important;margin:0 0 24px!important;}',
+      '.ym-export-left,.ym-export-right{font-size:15px!important;line-height:1.5!important;font-weight:600!important;white-space:pre-line!important;font-family:"DM Mono","Space Mono",monospace!important;}',
+      '.ym-export-right{text-align:right!important;opacity:.72!important;}',
+      '.ym-export-title{text-align:center!important;font-size:28px!important;line-height:1.18!important;font-weight:900!important;margin:0!important;}',
+      '.ym-export-subtitle{text-align:center!important;font-size:15px!important;line-height:1.45!important;margin-top:8px!important;font-weight:500!important;opacity:.82!important;}',
+      '.ym-export-score{width:100%!important;overflow:visible!important;background:transparent!important;}',
+      '.ym-export-score .sw-lb{background:transparent!important;border:0!important;box-shadow:none!important;}',
+      '.ym-export-score .sw-lsec-name::after{background:transparent!important;}',
+      '.ym-export-score .p-lyric2,.ym-export-score .p-lyric3,.ym-export-score .p-lyric4{opacity:1!important;}',
+      '.ym-export-score .jp-u1-line,.ym-export-score .jp-u2-line{background:#111!important;}',
+      '.ym-export-score .jp-slur::before,.ym-export-score .jp-slur-open::before,.ym-export-score .jp-slur-close::before,.ym-export-score .jp-tuplet-br,.ym-export-score .jp-volta::before,.ym-export-score .prev-volta::before{border-color:#111!important;}',
+      '.ym-export-score .jp-tuplet-num{background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;}'
+    ].join('\n');
+    sheet.appendChild(style);
+
+    var watermark=document.createElement('img');
+    watermark.className='ym-export-watermark';
+    watermark.src=YM_LOGO_SRC;
+    watermark.alt='';
+    sheet.appendChild(watermark);
+
+    var content=document.createElement('div');
+    content.className='ym-export-content';
+
+    var song=opt.song||{};
+    var leftLines=[
+      song.bpm ? '♪ = '+song.bpm : '',
+      '1= '+(opt.key||song.origKey||'C')+'   '+(song.timeSign||'4/4')
+    ].filter(Boolean);
+    var title=song.title||opt.title||'未命名诗歌';
+    var subtitle=[song.artist,song.sub].filter(Boolean).join('  ');
+
+    var head=document.createElement('div');
+    head.className='ym-export-head';
+    head.innerHTML=[
+      '<div class="ym-export-left">'+escapeHtml(leftLines.join('\n'))+'</div>',
+      '<div><div class="ym-export-title">'+escapeHtml(title)+'</div>'+(subtitle?'<div class="ym-export-subtitle">'+escapeHtml(subtitle)+'</div>':'')+'</div>',
+      '<div class="ym-export-right"></div>'
+    ].join('');
+    content.appendChild(head);
+
+    var score=document.createElement('div');
+    score.className='ym-export-score';
+    var clone=panelInner.cloneNode(true);
+    clone.style.width='auto';
+    clone.style.maxWidth='none';
+    clone.style.margin='0';
+    clone.style.transform='none';
+    score.appendChild(clone);
+    content.appendChild(score);
+    sheet.appendChild(content);
+    host.appendChild(sheet);
+    mount.appendChild(host);
+
+    var naturalW=Math.max(720,Math.ceil(clone.scrollWidth||panelInner.scrollWidth||0)+60);
+    sheet.style.width=naturalW+'px';
+
+    return {
+      node:sheet,
+      score:clone,
+      cleanup:function(){ host.remove(); }
+    };
+  }
+
   function normalizeExportNotation(scope){
     if(!scope||!scope.querySelectorAll) return;
     var wraps=scope.querySelectorAll('.jp-lines-wrap');
@@ -924,17 +1043,18 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function exportTransposePanel(panelInner,opt){
     opt=opt||{};
     if(!panelInner) return Promise.reject(new Error('panel missing'));
-    var bg=resolveExportBackground(panelInner,opt.bgColor);
+    var bg=opt.bgColor||'#ffffff';
     var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     return waitFonts
       .then(function(){
-        var snap=buildExportClone(panelInner,{tight:!!opt.tight});
+        var snap=opt.song ? buildSongExportSheet(panelInner,opt) : buildExportClone(panelInner,{tight:!!opt.tight});
         if(opt.hideTransposeOptions){
           var keyZone=snap.node.querySelector('.sw-ks');
           if(keyZone) keyZone.remove();
         }
-        normalizeExportNotation(snap.node);
+        normalizeExportNotation(snap.score||snap.node);
         return waitPaint2()
+          .then(function(){ return waitForNodeImages(snap.node); })
           .then(function(){ return nodeToPngBlobRobust(snap.node,bg); })
           .finally(function(){ snap.cleanup(); });
       })
@@ -1886,7 +2006,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       setExportButtonState('生成中...');
       exportTransposePanel(lbDiv,{
         title:song.title||'transpose',
-        key:'1='+curKey,
+        key:curKey,
+        song:song,
         tight:true,
         width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
       }).then(function(){
