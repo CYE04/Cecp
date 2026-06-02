@@ -13,6 +13,8 @@
     }
   })();
   const WECHAT='CYuen_290104';
+  const AUDIO_API='/api/song-audio';
+  const INTERNAL_KEY='cecp2026';
   const SOURCE_RULES=[
     {name:'赞美之泉',patterns:['赞美之泉','stream of praise']},
     {name:'约书亚乐团',patterns:['约书亚乐团','joshua band','约书亚']},
@@ -49,6 +51,11 @@
   if(document.body) document.body.classList.add('ml-fullscreen');
   root.setAttribute('data-ml-version',ML_VER);
   try{console.info('[musiclib] loaded version',ML_VER);}catch(_){}
+  ensureNoIndexMeta();
+  if(!hasInternalKey()){
+    renderInternalOnlyNotice();
+    return;
+  }
 
   let songs=[],query='',sourceFilter='全部';
   let _apLoaded=false,_ap=null;
@@ -1348,7 +1355,7 @@
       `今日第 ${index+1} 首`,
       song.origKey?`调性 ${song.origKey}`:'',
       song.bpm?`速度 ${song.bpm}`:'',
-      song.mp3?'有音频':''
+      hasSongAudio(song)?'有音频':''
     ].filter(Boolean);
   }
   function setWorshipHero(song,index){
@@ -1360,7 +1367,7 @@
     $('ml-wp-artist').textContent=song.displayArtist||song.artist||song.source||'诗歌';
     $('ml-wp-lyric').textContent=getSongLyricHighlight(song);
     $('ml-wp-tags').innerHTML=getWorshipTags(song,index).map(t=>`<span>${t}</span>`).join('');
-    $('ml-wp-play').disabled=!song.mp3;
+    $('ml-wp-play').disabled=!hasSongAudio(song);
     $('ml-wp-open').disabled=false;
   }
   function renderWorshipPicks(){
@@ -1404,9 +1411,9 @@
     observeRevealItems();
   }
   function playWorshipPick(song){
-    if(!song||!song.mp3) return;
+    if(!hasSongAudio(song)) return;
     _mpBind();
-    if(!_mpSongs.length) _mpSongs=songs.filter(s=>s.mp3);
+    if(!_mpSongs.length) _mpSongs=songs.filter(hasSongAudio);
     let idx=_mpSongs.findIndex(x=>x.id===song.id);
     if(idx<0){ _mpSongs=[song].concat(_mpSongs); idx=0; }
     _mpPlayIdx(idx,true);
@@ -1487,6 +1494,73 @@
       albumYear,
       displayArtist:(song.artist||source||'未知来源').trim()
     });
+  }
+  function ensureNoIndexMeta(){
+    [
+      ['robots','noindex,nofollow'],
+      ['googlebot','noindex,nofollow']
+    ].forEach(([name,content])=>{
+      let meta=document.head.querySelector(`meta[name="${name}"]`);
+      if(!meta){
+        meta=document.createElement('meta');
+        meta.setAttribute('name',name);
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content',content);
+    });
+  }
+  function hasInternalKey(){
+    try{
+      return new URLSearchParams(location.search).get('key')===INTERNAL_KEY;
+    }catch(_){
+      return false;
+    }
+  }
+  function renderInternalOnlyNotice(){
+    root.innerHTML=`
+      <div id="ml-header">
+        <div id="ml-nav">
+          <div id="ml-brand">
+            <span class="ml-brand-dot"><img src="${LOGO_SRC}" alt="橄榄树团契"></span>
+            <span class="ml-brand-name">诗歌库</span>
+          </div>
+        </div>
+        <div id="ml-hero">
+          <h1 id="ml-title">诗歌库</h1>
+          <div id="ml-subtitle">本诗歌库仅供 CECP 教会内部敬拜练习使用，请通过内部链接访问。</div>
+        </div>
+      </div>
+      <div id="ml-empty" style="display:block">
+        <div id="ml-empty-icon">♪</div>
+        <div id="ml-empty-msg">本诗歌库仅供 CECP 教会内部敬拜练习使用，请通过内部链接访问。</div>
+        <div id="ml-empty-sub">本页面不会加载歌曲列表、歌词或音频资源。</div>
+      </div>
+    `;
+  }
+  function hasSongAudio(song){
+    return !!(song&&(song.audioId||song.mp3));
+  }
+  function getSongAudioApiUrl(song){
+    const id=song&&song.audioId;
+    return id ? AUDIO_API+'?id='+encodeURIComponent(id) : '';
+  }
+  async function resolveSongAudioUrl(song){
+    const apiUrl=getSongAudioApiUrl(song);
+    if(!apiUrl) return song&&song.mp3 ? song.mp3 : '';
+    const ctrl=typeof AbortController!=='undefined' ? new AbortController() : null;
+    try{
+      const res=await fetch(apiUrl,{cache:'no-store',signal:ctrl&&ctrl.signal});
+      if(!res.ok) throw new Error('audio api '+res.status);
+      const type=(res.headers.get('content-type')||'').toLowerCase();
+      if(type.includes('application/json')){
+        const data=await res.json();
+        return data&&data.url ? data.url : '';
+      }
+      if(ctrl) ctrl.abort();
+      return apiUrl;
+    }catch(_){
+      return song&&song.mp3 ? song.mp3 : '';
+    }
   }
   function hi(t,q){
     if(!q||!t)return t||'';
@@ -1609,7 +1683,7 @@
             </section>
           `).join('')+'<div id="ml-list-end"></div>';
       }
-      _mpSongs = songs.filter(s=>s.mp3);
+      _mpSongs = songs.filter(hasSongAudio);
       _mpRenderQueue();
       list.querySelectorAll('.ml-song-card').forEach(el=>{
         el.addEventListener('click',()=>{const s=songs.find(x=>x.id===el.dataset.id);if(s)openDetail(s);});
@@ -1632,7 +1706,7 @@
         playBtn.onclick=e=>{
           e.stopPropagation();
           const s=songs.find(x=>x.id===el.dataset.id);
-          if(!s||!s.mp3) return;
+          if(!hasSongAudio(s)) return;
           const idx=_mpSongs.findIndex(x=>x.id===s.id);
           if(idx>=0) _mpPlayIdx(idx,true);
         };
@@ -1651,7 +1725,7 @@
     const tags=[
       s.origKey?`<span class="ml-song-tag is-key">${s.origKey}</span>`:'',
       s.timeSign?`<span class="ml-song-tag">${s.timeSign}</span>`:'',
-      s.mp3?`<span class="ml-song-tag">音频</span>`:''
+      hasSongAudio(s)?`<span class="ml-song-tag">音频</span>`:''
     ].filter(Boolean).join('');
     return`<div class="ml-song-card ml-reveal" data-id="${s.id}">
       <div class="ml-card-art">${cover}</div>
@@ -2488,7 +2562,13 @@
     const xnt=$('ml-player-now-title'); if(xnt) xnt.textContent=s.title||'正在播放';
     const xns=$('ml-player-now-sub'); if(xns) xns.textContent=s.artist||s.source||'诗歌';
     _mpSetCover(s.cover||'');
-    _mpAudio.src=s.mp3||'';
+    _mpAudio.src=getSongAudioApiUrl(s) || s.mp3 || '';
+    resolveSongAudioUrl(s).then(url=>{
+      if(_mpSongs[_mpIdx]&&_mpSongs[_mpIdx].id===s.id&&url&&_mpAudio.src!==url){
+        _mpAudio.src=url;
+        if(autoplay) _mpAudio.play().catch(()=>{});
+      }
+    });
     $('ml-mp-cur').textContent='0:00';
     $('ml-mp-dur').textContent='0:00';
     $('ml-mp-fill').style.width='0%';
@@ -2653,14 +2733,17 @@
     syncHaloTheme();
 
     _mpBind();
-    if(s.mp3){
+    if(hasSongAudio(s)){
       const idx=_mpSongs.findIndex(x=>x.id===s.id);
       const isSameSong = (idx>=0 && idx===_mpIdx);
       if(!isSameSong){
         if(idx>=0) _mpIdx=idx; else { _mpSongs=[s]; _mpIdx=0; }
         _mpRenderQueue();
         _mpLrc=[]; _mpLrcIdx=-1;
-        _mpAudio.src=s.mp3||'';
+        _mpAudio.src=getSongAudioApiUrl(s) || s.mp3 || '';
+        resolveSongAudioUrl(s).then(url=>{
+          if(_mpSongs[_mpIdx]&&_mpSongs[_mpIdx].id===s.id&&url&&_mpAudio.src!==url) _mpAudio.src=url;
+        });
         if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});
       }
       const titleEl=document.getElementById('ml-mp-title');

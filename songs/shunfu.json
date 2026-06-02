@@ -9,7 +9,6 @@
   "origKey": "A",
   "timeSign": "4/4",
   "bpm": 64,
-  "mp3": "/upload/shunfu.mp3",
   "cover": "https://cecpadua.github.io/resouces/covers/shunfu.jpg",
   "lrc": "https://cecpadua.github.io/resouces/lyrics/shunfu.lrc",
   "youtube": "https://youtu.be/Zx1AMuYdykw?si=ySDQnSsh75SMQH8J",
@@ -429,5 +428,6 @@
         ]
       ]
     }
-  ]
+  ],
+  "audioId": "shunfu"
 }
