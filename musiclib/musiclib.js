@@ -14,6 +14,7 @@
   })();
   const WECHAT='CYuen_290104';
   const AUDIO_API='/api/song-audio';
+  const AUDIO_MAP_SCRIPT='/upload/cecp-audio-map.js';
   const INTERNAL_KEY='cecp2026';
   const SOURCE_RULES=[
     {name:'赞美之泉',patterns:['赞美之泉','stream of praise']},
@@ -63,6 +64,7 @@
   let _themeObserver=null;
   let _detailStatePushed=false;
   let _revealObserver=null,_weatherCache=null;
+  let _audioMapPromise=null;
 
   root.innerHTML=`
     <div id="ml-header">
@@ -1544,6 +1546,28 @@
     const id=song&&song.audioId;
     return id ? AUDIO_API+'?id='+encodeURIComponent(id) : '';
   }
+  function loadAudioMap(){
+    if(_audioMapPromise) return _audioMapPromise;
+    _audioMapPromise=new Promise(resolve=>{
+      if(window.CECP_AUDIO_MAP) return resolve(window.CECP_AUDIO_MAP);
+      const script=document.createElement('script');
+      script.src=AUDIO_MAP_SCRIPT+'?v='+encodeURIComponent(ML_VER);
+      script.async=true;
+      script.onload=()=>resolve(window.CECP_AUDIO_MAP||{});
+      script.onerror=()=>resolve({});
+      document.head.appendChild(script);
+    });
+    return _audioMapPromise;
+  }
+  async function firstReachableAudioUrl(urls){
+    for(const url of urls.filter(Boolean)){
+      try{
+        const res=await fetch(url,{method:'HEAD',cache:'no-store'});
+        if(res.ok) return url;
+      }catch(_){}
+    }
+    return '';
+  }
   async function resolveSongAudioUrl(song){
     const apiUrl=getSongAudioApiUrl(song);
     if(!apiUrl) return song&&song.mp3 ? song.mp3 : '';
@@ -1559,7 +1583,15 @@
       if(ctrl) ctrl.abort();
       return apiUrl;
     }catch(_){
-      return song&&song.mp3 ? song.mp3 : '';
+      const map=await loadAudioMap();
+      const mapped=map&&song&&song.audioId ? map[song.audioId] : '';
+      if(mapped) return mapped;
+      const id=song&&song.audioId;
+      return await firstReachableAudioUrl([
+        song&&song.mp3,
+        id ? '/upload/'+id+'.mp3' : '',
+        id ? '/upload/'+id+'.m4a' : ''
+      ]);
     }
   }
   function hi(t,q){
