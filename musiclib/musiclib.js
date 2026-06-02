@@ -13,8 +13,6 @@
     }
   })();
   const WECHAT='CYuen_290104';
-  const AUDIO_API='/api/song-audio';
-  const AUDIO_MAP_SCRIPT='/upload/cecp-audio-map.js';
   const INTERNAL_KEY='cecp2026';
   const SOURCE_RULES=[
     {name:'赞美之泉',patterns:['赞美之泉','stream of praise']},
@@ -64,7 +62,6 @@
   let _themeObserver=null;
   let _detailStatePushed=false;
   let _revealObserver=null,_weatherCache=null;
-  let _audioMapPromise=null;
 
   root.innerHTML=`
     <div id="ml-header">
@@ -1535,64 +1532,12 @@
       <div id="ml-empty" style="display:block">
         <div id="ml-empty-icon">♪</div>
         <div id="ml-empty-msg">本诗歌库仅供 CECP 教会内部敬拜练习使用，请通过内部链接访问。</div>
-        <div id="ml-empty-sub">本页面不会加载歌曲列表、歌词或音频资源。</div>
+        <div id="ml-empty-sub">如需进入内部链接，请联系 YuEn。微信：${WECHAT}；Instagram：@_yuen0129。</div>
       </div>
     `;
   }
   function hasSongAudio(song){
-    return !!(song&&(song.audioId||song.mp3));
-  }
-  function getSongAudioApiUrl(song){
-    const id=song&&song.audioId;
-    return id ? AUDIO_API+'?id='+encodeURIComponent(id) : '';
-  }
-  function loadAudioMap(){
-    if(_audioMapPromise) return _audioMapPromise;
-    _audioMapPromise=new Promise(resolve=>{
-      if(window.CECP_AUDIO_MAP) return resolve(window.CECP_AUDIO_MAP);
-      const script=document.createElement('script');
-      script.src=AUDIO_MAP_SCRIPT+'?v='+encodeURIComponent(ML_VER);
-      script.async=true;
-      script.onload=()=>resolve(window.CECP_AUDIO_MAP||{});
-      script.onerror=()=>resolve({});
-      document.head.appendChild(script);
-    });
-    return _audioMapPromise;
-  }
-  async function firstReachableAudioUrl(urls){
-    for(const url of urls.filter(Boolean)){
-      try{
-        const res=await fetch(url,{method:'HEAD',cache:'no-store'});
-        if(res.ok) return url;
-      }catch(_){}
-    }
-    return '';
-  }
-  async function resolveSongAudioUrl(song){
-    const apiUrl=getSongAudioApiUrl(song);
-    if(!apiUrl) return song&&song.mp3 ? song.mp3 : '';
-    const ctrl=typeof AbortController!=='undefined' ? new AbortController() : null;
-    try{
-      const res=await fetch(apiUrl,{cache:'no-store',signal:ctrl&&ctrl.signal});
-      if(!res.ok) throw new Error('audio api '+res.status);
-      const type=(res.headers.get('content-type')||'').toLowerCase();
-      if(type.includes('application/json')){
-        const data=await res.json();
-        return data&&data.url ? data.url : '';
-      }
-      if(ctrl) ctrl.abort();
-      return apiUrl;
-    }catch(_){
-      const map=await loadAudioMap();
-      const mapped=map&&song&&song.audioId ? map[song.audioId] : '';
-      if(mapped) return mapped;
-      const id=song&&song.audioId;
-      return await firstReachableAudioUrl([
-        song&&song.mp3,
-        id ? '/upload/'+id+'.mp3' : '',
-        id ? '/upload/'+id+'.m4a' : ''
-      ]);
-    }
+    return !!(song&&song.mp3);
   }
   function hi(t,q){
     if(!q||!t)return t||'';
@@ -2594,13 +2539,7 @@
     const xnt=$('ml-player-now-title'); if(xnt) xnt.textContent=s.title||'正在播放';
     const xns=$('ml-player-now-sub'); if(xns) xns.textContent=s.artist||s.source||'诗歌';
     _mpSetCover(s.cover||'');
-    _mpAudio.src=getSongAudioApiUrl(s) || s.mp3 || '';
-    resolveSongAudioUrl(s).then(url=>{
-      if(_mpSongs[_mpIdx]&&_mpSongs[_mpIdx].id===s.id&&url&&_mpAudio.src!==url){
-        _mpAudio.src=url;
-        if(autoplay) _mpAudio.play().catch(()=>{});
-      }
-    });
+    _mpAudio.src=s.mp3||'';
     $('ml-mp-cur').textContent='0:00';
     $('ml-mp-dur').textContent='0:00';
     $('ml-mp-fill').style.width='0%';
@@ -2772,10 +2711,7 @@
         if(idx>=0) _mpIdx=idx; else { _mpSongs=[s]; _mpIdx=0; }
         _mpRenderQueue();
         _mpLrc=[]; _mpLrcIdx=-1;
-        _mpAudio.src=getSongAudioApiUrl(s) || s.mp3 || '';
-        resolveSongAudioUrl(s).then(url=>{
-          if(_mpSongs[_mpIdx]&&_mpSongs[_mpIdx].id===s.id&&url&&_mpAudio.src!==url) _mpAudio.src=url;
-        });
+        _mpAudio.src=s.mp3||'';
         if(s.lrc) fetch(s.lrc).then(r=>r.text()).then(text=>{_mpLrc=_mpParseLrc(text);_mpRenderLrc();}).catch(()=>{});
       }
       const titleEl=document.getElementById('ml-mp-title');
