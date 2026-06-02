@@ -1150,6 +1150,9 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       replay: [
         {label:'📺 直播回放', href:'#ym-replay'},
       ],
+      tutorial: [
+        {label:'🎬 视频教程', href:'#ym-tutorial'},
+      ],
       game: [
         {label:'🎮 游戏活动', href:'#ym-game'},
       ],
@@ -2487,6 +2490,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
 
   function getSectionOrder() {
     var defaults = ['flow', 'songs', 'message', 'ppt', 'replay', 'game', 'action'];
+    var valid = defaults.concat(['tutorial']);
     var raw = Array.isArray(C.sectionOrder) ? C.sectionOrder : [];
     var seen = {};
     var order = [];
@@ -2494,10 +2498,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     raw.forEach(function(name){
       var key = String(name || '').toLowerCase();
       if (key === 'schedule') key = 'flow';
-      if (!defaults.includes(key) || seen[key]) return;
+      if (!valid.includes(key) || seen[key]) return;
       seen[key] = true;
       order.push(key);
     });
+
+    if (C.tutorialUrl && !seen.tutorial) {
+      seen.tutorial = true;
+      order.push('tutorial');
+    }
 
     defaults.forEach(function(key){
       if (!seen[key]) order.push(key);
@@ -2555,6 +2564,21 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     return frag;
   }
 
+  function buildTutorialSection() {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(anchor('ym-tutorial'));
+    frag.appendChild(secTitle(C.tutorialTitle || '🎬 视频教程'));
+    if(C.tutorialUrl){
+      var wrap = div('ym-iframe-wrap');
+      var iframe = el('iframe',{src:C.tutorialUrl,allowfullscreen:'true',allow:'accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture'});
+      wrap.appendChild(iframe);
+      frag.appendChild(wrap);
+    } else {
+      frag.appendChild(el('p',{class:'replay-tip',text:'本周暂未提供视频教程 🙏🏻'}));
+    }
+    return frag;
+  }
+
   function buildGameSection() {
     var frag = document.createDocumentFragment();
     frag.appendChild(anchor('ym-game'));
@@ -2580,6 +2604,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       message: buildMessageSection,
       ppt: buildPptSection,
       replay: buildReplaySection,
+      tutorial: buildTutorialSection,
       game: buildGameSection,
       action: buildActionSection,
     };
