@@ -1526,13 +1526,14 @@
         </div>
         <div id="ml-hero">
           <h1 id="ml-title">诗歌库</h1>
-          <div id="ml-subtitle">本诗歌库仅供 CECP 教会内部敬拜练习使用，请通过内部链接访问。</div>
+          <div id="ml-subtitle">本诗歌库仅供 CECP 教会内部敬拜练习使用。请联系 YuEn 获取内部链接：微信 ${WECHAT}，Instagram @_yuen0129。</div>
         </div>
       </div>
       <div id="ml-empty" style="display:block">
         <div id="ml-empty-icon">♪</div>
-        <div id="ml-empty-msg">本诗歌库仅供 CECP 教会内部敬拜练习使用，请通过内部链接访问。</div>
-        <div id="ml-empty-sub">如需进入内部链接，请联系 YuEn。微信：${WECHAT}；Instagram：@_yuen0129。</div>
+        <div id="ml-empty-msg">请联系 YuEn 获取诗歌库内部链接</div>
+        <div id="ml-empty-sub">微信：${WECHAT}　Instagram：@_yuen0129</div>
+        <div style="margin-top:18px;font-size:14px;color:var(--text3);line-height:1.7;">本页面不会加载歌曲列表、歌词或音频资源。</div>
       </div>
     `;
   }
