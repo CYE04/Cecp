@@ -2469,10 +2469,23 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   }
 
   /* ══════════════ Replay ══════════════ */
+  function normalizeVideoUrl(url) {
+    if(!url) return url;
+    try {
+      var parsed = new URL(url, window.location.href);
+      parsed.searchParams.delete('autoplay');
+      return parsed.href;
+    } catch (_) {
+      return String(url).replace(/([?&])autoplay=1(&?)/, function(_, lead, tail){
+        return tail ? lead : '';
+      });
+    }
+  }
+
   function buildReplay() {
     if(C.replayUrl){
       var wrap = div('ym-iframe-wrap');
-      var iframe = el('iframe',{src:C.replayUrl,allowfullscreen:'true',allow:'accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture'});
+      var iframe = el('iframe',{src:normalizeVideoUrl(C.replayUrl),allowfullscreen:'true',allow:'accelerometer;clipboard-write;encrypted-media;gyroscope;picture-in-picture'});
       wrap.appendChild(iframe);
       return wrap;
     }
@@ -2570,7 +2583,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     frag.appendChild(secTitle(C.tutorialTitle || '🎬 视频教程'));
     if(C.tutorialUrl){
       var wrap = div('ym-iframe-wrap');
-      var iframe = el('iframe',{src:C.tutorialUrl,allowfullscreen:'true',allow:'accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture'});
+      var iframe = el('iframe',{src:normalizeVideoUrl(C.tutorialUrl),allowfullscreen:'true',allow:'accelerometer;clipboard-write;encrypted-media;gyroscope;picture-in-picture'});
       wrap.appendChild(iframe);
       frag.appendChild(wrap);
     } else {
