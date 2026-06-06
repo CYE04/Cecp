@@ -1,0 +1,117 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-06 19:44:59",
+  "id": "bengpaobufangqi",
+  "title": "奔跑不放弃",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉【新的事将要成就】(2015) (林后4:8,17) 曾祥怡词曲",
+  "origKey": "F",
+  "timeSign": "4/4",
+  "bpm": 64,
+  "mp3": "/upload/bengpaobufangqi.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/nengbuneng.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/bengpaobufangqi.lrc",
+  "youtube": "https://youtu.be/3tNKXsR-H_E?si=ZyUcJ_LZs7MUY8nY",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/bengpaobufangqiF.jpg",
+  "sections": [
+  {
+    "name": "奔跑不放弃",
+    "lines": [
+      [
+        {"chord":"Bb/DㅤㅤㅤC/E","n":"1_ 4,_ 5,_ 1_ 1 7, |","lyric":""},
+        {"chord":"F","n":"5, - - - |","lyric":""},
+        {"chord":"Bb/DㅤㅤㅤC/E","n":"1_ 4,_ 5,_ 1_ 1 2 |","lyric":""},
+        {"chord":"F","n":"5, - - 3_ 4_ |","lyric":""},
+        {"chord":"Cm/Eb","n":"5 - - 4__ 3__ 2_ |","lyric":""},
+        {"chord":"Bb/D","n":"( 1 - - 1_ ) 2__ 3__ |","lyric":""},
+        {"chord":"Gm7","n":"4_ ( 3_ 3_ ) ( 2_ 2 ) 1 |","lyric":""}
+      ],
+      [
+        {"chord":"Csus4 C","n":"2 - - - sp || sp","lyric":"ㅤ"},
+        {"chord":"F","n":"5,_ 1_","lyric":"每个"},
+        {"chord":"","n":"1_ 3_","lyric":"狂风"},
+        {"chord":"C/E","n":"2_ 7,__ ( 5,__ sp 5,·_ ) sp_ 7,__ sp | sp","lyric":"暴雨里,ㅤㅤ 你"},
+        {"chord":"Bb/D","n":"1_ 1_","lyric":"同在"},
+        {"chord":"","n":"7,_ 6,_","lyric":"在那"},
+        {"chord":"F/C","n":"5, - sp | sp","lyric":"里"},
+        {"chord":"Bb","n":"6,_ 1_","lyric":"每个"},
+        {"chord":"","n":"1_ 4_","lyric":"难处"},
+        {"chord":"F/A","n":"3_ 2__ ( 1__ sp 1·_ ) sp_ 2__ |","lyric":"低谷里,ㅤ ㅤ你"}
+      ],
+      [
+        {"chord":"Gm","n":"3_ 3_","lyric":"恩典"},
+        {"chord":"","n":"3__ 4·_","lyric":"在那"},
+        {"chord":"C","n":"2 - sp | sp","lyric":"里。"},
+        {"chord":"F","n":"5,_ 1_","lyric":"每个"},
+        {"chord":"","n":"1_ 3_","lyric":"伤心"},
+        {"chord":"","n":"2_ 7,__ ( 5,__ sp 5,·_ ) sp_ 3__ sp | sp","lyric":"失望里,ㅤ ㅤ你"},
+        {"chord":"Eb或","n":"4_ 4_","lyric":"爱我"},
+        {"chord":"F/Eb","n":"4__ 5·_","lyric":"爱到"},
+        {"chord":"D","n":"3 sp 2_ 3_ sp | sp","lyric":"低。在你"},
+        {"chord":"Gm","n":"4_ 4__ sp__ ( 4__ sp 4__ ) 6,·_","lyric":"爱的ㅤ光ㅤㅤ中,"}
+      ],
+      [
+        {"chord":"C","n":"7,_ 7,__ sp__ ( 1__ sp 1__ ) 2·_ sp | sp","lyric":"我得ㅤ着ㅤㅤ能"},
+        {"chord":"FㅤㅤㅤBb/C  ㅤ【Chorus】","n":"1 sp - sp - sp 5_ 4_ sp || sp","lyric":"力。ㅤㅤㅤㅤ 我爱"},
+        {"chord":"F","n":"3· sp","lyric":"你，"},
+        {"chord":"","n":"1_","lyric":"用"},
+        {"chord":"C/E","n":"6_ 5__ sp__ ( 3__ sp 3_ ) 2_ sp | sp","lyric":"尽我ㅤ全ㅤㅤ心"},
+        {"chord":"Bb/D","n":"1 sp","lyric":"全"},
+        {"chord":"","n":"7,_ 6,_","lyric":"意全"},
+        {"chord":"F/C","n":"5, sp - sp |","lyric":"力，"}
+      ],
+      [
+        {"chord":"Bb","n":"4_ 4_","lyric":"荣耀"},
+        {"chord":"","n":"4_ 5_","lyric":"高举"},
+        {"chord":"F/A","n":"3_ sp_ 2__ ( 1__ sp 1·_ ) sp_ 2__ sp | sp","lyric":"你ㅤ的名,ㅤㅤ 我"},
+        {"chord":"Gm","n":"3_ 3_","lyric":"跟随"},
+        {"chord":"","n":"3__ 4·_ sp","lyric":"不怀"},
+        {"chord":"C","n":"2","lyric":"疑。"},
+        {"chord":"","n":"5_ sp_ 4_ sp | sp","lyric":"我ㅤ爱"},
+        {"chord":"F","n":"3·","lyric":"你，"},
+        {"chord":"","n":"1_","lyric":"用"},
+        {"chord":"C/E","n":"6_ sp_ 5__ sp__ ( 3__ sp 3_ ) sp_ 2_ sp |","lyric":"尽ㅤ我ㅤ全ㅤㅤㅤ心"}
+      ],
+      [
+        {"chord":"Bb/D","n":"1","lyric":"全"},
+        {"chord":"","n":"1__ 4·_","lyric":"意全"},
+        {"chord":"F/C","n":"3 - sp | sp","lyric":"力，"},
+        {"chord":"Bb","n":"4_ 4_","lyric":"在这"},
+        {"chord":"","n":"4_ 5_","lyric":"爱的"},
+        {"chord":"F/A","n":"3_ 2__ ( 1__ sp 1·_ ) sp_ 2__ sp |","lyric":"路程里,ㅤ ㅤ我"},
+        {"chord":"ㅤㅤㅤGm","timeSign":"2/4","n":"3_ 2_","lyric":"ㅤㅤ奔跑"},
+        {"chord":"Bb/C","n":"1__ 7,·_ sp |","lyric":"不放"},
+        {"chord":"ㅤㅤㅤFㅤㅤㅤㅤㅤㅤㅤㅤ Ebㅤ F/A","timeSign":"4/4","n":"( 1 - - - ||/ sp 1 ) - - - |","lyric":"ㅤㅤ弃"}
+      ],
+      [
+        {"chord":"","n":"||","lyric":"ㅤ"},
+        {"chord":"Bb","n":"1_ 7,_","lyric":"四面"},
+        {"chord":"ㅤㅤㅤㅤㅤC/Bb","n":"1_ ( 2_ sp 2_ ) 2_","lyric":"受敌,ㅤ 却"},
+        {"chord":"","n":"1_ 7,_ sp | sp","lyric":"不被"},
+        {"chord":"F/A","n":"( 1·_ sp_ 5,__ )","lyric":"困"},
+        {"chord":"","n":"5, - - sp | sp","lyric":"住。"},
+        {"chord":"Bb","n":"1_ 7,_","lyric":"心里"},
+        {"chord":"ㅤㅤㅤㅤㅤC","n":"1_ ( 2_ sp 2_ ) 2_","lyric":"作难,ㅤ 却"},
+        {"chord":"","n":"1_ 2_ sp | sp","lyric":"不至"},
+        {"chord":"F","n":"( 4·_ sp_ 3__ ) sp","lyric":"失"},
+        {"chord":"ㅤ(Cm F7)","n":"3 - - sp |","lyric":"望。"}
+      ],
+      [
+        {"chord":"Bb","n":"1_ 7,_","lyric":"至暂"},
+        {"chord":"ㅤㅤㅤㅤㅤC/Bb","n":"1_ ( 2_ sp 2_ ) 2_","lyric":"至轻, ㅤ 的"},
+        {"chord":"","n":"3_ 4_ sp | sp","lyric":"苦楚"},
+        {"chord":"Am","n":"5 sp","lyric":"要"},
+        {"chord":"(A/C#)","n":"3","lyric":"成"},
+        {"chord":"Dm","n":"1 - sp | sp","lyric":"就"},
+        {"chord":"Gm","n":"4_ 3_","lyric":"极重"},
+        {"chord":"","n":"4_ 4_","lyric":"无比"},
+        {"chord":"(G/B)","n":"4_ 3_","lyric":"永远"},
+        {"chord":"","n":"2_ 1_ sp | sp","lyric":"的荣"},
+        {"chord":"Cㅤㅤ(F ㅤC/G","n":"5 sp - sp -","lyric":"耀。"},
+        {"chord":"F/A)","n":"5_ 4_ sp ||","lyric":"我爱"}
+      ]
+    ]
+  }
+]
+}
