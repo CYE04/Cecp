@@ -1,0 +1,132 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-06 18:08:05",
+  "id": "zainimeiyounanchengdeshi-zanmei",
+  "title": "在你没有难成的事",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉【赞美中信心不断升起】(2022) (太17:20，耶32:17,20-22，林后1:20) 郑懋柔词/游智婷曲",
+  "origKey": "A",
+  "timeSign": "4/4",
+  "bpm": 158,
+  "mp3": "/upload/zainimeiyounanchengdeshi-zanmei.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/zanmeizhongxinxinbuduanshengqi.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/zainimeiyounanchengdeshi-zanmei.lrc",
+  "youtube": "https://youtu.be/3QSUYtAcJjk?si=GohbajUZcK3zEw-W",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/zainimeiyounanchengdeshiA-zanmei.jpg",
+  "sections": [
+  {
+    "name": "在你没有难成的事",
+    "lines": [
+      [
+        {"chord":"","n":"|:","lyric":""},
+        {"chord":"A [电","n":"3'_ 1'_","lyric":""},
+        {"chord":"吉他]","n":"3'_ 1'_","lyric":""},
+        {"chord":"","n":"3'_ 1'_","lyric":""},
+        {"chord":"","n":"3'_ 1'_ sp | sp","lyric":""},
+        {"chord":"C#m","n":"3'_ 7_","lyric":""},
+        {"chord":"","n":"3'_ 7_","lyric":""},
+        {"chord":"","n":"3'_ 7_","lyric":""},
+        {"chord":"","n":"3'_ 7_ sp | sp","lyric":""},
+        {"chord":"F#m","n":"3'_ 6_","lyric":""},
+        {"chord":"","n":"3'_ 6_","lyric":""},
+        {"chord":"","n":"3'_ 6_","lyric":""},
+        {"chord":"","n":"3'_ 6_ sp | sp","lyric":""},
+        {"chord":"D","n":"4'_ 4'_","lyric":""},
+        {"chord":"ㅤC#m","n":"4'_ 3'_","lyric":""},
+        {"chord":"","n":"0_","lyric":""},
+        {"chord":"Bm","n":"2'·","lyric":""},
+        {"chord":"","lyric":""},
+        {"chord":"","n":":|","lyric":""}
+      ],
+      [
+        {"chord":"ㅤㅤ A","n":"|| sp 0 5","lyric":"ㅤ ㅤ芥"},
+        {"chord":"","n":"5","lyric":"菜"},
+        {"chord":"","n":"3 sp | sp","lyric":"种"},
+        {"chord":"","n":"4 sp","lyric":"的"},
+        {"chord":"","n":"3_ ( 3_ sp 3 )","lyric":"信心，"},
+        {"chord":"","n":"2_ 1_ sp | sp","lyric":"可以"},
+        {"chord":"D/A","n":"2","lyric":"将"},
+        {"chord":"","n":"2_ ( 2_ sp 2 )","lyric":"大山"},
+        {"chord":"","n":"3 sp | sp","lyric":"挪"},
+        {"chord":"","n":"4 - - - sp | sp","lyric":"开；"},
+        {"chord":"Bm","n":"2","lyric":"相"},
+        {"chord":"","n":"2_ ( 2_ sp 2 )","lyric":"信神"},
+        {"chord":"","n":"3 sp |","lyric":"的"}
+      ],
+      [
+        {"chord":"E","n":"4· sp","lyric":"应"},
+        {"chord":"","n":"( 2_ sp 2 )","lyric":"许，"},
+        {"chord":"","n":"2_ 1_ sp | sp","lyric":"可以"},
+        {"chord":"A","n":"3· sp","lyric":"跨"},
+        {"chord":"","n":"( 4_ sp 4 )","lyric":"越"},
+        {"chord":"","n":"5 sp | sp","lyric":"困"},
+        {"chord":"","n":"3 - - - sp | sp","lyric":"难。"},
+        {"chord":"D","n":"6· sp","lyric":"信"},
+        {"chord":"","n":"( 6_ sp 6 )","lyric":"心"},
+        {"chord":"","n":"5 sp | sp","lyric":"的"},
+        {"chord":"A/C#","n":"5· sp","lyric":"祷"},
+        {"chord":"","n":"( 1_ sp 1 ) sp - sp |","lyric":"告，"}
+      ],
+      [
+        {"chord":"","lyric":""}
+      ],
+      [
+        {"chord":"C#","n":"2· sp","lyric":"神"},
+        {"chord":"","n":"( 3_ sp 3 )","lyric":"都"},
+        {"chord":"","n":"2 sp | sp","lyric":"听"},
+        {"chord":"F#m ㅤㅤㅤE/G# ㅤA","n":"1 sp - sp - sp - sp | sp","lyric":"见；"},
+        {"chord":"Bm","n":"2","lyric":"大"},
+        {"chord":"","n":"2","lyric":"声"},
+        {"chord":"","n":"2","lyric":"地"},
+        {"chord":"","n":"3_ ( 4_ sp | sp 4 )","lyric":"宣告,"},
+        {"chord":"","n":"4","lyric":"勇"},
+        {"chord":"","n":"4","lyric":"敢"},
+        {"chord":"","n":"6 sp | sp","lyric":"向"},
+        {"chord":"E","n":"5 sp - sp - sp - sp ||","lyric":"前。"}
+      ],
+      [
+        {"chord":"ㅤ【Chorus】","n":"0 0 5 6 sp || sp","lyric":"ㅤㅤ在你"},
+        {"chord":"A","n":"1'· sp","lyric":"没"},
+        {"chord":"","n":"1'_ 0 0 sp | sp","lyric":"有，"},
+        {"chord":"C#","n":"2'· sp","lyric":"没"},
+        {"chord":"","n":"2'_ 0 0 sp | sp","lyric":"有"},
+        {"chord":"F#m","n":"2'· sp","lyric":"难"},
+        {"chord":"","n":"( 3'_ 3' )","lyric":"成"},
+        {"chord":"","n":"2' sp | sp","lyric":"的"},
+        {"chord":"A/E","n":"1' - - - sp | sp","lyric":"事，"},
+        {"chord":"","n":"6· sp","lyric":"软"},
+        {"chord":"","n":"( 1'_ 1' )","lyric":"弱"},
+        {"chord":"","n":"1' sp |","lyric":"和"}
+      ],
+      [
+        {"chord":"A/C#","n":"2'","lyric":"忧"},
+        {"chord":"","n":"5_ ( 5_ sp 5 )","lyric":"虑中,"},
+        {"chord":"","n":"5 sp | sp","lyric":"你"},
+        {"chord":"Bm","n":"6","lyric":"不"},
+        {"chord":"","n":"6_ ( 6_ sp 6 )","lyric":"曾放"},
+        {"chord":"","n":"3' sp | sp","lyric":"弃"},
+        {"chord":"E","n":"2' -","lyric":"我。"},
+        {"chord":"","n":"1' 2' sp | sp","lyric":"你的"},
+        {"chord":"A","n":"( 3' sp 5_ ) 5_ sp 0 0 sp | sp","lyric":"应ㅤㅤ许，"},
+        {"chord":"C#","n":"( 3' sp 2'_ ) 2'_ sp 0 0 sp |","lyric":"应ㅤㅤ许"}
+      ],
+      [
+        {"chord":"F#m","n":"2'","lyric":"不"},
+        {"chord":"","n":"1'","lyric":"论"},
+        {"chord":"","n":"1'_","lyric":"有"},
+        {"chord":"","n":"2'· sp | sp","lyric":"多"},
+        {"chord":"F#m","n":"6' sp - sp - sp - sp | sp","lyric":"少，"},
+        {"chord":"D","n":"5","lyric":"在"},
+        {"chord":"","n":"1'_ ( 1'_ sp 1' )","lyric":"基督"},
+        {"chord":"","n":"2' sp | sp","lyric":"里"},
+        {"chord":"E","n":"3'· sp","lyric":"都"},
+        {"chord":"","n":"( 2'_ sp 2' )","lyric":"是"},
+        {"chord":"","n":"1' sp | sp","lyric":"阿"},
+        {"chord":"A ","n":"1' - sp - sp -","lyric":"们。ㅤㅤㅤㅤㅤ"},
+        {"chord":"","n":"||/","lyric":"ㅤ"}
+      ]
+    ]
+  }
+]
+}
