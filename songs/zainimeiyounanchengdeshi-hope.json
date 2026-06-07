@@ -1,0 +1,96 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-07 12:54:46",
+  "id": "zainimeiyounanchengdeshi-hope",
+  "title": "在祢没有难成的事",
+  "artist": "The Hope ",
+  "sub": "The Hope 【在祢没有难成的事】 作曲/作词 Composers & Lyricists : Franky Kuncoro  翻译 Translation : 章思贤 Szian Cheong (FGACYC Worship)",
+  "origKey": "G",
+  "timeSign": "4/4",
+  "bpm": 65,
+  "mp3": "/upload/zainimeiyounanchengdeshi-hope.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/zainimeiyounanchengdeshi-hope.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/zainimeiyounanchengdeshi-hope.lrc",
+  "youtube": "https://youtu.be/rUvwUc2_66s?si=QHKKFOMJQtnUDSUV",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/zainimeiyounanchengdeshiG-hope.jpg",
+  "sections": [
+  {
+    "name": "在祢没有难成的事",
+    "lines": [
+      [
+        {"chord":"ㅤㅤG","n":"sp 1 sp","lyric":"ㅤ"},
+        {"chord":"","n":"1' sp","lyric":"ㅤ"},
+        {"chord":"","n":"7 sp","lyric":"ㅤ"},
+        {"chord":"","n":"5 sp | sp","lyric":"ㅤ"},
+        {"chord":"C","n":"1 sp","lyric":"ㅤ"},
+        {"chord":"","n":"6 sp","lyric":"ㅤ"},
+        {"chord":"","n":"5 sp","lyric":"ㅤ"},
+        {"chord":"","n":"4 sp | sp","lyric":"ㅤ"},
+        {"chord":"Em7","n":"3 sp","lyric":"ㅤ"},
+        {"chord":"","n":"3' sp","lyric":"ㅤ"},
+        {"chord":"","n":"2' sp","lyric":"ㅤ"},
+        {"chord":"","n":"1' sp | sp","lyric":"ㅤ"},
+        {"chord":"D","n":"5 sp","lyric":"ㅤ"},
+        {"chord":"","n":"2' sp","lyric":"ㅤ"},
+        {"chord":"C","n":"1'· sp sp sp","lyric":"ㅤ"},
+        {"chord":"","n":"5_ sp |","lyric":"祢"}
+      ],
+      [
+        {"chord":"ㅤㅤG","n":"sp 3_ 4_","lyric":"ㅤ是我"},
+        {"chord":"","n":"5_ ( 5_ sp 5 ) sp - sp | sp","lyric":"喜悦，"},
+        {"chord":"C","n":"3_ 2_","lyric":"是我"},
+        {"chord":"","n":"4_ ( 4_ sp 4 )","lyric":"力量，"},
+        {"chord":"","n":"3_ 2_ sp | sp","lyric":"当我"},
+        {"chord":"Em7","n":"1","lyric":"敬"},
+        {"chord":"ㅤㅤㅤㅤㅤD","n":"1'_ ( 7_ sp 7_ )","lyric":"拜祢"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤC","n":"5 ( 7_ sp | sp 7_ ) ( 6_ 6 ) - sp","lyric":"喔主。"},
+        {"chord":"","n":"0_ 5_ sp |","lyric":"ㅤ祢"}
+      ],
+      [
+        {"chord":"ㅤㅤG","n":"sp 3_ sp_ 4_","lyric":"ㅤ是ㅤ我"},
+        {"chord":"","n":"5_ sp_ ( 5_ sp 5 ) sp - sp | sp","lyric":"盼ㅤ望，"},
+        {"chord":"C","n":"2_ sp_ 3_","lyric":"是ㅤ我"},
+        {"chord":"","n":"4_ sp_ ( 4_ sp 4 )","lyric":"帮ㅤ助，"},
+        {"chord":"","n":"3_ sp_ 2_ sp | sp","lyric":"唯ㅤ有"},
+        {"chord":"Em7","n":"1","lyric":"祢"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤ D","n":"1'_ sp_ ( 7_ sp 7_ ) sp","lyric":"我ㅤ的"},
+        {"chord":"","n":"5 sp sp sp","lyric":"天"},
+        {"chord":"","n":"([ 7_ sp |","lyric":"父。"}
+      ],
+      [
+        {"chord":"ㅤㅤC","n":"sp ]) 7_ ( 6_ sp 6 ) sp - sp","lyric":"ㅤ"},
+        {"chord":"","n":"0_ 6_ sp | sp","lyric":"ㅤ我"},
+        {"chord":"G","n":"5","lyric":"渴"},
+        {"chord":"","n":"1'","lyric":"慕"},
+        {"chord":"D/F#","n":"-","lyric":"ㅤ"},
+        {"chord":"","n":"0_ 6_ sp | sp","lyric":"ㅤ祢"},
+        {"chord":"Em","n":"5","lyric":"能"},
+        {"chord":"","n":"1' sp - sp","lyric":"力"},
+        {"chord":"","n":"0_ 6_ sp | sp","lyric":"ㅤ彰"},
+        {"chord":"Am7","n":"5","lyric":"显"},
+        {"chord":"","n":"1'_ ( 1'_ sp 1'_ )","lyric":"在我"},
+        {"chord":"","n":"2' sp","lyric":"生"},
+        {"chord":"","n":"([ 2'_ sp |","lyric":"命。"}
+      ],
+      [
+        {"chord":"ㅤㅤD","n":"sp ]) 2' sp - sp - sp - sp | sp","lyric":"ㅤ"},
+        {"chord":"G","n":"2'_ sp_ 1'__ sp__ ( 2'__ sp 2'_ ) sp_ 1'__ sp__ ( 2'__ sp 2'_ ) sp_ 1'__ sp__ ( 2'__ sp 2'__ ) sp_ 2'·_ sp | sp","lyric":"在ㅤ祢ㅤ从 ㅤ ㅤ 没ㅤ有 ㅤ ㅤ 难ㅤ成ㅤㅤㅤ的"},
+        {"chord":"CㅤㅤㅤㅤㅤㅤㅤㅤㅤG/B","n":"6 sp - sp - sp - sp |","lyric":"事，"}
+      ],
+      [
+        {"chord":"ㅤㅤAm7","n":"sp 4'_ 3'__ ( 4'__ sp 4'_ ) 3'__ ( 4'__ sp 4'_ ) 3'__ ( 2'__ sp 2'_ ) 1'_ sp | sp","lyric":"ㅤ在祢里 ㅤ 面凡ㅤㅤ事都ㅤㅤ有"},
+        {"chord":"C/D","n":"1' 7","lyric":"可能。"},
+        {"chord":"D","n":"( 1'·_ sp_ 2'__ )","lyric":"耶"},
+        {"chord":"","n":"2' sp | sp","lyric":"稣"},
+        {"chord":"G","n":"2'_ 1'__ ( 2'__ sp 2'_ ) 1'__ ( 2'__ sp 2'_ ) 1'__ ( 2'__ sp 2'__ ) 3'·_ sp |","lyric":"在祢从 ㅤ 没有 ㅤ 难成ㅤㅤ 的"}
+      ],
+      [
+        {"chord":"ㅤㅤC","n":"sp 6 - - sp","lyric":"ㅤ事，"},
+        {"chord":"G/BㅤㅤㅤㅤㅤㅤㅤAm7ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ D","n":"0_ sp_ 6__ ( 4'__ sp | sp 4'_ ) sp_ 3'__ ( 2'__ sp 2'__ ) sp_ 1'_ sp_ ( 4'__ sp 4'__ ) sp_ 3'_ sp_ ( 2'__ sp 2'__ ) 1'__ 7_ sp | sp","lyric":"ㅤㅤ因为ㅤㅤㅤㅤ我全ㅤㅤㅤ心ㅤ信ㅤㅤㅤ靠ㅤ你,ㅤ  我的"},
+        {"chord":"G","n":"1 sp - sp - sp - sp ||","lyric":"主。"}
+      ]
+    ]
+  }
+]
+}
