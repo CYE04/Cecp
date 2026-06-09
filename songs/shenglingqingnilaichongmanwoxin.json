@@ -1,0 +1,76 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-09 19:41:33",
+  "id": "shenglingqingnilaichongmanwoxin",
+  "title": "圣灵请你来充满心",
+  "artist": "约书亚乐团",
+  "sub": "约书亚乐团【双膝跪下触摸天堂】(2016) Caroline Tjen词曲 City Harvest Church 译",
+  "origKey": "G",
+  "timeSign": "4/4",
+  "bpm": 67,
+  "mp3": "/upload/shenglingqingnilaichongmanwoxin.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/shuangxiguixiachumotiantang.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/shenglingqingnilaichongmanwoxin.lrc",
+  "youtube": "https://youtu.be/BVr0nJkHU-g?si=FvzK_nG2h1vfUCuE",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/shenglingqingnilaichongmanwoxinG.jpg",
+  "sections": [
+  {
+    "name": "圣灵请你来充满我",
+    "lines": [
+      [
+        {"chord":"G","n":"5, sp","lyric":"圣"},
+        {"chord":"","n":"5,_ sp_ 2__ ( 1__ sp 1__ ) 5,·_ sp","lyric":"灵ㅤ请你 ㅤ 来"},
+        {"chord":"","n":"{3 5,_ 4,_ 3,_ } ([ sp | sp","lyric":"充满我"},
+        {"chord":"C9","n":"]) 3,__ ( 6,·_ sp 6, ) ( sp 6,· ) sp sp","lyric":"ㅤ心，"},
+        {"chord":"","n":"5,_ sp | sp","lyric":"我"},
+        {"chord":"G","n":"5, sp","lyric":"需"},
+        {"chord":"","n":"5,_ sp_ 2__ ( 1__ sp 1__ ) 5,·_ sp","lyric":"要ㅤ你恩 ㅤ 膏"},
+        {"chord":"","n":"{3 5,_ 4,_ 3,_ } ([ sp |","lyric":"充满我"}
+      ],
+      [
+        {"chord":"C9","n":"]) 3,__ ( 6,·_ sp 6, ) ( sp sp 6,· ) sp","lyric":"ㅤ灵。"},
+        {"chord":"","n":"5,_ sp | sp","lyric":"圣"},
+        {"chord":"Am或C9","n":"6,_ sp_ 6,__ sp__ ( 6,__ sp 6,__ ) 3,·_ sp","lyric":"灵ㅤ啊, 我ㅤ ㅤ好"},
+        {"chord":"D/C","n":"2_ ( 7,_ sp 7,·_ ) sp_ 6,__ sp | sp","lyric":"爱你， ㅤ 我"},
+        {"chord":"Bm7","n":"5,_ 5,_","lyric":"的灵"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤEm","n":"2_ 1__ ( 7,__ sp 7,_ ) ( 1_ sp 1·_ ) sp_ 5__ sp |","lyric":"让你牵 ㅤ 引，ㅤㅤ而"}
+      ],
+      [
+        {"chord":"Am7","n":"4,_ sp_ 5,__ ( 6,__ sp 6,·_ ) sp_ 5,__","lyric":"每ㅤ一天 ㅤㅤ 我"},
+        {"chord":"","n":"6,_ 7,__ sp__ ( 1,__ sp 1,_ ) sp_ ([ 6,_","lyric":"要更ㅤ深ㅤㅤㅤ爱"},
+        {"chord":"","n":"|","lyric":"ㅤ"},
+        {"chord":"D","n":"]) 6,_ ( 5,_ sp 5, ) [v1 sp - sp - sp :| ]v","lyric":"ㅤ你。"},
+        {"chord":"ㅤ D","n":"sp ]) 6,_ ( 2_ sp 2 ) [v2 sp sp","lyric":"ㅤㅤ你。"},
+        {"chord":"ㅤㅤ【Chorus】","n":"0_ 5,_ sp 1_ 2_ sp || ]v","lyric":"ㅤ我ㅤ要追"}
+      ],
+      [
+        {"chord":"","n":"||","lyric":"ㅤ"},
+        {"chord":"G","n":"2·_ sp_ ( 3__ sp 3_ ) 3_","lyric":"求ㅤ你, ㅤ 主"},
+        {"chord":"","n":"0_ 5,_","lyric":"ㅤ我"},
+        {"chord":"","n":"1_ 2_ sp | sp","lyric":"将生"},
+        {"chord":"Em7","n":"2·_ sp_ ( 1__ sp 1__ ) 7,_ ( 1__ 1 ) sp","lyric":"命ㅤ献 ㅤ  给你，"},
+        {"chord":"","n":"{3 6,_ 7,_ 1_ } sp | sp","lyric":"牵引我"},
+        {"chord":"Am7","n":"5·_ sp_ ( 4__ sp 4__ ) 3_ ( 4__ sp 4_ ) 6,_","lyric":"更ㅤ亲 ㅤ 近你, ㅤ 你"},
+        {"chord":"","n":"7,_ 1_ sp |","lyric":"大能"}
+      ],
+      [
+        {"chord":"D","n":"1_ sp_ 1_ sp","lyric":"更ㅤ新"},
+        {"chord":"","n":"2_ sp_ 2_ sp sp","lyric":"我ㅤ灵。"},
+        {"chord":"","n":"0_ sp_ 7,_ sp","lyric":"ㅤㅤ无"},
+        {"chord":"","n":"1_ sp_ 2_ sp | sp","lyric":"人ㅤ能"},
+        {"chord":"Bsus4ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ ㅤB","n":"4·_ sp_ sp_ ( 3__ sp sp 3__ ) sp_ 7,_ sp_ ( 3__ sp sp sp 3 ) sp sp","lyric":"与ㅤㅤ你 ㅤㅤ ㅤ 相ㅤ 比，"},
+        {"chord":"","n":"{3 2_ sp_ 1_ sp_ 7,_ } sp |","lyric":"主ㅤ我ㅤ仰"}
+      ],
+      [
+        {"chord":"Em7ㅤㅤㅤㅤㅤG/D","n":"2_ sp_ 1__ sp__ ( 1__ sp 1_ ) sp_ 5,_ sp","lyric":"望ㅤ你ㅤ的ㅤㅤㅤ荣"},
+        {"chord":"A/C#","n":"6,· sp","lyric":"面"},
+        {"chord":"","n":"5,_ sp | sp","lyric":"我"},
+        {"chord":"Am7","n":"6,_ sp_ 7,__ sp__ ( 1,__ sp 1,·_ ) sp_ 5,__","lyric":"敬ㅤ拜ㅤ祢, ㅤㅤ在"},
+        {"chord":"D","n":"5,__ 3·_","lyric":"灵与"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤG","n":"2_ sp_ 1__ ( 1__ sp | sp 1 ) sp - sp - sp - sp ||/","lyric":"真ㅤ理里。"}
+      ]
+    ]
+  }
+]
+}
