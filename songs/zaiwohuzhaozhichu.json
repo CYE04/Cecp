@@ -1,0 +1,90 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-10 18:59:30",
+  "id": "zaiwohuzhoachichu",
+  "title": "在我呼召之处",
+  "artist": "约书亚乐团",
+  "sub": "约书亚乐团《恢复荣耀》(2011) JoonYoung Kim 词 EunJeong Song 曲",
+  "origKey": "D",
+  "timeSign": "4/4",
+  "bpm": 61,
+  "mp3": "/upload/zaiwohuzhoachichu.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/huifurongyao.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/zaiwohuzhoachichu.lrc",
+  "youtube": "https://youtu.be/uwXsvypmGVE?si=LYAAg0FP7K1OEK8w",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/zaiwohuzhoachichuD.jpg",
+  "sections": [
+  {
+    "name": "在我呼召之处",
+    "lines": [
+      [
+        {"chord":"D","n":"0","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"3,_ 4,_","lyric":"主温","lyric2":"主慈"},
+        {"chord":"","n":"5,","lyric":"柔","lyric2":"爱"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤG/D","n":"2_ ( 1_ sp | sp 1_ ) ( 5,_ 5, ) - - |","lyric":"的圣ㅤㅤ灵，","lyric2":"的真ㅤㅤ理，"},
+        {"chord":"Dmaj7","n":"0 3,_ 4,__ ( 5,__ sp 5,_ ) 2_","lyric":"ㅤ让我全 ㅤ 心","lyric2":"ㅤ你荣光 ㅤ 照"},
+        {"chord":"ㅤㅤㅤㅤㅤC/D或Am7/D","n":"1_ ( 3_ sp | sp 3 ) - -","lyric":"感受，","lyric2":"向我，"},
+        {"chord":"","n":"3_ 4_ sp |","lyric":"渗透","lyric2":"包围"},
+        {"chord":"Gmaj7","n":"5 sp 5_ 1__ ( 1__ 1 )","lyric":"我ㅤ的生命,","lyric2":"我ㅤ的身体,"},
+        {"chord":"","n":"0_ 5,__ 5,__ sp |","lyric":"ㅤ赐下","lyric2":"ㅤ赐下"}
+      ],
+      [
+        {"chord":"F#m7 ㅤㅤㅤㅤㅤㅤㅤBm7","n":"2_ 1__ ( 7,__ sp 7,__ ) 5,_ ( 1__ 1 ) - sp | sp","lyric":"平静和 ㅤ 安息，","lyric2":"平静和 ㅤ 安息，"},
+        {"chord":"Em7","n":"0","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤG/A","n":"6,_ 7,__ ( 1__ sp 1_ ) 2_","lyric":"你使我 ㅤ 心","lyric2":"让我感 ㅤ 受"},
+        {"chord":"","n":"6,_ 7,_ sp | sp","lyric":"你满","lyric2":"你的"},
+        {"chord":"D","n":"[v1 ]v 1 - - - ]v sp","lyric":"足。","lyric2":"ㅤ"},
+        {"chord":"","n":":| sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"D","n":"[v2 1","lyric":"爱。","lyric2":"ㅤ"},
+        {"chord":"[Chorus]","n":"0_ 5,__ 5,__","lyric":"ㅤ在呼","lyric2":"ㅤ"},
+        {"chord":"","n":"3_ 4_","lyric":"召我","lyric2":"ㅤ"},
+        {"chord":"","n":"]v 5_ ([ 5_ sp |","lyric":"之处，","lyric2":"ㅤ"}
+      ],
+      [
+        {"chord":"ㅤㅤGmaj7","n":"|| sp ]) 5 sp 0_ 5,__ 5,__ sp","lyric":"ㅤ ㅤㅤ 我要"},
+        {"chord":"","n":"3_ 4_ sp","lyric":"献上"},
+        {"chord":"ㅤㅤㅤㅤㅤ F#m7","n":"5_ ( 5_ sp | sp 5 )","lyric":"敬拜"},
+        {"chord":"","n":"0_ 5,__ 5,__","lyric":"ㅤ无论"},
+        {"chord":"Bm7","n":"3_ 4_","lyric":"遭遇"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤEm7","n":"5_ ( 4_ sp | sp 4 )","lyric":"何事，"},
+        {"chord":"","n":"0_ 4__ 3__","lyric":"ㅤ依然"},
+        {"chord":"G/A","n":"4_ 5_","lyric":"扬声"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤ D","n":"2_ ( 3_ sp | sp 3 ) sp","lyric":"歌唱"},
+        {"chord":"","n":"0_ 5,__ 5,__","lyric":"ㅤ在呼"}
+      ],
+      [
+        {"chord":"D7或D/F#ㅤㅤㅤㅤ Gmaj7","n":"3_ 4_ sp 5_ ( 5_ sp | sp 5 )","lyric":"召我ㅤ之处，"},
+        {"chord":"","n":"0_ 5,__ 5,__","lyric":"ㅤ我要"},
+        {"chord":"","n":"3_ 4_","lyric":"献上"},
+        {"chord":"ㅤㅤㅤㅤㅤ F#m7","n":"5_ ( 5_ sp | sp 5 )","lyric":"敬拜，"},
+        {"chord":"","n":"0_ 5,__ 5,__ sp","lyric":"ㅤ无论"},
+        {"chord":"Bm7","n":"3_ 4_","lyric":"遭遇"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤEm7","n":"5_ ( 4_ sp | sp 4_ ) 3__ 1__","lyric":"何事， ㅤ 依然"},
+        {"chord":"ㅤㅤ G/A","n":"0_ 3_ sp 2 sp","lyric":"ㅤ扬ㅤ声"},
+        {"chord":"","n":"1_ ([ 1_ sp |","lyric":"歌唱。"}
+      ],
+      [
+        {"chord":" Dㅤ Fine","n":"]) 1 - -","lyric":"ㅤ"},
+        {"chord":"[Bridge]","n":"0_ 1__ 1__ sp ||/ sp","lyric":"ㅤ在我"},
+        {"chord":"Gmaj7ㅤㅤㅤㅤㅤㅤㅤㅤ A/G","n":"6_ 6__ ( 6__ sp 6_ ) 6__ ( 6__ sp 6_ ) 2__ ( 3__ sp 3__ ) 4·_ sp | sp","lyric":"行走时 ㅤ 成为ㅤㅤ我道ㅤㅤ路，"},
+        {"chord":"F#m7ㅤㅤㅤㅤㅤㅤㅤㅤㅤBm7","n":"5_ 5__ ( 5__ sp 5_ ) 5__ ( 5__ sp 5_ ) 1__ ( 2__ sp 2__ ) sp_ 3_ sp_ 5,__ sp |","lyric":"活着时 ㅤ 成为ㅤㅤ我生ㅤㅤㅤ命, 就"}
+      ],
+      [
+        {"chord":"Em7","n":"3_ sp_ 4__ ( 4__ sp 4 )","lyric":"在ㅤ这地"},
+        {"chord":"G/AㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤDㅤㅤㅤㅤㅤㅤㅤㅤD7","n":"0_ 3__ ( 2__ sp 2__ ) 5_ ( 3__ sp | sp 3 ) sp - sp - sp","lyric":"ㅤ献上 ㅤ 敬拜。"},
+        {"chord":"或Am7/D","n":"0_ sp_ 1__ 1__ sp | sp","lyric":"ㅤㅤ在我"},
+        {"chord":"Gmaj7","n":"6_ 6__ ( 6__ sp 6_ ) 6__ ( 6__ sp 6_ ) 2__ ( 3__ sp 3__ ) 4·_ sp |","lyric":"行走时 ㅤ 成为ㅤㅤ我道 ㅤ 路"}
+      ],
+      [
+        {"chord":"F#m7ㅤㅤㅤㅤㅤㅤㅤㅤㅤ Bm7","n":"5_ 5__ ( 5__ sp 5_ ) 5__ ( 5__ sp 5_ ) 1__ ( 2__ sp 2__ ) 3_ sp_ 5,__ sp | sp","lyric":"活着时 ㅤ 成为ㅤㅤ我生 ㅤ 命,ㅤ就"},
+        {"chord":"C","n":"3_ 4__ ( 4__ 4 )","lyric":"在这地"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ Asus4","n":"0_ 3__ ( 4__ sp 4__ ) 5_ sp_ ( 5__ sp | sp 5 )","lyric":"ㅤ献上ㅤㅤ敬ㅤ拜。"},
+        {"chord":"","n":"0_ 5,__ 5,__","lyric":"ㅤ在呼"},
+        {"chord":"D/F#","n":"3_ 4_","lyric":"召我"},
+        {"chord":" ","n":"5_ ([ 5_ sp |","lyric":"之处"}
+      ]
+    ]
+  }
+]
+}
