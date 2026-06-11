@@ -1,0 +1,120 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-11 20:07:27",
+  "id": "shengjiedaoyongyuan",
+  "title": "圣洁到永远",
+  "artist": "Original Song by Chris Tomlin",
+  "sub": "【Holy Forever】(2022) JennJohnson, BrianJohnson &曲ChrisTomlin, Jason Inram and PhilWickham 词李翔中文译词",
+  "origKey": "E",
+  "timeSign": "4/4",
+  "bpm": 72,
+  "mp3": "/upload/shengjiedaoyongyuan.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/shengjiedaoyogyuan.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/shengjiedaoyongyuan.lrc",
+  "youtube": "https://youtu.be/8qMfZRUjcEM?si=D-k362DYdwdbXFPX",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/shengjiedaoyongyuanE.jpg",
+  "sections": [
+  {
+    "name": "圣洁到永远",
+    "lines": [
+      [
+        {"chord":"","n":"sp sp","lyric":""},
+        {"chord":"E","n":"3__ 5/3_ ( 6/3_ sp 6/3__ )","lyric":"世世代","lyric2":"凡被赦"},
+        {"chord":"","n":"5/2__ ( 5/2__ sp 5/2_ )","lyric":"代前","lyric2":"免的"},
+        {"chord":"","n":"3·/1· sp | sp","lyric":"来，","lyric2":"人，"},
+        {"chord":"AㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤE","n":"6__ 6_ ( 6__ sp 6_ ) 5__ ( 5__ sp 5_ )","lyric":"向你俯 ㅤ 伏敬","lyric2":"凡蒙救 ㅤ 赎的"},
+        {"chord":"","n":"3·","lyric":"拜，","lyric2":"人，"},
+        {"chord":"C#mㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ B","n":"3__ 3_ ( 4__ sp 4_ ) 3__ ( 3__ sp 3_ ) 2_","lyric":"齐来歌 ㅤ 颂宣ㅤㅤ扬","lyric2":"永远歌 ㅤ 颂宣ㅤㅤ扬"},
+        {"chord":"","n":"2__ 1__ ([ 1_ sp |","lyric":"神羔羊；","lyric2":"神羔羊；"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"A","n":"]) 1 0 0 0 |","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"E","n":"3__ 3_ ( 3__ sp 3_ ) 2__ ( 2__ sp 2_ )","lyric":"历世历 ㅤ 代圣","lyric2":"凡得自 ㅤ 由的"},
+        {"chord":"","n":"1· sp |","lyric":"徒，","lyric2":"人，"},
+        {"chord":"A","n":"6__ 6_ ( 6__ sp 6_ ) 5__ ( 5__ sp 5_ )","lyric":"所有信 ㅤ 靠的","lyric2":"凡信他 ㅤ 名的"},
+        {"chord":"","n":"3· sp |","lyric":"人，","lyric2":"人，"},
+        {"chord":"C#mㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ B","n":"3__ 3_ ( 4__ sp 4_ ) 3__ ( 3__ sp 3_ ) 2_","lyric":"齐来歌 ㅤ 颂宣ㅤㅤ扬","lyric2":"永远歌 ㅤ 颂宣ㅤㅤ扬"},
+        {"chord":"","n":"2__ 1__ ([ 1_ sp |","lyric":"神羔羊。","lyric2":"神羔羊。"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"A","n":"]) 1 0 0","lyric":"ㅤ"},
+        {"chord":"","n":"0_ 6_ sp | sp","lyric":"ㅤ你"},
+        {"chord":"A","n":"6·","lyric":"名"},
+        {"chord":"","n":"6__ 6__","lyric":"称为"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤC#m","n":"( 6_ 5__ ) ( 5__ sp 5_ ) 7_ sp |","lyric":"至ㅤ高,ㅤ 你"},
+        {"chord":"B","n":"7·","lyric":"名"},
+        {"chord":"","n":"7__ 7__","lyric":"称为"},
+        {"chord":"","n":"( 7_ 6__ ) ( 6__ sp 6_ ) 1'_ sp |","lyric":"至ㅤ大, ㅤ 你"},
+        {"chord":"C#m","n":"1'","lyric":"名"},
+        {"chord":"","n":"0·_ sp_ 1'__","lyric":"ㅤㅤ超"},
+        {"chord":"","n":"1'·_ sp_ 7__","lyric":"乎ㅤ万"},
+        {"chord":"","n":"7·_ sp_ 6__ sp |","lyric":"名ㅤ之"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"A","n":"6 0 0","lyric":"上ㅤ"},
+        {"chord":"","n":"0_ 6_ sp | sp","lyric":"ㅤ超"},
+        {"chord":"A","n":"6·","lyric":"越"},
+        {"chord":"","n":"6__ 6__","lyric":"所有"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤC#m","n":"( 6_ 5__ ) ( 5__ sp 5_ ) 7_ sp |","lyric":"权ㅤ柄, ㅤ 超"},
+        {"chord":"B","n":"7·","lyric":"越"},
+        {"chord":"","n":"7__ 7__","lyric":"所有"},
+        {"chord":"","n":"( 7_ 6__ ) ( 6__ sp 6_ ) 1'_ sp |","lyric":"能ㅤ力, ㅤ 你"},
+        {"chord":"C#m","n":"1'","lyric":"名"},
+        {"chord":"","n":"0·_ sp_ 1'__","lyric":"ㅤㅤ超"},
+        {"chord":"","n":"1'·_ sp_ 7__","lyric":"乎ㅤ万"},
+        {"chord":"","n":"7·_ sp_ 6__ sp |","lyric":"名ㅤ之"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"||","lyric":"ㅤ"},
+        {"chord":"A","n":"]) 1' - - - sp | sp","lyric":"ㅤ"},
+        {"chord":"C#m","n":"1'_ sp_ 1'_","lyric":"永ㅤ远"},
+        {"chord":"","n":"1'_ 1'__ ( 3'__ sp 3'_ ) 2'_","lyric":"歌颂宣 ㅤ 扬"},
+        {"chord":"Bㅤㅤㅤㅤㅤㅤㅤ A","n":"2'__ 1'__ ( 1'_ sp || sp 1' )","lyric":"你阿门。 (上)"},
+        {"chord":"(F#m)","n":"0_ 1'__ 2'__","lyric":"众天"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ A","n":"3'·_ sp_ ( 1'__ sp 1'_ ) ( 6_ sp | sp 6 ) -","lyric":"使ㅤ呼ㅤㅤ喊"},
+        {"chord":"ㅤㅤㅤC#m","n":"( 3' sp 1' ) sp |","lyric":"圣"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"B","n":"2' sp","lyric":"洁"},
+        {"chord":"","n":"0_ 7__ 1'__","lyric":"ㅤ万有"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤG#m","n":"2'·_ sp_ ( 7__ sp 7_ ) ( 5_ sp | sp 5 ) - sp","lyric":"都ㅤ呼ㅤㅤ喊"},
+        {"chord":"","n":"( 2' sp 7 ) sp | sp","lyric":"圣"},
+        {"chord":"C#m","n":"1' sp","lyric":"洁!"},
+        {"chord":"","n":"0_ 1'__ 2'__","lyric":"ㅤ我们"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤF#m","n":"3'·_ sp_ ( 1'__ sp 1'_ ) ( 4'_ sp | sp 4' ) -","lyric":"高ㅤ举ㅤㅤ你"},
+        {"chord":"","n":"( 4' sp 3' ) sp |","lyric":"圣"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"B","n":"2' -","lyric":"洁，"},
+        {"chord":"","n":"2'_ 3'_","lyric":"圣洁"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤE","n":"4'_ ( 4'_ sp | sp 4'_ ) ( 3'_ 3' ) - 0 |","lyric":"到永ㅤㅤㅤ远"},
+        {"chord":"","n":"0","lyric":"ㅤ"},
+        {"chord":"","n":"0_ 1'__ 2'__","lyric":"听万"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤA","n":"3'·_ sp_ ( 1'__ sp 1'_ ) ( 6_ || 6 ) -","lyric":"民ㅤ歌 ㅤ 唱,"},
+        {"chord":"ㅤC#m","n":"( 3' 1' ) |","lyric":"圣"},
+        {"chord":"B","n":"2'","lyric":"洁!"},
+        {"chord":"","n":"0_ 7__ 1'__","lyric":"ㅤ归万"},
+        {"chord":"","n":"2'·_ sp_ ( 7__ sp 7_ ) ([ 5_ sp |","lyric":"王ㅤ之ㅤㅤ王，"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"G#m","n":"]) 5 -","lyric":"ㅤ"},
+        {"chord":"","n":"( 2' 7 ) sp | sp","lyric":"圣"},
+        {"chord":"","n":"1'","lyric":"洁,"},
+        {"chord":"","n":"0_ 1'__ 2'__","lyric":"ㅤ你永"},
+        {"chord":"C#mㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤF#m","n":"3'·_ sp_ ( 1'__ sp 1'_ ) ( 4'_ sp | sp 4' ) -","lyric":"不ㅤ改ㅤㅤ变，"},
+        {"chord":"","n":"( 4' 3' ) sp | sp","lyric":"圣"},
+        {"chord":"B","n":"2' - 2'_ 3'_","lyric":"洁，圣洁"},
+        {"chord":"","n":"4'_ ( 4'_ sp | sp 4' ) ( 3' sp 3' ) - 0 ||/","lyric":"到永ㅤㅤㅤ远"}
+      ]
+    ]
+  }
+]
+}
