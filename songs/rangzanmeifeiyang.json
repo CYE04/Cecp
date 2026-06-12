@@ -1,7 +1,7 @@
 {
   "version": "1",
   "created": "YuEn",
-  "createdTime": "2026-06-12 19:14:18",
+  "createdTime": "2026-06-12 19:21:20",
   "id": "rangzanmeifeiyang",
   "title": "让赞美飞扬",
   "artist": "赞美之泉",
@@ -149,8 +149,8 @@
         {"chord":"","n":"7_ 7_","lyric":"们的"},
         {"chord":"","n":"1'","lyric":"心"},
         {"chord":"","n":"2' sp | sp","lyric":"向"},
-        {"chord":"D","n":"6 -","lyric":"神"},
-        {"chord":"","n":"7 - sp | sp","lyric":"敞"},
+        {"chord":"","n":"6 -","lyric":"神"},
+        {"chord":"D","n":"7 - sp | sp","lyric":"敞"},
         {"chord":"G","n":"1 sp - sp - sp - sp ||/","lyric":"开。"}
       ]
     ]
