@@ -1,0 +1,122 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-14 18:41:15",
+  "id": "jidushiwomanzu",
+  "title": "基督是我满足",
+  "artist": "约书亚乐团",
+  "sub": "约书亚乐团《点燃》(2015) / Hillsong (2013) Reuben Morgan&Jonas Myrin曲 Evelyn Kong & Nelson Ng & Debbie Wang & Zon Shih&赵治德译",
+  "origKey": "A",
+  "timeSign": "4/4",
+  "bpm": 80,
+  "mp3": "/upload/jidushiwomanzu.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/dianran.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/jidushiwomanzu.lrc",
+  "youtube": "https://youtu.be/2DRY1xb3bPc?si=Be7OgIH-m6cBoyrK",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/jidushiwomanzuA.jpg",
+  "sections": [
+  {
+    "name": "新段落",
+    "lines": [
+      [
+        {"chord":"F#m","n":"1","lyric":"你","lyric2":"基"},
+        {"chord":"","n":"( 1·_ sp_ 1__ )","lyric":"是","lyric2":"督ㅤ我"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ D","n":"1·_ sp_ ( 7,__ sp 7,_ ) ( 1,_ sp | sp 1, )","lyric":"我ㅤ奖ㅤㅤ赏,","lyric2":"全ㅤ所ㅤㅤ有,"},
+        {"chord":"","n":"0·_ sp_ 5,__","lyric":"ㅤㅤ是","lyric2":"ㅤㅤ救"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤA","n":"3_ 2__ ( 2__ sp 2_ ) 1__ ( 1__ sp | sp 1 )","lyric":"我唯一 ㅤ 所爱","lyric2":"恩喜乐 ㅤ 在于"},
+        {"chord":"","n":"( 6,_ 5,_ ) 0 0 sp |","lyric":"慕，","lyric2":"祢，"},
+        {"chord":"E/G#","n":"0 0 0","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"6,_ 7,_ sp |","lyric":"这世","lyric2":"这盼"},
+        {"chord":"F#m","n":"1 1","lyric":"上没","lyric2":"望永"}
+      ],
+      [
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ D","n":"1·_ sp_ ( 7,__ sp 7,_ ) ( 1_ sp | sp 1 )","lyric":"有ㅤ事ㅤㅤ物","lyric2":"不ㅤ止ㅤㅤ息，"},
+        {"chord":"","n":"0_ 5,__ 5,__","lyric":"ㅤ能够","lyric2":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤA","n":"3_ 2__ ( 2__ sp 2_ ) 1__ ( 1__ sp | 1 ) 0 0 0 |","lyric":"带给我 ㅤ 满足。","lyric2":"天堂是 ㅤ 我家。"},
+        {"chord":"E/G#","n":"0 3","lyric":"ㅤ在","lyric2":"ㅤ暴"},
+        {"chord":"C#m","n":"7,_ sp_ ( 1__ sp 1_ ) ( 6,_ sp | 6,· )","lyric":"试ㅤ炼ㅤㅤ中，","lyric2":"风ㅤ雨ㅤㅤ中，"},
+        {"chord":"","n":"5,_","lyric":"我","lyric2":"我"},
+        {"chord":"","n":"7,","lyric":"灵","lyric2":"灵"},
+        {"chord":"","n":"1·_ sp_ ([ 1__ sp |","lyric":"歌ㅤ唱，","lyric2":"歌ㅤ唱，"}
+      ],
+      [
+        {"chord":"F#m","n":"]) 1","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"3","lyric":"永","lyric2":"与"},
+        {"chord":"","n":"7,·_ sp_ ( 1__ sp 1_ ) ([ 6,_ sp |","lyric":"不ㅤ回ㅤㅤ头，","lyric2":"祢ㅤ同ㅤㅤ行，"},
+        {"chord":" D","n":"]) 6,· [v1","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"5,_","lyric":"我","lyric2":"ㅤ"},
+        {"chord":"F#mㅤㅤㅤㅤㅤㅤㅤㅤㅤEㅤ[接Chorus]","n":"1·_ sp_ ( 2__ sp 2·_ ) sp_ ( 2__ | 2 ) - - - sp ||/ ]v","lyric":"得ㅤ自ㅤㅤㅤ由。","lyric2":"ㅤ"},
+        {"chord":"D","n":"[v2 ]) 6·","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"5,_","lyric":"荣","lyric2":"ㅤ"},
+        {"chord":"","n":"1_ sp_ ( 2__ sp 2_ ) 1_ sp | sp","lyric":"耀ㅤ归ㅤㅤ给","lyric2":"ㅤㅤ"},
+        {"chord":"F#mㅤ E","n":"3 - 2 - sp || ]v","lyric":"上ㅤ帝","lyric2":"ㅤ"}
+      ],
+      [
+        {"chord":"ㅤㅤ Aㅤ【Chorus】","n":"|| sp 3 - 3· sp 1_ sp | sp","lyric":"ㅤ 基ㅤ督ㅤ是"},
+        {"chord":"","n":"4","lyric":"我"},
+        {"chord":"","n":"3","lyric":"满"},
+        {"chord":"","n":"3","lyric":"足,"},
+        {"chord":"","n":"0 sp | sp","lyric":"ㅤ"},
+        {"chord":"F#m7ㅤㅤㅤㅤE","n":"3 - 3· sp 1_ sp | sp","lyric":"基ㅤ督ㅤ祢"},
+        {"chord":"F#mㅤㅤㅤEㅤㅤㅤㅤㅤㅤㅤD","n":"4 3 sp 2· sp ( 1_ sp | sp 1_ ) ( 1_ sp 1 )","lyric":"是我心 满ㅤㅤ ㅤ 足,"},
+        {"chord":"","n":"4·_ sp_ 3__","lyric":"我ㅤ一"},
+        {"chord":"","n":"2_ 1_ sp |","lyric":"切所"}
+      ],
+      [
+        {"chord":"E","n":"2","lyric":"需"},
+        {"chord":"","n":"3","lyric":"在"},
+        {"chord":"F#m","n":"2","lyric":"于"},
+        {"chord":"ㅤㅤㅤㅤㅤD","n":"( 1 sp | sp 1 ) -","lyric":"祢，"},
+        {"chord":"","n":"4·_ sp_ 3__","lyric":"一ㅤ切"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤ E ㅤ[接第2段]","n":"2_ ( 1_ sp | sp 1_ ) ( 2_ 2 ) - - :|","lyric":"在于ㅤㅤㅤ祢"},
+        {"chord":"A","n":"0 0 0 0","lyric":"ㅤ"},
+        {"chord":"","n":"|","lyric":"ㅤ"},
+        {"chord":"D/A","n":"0 0 0 0","lyric":"ㅤ"},
+        {"chord":"","n":"|","lyric":"ㅤ"},
+        {"chord":"D/A","n":"0 0 0_ 1_","lyric":"ㅤㅤㅤ 我"},
+        {"chord":"","n":"1_ 2_ sp ||","lyric":"已经"}
+      ],
+      [
+        {"chord":"ㅤㅤㅤA","n":"|: sp 3· sp","lyric":"ㅤㅤ决"},
+        {"chord":"ㅤㅤㅤD/A","n":"( 4_ sp 4_ ) 4_","lyric":"定ㅤㅤ要"},
+        {"chord":"ㅤ(*)","n":"4_ 3_ sp | sp","lyric":"跟随"},
+        {"chord":"A2","n":"2· sp","lyric":"耶"},
+        {"chord":"ㅤㅤㅤA","n":"( 1_ sp 1_ ) 1_","lyric":"稣, ㅤ 永"},
+        {"chord":"ㅤ(*)","n":"1_ 7,_ sp |","lyric":"不回"},
+        {"chord":"ㅤD","n":"sp [v1 6, -","lyric":"ㅤ头，"},
+        {"chord":"F#m","n":"0_ 1_","lyric":"ㅤ永"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤ E","n":"1_ ( 2_ sp | sp 2_ ) 2_ 0","lyric":"不回ㅤㅤㅤ头。"},
+        {"chord":"","n":"0_ 1_","lyric":"ㅤ我"},
+        {"chord":"","n":"1_ 2_ sp :| ]v","lyric":"已经"}
+      ],
+      [
+        {"chord":"D","n":"6, [v2","lyric":"头,"},
+        {"chord":"","n":"3","lyric":"永"},
+        {"chord":"E","n":"2· sp","lyric":"不"},
+        {"chord":"ㅤㅤㅤㅤㅤA","n":"( 1_ sp | sp 1_ ) ( 1_ sp 1 )","lyric":"回ㅤㅤㅤ头"},
+        {"chord":"","n":"0_ 1_","lyric":"ㅤ十"},
+        {"chord":"","n":"1_ 2_ ]v sp","lyric":"架在"},
+        {"chord":"","n":"|: sp","lyric":"ㅤ"},
+        {"chord":"A","n":"3· sp sp","lyric":"前"},
+        {"chord":"ㅤㅤ D/A","n":"( 4_ sp 4_ ) 4_","lyric":"面，ㅤ世"},
+        {"chord":"ㅤ(*)","n":"4_ 3_ sp | sp","lyric":"界在"},
+        {"chord":"A2","n":"2· sp","lyric":"背"},
+        {"chord":"ㅤㅤㅤA","n":"( 1_ sp 1_ ) 1_","lyric":"后，ㅤ永"},
+        {"chord":"ㅤ(*)","n":"1_ 7,_ sp |","lyric":"不回"}
+      ],
+      [
+        {"chord":"D","n":"[v1 6, -","lyric":"头，"},
+        {"chord":"F#m","n":"0_ 1_","lyric":"ㅤ永"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤ E","n":"1_ ( 2_ sp | sp 2_ ) ( 2_ sp 2 )","lyric":"不回ㅤㅤㅤ头。"},
+        {"chord":"","n":"0_ 1_","lyric":"ㅤ十"},
+        {"chord":"","n":"1_ 2_ ]v sp","lyric":"架在"},
+        {"chord":"","n":":| sp","lyric":"ㅤ"},
+        {"chord":"D","n":"6, [v2","lyric":"头,"},
+        {"chord":"","n":"3","lyric":"永"},
+        {"chord":"E","n":"2· sp","lyric":"不"},
+        {"chord":"ㅤㅤㅤㅤㅤAㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤD.S. al Fine","n":"( 1_ sp | sp 1_ ) ( 1_ 1 ) ( - - sp | sp 1 ) - - - sp ||/ ]v","lyric":"回ㅤㅤ ㅤ头"}
+      ]
+    ]
+  }
+]
+}
