@@ -1,0 +1,102 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-16 19:50:26",
+  "id": "jiandanhuxi",
+  "title": "简单呼吸",
+  "artist": "约书亚乐团",
+  "sub": "约书亚乐团【像极了天堂】(2024) 周巽光、玺恩、马永蒂、高承恩词曲",
+  "origKey": "C",
+  "timeSign": "4/4",
+  "bpm": 74,
+  "mp3": "/upload/jiandanhuxi.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/xiangjiletiantang.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/jiandanhuxi.lrc",
+  "youtube": "https://youtu.be/YScPG4Ap0GM?si=Y_blISgBKr0cYhFa",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/jiandanhuxiC.jpg",
+  "sections": [
+  {
+    "name": "简单呼吸",
+    "lines": [
+      [
+        {"chord":"ㅤㅤ ㅤCㅤㅤG/B","n":"|: sp 3 - 2 - sp | sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"Am7","n":"1 - - - sp |:| sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"C","n":"0·_ sp_ 5,__","lyric":"ㅤㅤ听","lyric2":"ㅤㅤ感"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤG/B","n":"5,__ 1_ ( 7,__ sp 7,__ ) ( 1·_ sp 1 ) sp | sp","lyric":"见你声 ㅤ 音，","lyric2":"受你气 ㅤ 息，"},
+        {"chord":"Am7","n":"0·_ sp_ 5,__","lyric":"ㅤㅤ呼","lyric2":"ㅤㅤ活"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤFmaj7","n":"5,__ 1_ ( 7,__ sp 7,__ ) ( 5,·_ sp 5, ) sp |","lyric":"唤我的 ㅤ 名，","lyric2":"泼的生 ㅤ 命，"}
+      ],
+      [
+        {"chord":"C","n":"[v1 0·_ sp_ 5,__","lyric":"ㅤㅤ在"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤG/BㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤAm7","n":"5,__ 1_ ( 7,__ sp 7,_ ) 1__ sp__ ( 2__ sp 2_ ) 1__ ( 1__ sp | 1 ) - 0 0 ]v","lyric":"此刻牵 ㅤ 动ㅤ我ㅤㅤ的心，"},
+        {"chord":"","n":":|","lyric":"ㅤ"},
+        {"chord":"Dm7","n":"0·_ sp_ 5,__ [v2","lyric":"ㅤㅤ面"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤC/EㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤFmaj7","n":"5,__ 1_ ( 7,__ sp 7,_ ) 1__ sp__ ( 2__ sp 2_ ) 1__ ( 3__ sp | 3 ) - - 0 | ]v","lyric":"对面是 ㅤ 如ㅤ此ㅤㅤ贴近。"}
+      ],
+      [
+        {"chord":"Dm7","n":"|| 0","lyric":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤC/EㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤF","n":"3__ 3_ ( 3__ sp 3__ ) 3_ sp_ ( 3__ sp 3_ ) 2__ ( 4__ sp | 4 )","lyric":"你气息 ㅤ 吹ㅤ入ㅤㅤ我心，"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤFmㅤㅤㅤㅤㅤDm7","n":"3__ 3_ ( 3__ sp 3__ ) 3_ sp_ ( 3__ sp 3_ ) 2__ ( 4__ sp | 4 )","lyric":"祢话语 ㅤ 充ㅤ 满 ㅤ 我灵，"},
+        {"chord":"","n":"5__ 5_ ( 5__ sp 5_ ) 5__ ( 5__ sp 5_ ) 1__ ([ 2__ sp |","lyric":"深渊与 ㅤ 深渊 ㅤ 响应。"}
+      ],
+      [
+        {"chord":"Gsus4","n":"]) 2 sp -","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"【Cho","n":"3_ 5_","lyric":"你触","lyric2":"ㅤ"},
+        {"chord":"rus】ㅤㅤㅤㅤ C","n":"3_ ( 5_ sp |: sp 5 ) sp - sp - sp","lyric":"动我","lyric2":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤG/B","n":"3_ ( 5_ sp | sp 5 ) sp - sp","lyric":"的心，","lyric2":"放弃，"},
+        {"chord":"","n":"3_ 5_","lyric":"简单","lyric2":"等候"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤAm","n":"3_ ( 5_ sp | sp 5 ) sp - sp - sp","lyric":"就像","lyric2":"我的"},
+        {"chord":"","n":"3_ ([ 7_ sp |","lyric":"呼吸，","lyric2":"回应，"}
+      ],
+      [
+        {"chord":"Em7/G","n":"]) 7 sp - sp","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"1'_ 5_","lyric":"渗透","lyric2":"专注"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤFmaj7","n":"3_ ( 6_ sp | sp 6 ) sp - sp","lyric":"我灵","lyric2":"听你"},
+        {"chord":"(G/F)","n":"6_ 2'_","lyric":"你的","lyric2":"温柔"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤEm7","n":"7_ ( 5_ sp | sp 5· ) ( sp sp 5_ )","lyric":"气吸，","lyric2":"声音，"},
+        {"chord":"","n":"5_ 7_","lyric":"你的","lyric2":"你的"},
+        {"chord":"","n":"1'_ ([ 4_","lyric":"爱唤ㅤ","lyric2":"爱诗"},
+        {"chord":"","n":"|","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"]) 4 [v1","lyric":"ㅤ","lyric2":"ㅤ"},
+        {"chord":"","n":"3_ ( 4_ sp 4_ ) 5","lyric":"醒我ㅤㅤ生","lyric2":"ㅤ"},
+        {"chord":"","n":"([ 2_ sp |","lyric":"命。","lyric2":"ㅤ"},
+        {"chord":"","n":"]v","lyric":""}
+      ],
+      [
+        {"chord":"Gsus4","n":"]) 2 [v1 -","lyric":"ㅤ"},
+        {"chord":"","n":"3_ 5_","lyric":"祢永"},
+        {"chord":"","n":"3_ ( 5_ :| ) ]v","lyric":"远不"},
+        {"chord":"Dm7","n":"( 4 )","lyric":"ㅤ"},
+        {"chord":"","n":"3_ ( 4_ sp 4_ )","lyric":"我灵"},
+        {"chord":"","n":"5","lyric":"苏"},
+        {"chord":"ㅤㅤㅤㅤGsus4","n":"( 6_ sp | sp 6 )","lyric":"醒，"},
+        {"chord":"","n":"1'_ ( 1'_ sp 1'_ )","lyric":"更多"},
+        {"chord":"","n":"7","lyric":"有"},
+        {"chord":"ㅤㅤㅤㅤ Dm7","n":"( 1'_ sp | sp 1' ) - - - sp | sp","lyric":"祢。"},
+        {"chord":"C/E","n":"0","lyric":"ㅤ"},
+        {"chord":"","n":"0","lyric":"ㅤ"},
+        {"chord":"","n":"0","lyric":"ㅤ"},
+        {"chord":"","n":"0 sp |","lyric":"ㅤ"}
+      ],
+      [
+        {"chord":"F","n":"0 0 0 0 |","lyric":"ㅤ"},
+        {"chord":"Fm","n":"0 0 0 0 |:","lyric":"ㅤ"},
+        {"chord":"Dm7","n":"0","lyric":"ㅤ"},
+        {"chord":"ㅤㅤㅤ【Bridge】ㅤ ㅤㅤㅤC/E","n":"1'_ ( 1'_ sp 1'_ ) ( 7_ sp 7_ ) ( 5_ sp | 5 ) - - - sp |","lyric":"感受 ㅤ 祢ㅤㅤ心，"},
+        {"chord":"F","n":"0","lyric":"ㅤ"},
+        {"chord":"","n":"1'_ ( 1'_ sp 1'_ ) 5_","lyric":"沉浸 ㅤ 祢"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤFㅤㅤㅤㅤFm","n":"2'·_ sp_ ( 2'__ sp | 2' ) - - - sp |","lyric":"爱ㅤ里"}
+      ],
+      [
+        {"chord":"Dm7","n":"0","lyric":"ㅤ"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤC/E","n":"1'_ ( 1'_ sp 1'_ ) ( 7_ sp 7_ ) ( 5_ sp | sp 5 )","lyric":"你属 ㅤ 于ㅤㅤ我，"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ F","n":"3·_ sp_ ( 2__ sp 2_ ) ( 1_ sp 1_ ) ( 5_ sp | sp 5 ) - sp - sp - sp | sp","lyric":"我ㅤ也ㅤㅤ属ㅤㅤ祢"},
+        {"chord":"Gsus4","n":"0","lyric":"ㅤ"},
+        {"chord":"","n":"0 sp","lyric":"ㅤ"},
+        {"chord":"G","n":"0 sp","lyric":"ㅤ"},
+        {"chord":"","n":"0 sp :|","lyric":"ㅤ"}
+      ]
+    ]
+  }
+]
+}
