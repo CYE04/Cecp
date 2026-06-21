@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/jidushiwomanzu.lrc",
   "youtube": "https://youtu.be/2DRY1xb3bPc?si=Be7OgIH-m6cBoyrK",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/jidushiwomanzuA.jpg",
-    "sections": [
+  "sections": [
   {
     "name": "基督是我满足",
     "lines": [
@@ -23,7 +23,7 @@
         {"chord":"","n":"( 1·_ sp_ 1__ )","lyric":"是","lyric2":"督ㅤ我"},
         {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ D","n":"1·_ sp_ ( 7,__ sp 7,_ ) ( 1,_ sp | sp 1, )","lyric":"我ㅤ奖ㅤㅤ赏,","lyric2":"全ㅤ所ㅤㅤ有,"},
         {"chord":"","n":"0·_ sp_ 5,__","lyric":"ㅤㅤ是","lyric2":"ㅤㅤ救"},
-        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤA","n":"3_ 2__ ( 2__ sp 2_ ) 1__ ( 1__ sp | sp 1 )","lyric":"我唯一 ㅤ 所爱","lyric2":"恩喜乐 ㅤ 在于"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ A","n":"3_ 2__ ( 2__ sp 2_ ) 1__ ( 1__ sp | sp 1 )","lyric":"我唯一 ㅤ 所爱","lyric2":"恩喜乐 ㅤ 在于"},
         {"chord":"","n":"( 6,_ 5,_ ) 0 0 sp |","lyric":"慕，","lyric2":"祢，"},
         {"chord":"E/G#","n":"0 0 0","lyric":"ㅤ","lyric2":"ㅤ"},
         {"chord":"","n":"6,_ 7,_ sp |","lyric":"这世","lyric2":"这盼"},
