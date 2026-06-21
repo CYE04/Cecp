@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/jidushiwomanzu.lrc",
   "youtube": "https://youtu.be/2DRY1xb3bPc?si=Be7OgIH-m6cBoyrK",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/jidushiwomanzuA.jpg",
-  "sections": [
+    "sections": [
   {
     "name": "新段落",
     "lines": [
@@ -34,9 +34,9 @@
         {"chord":"","n":"0_ 5,__ 5,__","lyric":"ㅤ能够","lyric2":"ㅤ"},
         {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤA","n":"3_ 2__ ( 2__ sp 2_ ) 1__ ( 1__ sp | 1 ) 0 0 0 |","lyric":"带给我 ㅤ 满足。","lyric2":"天堂是 ㅤ 我家。"},
         {"chord":"E/G#","n":"0 3","lyric":"ㅤ在","lyric2":"ㅤ暴"},
-        {"chord":"C#m","n":"7,_ sp_ ( 1__ sp 1_ ) ( 6,_ sp | 6,· )","lyric":"试ㅤ炼ㅤㅤ中，","lyric2":"风ㅤ雨ㅤㅤ中，"},
+        {"chord":"C#mㅤㅤㅤㅤㅤㅤㅤㅤㅤD","n":"7,_ sp_ ( 1__ sp 1_ ) ( 6,_ sp | 6,· )","lyric":"试ㅤ炼ㅤㅤ中，","lyric2":"风ㅤ雨ㅤㅤ中，"},
         {"chord":"","n":"5,_","lyric":"我","lyric2":"我"},
-        {"chord":"","n":"7,","lyric":"灵","lyric2":"灵"},
+        {"chord":"E","n":"7,","lyric":"灵","lyric2":"灵"},
         {"chord":"","n":"1·_ sp_ ([ 1__ sp |","lyric":"歌ㅤ唱，","lyric2":"歌ㅤ唱，"}
       ],
       [
