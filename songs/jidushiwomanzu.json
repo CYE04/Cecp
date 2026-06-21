@@ -14,9 +14,9 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/jidushiwomanzu.lrc",
   "youtube": "https://youtu.be/2DRY1xb3bPc?si=Be7OgIH-m6cBoyrK",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/jidushiwomanzuA.jpg",
-   "sections": [
+    "sections": [
   {
-    "name": "新段落",
+    "name": "基督是我满足",
     "lines": [
       [
         {"chord":"F#m","n":"1","lyric":"你","lyric2":"基"},
