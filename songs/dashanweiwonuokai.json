@@ -1,0 +1,123 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-22 19:38:09",
+  "id": "dashanweiwonuokai",
+  "title": "大山为我挪开",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉 【我相信】(2019) (赛41:10) 林庆忠词/游智婷曲",
+  "origKey": "E",
+  "timeSign": "4/4",
+  "bpm": 152,
+  "mp3": "/upload/dashanweiwonuokai.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/laixiangyehehuagechang.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/dashanweiwonuokai.lrc",
+  "youtube": "https://youtu.be/_xJkYVZ50p0?si=r1p5WEvVzwELojdD",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/dashanweiwonuokaiE.jpg",
+  "sections": [
+  {
+    "name": "大山为我挪开",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"|:","lyric":""},
+        {"chord":"E","n":"3· sp","lyric":""},
+        {"chord":"","n":"( 5,_ sp sp 5, ) sp","lyric":""},
+        {"chord":"","n":"3 sp | sp","lyric":""},
+        {"chord":"B/E","n":"2· sp","lyric":""},
+        {"chord":"","n":"( 5,_ sp sp 5, ) sp","lyric":""},
+        {"chord":"","n":"2 sp | sp","lyric":""},
+        {"chord":"A/E","n":"( 1 sp - sp - sp - sp | sp 1 ) sp - sp - sp - sp :|","lyric":""}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"ㅤㅤE","n":"|: 3·","lyric":"ㅤ虽","lyric2":"ㅤ不"},
+        {"chord":"","n":"( 5,_ 5, )","lyric":"然","lyric2":"能"},
+        {"chord":"","n":"3 sp | sp","lyric":"道","lyric2":"名"},
+        {"chord":"B/E","n":"2","lyric":"路","lyric2":"白"},
+        {"chord":"","n":"1_ ( 2_ 2 ) - sp | sp","lyric":"崎岖,","lyric2":"为何"},
+        {"chord":"A","n":"1·","lyric":"困","lyric2":"担"},
+        {"chord":"","n":"( 7,_ 7, )","lyric":"难","lyric2":"此"},
+        {"chord":"","n":"6, sp |","lyric":"险","lyric2":"重"},
+        {"chord":"E","n":"5, - - - | sp","lyric":"阻，","lyric2":"担，"},
+        {"chord":"F#m","n":"4·","lyric":"但","lyric2":"但"},
+        {"chord":"","n":"( 6,_ 6, ) 4 sp | sp","lyric":"我ㅤ心","lyric2":"我ㅤ始"},
+        {"chord":"E/G#","n":"3 sp 5_ ( 1_ 1 ) - sp |","lyric":"中ㅤ知道，","lyric2":"终ㅤ信心，"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"A","n":"[v1 1 - 3_ 2_","lyric":"祢ㅤ一直"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤB","n":"1_ ( 2_ sp | sp 2 ) - - - :| ]v","lyric":"都在"},
+        {"chord":"A","n":"[v2 1","lyric":"祢"},
+        {"chord":"","n":"1_ ( 1_ 1 ) ( 1 - sp | sp 1 ) -","lyric":"一直"},
+        {"chord":"","n":"3","lyric":"牵"},
+        {"chord":"","n":"4 sp | sp","lyric":"着"},
+        {"chord":"B","n":"( 5 - - - sp | sp 5 ) - - - ]v ||","lyric":"我"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"E","n":"|: 3","lyric":"大","lyric2":"祢"},
+        {"chord":"【Chorus】","n":"3 sp 3_ 4_","lyric":"山ㅤ为我","lyric2":"手ㅤ上的"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤB","n":"5_ ( 5_ sp | sp 5 ) - - - sp | sp","lyric":"挪开，","lyric2":"钉痕，"},
+        {"chord":"C#m","n":"1","lyric":"大","lyric2":"彰"},
+        {"chord":"","n":"1","lyric":"海","lyric2":"显"},
+        {"chord":"","n":"1_ 2_","lyric":"有路","lyric2":"十架"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤG#m","n":"3_ ( 3_ sp | sp 3 ) - - - sp | sp","lyric":"出来，","lyric2":"大爱"},
+        {"chord":"","n":"1 6","lyric":"我要","lyric2":"我要"},
+        {"chord":"","n":"6_ 5_","lyric":"大声","lyric2":"大声"},
+        {"chord":"","n":"4_ ( 5_ sp | )","lyric":"宣告","lyric2":"宣告"}
+      ]},
+      [
+        {"chord":"","lyric":""},
+        {"chord":"E/G#","n":"( sp 5 ) 3 1 0 sp | sp","lyric":"ㅤㅤ耶稣，"},
+        {"chord":"F#m","n":"[v1 1 -","lyric":"祢"},
+        {"chord":"","n":"3_ 2_","lyric":"一直"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤB","n":"1_ ( 2_ sp | sp 2 ) - - - :| ]v","lyric":"都在。"},
+        {"chord":"F#m","n":"[v2 1 -","lyric":"祢"},
+        {"chord":"","n":"3_ 2_","lyric":"一直"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤE","n":"1_ ( 1_ sp | sp 1 ) - - - sp |","lyric":"都在。"},
+        {"chord":"","n":"0 0 0 0 sp ||/ ]v","lyric":"ㅤ"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"C#mㅤㅤ[间奏，接Bridge]","n":"|| 0 0 0 0 | sp 0 0 0 0 sp | sp","lyric":""},
+        {"chord":"E","n":"0 0 0 0 |","lyric":""},
+        {"chord":"ㅤㅤㅤ(B)","n":"0 0 0 0 |","lyric":""},
+        {"chord":"C#m","n":"0 0 0 0 sp | sp 0 0 0 0 sp | sp","lyric":""},
+        {"chord":"E","n":"0 0 0 0 sp |","lyric":""},
+        {"chord":"ㅤㅤㅤ(B)","n":"0 0 0 0 |","lyric":""}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"C#m","n":"|| sp 1 sp","lyric":"ㅤ 祢"},
+        {"chord":"【Bridge】","n":"1_ ( 1_ sp 1 ) sp","lyric":"的话"},
+        {"chord":"","n":"5, sp | sp","lyric":"让"},
+        {"chord":"B/D#","n":"2","lyric":"我"},
+        {"chord":"","n":"2_ ( 2_ sp 2 ) sp 0 sp | sp","lyric":"明白，"},
+        {"chord":"E","n":"3 sp","lyric":"祢"},
+        {"chord":"","n":"3_ ( 3_ sp 3 ) sp","lyric":"爱我"},
+        {"chord":"","n":"5 sp | sp","lyric":"永"},
+        {"chord":"A","n":"5","lyric":"不"},
+        {"chord":"","n":"1_ ( 1_ sp 1 ) sp","lyric":"更改，"},
+        {"chord":"","n":"0 sp |","lyric":"ㅤ"}
+      ],
+      [
+        {"chord":"","lyric":""},
+        {"chord":"C#m","n":"1","lyric":"祢"},
+        {"chord":"","n":"1_ ( 1_ 1 )","lyric":"保守"},
+        {"chord":"","n":"5, sp | sp","lyric":"我"},
+        {"chord":"B/D#","n":"2","lyric":"的"},
+        {"chord":"","n":"2_ ( 2_ 2 ) 0 |","lyric":"心怀，"},
+        {"chord":"E","n":"3","lyric":"紧"},
+        {"chord":"","n":"1","lyric":"握"},
+        {"chord":"","n":"3_","lyric":"祢"},
+        {"chord":"","n":"5","lyric":"双"},
+        {"chord":"ㅤㅤㅤㅤㅤF#m","n":"( 5_ sp | sp 5 ) -","lyric":"手"},
+        {"chord":"","n":"5_","lyric":"不"},
+        {"chord":"","n":"( 6 sp 5_ ) sp |","lyric":"放"},
+        {"chord":"BㅤㅤㅤㅤㅤㅤㅤㅤTo Chorus","n":"5 - - - | sp 0 0 0 0 sp ||","lyric":"开"}
+      ]
+    ]
+  }
+]
+}
