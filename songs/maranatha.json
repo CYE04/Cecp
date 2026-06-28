@@ -14,11 +14,11 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/maranatha.lrc",
   "youtube": "https://youtu.be/ZkKo6tobBew?si=8GdyCn6CDycNAgio",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/maranathaBb.jpg",
-   "sections": [
+ "sections": [
   {
     "name": "Maranatha",
     "lines": [
-      [
+      { "b": true, "line": [
         {"chord":"","n":"1'_ 2'_ |","lyric":""},
         {"chord":"Bb","n":"3' - 0_ 1'_","lyric":""},
         {"chord":"","n":"3'_ 6'_ |","lyric":""},
@@ -29,16 +29,16 @@
         {"chord":"Bb ㅤ Gm7","n":"3' 1' 7 1' |","lyric":""},
         {"chord":"Cm","n":"4' 3' 2' 1' |","lyric":""},
         {"chord":"F7","n":"2' - 5' - ||","lyric":""}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"Bb","n":"0_ 3_ sp 3_ sp_ 4__ sp__ ( 5__ sp 5 ) sp - sp | sp","lyric":"ㅤMa-ra-na-tha!"},
         {"chord":"Bbmaj7","n":"0_ 3_ sp 3_ sp_ 6__ ( 5__ sp 5 ) sp - sp | sp","lyric":"ㅤ主ㅤ耶ㅤ稣啊，"},
         {"chord":"Eb","n":"0","lyric":"ㅤ"},
         {"chord":"","n":"4_ 5_","lyric":"我深"},
         {"chord":"Cm","n":"6_ sp_ 5__ ( 4__ sp 4_ ) 5_ sp | sp","lyric":"愿ㅤ你快 ㅤ 再"},
         {"chord":"F","n":"5 - - 0 sp |","lyric":"来，"}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"Cm","n":"0_ sp_ 4__ 3__ sp","lyric":"ㅤㅤ直到"},
         {"chord":"","n":"( 4__ 5·_ ) sp","lyric":"地"},
         {"chord":"","n":"6 sp - sp | sp","lyric":"极，"},
@@ -49,16 +49,16 @@
         {"chord":"","n":"4_ 3_","lyric":"敬拜"},
         {"chord":"Cm","n":"4_ sp_ 3__ ( 2__ sp 2_ ) 1_ sp | sp","lyric":"称ㅤ颂赞 ㅤ 美"},
         {"chord":"F","n":"3_ sp_ 2__ ( 2__ sp 2 ) - - sp |","lyric":"主ㅤ圣名。"}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"Bb","n":"0_ 3_ sp 3_ sp_ 4__ sp__ ( 5__ sp 5 ) sp - sp | sp","lyric":"ㅤMa-ra-na-tha!"},
         {"chord":"Bbmaj7","n":"0_ 3_ sp 3_ sp_ 6__ ( 5__ sp 5 ) sp - sp | sp","lyric":"ㅤ主ㅤ耶ㅤ稣啊，"},
         {"chord":"Eb","n":"0","lyric":"ㅤ"},
         {"chord":"","n":"4_ 5_","lyric":"我深"},
         {"chord":"Cm","n":"6_ sp_ 5__ ( 4__ sp 4_ ) 5_ sp | sp","lyric":"愿ㅤ你快 ㅤ 再"},
         {"chord":"F","n":"5 - - 0 sp |","lyric":"来，"}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"Cm","n":"0_ 4__ 3__","lyric":"ㅤ万国"},
         {"chord":"","n":"4__ 5·_ sp","lyric":"和万"},
         {"chord":"","n":"6 sp - sp | sp","lyric":"邦"},
@@ -69,8 +69,8 @@
         {"chord":"","n":"6_ 7_","lyric":"喜歌"},
         {"chord":"F","n":"1'_ sp_ 7__ ( 6__ sp 6_ ) 7_ sp | sp","lyric":"唱ㅤ跳舞 ㅤ 来"},
         {"chord":"Bb","n":"( 2'_ 1'__ ) ( 1'__ 1' ) - - sp ||","lyric":"敬ㅤ拜。"}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"Gm 【Pre-Chorus】","n":"0_ sp_ 1'__ sp__ 7__ sp 1'__ sp_ 7·_ sp 0_ sp_ 1'__ sp__ 7__","lyric":"ㅤㅤ我ㅤ们ㅤ预ㅤ备 ㅤ ㅤ主ㅤ的"},
         {"chord":"","n":"1'__ sp_ 3'·_ sp | sp","lyric":"道ㅤ路，"},
         {"chord":"Dm","n":"7_ 7_","lyric":"迎接"},
@@ -78,8 +78,8 @@
         {"chord":"","n":"3__ 5__ sp | sp","lyric":"背起"},
         {"chord":"Eb","n":"6_ 6__ ( 6__ sp 6_ ) 6_","lyric":"主耶稣 ㅤ 的"},
         {"chord":"Cm","n":"6_ 7__ ( 1'__ sp 1' ) sp |","lyric":"十字架，"}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"F","n":"1'_ sp_ 7_","lyric":"传ㅤ遍"},
         {"chord":"ㅤㅤㅤㅤㅤㅤㅤ(C#7)","n":"7_ sp_ 6__ ( 7__ sp 7 ) - sp | sp","lyric":"各ㅤ地方；"},
         {"chord":"Gm","n":"0_ 1'__ sp__ 7__","lyric":"ㅤ主ㅤ的"},
@@ -89,16 +89,16 @@
         {"chord":"Dm","n":"7_ sp_ 7_","lyric":"遮ㅤ盖"},
         {"chord":"","n":"7_ sp_ 6__ sp__ ( 5__ sp 5· ) sp","lyric":"全ㅤ地ㅤ时，"},
         {"chord":"","n":"3__ 5__ sp | sp","lyric":"我们"}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"Eb","n":"6_ sp_ 6__ sp__ ( 6__ sp 6_ ) sp_ 6_","lyric":"在ㅤ地ㅤ极 ㅤㅤ 迎"},
         {"chord":"Cm","n":"6_ sp_ 7__ sp__ ( 1'__ sp 1'_ ) 2'_ sp | sp","lyric":"接ㅤ主ㅤ的 ㅤ 降"},
         {"chord":"F","n":"2' sp -","lyric":"临。"},
         {"chord":"ㅤ【Chorus】ㅤㅤㅤㅤㅤㅤㅤㅤBb","n":"0_ 1'_ sp 1'_ sp_ 7__ sp__ ( 1'__ sp || sp 1' ) -","lyric":"ㅤMa-ra-na-tha!"},
         {"chord":"","n":"0_ 5_","lyric":"ㅤMa-"},
         {"chord":"","n":"1'_ sp_ 2'__ sp__ ([ 3'__ sp sp |","lyric":" ra - na- tha！"}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"Gm","n":"]) 3' sp - sp -","lyric":"ㅤ"},
         {"chord":"","n":"0 2'__ 3'__ sp | sp","lyric":"ㅤ阿门!"},
         {"chord":"Eb","n":"4'_ sp_ 3'__ sp__ ( 2'__ sp 2'_ ) sp_ 1'_","lyric":"主ㅤ耶ㅤ稣 ㅤㅤ 啊，"},
@@ -106,8 +106,8 @@
         {"chord":"F","n":"2' sp - sp","lyric":"来。"},
         {"chord":"","n":"0_ 1'_","lyric":"ㅤMa-"},
         {"chord":"","n":"1'_ sp_ 7'__ sp__ ([ 1'__ sp |","lyric":"ra -na-tha!"}
-      ],
-      [
+      ]},
+      { "b": true, "line": [
         {"chord":"Bb","n":"]) 1' -","lyric":"ㅤ"},
         {"chord":"","n":"0_ 5_","lyric":"ㅤMa-"},
         {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤGm","n":"1'_ sp_ 2'__ sp__ ( 3'__ sp | sp 3' ) - -","lyric":"ra - na-tha!"},
@@ -116,7 +116,7 @@
         {"chord":"F7","n":"2'_ sp_ 2'_","lyric":"我ㅤ愿"},
         {"chord":"","n":"2'·_ sp_ 1'__ sp | sp","lyric":"你ㅤ再"},
         {"chord":"Bb","n":"1' - - 0 sp |","lyric":"来。"}
-      ]
+      ]}
     ]
   }
 ]
