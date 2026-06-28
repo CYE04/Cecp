@@ -1,0 +1,103 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-06-28 12:58:49",
+  "id": "womenairangshijiebuyiyang",
+  "title": "我们爱让世界不一样",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉【沙漠中的赞美】(2008) (约壹4:19) 游智婷词曲",
+  "origKey": "D",
+  "timeSign": "4/4",
+  "bpm": 72,
+  "mp3": "/upload/womenairangshijiebuyiyang.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/shamozhongdezanmei.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/womenairangshijiebuyiyang.lrc",
+  "youtube": "https://youtu.be/fUijjKO3lYU?si=emiDTQnmA6w0neiC",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/womenairangshijiebuyiyangD.jpg",
+  "sections": [
+  {
+    "name": "我们爱让世界不一样",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"3_ 4_ sp |: sp","lyric":"你和"},
+        {"chord":"D","n":"5· sp","lyric":"我"},
+        {"chord":"","n":"6_ sp","lyric":"是"},
+        {"chord":"A/C#","n":"5_ 3_","lyric":"天父"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤBm","n":"2_ 3__ ( 2__ sp | sp 2_ ) sp","lyric":"爱的创"},
+        {"chord":"","n":"1·","lyric":"造，"},
+        {"chord":"(D/A)","n":"0","lyric":"ㅤ"},
+        {"chord":"","n":"3_ 4_ sp | sp","lyric":"每个"},
+        {"chord":"G","n":"5· sp","lyric":"人"},
+        {"chord":"","n":"6_ sp","lyric":"有"},
+        {"chord":"D/F#","n":"5_ 1'__ sp__ ( 1'__ sp 1'_ ) 3_ sp |","lyric":"最美ㅤ的ㅤㅤ梦"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"Em","n":"2 sp - sp","lyric":"想；"},
+        {"chord":"A","n":"0 sp","lyric":"ㅤ"},
+        {"chord":"","n":"3_ sp_ 4_ sp | sp","lyric":"一ㅤ路"},
+        {"chord":"Bm","n":"3 sp","lyric":"上"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤBm/","n":"3_ sp_ 3__ ( #5__ sp sp 5_ )","lyric":"彼ㅤ此照"},
+        {"chord":"A#","n":"3 sp","lyric":"亮,"},
+        {"chord":"","n":"3_ sp | sp","lyric":"扶"},
+        {"chord":"D/A","n":"7 sp","lyric":"持"},
+        {"chord":"E/G#","n":"6 sp","lyric":"拥"},
+        {"chord":"GㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤD/F#","n":"( 3__ 2__ 1_ sp 1_ sp_ 1__ ) 5,__ sp |","lyric":"抱，ㅤㅤㅤㅤㅤ我"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"Em7","n":"6_ 1__ ( 1__ sp 1_ ) 4_","lyric":"你的爱 ㅤ 让"},
+        {"chord":"G/A","n":"3_ 2_","lyric":"世界"},
+        {"chord":"","n":"1__ ( 2_ 1__ ) sp | sp","lyric":"不一"},
+        {"chord":"DㅤㅤㅤG/BㅤㅤA/C#","n":"[v2 1 sp - sp 0 0 sp :| ]v","lyric":"样。"},
+        {"chord":"ㅤㅤDㅤ ㅤㅤG/A","n":"sp [v2 1 sp - 0","lyric":"ㅤ样。"},
+        {"chord":"","n":"5_ 4_ sp | sp","lyric":"我们"},
+        {"chord":"D","n":"3·","lyric":"爱,"},
+        {"chord":"","n":"5_","lyric":"因"},
+        {"chord":"","n":"6_ 5_","lyric":"神先"},
+        {"chord":"","n":"3_ 2_ sp | ]v","lyric":"爱我"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"Bm","n":"1·","lyric":"们；"},
+        {"chord":"","n":"5_","lyric":"虽"},
+        {"chord":"","lyric":""},
+        {"chord":"D/A","n":"6_ 5_ sp","lyric":"你我"},
+        {"chord":"","n":"3_ 2_ sp | sp","lyric":"不一"},
+        {"chord":"G","n":"1_ sp_ 6,_ sp","lyric":"样，我"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤD/F#","n":"1_ 2__ ( 1__ sp 1_ ) 5,_ sp","lyric":"们一路,ㅤ 唱,"},
+        {"chord":"","n":"0_ 5,__ 5,__ sp | sp","lyric":"ㅤ走往"},
+        {"chord":"Em","n":"4_ 3_ sp","lyric":"祝福"},
+        {"chord":"","n":"2_ 1_ sp","lyric":"的方"},
+        {"chord":"A","n":"2 sp","lyric":"向。"},
+        {"chord":"","n":"5_ 4_ sp |","lyric":"我们"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"D","n":"3· sp","lyric":"爱，"},
+        {"chord":"","n":"5_ sp","lyric":"因"},
+        {"chord":"A/C#","n":"6_ 5_ sp","lyric":"神先"},
+        {"chord":"","n":"3_ 2_ sp | sp","lyric":"爱我"},
+        {"chord":"Bb/D","n":"1· sp","lyric":"们；"},
+        {"chord":"","n":"5_ sp","lyric":"心"},
+        {"chord":"D","n":"6_ 5_ sp","lyric":"再坚"},
+        {"chord":"","n":"3_ 2_ sp | sp","lyric":"强也"},
+        {"chord":"G","n":"1_ 6,_ sp","lyric":"不要"},
+        {"chord":"ㅤㅤㅤㅤㅤㅤㅤㅤㅤD/F#","n":"1_ sp_ 2__ sp__ ( 1__ sp 1_ ) 5,_ sp","lyric":"独ㅤ自ㅤ飞 ㅤ 翔,"},
+        {"chord":"","n":"0·_ sp_ 5,__ sp |","lyric":"ㅤㅤ只"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"Em","n":"6_ 1__ ( 1__ sp 1·_ ) sp_ 5,__ sp","lyric":"要微笑,ㅤ ㅤ只"},
+        {"chord":"D/F#","n":"6,_ 1__ ( 1__ sp 1_ ) 6,__ 6,__ sp | sp","lyric":"要原谅, ㅤ有你"},
+        {"chord":"G","n":"4_ 3_ sp","lyric":"爱的"},
+        {"chord":"ㅤㅤㅤㅤㅤA","n":"1_ ( 6,_ sp 6,_ ) 3_ sp","lyric":"地方ㅤㅤ就"},
+        {"chord":"","n":"3_ 2_ sp | sp","lyric":"是天"},
+        {"chord":"Dㅤㅤㅤㅤㅤ(G/A","n":"1 sp - sp - sp","lyric":"堂。"},
+        {"chord":"[升F调]","n":"5_ 4_ sp |","lyric":"我们"}
+      ]}
+    ]
+  }
+]
+}
