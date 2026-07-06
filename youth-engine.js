@@ -1,5 +1,5 @@
 /**
- * youth-engine.js v3.2
+ * youth-engine.js v3.1
  * 橄榄树团契 · 青年聚会渲染引擎
  * 托管于 GitHub Pages，所有帖子共用
  *
@@ -1802,6 +1802,34 @@ function trChordEx(text,st,useFlat,trChordFn){
   }
   return out;
 }
+function segIsLabelBlock(seg){
+  return !!seg&&typeof seg==='object'&&typeof seg.label==='string';
+}
+function segIsRenderableBlock(seg){
+  if(!seg||typeof seg!=='object')return false;
+  if(segIsLabelBlock(seg))return true;
+  return typeof seg.chord!=='undefined'||typeof seg.n!=='undefined'||typeof seg.lyric!=='undefined'||typeof seg.lyric2!=='undefined'||typeof seg.lyric3!=='undefined'||typeof seg.lyric4!=='undefined';
+}
+function segRenderLabelBlock(seg,row){
+  if(row&&row.style)row.style.paddingTop='calc(var(--volta-rail,0px) + 1.15em)';
+  var holder=document.createElement('span');
+  holder.className='sec-label-holder';
+  holder.style.cssText='display:inline-block;width:0;overflow:visible;vertical-align:top;position:relative;align-self:stretch;';
+  holder.setAttribute('aria-hidden','true');
+  var tag=document.createElement('span');
+  var jump=seg.style==='jump';
+  tag.className='sec-label'+(jump?' sec-label-jump':'');
+  var base='display:block;position:absolute;left:0;bottom:100%;white-space:nowrap;line-height:1.2;';
+  if(jump){
+    tag.style.cssText=base+'font-style:italic;font-size:0.78em;opacity:0.85;';
+    tag.textContent=String(seg.label||'');
+  }else{
+    tag.style.cssText=base+'font-weight:700;font-size:0.78em;';
+    tag.textContent='【'+String(seg.label||'')+'】';
+  }
+  holder.appendChild(tag);
+  return holder;
+}
 /* ═══════════ CECP-SONG-EXT v1 END ═══════════ */
   function trChordToken(token,st,useFlat){
     var raw=String(token||'');
@@ -2078,6 +2106,8 @@ function trChordEx(text,st,useFlat,trChordFn){
           var segs=Array.isArray(line)?line:(line.line||[]);
           var voltaWrap=null;
           segs.forEach(function(seg){
+            if(!segIsRenderableBlock(seg))return;
+            if(segIsLabelBlock(seg)){(voltaWrap||row).appendChild(segRenderLabelBlock(seg,row));return;}
             var s=div('prev-seg');
             var c=div('p-chord'+(seg.chord?'':' empty'));
             setChordContentEx(c,seg.chord?trChordEx(seg.chord,st,useFlat,trChord):'\u00a0',setChordContent);
