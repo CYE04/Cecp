@@ -1,5 +1,5 @@
 /**
- * youth-engine.js v3.1
+ * youth-engine.js v3.2
  * 橄榄树团契 · 青年聚会渲染引擎
  * 托管于 GitHub Pages，所有帖子共用
  *
