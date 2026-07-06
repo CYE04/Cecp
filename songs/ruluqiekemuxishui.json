@@ -14,7 +14,7 @@
   "lrc": "",
   "youtube": "https://youtu.be/NHwHhEWEG_0?si=yGke5H-I2obpInVU",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/ruluqiekemuxishuiC.jpg",
-   "sections": [
+ "sections": [
   {
     "name": "主歌",
     "lines": [
@@ -40,6 +40,7 @@
         {"chord":"C","n":"1 - sp - sp - sp |","lyric":"你。"}
       ],
       [
+        {"label":"Chorus"},
         {"chord":"Am","n":"1' sp 1' sp","lyric":"你ㅤ是"},
         {"chord":"Am/G","n":"1' sp 1'_ 7_ sp |","lyric":"我ㅤ的力"},
         {"chord":"F","n":"6 sp 6","lyric":"量、盾"},
