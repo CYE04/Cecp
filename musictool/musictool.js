@@ -611,7 +611,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 
 <div class="topbar">
   <div class="dot"></div>
-  <div class="topbar-title">简谱编辑器 <span>v3.2</span></div>
+  <div class="topbar-title">简谱编辑器 <span>v3.1</span></div>
   <div class="topbar-tabs">
     <button class="top-tab" data-action="import" type="button">导入</button>
     <button class="top-tab" data-action="bulk-lyric" type="button" title="批量填歌词">⌨ 填歌词</button>
