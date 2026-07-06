@@ -1,20 +1,20 @@
 {
   "version": "1",
   "created": "YuEn",
-  "createdTime": "2026-07-06 19:12:18",
-  "id": "rulukemu",
-  "title": "如路",
-  "artist": "",
-  "sub": "",
+  "createdTime": "2026-03-19 22:26:06",
+  "id": "ruluqiemuxishui",
+  "title": "如鹿切慕溪水",
+  "artist": "As The Deer",
+  "sub": "As The Deer (诗42:1-2) Martin Nystrom (1984) 词曲",
   "origKey": "C",
   "timeSign": "4/4",
-  "bpm": 72,
-  "mp3": "",
-  "cover": "",
+  "bpm": 70,
+  "mp3": "/upload/ruluqiekemuxishui.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/ruluqiekemuxishui.jpg",
   "lrc": "",
-  "youtube": "",
-  "scoreImg": "",
-  "sections": [
+  "youtube": "https://youtu.be/NHwHhEWEG_0?si=yGke5H-I2obpInVU",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/ruluqiekemuxishuiC.jpg",
+   "sections": [
   {
     "name": "主歌",
     "lines": [
