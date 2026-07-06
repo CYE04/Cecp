@@ -726,6 +726,15 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 
 <div class="bottom-area">
   <div class="seg-pane">
+    <datalist id="secLabelPresets">
+      <option value="Intro"></option>
+      <option value="Verse"></option>
+      <option value="Pre-Chorus"></option>
+      <option value="Chorus"></option>
+      <option value="Bridge"></option>
+      <option value="Outro"></option>
+      <option value="To Chorus"></option>
+    </datalist>
     <div class="seg-pane-inner" id="sectionsWrap"></div>
     <button class="add-sec-btn" onclick="addSection()">+ 新增段落</button>
     <button class="add-sec-btn" onclick="openBulkLyric()" style="color:var(--accent2);border-color:rgba(124,106,247,0.3);">⌨ 批量填歌词</button>
@@ -1182,8 +1191,29 @@ function segIsRenderableBlock(seg){
   if(segIsLabelBlock(seg))return true;
   return typeof seg.chord!=='undefined'||typeof seg.n!=='undefined'||typeof seg.lyric!=='undefined'||typeof seg.lyric2!=='undefined'||typeof seg.lyric3!=='undefined'||typeof seg.lyric4!=='undefined';
 }
+var SEC_LABEL_COLORS=[
+  ['pre-chorus','prechorus','pre chorus','前副歌','导歌','#0d9488'],
+  ['chorus','副歌','#e8590c'],
+  ['verse','主歌','#2f6fdb'],
+  ['bridge','桥段','桥','#7c3aed'],
+  ['intro','前奏','#6b7280'],
+  ['outro','ending','尾奏','尾声','#b45309']
+];
+var SEC_LABEL_FALLBACK=['#db2777','#0891b2','#4f46e5','#65a30d','#9333ea','#0284c7'];
+function secLabelColor(text){
+  var t=String(text||'').toLowerCase();
+  for(var i=0;i<SEC_LABEL_COLORS.length;i++){
+    var grp=SEC_LABEL_COLORS[i];
+    for(var j=0;j<grp.length-1;j++){
+      if(grp[j]&&t.indexOf(grp[j])>=0)return grp[grp.length-1];
+    }
+  }
+  var h=0;
+  for(var k=0;k<t.length;k++)h=(h*31+t.charCodeAt(k))%997;
+  return SEC_LABEL_FALLBACK[h%SEC_LABEL_FALLBACK.length];
+}
 function segRenderLabelBlock(seg,row){
-  if(row&&row.style)row.style.paddingTop='calc(var(--volta-rail,0px) + 1.15em)';
+  if(row&&row.style)row.style.paddingTop='calc(var(--volta-rail,0px) + 1.05em)';
   var holder=document.createElement('span');
   holder.className='sec-label-holder';
   holder.style.cssText='display:inline-block;width:0;overflow:visible;vertical-align:top;position:relative;align-self:stretch;';
@@ -1191,14 +1221,14 @@ function segRenderLabelBlock(seg,row){
   var tag=document.createElement('span');
   var jump=seg.style==='jump';
   tag.className='sec-label'+(jump?' sec-label-jump':'');
-  var base='display:block;position:absolute;left:0;bottom:100%;white-space:nowrap;line-height:1.2;';
+  var color=secLabelColor(seg.label);
+  var base='display:inline-block;position:absolute;left:0;bottom:100%;margin-bottom:2px;white-space:nowrap;line-height:1.4;font-size:0.58em;padding:0 7px;border-radius:999px;box-sizing:border-box;letter-spacing:0.4px;';
   if(jump){
-    tag.style.cssText=base+'font-style:italic;font-size:0.78em;opacity:0.85;';
-    tag.textContent=String(seg.label||'');
+    tag.style.cssText=base+'font-style:italic;font-weight:600;color:'+color+';border:1px solid '+color+';background:transparent;opacity:0.92;';
   }else{
-    tag.style.cssText=base+'font-weight:700;font-size:0.78em;';
-    tag.textContent='【'+String(seg.label||'')+'】';
+    tag.style.cssText=base+'font-weight:700;color:#ffffff;border:1px solid '+color+';background:'+color+';';
   }
+  tag.textContent=String(seg.label||'');
   holder.appendChild(tag);
   return holder;
 }
@@ -1846,6 +1876,59 @@ function renderEditor(){
         document.addEventListener('dragend',function(){tr.draggable=false;},{once:true});
         tdH.appendChild(h);tr.appendChild(tdH);
 
+        // 段落标记行（label 块专属 UI）
+        if(segIsLabelBlock(seg)){
+          tr.className='seg-row seg-row-label';
+          var tdLab=document.createElement('td');tdLab.colSpan=3;
+          var wrapLab=document.createElement('div');
+          wrapLab.style.cssText='display:flex;align-items:center;gap:6px;padding:2px 0;';
+          var pill=document.createElement('span');
+          pill.textContent=String(seg.label||'')||'标记';
+          var pillColor=secLabelColor(seg.label);
+          if(seg.style==='jump'){
+            pill.style.cssText='flex:none;font-size:9px;font-weight:600;font-style:italic;letter-spacing:0.4px;color:'+pillColor+';border:1px solid '+pillColor+';background:transparent;padding:0 7px;border-radius:999px;line-height:1.5;';
+          }else{
+            pill.style.cssText='flex:none;font-size:9px;font-weight:700;letter-spacing:0.4px;color:#ffffff;border:1px solid '+pillColor+';background:'+pillColor+';padding:0 7px;border-radius:999px;line-height:1.5;';
+          }
+          var inpLab=document.createElement('input');
+          inpLab.value=seg.label||'';
+          inpLab.setAttribute('list','secLabelPresets');
+          inpLab.placeholder='标记文字…';
+          inpLab.style.cssText='max-width:110px;';
+          inpLab.oninput=(function(si,li,gi,pill){return function(){
+            data[si].lines[li].segs[gi].label=this.value;
+            pill.textContent=this.value||'标记';
+            var c=secLabelColor(this.value);
+            if(data[si].lines[li].segs[gi].style!=='jump'){pill.style.background=c;pill.style.borderColor=c;}
+            else{pill.style.color=c;pill.style.borderColor=c;}
+            renderPreview();
+          };})(si,li,gi,pill);
+          var jmpWrap=document.createElement('label');
+          jmpWrap.style.cssText='display:flex;align-items:center;gap:3px;font-size:9px;color:var(--ink3);cursor:pointer;white-space:nowrap;flex:none;';
+          var jmpCb=document.createElement('input');
+          jmpCb.type='checkbox';
+          jmpCb.checked=seg.style==='jump';
+          jmpCb.style.cssText='width:auto;margin:0;';
+          jmpCb.onchange=(function(si,li,gi){return function(){
+            saveUndo();
+            if(this.checked)data[si].lines[li].segs[gi].style='jump';
+            else delete data[si].lines[li].segs[gi].style;
+            renderEditor();renderPreview();
+          };})(si,li,gi);
+          jmpWrap.appendChild(jmpCb);
+          jmpWrap.appendChild(document.createTextNode('跳转样式'));
+          wrapLab.appendChild(pill);
+          wrapLab.appendChild(inpLab);
+          wrapLab.appendChild(jmpWrap);
+          tdLab.appendChild(wrapLab);tr.appendChild(tdLab);
+          var tdDelLab=document.createElement('td');
+          var btnDelLab=document.createElement('button');btnDelLab.className='btn-del-seg';btnDelLab.textContent='✕';
+          btnDelLab.onclick=(function(si,li,gi){return function(){saveUndo();delSeg(si,li,gi);renderPreview();};})(si,li,gi);
+          tdDelLab.appendChild(btnDelLab);tr.appendChild(tdDelLab);
+          tbl.appendChild(tr);
+          return;
+        }
+
         // 和弦
         var tdC=document.createElement('td');
         var inpC=document.createElement('input');inpC.className='inp-chord'+(chordLooksSuspicious(seg.chord)?' warn':'');inpC.value=seg.chord||'';
@@ -1988,7 +2071,12 @@ function renderEditor(){
       var tdAdd=document.createElement('td');tdAdd.colSpan=5;tdAdd.style.paddingTop='3px';
       var ab=document.createElement('button');ab.className='btn-add-seg';ab.textContent='+ 格子';
       ab.onclick=(function(si,li){return function(){saveUndo();addSeg(si,li);};})(si,li);
-      tdAdd.appendChild(ab);trAdd.appendChild(tdAdd);tbl.appendChild(trAdd);
+      tdAdd.appendChild(ab);
+      var albBtn=document.createElement('button');albBtn.className='btn-add-seg';albBtn.textContent='+ 段落标记';albBtn.style.marginLeft='10px';
+      albBtn.title='插入段落标记（Chorus / Bridge…），插入后可改文字、拖动排序';
+      albBtn.onclick=(function(si,li){return function(){saveUndo();addLabelSeg(si,li);};})(si,li);
+      tdAdd.appendChild(albBtn);
+      trAdd.appendChild(tdAdd);tbl.appendChild(trAdd);
 
       rb.appendChild(tbl);
       sb.appendChild(rb);
@@ -2023,6 +2111,7 @@ function moveLine(si,li,dir){
 }
 function delLine(si,li){saveUndo();data[si].lines.splice(li,1);renderEditor();}
 function addSeg(si,li){data[si].lines[li].segs.push({chord:'',n:'',lyric:''});renderEditor();}
+function addLabelSeg(si,li){data[si].lines[li].segs.push({label:'Chorus'});renderEditor();renderPreview();}
 function delSeg(si,li,gi){data[si].lines[li].segs.splice(gi,1);renderEditor();}
 
 /* ════════════════════════════════════════
