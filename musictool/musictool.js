@@ -244,6 +244,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .inp-lyric{max-width:80px;}
 .btn-del-seg{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:11px;}
 .btn-del-seg:hover{color:var(--red);}
+.btn-ins-sp{background:none;border:1px solid var(--border);border-radius:3px;color:var(--ink3);cursor:pointer;font-size:8px;font-family:'Space Mono',monospace;padding:1px 3px;line-height:1.4;flex:none;}
+.btn-ins-sp:hover{color:var(--accent2);border-color:var(--accent2);}
 .drag-handle{cursor:grab;color:var(--ink3);font-size:11px;padding:0 2px;user-select:none;}
 .drag-handle:hover{color:var(--ink2);}
 .seg-row{transition:opacity .15s;}
@@ -1041,6 +1043,165 @@ function trKeyName(key,st,useFlat){
   if(n===undefined)return key;
   return (useFlat?NOTES_FLAT:NOTES_SHARP)[(n+st+120)%12]+p.suf;
 }
+/* ═══════════ CECP-SONG-EXT v1 BEGIN ═══════════
+   共享模块：{sp} 专属空格渲染 + 移调占位补偿。
+   本块在以下三个文件中逐字节相同（权威版本 = shared/song-ext.js）：
+     musiclib/musiclib.js / youth-engine.js / musictool/musictool.js
+   修改流程：先改 shared/song-ext.js，再同步三处，diff 校验一致。
+   注意：本块内禁止出现反斜杠字符
+   （musictool.js 经 CMS 部署会丢失一层反斜杠），
+   转义字符一律用 String.fromCharCode 构造。 */
+var SP_TOKEN='{sp}';
+var SP_TAB=String.fromCharCode(9);
+var SP_HANGUL_FILLER=String.fromCharCode(0x3164);
+var SP_IDEO_SPACE=String.fromCharCode(0x3000);
+var SP_WIDTH_CACHE={};
+function spHasToken(text){
+  return String(text||'').indexOf(SP_TOKEN)>=0;
+}
+function spStripTokens(text){
+  return String(text||'').split(SP_TOKEN).join('');
+}
+function spMeasureWidth(el,sample){
+  if(!el||!document.body)return 0;
+  var cs=getComputedStyle(el);
+  var key=sample+'|'+cs.font+'|'+cs.letterSpacing+'|'+cs.wordSpacing+'|'+cs.lineHeight;
+  if(Object.prototype.hasOwnProperty.call(SP_WIDTH_CACHE,key))return SP_WIDTH_CACHE[key];
+  var probe=document.createElement('span');
+  probe.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;white-space:pre;pointer-events:none;';
+  probe.style.font=cs.font;
+  probe.style.letterSpacing=cs.letterSpacing;
+  probe.style.wordSpacing=cs.wordSpacing;
+  probe.style.lineHeight=cs.lineHeight;
+  probe.textContent=sample;
+  document.body.appendChild(probe);
+  var w=probe.getBoundingClientRect().width;
+  probe.remove();
+  SP_WIDTH_CACHE[key]=w;
+  return w;
+}
+function spAppendGap(el,cls,width){
+  var gap=document.createElement('span');
+  gap.className=cls;
+  gap.setAttribute('aria-hidden','true');
+  gap.style.display='inline-block';
+  gap.style.width=width+'px';
+  gap.textContent=' ';
+  el.appendChild(gap);
+}
+function spSetContent(el,text,kind,fallback){
+  var raw=String(text||'');
+  if(raw.indexOf(SP_TOKEN)<0){fallback(el,raw);return;}
+  var sample=kind==='chord'?'0':'我';
+  var cls=kind==='chord'?'chord-gap sp-gap':'lyric-gap sp-gap';
+  var width=spMeasureWidth(el,sample);
+  el.textContent='';
+  var parts=raw.split(SP_TOKEN);
+  for(var i=0;i<parts.length;i++){
+    if(i>0)spAppendGap(el,cls,width);
+    if(parts[i]){
+      var sub=document.createElement('span');
+      el.appendChild(sub);
+      fallback(sub,parts[i]);
+    }
+  }
+}
+function setChordContentEx(el,text,fallback){
+  spSetContent(el,text,'chord',fallback);
+}
+function setLyricContentEx(el,text,fallback){
+  spSetContent(el,text,'lyric',fallback);
+}
+function spIsGapChar(ch){
+  return ch===' '||ch===SP_TAB||ch===SP_HANGUL_FILLER;
+}
+function spTokenizeChord(text){
+  var raw=String(text||''),out=[],i=0,cur='';
+  function flushText(){
+    if(cur){out.push({gap:false,text:cur});cur='';}
+  }
+  while(i<raw.length){
+    var isSp=raw.substr(i,SP_TOKEN.length)===SP_TOKEN;
+    var ch=raw.charAt(i);
+    if(isSp||spIsGapChar(ch)){
+      flushText();
+      var units=[];
+      while(i<raw.length){
+        if(raw.substr(i,SP_TOKEN.length)===SP_TOKEN){
+          units.push(SP_TOKEN);i+=SP_TOKEN.length;continue;
+        }
+        var gc=raw.charAt(i);
+        if(spIsGapChar(gc)){units.push(gc);i++;continue;}
+        break;
+      }
+      out.push({gap:true,units:units});
+      continue;
+    }
+    cur+=ch;i++;
+  }
+  flushText();
+  return out;
+}
+function spResizeGapRun(units,len){
+  var mapped=[];
+  for(var i=0;i<units.length;i++){
+    var u=units[i];
+    mapped.push(u===SP_HANGUL_FILLER?SP_IDEO_SPACE:u);
+  }
+  if(!mapped.length||len<=0)return '';
+  var out='';
+  for(var j=0;j<len;j++)out+=mapped[j%mapped.length];
+  return out;
+}
+function trChordEx(text,st,useFlat,trChordFn){
+  var raw=String(text||'');
+  if(raw.indexOf(SP_TOKEN)<0)return trChordFn(raw,st,useFlat);
+  var parts=spTokenizeChord(raw),out='',i=0;
+  while(i<parts.length){
+    var part=parts[i];
+    if(part.gap){out+=part.units.join('');i++;continue;}
+    var tr=trChordFn(part.text,st,useFlat);
+    out+=tr;
+    if(i+1<parts.length&&parts[i+1].gap){
+      var units=parts[i+1].units;
+      var nextLen=units.length+(Array.from(part.text).length-Array.from(tr).length);
+      if(nextLen<0)nextLen=0;
+      if(nextLen===0&&i+2<parts.length&&!parts[i+2].gap)nextLen=1;
+      out+=spResizeGapRun(units,nextLen);
+      i+=2;continue;
+    }
+    i++;
+  }
+  return out;
+}
+/* ═══════════ CECP-SONG-EXT v1 END ═══════════ */
+/* ── {sp} 编辑器辅助（musictool 专用，禁止反斜杠） ── */
+function mtSetPlainText(el,text){el.textContent=String(text||'');}
+function mtMakeSpBtn(inp,commit){
+  var b=document.createElement('button');
+  b.type='button';
+  b.className='btn-ins-sp';
+  b.textContent='{sp}';
+  b.title='在光标处插入 {sp} 占位空格';
+  b.onclick=function(){
+    var v=inp.value;
+    var start=inp.selectionStart,end=inp.selectionEnd;
+    if(typeof start!=='number'){start=v.length;end=v.length;}
+    inp.value=v.slice(0,start)+SP_TOKEN+v.slice(end);
+    if(commit)commit(inp.value);
+    inp.focus();
+    var pos=start+SP_TOKEN.length;
+    if(inp.setSelectionRange)inp.setSelectionRange(pos,pos);
+  };
+  return b;
+}
+function mtWrapWithSpBtn(inp,commit){
+  var wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;align-items:center;gap:2px;';
+  wrap.appendChild(inp);
+  wrap.appendChild(mtMakeSpBtn(inp,commit));
+  return wrap;
+}
 function trChordToken(raw,st,useFlat){
   raw=String(raw||'');
   var m=raw.match(/^([A-G](?:#|b)?)([^A-G]*)(.*)$/);
@@ -1662,7 +1823,7 @@ function renderEditor(){
         var inpC=document.createElement('input');inpC.className='inp-chord'+(chordLooksSuspicious(seg.chord)?' warn':'');inpC.value=seg.chord||'';
         if(chordLooksSuspicious(seg.chord))inpC.title='这个和弦可能无法识别，导出仍会保留原文';
         inpC.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].chord=this.value;renderPreview();};})(si,li,gi);
-        tdC.appendChild(inpC);tr.appendChild(tdC);
+        tdC.appendChild(mtWrapWithSpBtn(inpC,(function(si,li,gi){return function(v){data[si].lines[li].segs[gi].chord=v;renderPreview();};})(si,li,gi)));tr.appendChild(tdC);
 
         // token field
         var tdN=document.createElement('td');
@@ -1772,19 +1933,19 @@ function renderEditor(){
         var inpL=document.createElement('input');inpL.className='inp-lyric';inpL.value=seg.lyric||'';
         inpL.style.display='block';
         inpL.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric=this.value;renderPreview();};})(si,li,gi);
-        tdL.appendChild(inpL);
+        tdL.appendChild(mtWrapWithSpBtn(inpL,(function(si,li,gi){return function(v){data[si].lines[li].segs[gi].lyric=v;renderPreview();};})(si,li,gi)));
         var inpL2=document.createElement('input');inpL2.className='inp-lyric';inpL2.value=seg.lyric2||'';
         inpL2.placeholder='下行…';inpL2.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
         inpL2.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric2=this.value;renderPreview();};})(si,li,gi);
-        tdL.appendChild(inpL2);
+        tdL.appendChild(mtWrapWithSpBtn(inpL2,(function(si,li,gi){return function(v){data[si].lines[li].segs[gi].lyric2=v;renderPreview();};})(si,li,gi)));
         var inpL3=document.createElement('input');inpL3.className='inp-lyric';inpL3.value=seg.lyric3||'';
         inpL3.placeholder='第三行…';inpL3.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
         inpL3.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric3=this.value;renderPreview();};})(si,li,gi);
-        tdL.appendChild(inpL3);
+        tdL.appendChild(mtWrapWithSpBtn(inpL3,(function(si,li,gi){return function(v){data[si].lines[li].segs[gi].lyric3=v;renderPreview();};})(si,li,gi)));
         var inpL4=document.createElement('input');inpL4.className='inp-lyric';inpL4.value=seg.lyric4||'';
         inpL4.placeholder='第四行…';inpL4.style.cssText='display:block;margin-top:2px;font-size:9px;opacity:0.7;';
         inpL4.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric4=this.value;renderPreview();};})(si,li,gi);
-        tdL.appendChild(inpL4);tr.appendChild(tdL);
+        tdL.appendChild(mtWrapWithSpBtn(inpL4,(function(si,li,gi){return function(v){data[si].lines[li].segs[gi].lyric4=v;renderPreview();};})(si,li,gi)));tr.appendChild(tdL);
 
         // 删除
         var tdD=document.createElement('td');
@@ -2144,12 +2305,12 @@ function renderPreview(){
       var voltaWrap=null;
       line.segs.forEach(function(seg){
         var s=document.createElement('div');s.className='prev-seg';
-        var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');c.textContent=seg.chord||'\u00a0';s.appendChild(c);
+        var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');setChordContentEx(c,seg.chord||String.fromCharCode(160),mtSetPlainText);s.appendChild(c);
         s.appendChild(renderNStr(seg.n||'',{inlineTimeSign:getSegInlineTimeSign(seg)}));
-        var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');l.textContent=seg.lyric||'';s.appendChild(l);
-        if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');l2.textContent=seg.lyric2;s.appendChild(l2);}
-        if(seg.lyric3){var l3=document.createElement('div');l3.className='p-lyric p-lyric3'+(line.bold?' bold':'');l3.textContent=seg.lyric3;s.appendChild(l3);}
-        if(seg.lyric4){var l4=document.createElement('div');l4.className='p-lyric p-lyric4'+(line.bold?' bold':'');l4.textContent=seg.lyric4;s.appendChild(l4);}
+        var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');setLyricContentEx(l,seg.lyric||'',mtSetPlainText);s.appendChild(l);
+        if(seg.lyric2){var l2=document.createElement('div');l2.className='p-lyric p-lyric2'+(line.bold?' bold':'');setLyricContentEx(l2,seg.lyric2,mtSetPlainText);s.appendChild(l2);}
+        if(seg.lyric3){var l3=document.createElement('div');l3.className='p-lyric p-lyric3'+(line.bold?' bold':'');setLyricContentEx(l3,seg.lyric3,mtSetPlainText);s.appendChild(l3);}
+        if(seg.lyric4){var l4=document.createElement('div');l4.className='p-lyric p-lyric4'+(line.bold?' bold':'');setLyricContentEx(l4,seg.lyric4,mtSetPlainText);s.appendChild(l4);}
         // 检测 volta 开始（indexOf 避免反斜杠在 CMS 里丢失）
         var _vn=getVoltaStartLabel(seg.n);
         if(_vn){
@@ -2554,7 +2715,7 @@ function previewTranspose(){
   var st=(b-a+12)%12,useFlat=!!FLAT_KEYS[to.root],lines=[];
   eachSeg(function(seg,line,sec,si,li,gi){
     if(seg.chord&&String(seg.chord).trim()){
-      lines.push((sec.name||('段落 '+(si+1)))+' L'+(li+1)+'-'+(gi+1)+': '+seg.chord+'  =>  '+trChordText(seg.chord,st,useFlat));
+      lines.push((sec.name||('段落 '+(si+1)))+' L'+(li+1)+'-'+(gi+1)+': '+seg.chord+'  =>  '+trChordEx(seg.chord,st,useFlat,trChordText));
     }
   });
   out.textContent=lines.length?lines.join('\\n'):'当前没有和弦可预览';
