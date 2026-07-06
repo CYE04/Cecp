@@ -1174,6 +1174,34 @@ function trChordEx(text,st,useFlat,trChordFn){
   }
   return out;
 }
+function segIsLabelBlock(seg){
+  return !!seg&&typeof seg==='object'&&typeof seg.label==='string';
+}
+function segIsRenderableBlock(seg){
+  if(!seg||typeof seg!=='object')return false;
+  if(segIsLabelBlock(seg))return true;
+  return typeof seg.chord!=='undefined'||typeof seg.n!=='undefined'||typeof seg.lyric!=='undefined'||typeof seg.lyric2!=='undefined'||typeof seg.lyric3!=='undefined'||typeof seg.lyric4!=='undefined';
+}
+function segRenderLabelBlock(seg,row){
+  if(row&&row.style)row.style.paddingTop='calc(var(--volta-rail,0px) + 1.15em)';
+  var holder=document.createElement('span');
+  holder.className='sec-label-holder';
+  holder.style.cssText='display:inline-block;width:0;overflow:visible;vertical-align:top;position:relative;align-self:stretch;';
+  holder.setAttribute('aria-hidden','true');
+  var tag=document.createElement('span');
+  var jump=seg.style==='jump';
+  tag.className='sec-label'+(jump?' sec-label-jump':'');
+  var base='display:block;position:absolute;left:0;bottom:100%;white-space:nowrap;line-height:1.2;';
+  if(jump){
+    tag.style.cssText=base+'font-style:italic;font-size:0.78em;opacity:0.85;';
+    tag.textContent=String(seg.label||'');
+  }else{
+    tag.style.cssText=base+'font-weight:700;font-size:0.78em;';
+    tag.textContent='【'+String(seg.label||'')+'】';
+  }
+  holder.appendChild(tag);
+  return holder;
+}
 /* ═══════════ CECP-SONG-EXT v1 END ═══════════ */
 /* ── {sp} 编辑器辅助（musictool 专用，禁止反斜杠） ── */
 function mtSetPlainText(el,text){el.textContent=String(text||'');}
@@ -2304,6 +2332,8 @@ function renderPreview(){
       var row=document.createElement('div');row.className='prev-row'+(line.bold?' bold':'');
       var voltaWrap=null;
       line.segs.forEach(function(seg){
+        if(!segIsRenderableBlock(seg))return;
+        if(segIsLabelBlock(seg)){(voltaWrap||row).appendChild(segRenderLabelBlock(seg,row));return;}
         var s=document.createElement('div');s.className='prev-seg';
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');setChordContentEx(c,seg.chord||String.fromCharCode(160),mtSetPlainText);s.appendChild(c);
         s.appendChild(renderNStr(seg.n||'',{inlineTimeSign:getSegInlineTimeSign(seg)}));
@@ -2356,6 +2386,16 @@ function renderCode(){
       }
       line.segs.forEach(function(seg,gi){
         var lastSeg=gi===line.segs.length-1;
+        if(segIsLabelBlock(seg)){
+          var lobj={label:seg.label};
+          if(seg.style)lobj.style=seg.style;
+          lines.push('        '+JSON.stringify(lobj)+(lastSeg?'':','));
+          return;
+        }
+        if(!segIsRenderableBlock(seg)){
+          lines.push('        '+JSON.stringify(seg)+(lastSeg?'':','));
+          return;
+        }
         var obj={chord:seg.chord||''};
         var segTimeSign=getSegInlineTimeSign(seg)||String(seg.timeSign||seg.ts||seg.meter||'').trim();
         if(segTimeSign)obj.timeSign=segTimeSign;
@@ -2564,10 +2604,11 @@ function doImport(){
     var parsed=eval('('+arrStr+')');
     if(!Array.isArray(parsed))throw new Error('不是数组');
     saveUndo();
+    var keepSeg=function(seg){return !!seg&&typeof seg==='object';};
     data=parsed.map(function(sec){
       return{name:sec.name||'',lines:(sec.lines||[]).map(function(line){
-        if(Array.isArray(line))return{bold:false,segs:line};
-        return{bold:!!line.b,segs:line.line||[]};
+        if(Array.isArray(line))return{bold:false,segs:line.filter(keepSeg)};
+        return{bold:!!line.b,segs:(line.line||[]).filter(keepSeg)};
       })};
     });
     curSi=-1;curLi=-1;curGi=-1;curTok=-1;clearSel();
