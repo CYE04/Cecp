@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/endianzhilu.lrc",
   "youtube": "https://youtu.be/0Q444bzsehU?si=Cwb2smX0td-M7CrQ",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/endianzhiluF.jpg",
-    "sections": [
+  "sections": [
   {
     "name": "前奏",
     "lines": [
@@ -89,7 +89,7 @@
       [
         {"chord":"{sp}Bb","n":"sp 6,· sp sp sp 3_ sp sp","lyric":"{sp}爱， {sp} 祢"},
         {"chord":"F/A","n":"( 5,· sp sp sp sp 5,__ ) sp__ 3,__ sp | sp","lyric":"手，{sp}{sp}{sp}{sp}{sp}牵"},
-        {"chord":"Gm{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}Bb/C","n":"4,_ sp_ 5,_ sp sp 6,_ sp_ 1_ sp sp 3 sp 6, sp | sp","lyric":"引{sp}我{sp}{sp}走{sp}这 {sp} 人{sp}生"},
+        {"chord":"Gm{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}Bb/C","n":"4,_ sp_ 5,_ sp sp 6,_ sp_ 1_ sp sp 3 sp 6, sp | sp","lyric":"引{sp}我{sp}{sp}走{sp}这 {sp} 人{sp}生"},
         {"chord":"","n":"1 sp - sp - sp - ||/","lyric":"路"}
       ]
     ]
