@@ -231,7 +231,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em}.jp-plain-sym.is-dash{position:relative;top:-0.12em}.jp-plain-bot{height:16px}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:9px;line-height:1;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
-.jp-dot-top{height:12px;justify-content:flex-end}.jp-dot-bot{height:12px;justify-content:flex-start}
+.jp-dot-top{height:8px;justify-content:flex-end}.jp-dot-bot{height:8px;justify-content:flex-start}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em}
@@ -246,13 +246,13 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-dual-top{margin-bottom:-2px}
 .jp-dual-top .jp-dot-bot{height:7px}
 .jp-dual-bot .jp-dot-top{height:7px}
-.jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
+.jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
-.jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
+.jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px}
 .jp-slur-open::before{content:'';position:absolute;top:2px;left:15%;right:-4px;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-radius:50% 0 0 0/100% 0 0 0}
-.jp-slur-close{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px}
+.jp-slur-close{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px}
 .jp-slur-close::before{content:'';position:absolute;top:2px;left:-4px;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:0 50% 0 0/0 100% 0 0}
-.jp-tuplet{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;margin-right:1px}
+.jp-tuplet{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px;margin-right:1px}
 .jp-tuplet-br{position:absolute;top:2px;left:2px;right:2px;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:3px 3px 0 0;pointer-events:none}
 .jp-tuplet-num{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:8px;line-height:1;padding:0 3px;background:var(--ym-bg);color:var(--ym-ink);pointer-events:none}
 .jp-timesig{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;flex-shrink:0;min-width:1.42em;margin:0 5px 0 2px;position:relative;top:-1px;line-height:1}
@@ -1066,6 +1066,204 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         var filename=base+(key?('_'+key):'')+'.png';
         saveBlobAs(blob,filename);
       });
+  }
+
+  /* ══════════ 分页导出：按 A4 分页的多页 PDF ══════════
+     长歌不再整体缩小塞进一页，而是按「行/段」边界拆成多张 A4 页：
+     - 只在 .sw-lrow / .sw-lsec 顶部切页，绝不切断行内的和弦/简谱/歌词；
+     - 一个 .sw-lsec 若能整段放进一页，就整段挪到下一页，不跨页拆开
+       （除非该段本身比一整页还高）；
+     - 短歌一页能放下时仍走原有单张 A4 PNG（composeA4SongImage）；
+     - 渲染完整复用 nodeToPngBlobRobust 的 fallback 链与
+       normalizeExportNotation 的简谱下划线修正，分页只是对渲染结果
+       做像素切分；若命中纯文本兜底渲染（画布纵横比与 DOM 不符），
+       切分坐标不可信，自动退回单页 PNG，不会崩溃；
+     - jsPDF 按需从 CDN 动态加载（与 loadHtml2Canvas 同款写法），
+       加载失败退化为逐页 PNG 下载。 */
+  var _jsPdfPromise=null;
+  function loadJsPdf(){
+    if(window.jspdf&&window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+    if(_jsPdfPromise) return _jsPdfPromise;
+    _jsPdfPromise=new Promise(function(resolve,reject){
+      function inject(src,next){
+        var s=document.createElement('script');
+        s.src=src;
+        s.async=true;
+        s.onload=function(){
+          if(window.jspdf&&window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
+          else if(next) inject(next,null);
+          else reject(new Error('jsPDF unavailable'));
+        };
+        s.onerror=function(){
+          s.remove();
+          if(next) inject(next,null);
+          else reject(new Error('jsPDF load failed'));
+        };
+        document.head.appendChild(s);
+      }
+      inject(
+        'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
+        'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js'
+      );
+    });
+    return _jsPdfPromise;
+  }
+
+  /* A4 页面几何（与 composeA4SongImage 的 2000x2828 基准一致，比例 1:1.414）。 */
+  var EXPORT_PAGE={W:2000,H:2828,first:{x:150,y:250,w:1700,h:2410},rest:{x:150,y:150,w:1700,h:2510},footerY:2758};
+
+  function computeExportPageRanges(node,firstCapCss,restCapCss){
+    var base=node.getBoundingClientRect();
+    var totalH=base.height;
+    if(!(totalH>0)) return [{top:0,bottom:1}];
+    var cutMap={};
+    Array.prototype.forEach.call(node.querySelectorAll('.sw-lrow,.sw-lsec'),function(el){
+      var y=el.getBoundingClientRect().top-base.top;
+      if(y>1&&y<totalH-1) cutMap[Math.round(y*10)/10]=true;
+    });
+    var cuts=Object.keys(cutMap).map(Number).sort(function(a,b){return a-b;});
+    var secs=Array.prototype.map.call(node.querySelectorAll('.sw-lsec'),function(el){
+      var r=el.getBoundingClientRect();
+      return {top:r.top-base.top,bottom:r.bottom-base.top};
+    });
+    var ranges=[];
+    var start=0,guard=0;
+    while(guard++<300){
+      var cap=ranges.length===0?firstCapCss:restCapCss;
+      if(totalH-start<=cap+0.5) break;
+      var limit=start+cap;
+      var cut=-1,i;
+      for(i=0;i<cuts.length;i++){
+        if(cuts[i]>start+1&&cuts[i]<=limit) cut=cuts[i];
+        else if(cuts[i]>limit) break;
+      }
+      if(cut<0){
+        ranges.push({top:start,bottom:limit});
+        start=limit;
+        continue;
+      }
+      for(i=0;i<secs.length;i++){
+        var sc=secs[i];
+        if(sc.top<cut-1&&cut<sc.bottom-1){
+          if((sc.bottom-sc.top)<=restCapCss+0.5&&sc.top>start+1) cut=sc.top;
+          break;
+        }
+      }
+      ranges.push({top:start,bottom:cut});
+      start=cut;
+    }
+    ranges.push({top:start,bottom:totalH});
+    return ranges;
+  }
+
+  function composeA4PageCanvas(scoreImg,logoImg,range,kPxPerCss,opt,pageIndex,pageCount){
+    var W=EXPORT_PAGE.W,H=EXPORT_PAGE.H;
+    var canvas=document.createElement('canvas');
+    canvas.width=W; canvas.height=H;
+    var ctx=canvas.getContext('2d');
+    if(!ctx) throw new Error('canvas unavailable');
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,W,H);
+    var first=pageIndex===0;
+    var song=opt.song||{};
+    if(first){
+      var title=song.title||opt.title||'';
+      var subtitle=[song.artist,song.sub].filter(Boolean).join('  ');
+      var leftLines=[song.bpm?'♪ = '+song.bpm:'','1= '+(opt.key||song.origKey||'C')+'  '+(song.timeSign||'4/4')].filter(Boolean);
+      ctx.fillStyle='#111';
+      ctx.textBaseline='top';
+      ctx.font='600 24px "DM Mono","Space Mono",monospace';
+      leftLines.forEach(function(line,i){ ctx.fillText(line,260,130+i*34); });
+      ctx.textAlign='center';
+      ctx.font='900 38px "Noto Serif SC","Songti SC","PingFang SC",serif';
+      ctx.fillText(title,W/2,128);
+      if(subtitle){
+        ctx.font='500 22px "Noto Serif SC","Songti SC","PingFang SC",serif';
+        ctx.fillText(subtitle,W/2,182);
+      }
+      ctx.textAlign='left';
+    }
+    var area=first?EXPORT_PAGE.first:EXPORT_PAGE.rest;
+    var sy=Math.max(0,Math.round(range.top*kPxPerCss));
+    var sh=Math.max(1,Math.min(scoreImg.height-sy,Math.round((range.bottom-range.top)*kPxPerCss)));
+    var s=area.w/scoreImg.width;
+    ctx.drawImage(scoreImg,0,sy,scoreImg.width,sh,area.x,area.y,area.w,sh*s);
+    if(logoImg){
+      var logoW=1180;
+      var logoH=logoW*(logoImg.naturalHeight||logoImg.height)/(logoImg.naturalWidth||logoImg.width);
+      ctx.save();
+      ctx.globalAlpha=0.07;
+      ctx.drawImage(logoImg,(W-logoW)/2,(H-logoH)/2,logoW,logoH);
+      ctx.restore();
+    }
+    if(pageCount>1){
+      ctx.fillStyle='#9a938a';
+      ctx.textAlign='center';
+      ctx.textBaseline='top';
+      ctx.font='500 24px "DM Mono","Space Mono",monospace';
+      ctx.fillText((song.title||opt.title||'')+' · '+(pageIndex+1)+' / '+pageCount,W/2,EXPORT_PAGE.footerY);
+      ctx.textAlign='left';
+    }
+    return canvas;
+  }
+
+  function exportSongAsPaginatedPdf(panelInner,opt){
+    opt=opt||{};
+    if(!panelInner) return Promise.reject(new Error('panel missing'));
+    var bg=resolveExportBackground(panelInner,opt.bgColor);
+    var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+    var keyPart=safeFileName(opt.key||'');
+    var stem=safeFileName(opt.title||'transpose')+(keyPart?('_'+keyPart):'');
+    return waitFonts.then(function(){
+      var snap=buildExportClone(panelInner,{tight:!!opt.tight});
+      if(opt.hideTransposeOptions){
+        var keyZone=snap.node.querySelector('.sw-ks');
+        if(keyZone) keyZone.remove();
+      }
+      normalizeExportNotation(snap.node);
+      makeExportTextBlack(snap.node);
+      return waitPaint2()
+        .then(function(){
+          var rect=snap.node.getBoundingClientRect();
+          var cloneW=Math.max(1,rect.width);
+          var cloneH=Math.max(1,rect.height);
+          var f=EXPORT_PAGE.first.w/cloneW;
+          var ranges=computeExportPageRanges(snap.node,EXPORT_PAGE.first.h/f,EXPORT_PAGE.rest.h/f);
+          return nodeToPngBlobRobust(snap.node,bg).then(function(blob){
+            return {blob:blob,cloneW:cloneW,cloneH:cloneH,ranges:ranges};
+          });
+        })
+        .finally(function(){ snap.cleanup(); });
+    }).then(function(res){
+      if(res.ranges.length<=1){
+        return composeA4SongImage(res.blob,opt).then(function(png){ saveBlobAs(png,stem+'.png'); });
+      }
+      return Promise.all([blobToImage(res.blob),loadImageForExport(YM_LOGO_SRC)]).then(function(items){
+        var scoreImg=items[0],logoImg=items[1];
+        var aspectDom=res.cloneW/res.cloneH;
+        var aspectImg=scoreImg.width/scoreImg.height;
+        if(!(aspectImg>0)||Math.abs(aspectDom-aspectImg)/aspectDom>0.05){
+          return composeA4SongImage(res.blob,opt).then(function(png){ saveBlobAs(png,stem+'.png'); });
+        }
+        var k=scoreImg.height/res.cloneH;
+        var pages=res.ranges.map(function(range,i){
+          return composeA4PageCanvas(scoreImg,logoImg,range,k,opt,i,res.ranges.length);
+        });
+        return loadJsPdf().then(function(jsPDF){
+          var pdf=new jsPDF({orientation:'portrait',unit:'pt',format:'a4',compress:true});
+          pages.forEach(function(cv,i){
+            if(i>0) pdf.addPage('a4','portrait');
+            pdf.addImage(cv.toDataURL('image/png'),'PNG',0,0,595.28,841.89,undefined,'SLOW');
+          });
+          saveBlobAs(pdf.output('blob'),stem+'.pdf');
+        }).catch(function(err){
+          try{ console.warn('[YouthEngine] jsPDF unavailable, fallback to per-page PNGs',err); }catch(_){}
+          return pages.reduce(function(p,cv,i){
+            return p.then(function(){ return canvasToPngBlob(cv); }).then(function(png){ saveBlobAs(png,stem+'_p'+(i+1)+'.png'); });
+          },Promise.resolve());
+        });
+      });
+    });
   }
 
   /* ══════════════ Welcome Modal ══════════════ */
@@ -1894,7 +2092,9 @@ function segRenderLabelBlock(seg,row){
    配色规则：同根音共用一色（G/G7/Gsus4/Gm 同色），12 音名 12 色，
    色相按半音序直接展开（pc*30°）：常见进行（I-IV-V、关系小调）
    的根音相距纯四/五度或小三度，映射后色差足够大，
-   同一首歌里的常用和弦颜色能明显区分；低饱和低对比不刺眼；
+   同一首歌里的常用和弦颜色能明显区分；
+   填充色醒目但文字对比度优先：浅色主题浅底深字、深色主题深底浅字
+   （同色相配对，保证和弦文字一眼可辨）；
    深浅主题分别取色：优先 html[data-resolved-theme]，
    无该属性的宿主回退 prefers-color-scheme。 */
 var CHORD_STYLE_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
@@ -1937,8 +2137,8 @@ function chordStyleEnsureCss(){
   var light='',dark='',i,h;
   for(i=0;i<12;i++){
     h=chordStyleHue(i);
-    light+='.chord-chip.chord-pc'+i+'{background:hsla('+h+',52%,46%,0.12);outline-color:hsla('+h+',42%,42%,0.4);}';
-    dark+='.chord-chip.chord-pc'+i+'{background:hsla('+h+',48%,64%,0.16);outline-color:hsla('+h+',40%,68%,0.38);}';
+    light+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',65%,86%);outline-color:hsl('+h+',48%,60%);color:hsl('+h+',90%,20%);}';
+    dark+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',42%,26%);outline-color:hsl('+h+',45%,48%);color:hsl('+h+',72%,84%);}';
   }
   var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"] .chord-chip.');
   var darkAuto=dark.split('.chord-chip.').join('html:not([data-resolved-theme="light"]) .chord-chip.');
@@ -3619,7 +3819,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       exportBtn.disabled=true;
       exportBtn.style.opacity='.65';
       setExportButtonState('生成中...');
-      exportTransposePanel(lbDiv,{
+      var exportOpts={
         title:song.title||'transpose',
         key:curKey,
         song:song,
@@ -3627,6 +3827,10 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
         bgColor:'#ffffff',
         tight:true,
         width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
+      };
+      exportSongAsPaginatedPdf(lbDiv,exportOpts).catch(function(err){
+        try{ console.warn('[YouthEngine] paginated export failed, fallback to legacy single image',err); }catch(_){}
+        return exportTransposePanel(lbDiv,exportOpts);
       }).then(function(){
         setExportButtonState('已下载');
       }).catch(function(err){
