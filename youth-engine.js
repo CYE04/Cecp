@@ -243,9 +243,9 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none}
 .jp-dual{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;line-height:1;margin:0 .04em}
 .jp-dual-top,.jp-dual-bot{display:inline-flex;align-items:flex-end}
-.jp-dual-top{margin-bottom:-2px}
-.jp-dual-top .jp-dot-bot{height:7px}
-.jp-dual-bot .jp-dot-top{height:7px}
+.jp-dual-top{margin-bottom:-5px}
+.jp-dual-top .jp-dot-bot{height:2px}
+.jp-dual-bot .jp-dot-top{height:2px}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
 .jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px}
@@ -500,12 +500,13 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     return '#ffffff';
   }
 
-  function nodeToPngBlobByHtml2Canvas(node,bgColor){
+  function nodeToPngBlobByHtml2Canvas(node,bgColor,opts){
     return loadHtml2Canvas().then(function(html2canvas){
       var dpr=Math.max(1,window.devicePixelRatio||1);
+      var scale=(opts&&isFinite(opts.scale)&&opts.scale>0)?opts.scale:Math.min(2,dpr);
       return html2canvas(node,{
         backgroundColor:bgColor||'#ffffff',
-        scale:Math.min(2,dpr),
+        scale:scale,
         foreignObjectRendering:false,
         useCORS:true,
         logging:false
@@ -691,8 +692,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     });
   }
 
-  function nodeToPngBlobRobust(node,bgColor){
-    return nodeToPngBlobByHtml2Canvas(node,bgColor).catch(function(primaryErr){
+  function nodeToPngBlobRobust(node,bgColor,opts){
+    return nodeToPngBlobByHtml2Canvas(node,bgColor,opts).catch(function(primaryErr){
       try{ console.warn('[YouthEngine] html2canvas export failed, fallback to svg',primaryErr); }catch(_){}
       return nodeToPngBlob(node,bgColor).catch(function(secondErr){
         try{ console.warn('[YouthEngine] svg export failed, fallback to text canvas',secondErr); }catch(_){}
@@ -1055,6 +1056,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         }
         normalizeExportNotation(snap.node);
         if(opt.a4) makeExportTextBlack(snap.node);
+        lyricHlPrepareExport(snap.node);
+        if(opt.a4) snap.node.style.setProperty('background','#ffffff','important');
         return waitPaint2()
           .then(function(){ return nodeToPngBlobRobust(snap.node,bg); })
           .then(function(blob){ return opt.a4 ? composeA4SongImage(blob,opt) : blob; })
@@ -1068,105 +1071,55 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       });
   }
 
-  /* ══════════ 分页导出：按 A4 分页的多页 PDF ══════════
-     长歌不再整体缩小塞进一页，而是按「行/段」边界拆成多张 A4 页：
-     - 只在 .sw-lrow / .sw-lsec 顶部切页，绝不切断行内的和弦/简谱/歌词；
-     - 一个 .sw-lsec 若能整段放进一页，就整段挪到下一页，不跨页拆开
-       （除非该段本身比一整页还高）；
-     - 短歌一页能放下时仍走原有单张 A4 PNG（composeA4SongImage）；
-     - 渲染完整复用 nodeToPngBlobRobust 的 fallback 链与
-       normalizeExportNotation 的简谱下划线修正，分页只是对渲染结果
-       做像素切分；若命中纯文本兜底渲染（画布纵横比与 DOM 不符），
-       切分坐标不可信，自动退回单页 PNG，不会崩溃；
-     - jsPDF 按需从 CDN 动态加载（与 loadHtml2Canvas 同款写法），
-       加载失败退化为逐页 PNG 下载。 */
-  var _jsPdfPromise=null;
-  function loadJsPdf(){
-    if(window.jspdf&&window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
-    if(_jsPdfPromise) return _jsPdfPromise;
-    _jsPdfPromise=new Promise(function(resolve,reject){
-      function inject(src,next){
-        var s=document.createElement('script');
-        s.src=src;
-        s.async=true;
-        s.onload=function(){
-          if(window.jspdf&&window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
-          else if(next) inject(next,null);
-          else reject(new Error('jsPDF unavailable'));
-        };
-        s.onerror=function(){
-          s.remove();
-          if(next) inject(next,null);
-          else reject(new Error('jsPDF load failed'));
-        };
-        document.head.appendChild(s);
-      }
-      inject(
-        'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
-        'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js'
-      );
-    });
-    return _jsPdfPromise;
+
+  /* ══════════ 单图导出：整首缩放进一张固定尺寸 PNG（纯白底） ══════════
+     取代此前的「A4 分页多页 PDF」方案，核心规则：
+     - 只输出一张 PNG，默认 A4 竖版基准（2000x2828，1:1.414）；
+     - 不做「先截原尺寸长图再缩小贴上」（位图降采样会发虚），而是把
+       目标缩放比例直接交给 html2canvas 的 scale 渲染参数，文字按
+       最终尺寸矢量光栅化，缩小后依然清晰；
+     - 最小可读字号下限：歌词在成图里的字高不低于 minLyricPx
+       （24px，约合 A4 打印 9pt）。竖版压到下限仍放不下时，不再继续
+       压小，而改用 A4 横版（2828x2000）+ 歌词区双栏排版，用宽度换
+       高度；双栏断点由 CSS break-inside 控制，只落在整行之间；
+       宽度上限即横版双栏，不再进一步拉宽；
+     - 背景永远纯白 #ffffff，不跟随深浅主题；导出前把荧光笔标记
+       内联为白底可辨的实色（lyricHlPrepareExport）。
+     resolveExportBackground 不再参与本路径，仅保留给旧版
+     exportTransposePanel 兜底（该路径调用方也固定传白底）。 */
+  var EXPORT_FIT={
+    portrait:{W:2000,H:2828},
+    landscape:{W:2828,H:2000},
+    headerH:250,bottomH:118,sideM:150,
+    minLyricPx:24,maxScale:2.6
+  };
+  function exportMeasureLyricFont(scope){
+    var el=scope.querySelector('.p-lyric');
+    if(!el)return 19;
+    var fs=parseFloat(getComputedStyle(el).fontSize);
+    return isFinite(fs)&&fs>0?fs:19;
   }
-
-  /* A4 页面几何（与 composeA4SongImage 的 2000x2828 基准一致，比例 1:1.414）。 */
-  var EXPORT_PAGE={W:2000,H:2828,first:{x:150,y:250,w:1700,h:2410},rest:{x:150,y:150,w:1700,h:2510},footerY:2758};
-
-  function computeExportPageRanges(node,firstCapCss,restCapCss){
-    var base=node.getBoundingClientRect();
-    var totalH=base.height;
-    if(!(totalH>0)) return [{top:0,bottom:1}];
-    var cutMap={};
-    Array.prototype.forEach.call(node.querySelectorAll('.sw-lrow,.sw-lsec'),function(el){
-      var y=el.getBoundingClientRect().top-base.top;
-      if(y>1&&y<totalH-1) cutMap[Math.round(y*10)/10]=true;
-    });
-    var cuts=Object.keys(cutMap).map(Number).sort(function(a,b){return a-b;});
-    var secs=Array.prototype.map.call(node.querySelectorAll('.sw-lsec'),function(el){
-      var r=el.getBoundingClientRect();
-      return {top:r.top-base.top,bottom:r.bottom-base.top};
-    });
-    var ranges=[];
-    var start=0,guard=0;
-    while(guard++<300){
-      var cap=ranges.length===0?firstCapCss:restCapCss;
-      if(totalH-start<=cap+0.5) break;
-      var limit=start+cap;
-      var cut=-1,i;
-      for(i=0;i<cuts.length;i++){
-        if(cuts[i]>start+1&&cuts[i]<=limit) cut=cuts[i];
-        else if(cuts[i]>limit) break;
-      }
-      if(cut<0){
-        ranges.push({top:start,bottom:limit});
-        start=limit;
-        continue;
-      }
-      for(i=0;i<secs.length;i++){
-        var sc=secs[i];
-        if(sc.top<cut-1&&cut<sc.bottom-1){
-          if((sc.bottom-sc.top)<=restCapCss+0.5&&sc.top>start+1) cut=sc.top;
-          break;
-        }
-      }
-      ranges.push({top:start,bottom:cut});
-      start=cut;
-    }
-    ranges.push({top:start,bottom:totalH});
-    return ranges;
+  function exportApplyTwoColumns(clone,baseW){
+    var st=document.createElement('style');
+    st.setAttribute('data-export-columns','1');
+    st.textContent='.sw-lline{break-inside:avoid;-webkit-column-break-inside:avoid;page-break-inside:avoid;}.sw-lsec{break-inside:auto;}';
+    clone.insertBefore(st,clone.firstChild);
+    clone.style.columnCount='2';
+    clone.style.columnGap='64px';
+    clone.style.columnFill='balance';
+    clone.style.width=Math.ceil(baseW*2+64)+'px';
   }
-
-  function composeA4PageCanvas(scoreImg,logoImg,range,kPxPerCss,opt,pageIndex,pageCount){
-    var W=EXPORT_PAGE.W,H=EXPORT_PAGE.H;
-    var canvas=document.createElement('canvas');
-    canvas.width=W; canvas.height=H;
-    var ctx=canvas.getContext('2d');
-    if(!ctx) throw new Error('canvas unavailable');
-    ctx.fillStyle='#fff';
-    ctx.fillRect(0,0,W,H);
-    var first=pageIndex===0;
-    var song=opt.song||{};
-    if(first){
+  function composeFittedSongImage(scoreBlob,opt,page){
+    return Promise.all([blobToImage(scoreBlob),loadImageForExport(YM_LOGO_SRC)]).then(function(items){
+      var scoreImg=items[0],logoImg=items[1];
+      var W=page.W,H=page.H;
+      var canvas=document.createElement('canvas');
+      canvas.width=W;canvas.height=H;
+      var ctx=canvas.getContext('2d');
+      if(!ctx)throw new Error('canvas unavailable');
+      ctx.fillStyle='#ffffff';
+      ctx.fillRect(0,0,W,H);
+      var song=opt.song||{};
       var title=song.title||opt.title||'';
       var subtitle=[song.artist,song.sub].filter(Boolean).join('  ');
       var leftLines=[song.bpm?'♪ = '+song.bpm:'','1= '+(opt.key||song.origKey||'C')+'  '+(song.timeSign||'4/4')].filter(Boolean);
@@ -1182,35 +1135,24 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         ctx.fillText(subtitle,W/2,182);
       }
       ctx.textAlign='left';
-    }
-    var area=first?EXPORT_PAGE.first:EXPORT_PAGE.rest;
-    var sy=Math.max(0,Math.round(range.top*kPxPerCss));
-    var sh=Math.max(1,Math.min(scoreImg.height-sy,Math.round((range.bottom-range.top)*kPxPerCss)));
-    var s=area.w/scoreImg.width;
-    ctx.drawImage(scoreImg,0,sy,scoreImg.width,sh,area.x,area.y,area.w,sh*s);
-    if(logoImg){
-      var logoW=1180;
-      var logoH=logoW*(logoImg.naturalHeight||logoImg.height)/(logoImg.naturalWidth||logoImg.width);
-      ctx.save();
-      ctx.globalAlpha=0.07;
-      ctx.drawImage(logoImg,(W-logoW)/2,(H-logoH)/2,logoW,logoH);
-      ctx.restore();
-    }
-    if(pageCount>1){
-      ctx.fillStyle='#9a938a';
-      ctx.textAlign='center';
-      ctx.textBaseline='top';
-      ctx.font='500 24px "DM Mono","Space Mono",monospace';
-      ctx.fillText((song.title||opt.title||'')+' · '+(pageIndex+1)+' / '+pageCount,W/2,EXPORT_PAGE.footerY);
-      ctx.textAlign='left';
-    }
-    return canvas;
+      var area={x:EXPORT_FIT.sideM,y:EXPORT_FIT.headerH,w:W-EXPORT_FIT.sideM*2,h:H-EXPORT_FIT.headerH-EXPORT_FIT.bottomH};
+      var s=Math.min(area.w/scoreImg.width,area.h/scoreImg.height,1.001);
+      var drawW=scoreImg.width*s,drawH=scoreImg.height*s;
+      ctx.drawImage(scoreImg,area.x+(area.w-drawW)/2,area.y,drawW,drawH);
+      if(logoImg){
+        var logoW=1180;
+        var logoH=logoW*(logoImg.naturalHeight||logoImg.height)/(logoImg.naturalWidth||logoImg.width);
+        ctx.save();
+        ctx.globalAlpha=0.07;
+        ctx.drawImage(logoImg,(W-logoW)/2,(H-logoH)/2,logoW,logoH);
+        ctx.restore();
+      }
+      return canvasToPngBlob(canvas);
+    });
   }
-
-  function exportSongAsPaginatedPdf(panelInner,opt){
+  function exportSongAsFittedPng(panelInner,opt){
     opt=opt||{};
-    if(!panelInner) return Promise.reject(new Error('panel missing'));
-    var bg=resolveExportBackground(panelInner,opt.bgColor);
+    if(!panelInner)return Promise.reject(new Error('panel missing'));
     var waitFonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
     var keyPart=safeFileName(opt.key||'');
     var stem=safeFileName(opt.title||'transpose')+(keyPart?('_'+keyPart):'');
@@ -1222,47 +1164,40 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       }
       normalizeExportNotation(snap.node);
       makeExportTextBlack(snap.node);
+      lyricHlPrepareExport(snap.node);
+      snap.node.style.setProperty('background','#ffffff','important');
       return waitPaint2()
         .then(function(){
-          var rect=snap.node.getBoundingClientRect();
-          var cloneW=Math.max(1,rect.width);
-          var cloneH=Math.max(1,rect.height);
-          var f=EXPORT_PAGE.first.w/cloneW;
-          var ranges=computeExportPageRanges(snap.node,EXPORT_PAGE.first.h/f,EXPORT_PAGE.rest.h/f);
-          return nodeToPngBlobRobust(snap.node,bg).then(function(blob){
-            return {blob:blob,cloneW:cloneW,cloneH:cloneH,ranges:ranges};
+          var r1=snap.node.getBoundingClientRect();
+          var cw=Math.max(1,r1.width),ch=Math.max(1,r1.height);
+          var lyricPx=exportMeasureLyricFont(snap.node);
+          var P=EXPORT_FIT.portrait;
+          var sPort=Math.min(
+            (P.W-EXPORT_FIT.sideM*2)/cw,
+            (P.H-EXPORT_FIT.headerH-EXPORT_FIT.bottomH)/ch,
+            EXPORT_FIT.maxScale
+          );
+          if(sPort*lyricPx>=EXPORT_FIT.minLyricPx){
+            return nodeToPngBlobRobust(snap.node,'#ffffff',{scale:sPort}).then(function(blob){return {blob:blob,page:P};});
+          }
+          exportApplyTwoColumns(snap.node,cw);
+          return waitPaint2().then(function(){
+            var r2=snap.node.getBoundingClientRect();
+            var cw2=Math.max(1,r2.width),ch2=Math.max(1,r2.height);
+            var L=EXPORT_FIT.landscape;
+            var sLand=Math.min(
+              (L.W-EXPORT_FIT.sideM*2)/cw2,
+              (L.H-EXPORT_FIT.headerH-EXPORT_FIT.bottomH)/ch2,
+              EXPORT_FIT.maxScale
+            );
+            return nodeToPngBlobRobust(snap.node,'#ffffff',{scale:sLand}).then(function(blob){return {blob:blob,page:L};});
           });
         })
         .finally(function(){ snap.cleanup(); });
     }).then(function(res){
-      if(res.ranges.length<=1){
-        return composeA4SongImage(res.blob,opt).then(function(png){ saveBlobAs(png,stem+'.png'); });
-      }
-      return Promise.all([blobToImage(res.blob),loadImageForExport(YM_LOGO_SRC)]).then(function(items){
-        var scoreImg=items[0],logoImg=items[1];
-        var aspectDom=res.cloneW/res.cloneH;
-        var aspectImg=scoreImg.width/scoreImg.height;
-        if(!(aspectImg>0)||Math.abs(aspectDom-aspectImg)/aspectDom>0.05){
-          return composeA4SongImage(res.blob,opt).then(function(png){ saveBlobAs(png,stem+'.png'); });
-        }
-        var k=scoreImg.height/res.cloneH;
-        var pages=res.ranges.map(function(range,i){
-          return composeA4PageCanvas(scoreImg,logoImg,range,k,opt,i,res.ranges.length);
-        });
-        return loadJsPdf().then(function(jsPDF){
-          var pdf=new jsPDF({orientation:'portrait',unit:'pt',format:'a4',compress:true});
-          pages.forEach(function(cv,i){
-            if(i>0) pdf.addPage('a4','portrait');
-            pdf.addImage(cv.toDataURL('image/png'),'PNG',0,0,595.28,841.89,undefined,'SLOW');
-          });
-          saveBlobAs(pdf.output('blob'),stem+'.pdf');
-        }).catch(function(err){
-          try{ console.warn('[YouthEngine] jsPDF unavailable, fallback to per-page PNGs',err); }catch(_){}
-          return pages.reduce(function(p,cv,i){
-            return p.then(function(){ return canvasToPngBlob(cv); }).then(function(png){ saveBlobAs(png,stem+'_p'+(i+1)+'.png'); });
-          },Promise.resolve());
-        });
-      });
+      return composeFittedSongImage(res.blob,opt,res.page);
+    }).then(function(png){
+      saveBlobAs(png,stem+'.png');
     });
   }
 
@@ -2218,6 +2153,247 @@ function chordChipDecorate(root){
   chordChipWalk(root);
 }
 /* ═══════════ CECP-CHORD-STYLE v1 END ═══════════ */
+
+/* ═══════════ CECP-LYRIC-HL v1 BEGIN ═══════════
+   共享模块：歌词荧光笔标记（本地持久化，仅歌词行可标记）。
+   本块在以下两个文件中逐字节相同（权威版本 = shared/lyric-hl.js）：
+     musiclib/musiclib.js / youth-engine.js
+   （本期不含 musictool.js，但仍遵守共享块「禁止反斜杠」约定，
+   转义一律用 String.fromCharCode，便于未来同步。）
+   修改流程：先改 shared/lyric-hl.js，再同步两处，diff 校验一致。
+   设计要点：
+   - 只有 .p-lyric（含 lyric2/3/4，均带 .p-lyric 类）可被标记；
+     .p-chord / .p-n 不参与。最小单位 = 一个 .prev-seg 里的一个歌词元素。
+   - 标记直接写在元素上（data-hl 属性 + 注入 CSS 背景色），是真实
+     DOM 样式，html2canvas 导出自动带上；导出前另有
+     lyricHlPrepareExport 把颜色内联成白底可辨的实色。
+   - 存储用 localStorage，键 cecp-lyric-hl:<songId>，值为内容坐标
+     [[行号,分段号,歌词行号,颜色号],...]，与 DOM 实例无关；每次
+     renderScore 重建 DOM 后由宿主调用 lyricHlApply 重放，坐标越界
+     的标记静默忽略。
+   - 手势冲突：默认关闭标记模式，歌词区滚动不受影响；开启后在根节点
+     上 pointer capture + touch-action:none，滑动只画不滚。 */
+var LYRIC_HL_COLORS=[
+  {name:'yellow',solid:'#FFE45E',dark:'rgba(255,228,94,0.34)'},
+  {name:'green',solid:'#A9E886',dark:'rgba(169,232,134,0.32)'},
+  {name:'pink',solid:'#FFAFC9',dark:'rgba(255,175,201,0.34)'},
+  {name:'blue',solid:'#9FD3FF',dark:'rgba(159,211,255,0.34)'},
+  {name:'orange',solid:'#FFC98A',dark:'rgba(255,201,138,0.34)'}
+];
+var LYRIC_HL_PREFIX='cecp-lyric-hl:';
+var LYRIC_HL_PEN_KEY='cecp-lyric-hl-pen';
+function lyricHlLoad(songId){
+  try{
+    var raw=localStorage.getItem(LYRIC_HL_PREFIX+String(songId||''));
+    if(!raw)return [];
+    var data=JSON.parse(raw);
+    return (data&&Object.prototype.toString.call(data.marks)==='[object Array]')?data.marks:[];
+  }catch(_){return [];}
+}
+function lyricHlSave(songId,marks){
+  try{
+    var key=LYRIC_HL_PREFIX+String(songId||'');
+    if(marks&&marks.length)localStorage.setItem(key,JSON.stringify({v:1,marks:marks}));
+    else localStorage.removeItem(key);
+  }catch(_){}
+}
+function lyricHlEnsureCss(){
+  if(typeof document==='undefined'||!document.head)return;
+  if(document.getElementById('cecp-lyric-hl-style'))return;
+  var st=document.createElement('style');
+  st.id='cecp-lyric-hl-style';
+  var base='.p-lyric[data-hl]{border-radius:3px;box-decoration-break:clone;}',i;
+  var light='',dark='';
+  for(i=0;i<LYRIC_HL_COLORS.length;i++){
+    light+='.p-lyric[data-hl="'+i+'"]{background-color:'+LYRIC_HL_COLORS[i].solid+';}';
+    dark+='.p-lyric[data-hl="'+i+'"]{background-color:'+LYRIC_HL_COLORS[i].dark+';}';
+  }
+  var darkAttr=dark.split('.p-lyric[').join('html[data-resolved-theme="dark"] .p-lyric[');
+  var darkAuto=dark.split('.p-lyric[').join('html:not([data-resolved-theme="light"]) .p-lyric[');
+  st.textContent=
+    base+light+darkAttr+
+    '@media (prefers-color-scheme: dark){'+darkAuto+'}'+
+    '.lyric-hl-marking{touch-action:none;-webkit-user-select:none;user-select:none;}'+
+    '.lyric-hl-marking .p-lyric{cursor:crosshair;}';
+  document.head.appendChild(st);
+}
+/* 元素 -> 内容坐标 {row,seg,line}；不属于歌词区时返回 null */
+function lyricHlCoordOf(root,el){
+  if(!el||!el.closest)return null;
+  var lyric=el.closest('.p-lyric');
+  if(!lyric||!root.contains(lyric))return null;
+  var row=lyric.closest('.sw-lrow');
+  var seg=lyric.closest('.prev-seg');
+  if(!row||!seg)return null;
+  var r=Array.prototype.indexOf.call(root.querySelectorAll('.sw-lrow'),row);
+  var sIdx=Array.prototype.indexOf.call(row.querySelectorAll('.prev-seg'),seg);
+  var lIdx=Array.prototype.indexOf.call(seg.querySelectorAll('.p-lyric'),lyric);
+  if(r<0||sIdx<0||lIdx<0)return null;
+  return {row:r,seg:sIdx,line:lIdx,el:lyric};
+}
+/* 内容坐标 -> 当前 DOM 节点；越界返回 null（内容被编辑过的兜底） */
+function lyricHlNodeAt(root,row,seg,line){
+  var rows=root.querySelectorAll('.sw-lrow');
+  if(row<0||row>=rows.length)return null;
+  var segs=rows[row].querySelectorAll('.prev-seg');
+  if(seg<0||seg>=segs.length)return null;
+  var lyrics=segs[seg].querySelectorAll('.p-lyric');
+  if(line<0||line>=lyrics.length)return null;
+  return lyrics[line];
+}
+/* 渲染完成后重放：清掉旧标记属性，再按存储坐标重新打上 */
+function lyricHlApply(root,songId){
+  if(!root||!root.querySelectorAll)return;
+  lyricHlEnsureCss();
+  Array.prototype.forEach.call(root.querySelectorAll('.p-lyric[data-hl]'),function(el){
+    el.removeAttribute('data-hl');
+  });
+  var marks=lyricHlLoad(songId);
+  for(var i=0;i<marks.length;i++){
+    var m=marks[i];
+    if(!m||m.length<4)continue;
+    var c=m[3];
+    if(!(c>=0&&c<LYRIC_HL_COLORS.length))continue;
+    var el=lyricHlNodeAt(root,m[0],m[1],m[2]);
+    if(el)el.setAttribute('data-hl',String(c));
+  }
+}
+/* 更新一处标记：colorIdx 为 null 时表示擦除 */
+function lyricHlSet(root,songId,coord,colorIdx){
+  var marks=lyricHlLoad(songId),out=[],found=false,i;
+  for(i=0;i<marks.length;i++){
+    var m=marks[i];
+    if(m&&m[0]===coord.row&&m[1]===coord.seg&&m[2]===coord.line){
+      found=true;
+      if(colorIdx!=null)out.push([coord.row,coord.seg,coord.line,colorIdx]);
+    }else out.push(m);
+  }
+  if(!found&&colorIdx!=null)out.push([coord.row,coord.seg,coord.line,colorIdx]);
+  lyricHlSave(songId,out);
+  if(coord.el){
+    if(colorIdx!=null)coord.el.setAttribute('data-hl',String(colorIdx));
+    else coord.el.removeAttribute('data-hl');
+  }
+}
+/* 导出前调用：把标记颜色内联成白底实色（live 深色模式的半透明变体
+   在纯白导出底上会太淡），并保证优先级高于导出置黑逻辑 */
+function lyricHlPrepareExport(scope){
+  if(!scope||!scope.querySelectorAll)return;
+  Array.prototype.forEach.call(scope.querySelectorAll('.p-lyric[data-hl]'),function(el){
+    var idx=parseInt(el.getAttribute('data-hl'),10);
+    if(idx>=0&&idx<LYRIC_HL_COLORS.length){
+      el.style.setProperty('background-color',LYRIC_HL_COLORS[idx].solid,'important');
+      el.style.setProperty('border-radius','3px');
+    }
+  });
+}
+/* 荧光笔控制条：笔开关 + 5 色 + 清空。宿主把返回的元素插进工具行，
+   并在每次 renderScore 末尾调用 lyricHlApply。root = 歌词区根节点
+   （innerHTML 会被重建但节点本身持久），getSongId 惰性取歌曲 id。 */
+function lyricHlCreateController(root,getSongId){
+  lyricHlEnsureCss();
+  var active=false;
+  var colorIdx=0;
+  try{
+    var savedPen=parseInt(localStorage.getItem(LYRIC_HL_PEN_KEY),10);
+    if(savedPen>=0&&savedPen<LYRIC_HL_COLORS.length)colorIdx=savedPen;
+  }catch(_){}
+  var wrap=document.createElement('span');
+  wrap.className='lyric-hl-ctrl';
+  wrap.style.cssText='display:inline-flex;align-items:center;gap:6px;vertical-align:middle;';
+  var pen=document.createElement('button');
+  pen.type='button';
+  pen.setAttribute('aria-label','歌词荧光笔');
+  pen.textContent=String.fromCharCode(0xD83D,0xDD8D);
+  pen.style.cssText='cursor:pointer;font-size:15px;line-height:1;min-height:36px;padding:0 12px;border-radius:11px;border:1px solid rgba(128,128,128,0.35);background:transparent;display:inline-flex;align-items:center;transition:background .15s,border-color .15s;';
+  var palette=document.createElement('span');
+  palette.style.cssText='display:none;align-items:center;gap:5px;';
+  var dots=[];
+  function refreshDots(){
+    for(var i=0;i<dots.length;i++){
+      dots[i].style.boxShadow=(i===colorIdx)?'0 0 0 2px rgba(128,128,128,0.9)':'none';
+      dots[i].style.transform=(i===colorIdx)?'scale(1.15)':'none';
+    }
+  }
+  LYRIC_HL_COLORS.forEach(function(c,i){
+    var d=document.createElement('button');
+    d.type='button';
+    d.setAttribute('aria-label','荧光笔颜色 '+c.name);
+    d.style.cssText='cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,0.18);padding:0;background:'+c.solid+';transition:transform .12s ease;';
+    d.addEventListener('click',function(ev){
+      ev.stopPropagation();
+      colorIdx=i;
+      try{localStorage.setItem(LYRIC_HL_PEN_KEY,String(i));}catch(_){}
+      refreshDots();
+    });
+    dots.push(d);
+    palette.appendChild(d);
+  });
+  var clearBtn=document.createElement('button');
+  clearBtn.type='button';
+  clearBtn.textContent='清空';
+  clearBtn.setAttribute('aria-label','清空本歌全部标记');
+  clearBtn.style.cssText='cursor:pointer;font-size:11px;font-weight:700;line-height:1;min-height:30px;padding:0 10px;border-radius:9px;border:1px solid rgba(128,128,128,0.35);background:transparent;color:inherit;display:inline-flex;align-items:center;';
+  clearBtn.addEventListener('click',function(ev){
+    ev.stopPropagation();
+    lyricHlSave(getSongId(),[]);
+    lyricHlApply(root,getSongId());
+  });
+  palette.appendChild(clearBtn);
+  wrap.appendChild(pen);
+  wrap.appendChild(palette);
+  function setActive(on){
+    active=!!on;
+    pen.style.background=active?'rgba(128,128,128,0.22)':'transparent';
+    pen.style.borderColor=active?'rgba(128,128,128,0.7)':'rgba(128,128,128,0.35)';
+    palette.style.display=active?'inline-flex':'none';
+    if(root&&root.classList){
+      if(active)root.classList.add('lyric-hl-marking');
+      else root.classList.remove('lyric-hl-marking');
+    }
+    refreshDots();
+  }
+  pen.addEventListener('click',function(ev){
+    ev.stopPropagation();
+    setActive(!active);
+  });
+  /* 笔迹手势：开启时 pointer capture，滑过的歌词逐段上色；
+     起笔落在「已是当前色」的分段 => 本次笔画为擦除模式（toggle） */
+  var stroke=null;
+  function strokeApply(target){
+    var coord=lyricHlCoordOf(root,target);
+    if(!coord)return;
+    var k=coord.row+'_'+coord.seg+'_'+coord.line;
+    if(stroke.seen[k])return;
+    stroke.seen[k]=true;
+    lyricHlSet(root,getSongId(),coord,stroke.erase?null:colorIdx);
+  }
+  root.addEventListener('pointerdown',function(e){
+    if(!active)return;
+    var coord=lyricHlCoordOf(root,e.target);
+    if(!coord)return;
+    e.preventDefault();
+    try{root.setPointerCapture(e.pointerId);}catch(_){}
+    stroke={erase:coord.el.getAttribute('data-hl')===String(colorIdx),seen:{}};
+    strokeApply(e.target);
+  });
+  root.addEventListener('pointermove',function(e){
+    if(!active||!stroke)return;
+    e.preventDefault();
+    var t=document.elementFromPoint(e.clientX,e.clientY);
+    if(t)strokeApply(t);
+  });
+  function endStroke(e){
+    if(!stroke)return;
+    stroke=null;
+    try{root.releasePointerCapture(e.pointerId);}catch(_){}
+  }
+  root.addEventListener('pointerup',endStroke);
+  root.addEventListener('pointercancel',endStroke);
+  refreshDots();
+  return wrap;
+}
+/* ═══════════ CECP-LYRIC-HL v1 END ═══════════ */
 
 /* ═══════════ CECP-CHORD-ENGINE v1 BEGIN ═══════════
    共享模块：和弦浏览器引擎（Chord Explorer）。
@@ -3478,8 +3654,26 @@ var ChordEngine=(function(){
 })();
 if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
 /* ═══════════ CECP-CHORD-ENGINE v1 END ═══════════ */
+  /* 合法和弦 token 判定（同 CECP-CHORD-STYLE chordStylePitchClass 的思路）：
+     根音 A-G 须在 token 开头（允许前置括号），可跟 #/b，
+     其后若为小写字母则首字母限 m/s/a/d ——
+     排除写在 chord 字段里的 "Fine"/"To Chorus" 等段落标记。 */
+  function isChordLikeToken(token){
+    var s=String(token||'').trim();
+    var i=0;
+    while(i<s.length&&s.charAt(i)==='(')i++;
+    var ch=s.charAt(i);
+    if(ch<'A'||ch>'G')return false;
+    var j=i+1;
+    var nx=s.charAt(j);
+    if(nx==='#'||nx==='b')j++;
+    var after=s.charAt(j);
+    if(after>='a'&&after<='z'&&'msad'.indexOf(after)<0)return false;
+    return true;
+  }
   function trChordToken(token,st,useFlat){
     var raw=String(token||'');
+    if(!isChordLikeToken(raw))return raw;
     var m=raw.match(/^([A-G](?:#|b)?)([^A-G]*)(.*)$/);
     if(m&&m[1]&&!m[3]){
       var rest=m[2]||'';
@@ -3707,6 +3901,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
 
     var metroDiv = buildMetro(song.bpm || 80);
     var toolsRow = div('sw-tools-row',[exportBtn, ytBtn, metroDiv]);
+    toolsRow.appendChild(lyricHlCreateController(lbDiv,function(){return song.id;}));
     wrap.appendChild(div('sw-tools',[toolsRow]));
 
     /* score image */
@@ -3780,6 +3975,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
         });
         lbDiv.appendChild(se);
       });
+      lyricHlApply(lbDiv,song.id);
       scheduleFitRows();
     }
     function fitRows(){
@@ -3828,8 +4024,8 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
         tight:true,
         width:Math.max(560,Math.ceil(wrap.getBoundingClientRect().width||0)||900)
       };
-      exportSongAsPaginatedPdf(lbDiv,exportOpts).catch(function(err){
-        try{ console.warn('[YouthEngine] paginated export failed, fallback to legacy single image',err); }catch(_){}
+      exportSongAsFittedPng(lbDiv,exportOpts).catch(function(err){
+        try{ console.warn('[YouthEngine] fitted export failed, fallback to legacy single image',err); }catch(_){}
         return exportTransposePanel(lbDiv,exportOpts);
       }).then(function(){
         setExportButtonState('已下载');
@@ -3886,6 +4082,11 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
           <button class="mreset">重置</button>
           <button class="mstop-btn">停止</button>
         </div>
+        <div class="mrow mrow-vol">
+          <span class="mvol-icon">\u{1F50A}</span>
+          <input class="mvol" type="range" min="0" max="200" step="5">
+          <span class="mvol-val"></span>
+        </div>
       </div>`;
 
     var bpm=defBpm,step=0,playing=false,timer=null,audioCtx=null,settingsOpen=false,pressTimer=null;
@@ -3894,7 +4095,8 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     var msettings=metro.querySelector('.msettings');
     var minput=metro.querySelector('.mbpm');
 
-    function playClick(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=step===0?900:700;g.gain.value=step===0?.1:.07;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.035);}
+    function metroVolPct(){try{var v=parseInt(localStorage.getItem('cecp-metro-vol'),10);if(isFinite(v)&&v>=0&&v<=200)return v;}catch(_){}return 100;}
+    function playClick(){var vol=metroVolPct();if(vol<=0)return;if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=step===0?900:700;g.gain.value=(step===0?.2:.14)*(vol/100);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.035);}
     function tick(){leaves.forEach(function(l){l.classList.remove('active')});leaves[step].classList.add('active');playClick();step=(step+1)%4;}
     function mstart(){mstop();step=0;tick();timer=setInterval(tick,60000/bpm);playing=true;}
     function mstop(){if(timer)clearInterval(timer);timer=null;playing=false;leaves.forEach(function(l){l.classList.remove('active')});}
@@ -3909,6 +4111,13 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     metro.addEventListener('mousedown',function(){pressTimer=setTimeout(openS,500);});
     metro.addEventListener('mouseup',cancelP);
     metro.addEventListener('mouseleave',cancelP);
+    var mvol=metro.querySelector('.mvol');
+    var mvolVal=metro.querySelector('.mvol-val');
+    var mvolIcon=metro.querySelector('.mvol-icon');
+    function refreshVolUi(){var v=metroVolPct();mvol.value=v;mvolVal.textContent=v+'%';mvolIcon.textContent=v===0?'\u{1F507}':'\u{1F50A}';}
+    mvol.addEventListener('input',function(e){e.stopPropagation();try{localStorage.setItem('cecp-metro-vol',String(Math.max(0,Math.min(200,parseInt(mvol.value,10)||0))));}catch(_){}refreshVolUi();});
+    mvol.addEventListener('click',function(e){e.stopPropagation();});
+    refreshVolUi();
     metro.querySelector('.mminus').onclick=function(e){e.stopPropagation();setBpm(bpm-1);};
     metro.querySelector('.mplus').onclick=function(e){e.stopPropagation();setBpm(bpm+1);};
     metro.querySelector('.mreset').onclick=function(e){e.stopPropagation();setBpm(defBpm);};

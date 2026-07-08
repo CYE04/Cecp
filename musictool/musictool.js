@@ -493,9 +493,9 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jp-fermata::after{content:'';position:absolute;top:13px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;pointer-events:none;}
 .jp-dual{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;line-height:1;margin:0 .04em;}
 .jp-dual-top,.jp-dual-bot{display:inline-flex;align-items:flex-end;}
-.jp-dual-top{margin-bottom:-2px;}
-.jp-dual-top .jp-dot-bot{height:7px;}
-.jp-dual-bot .jp-dot-top{height:7px;}
+.jp-dual-top{margin-bottom:-5px;}
+.jp-dual-top .jp-dot-bot{height:2px;}
+.jp-dual-bot .jp-dot-top{height:2px;}
 
 /* ── 批量填歌词 modal ── */
 .lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
@@ -1428,8 +1428,26 @@ function mtWrapWithSpBtn(inp,commit){
   wrap.appendChild(mtMakeSpBtn(inp,commit));
   return wrap;
 }
+/* 合法和弦 token 判定（同 CECP-CHORD-STYLE chordStylePitchClass 的思路，禁止反斜杠）：
+   根音 A-G 须在 token 开头（允许前置括号），可跟 #/b，
+   其后若为小写字母则首字母限 m/s/a/d ——
+   排除写在 chord 字段里的 "Fine"/"To Chorus" 等段落标记。 */
+function isChordLikeToken(token){
+  var s=String(token||'').trim();
+  var i=0;
+  while(i<s.length&&s.charAt(i)==='(')i++;
+  var ch=s.charAt(i);
+  if(ch<'A'||ch>'G')return false;
+  var j=i+1;
+  var nx=s.charAt(j);
+  if(nx==='#'||nx==='b')j++;
+  var after=s.charAt(j);
+  if(after>='a'&&after<='z'&&'msad'.indexOf(after)<0)return false;
+  return true;
+}
 function trChordToken(raw,st,useFlat){
   raw=String(raw||'');
+  if(!isChordLikeToken(raw))return raw;
   var m=raw.match(/^([A-G](?:#|b)?)([^A-G]*)(.*)$/);
   if(m&&m[1]&&!m[3]){
     var rest=m[2]||'';
