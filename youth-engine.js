@@ -4347,9 +4347,11 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       wrap.appendChild(volWrap);
     }
 
-    // audio engine
+    // audio engine（挂进 wrap：不可见，但让宿主页面能 querySelector 到以便暂停）
     var audio = document.createElement('audio');
     audio.src = song.mp3;
+    audio.style.display = 'none';   // display:none 不影响播放，避免成为可见 flex item
+    wrap.appendChild(audio);
     var lrcData = [], lrcIdx = -1;
 
     function fmt(s) { var m=Math.floor(s/60),ss=Math.floor(s%60); return m+':'+(ss<10?'0':'')+ss; }
@@ -4417,8 +4419,8 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
   }
 
   /* ══════════════ Build all sections ══════════════ */
-  function buildSongs() {
-    var songs = C.songs || [];
+  function buildSongs(songsArg) {
+    var songs = songsArg || (C && C.songs) || [];
     if (!songs.length) return el('p',{class:'ym-meta',text:'本周暂无诗歌安排'});
 
     var wrap   = div('ym-songs-wrap');
@@ -4750,6 +4752,27 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
   }
 
   /* ══════════════ 对外 API（在 IIFE 内注册，可访问内部函数）══════════════ */
+
+  /* 供其他引擎（如 camp-engine.js）复用诗歌渲染：
+     传入 song id 数组（songs/<id>.json 的 id），内部逐个 fetch，
+     复用 buildSongs/buildSongCard/buildAPlayer，
+     返回 Promise<HTMLElement>（诗歌 tab + 播放器 + 和弦谱，观感与 weekly 一致）。 */
+  window.YouthEngine.buildSongSet = function(songIds) {
+    _injectCSS();
+    initLightbox();
+    var ids = Array.isArray(songIds) ? songIds : [];
+    var songPromises = ids.map(function(id) {
+      return fetch(YM_BASE + '/songs/' + id + '.json')
+        .then(function(r) {
+          if (!r.ok) throw new Error('歌曲不存在: ' + id);
+          return r.json();
+        });
+    });
+    return Promise.all(songPromises).then(function(songs) {
+      return buildSongs(songs);
+    });
+  };
+
   window.YouthEngine.render = function(weekId, root) {
     if (!root) root = document.getElementById('ym-root');
     if (!root) { console.error('[YM] root element not found'); return; }
