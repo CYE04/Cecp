@@ -453,20 +453,20 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 .jp-plain-top{height:12px;}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;}.jp-plain-sym.is-dash{position:relative;top:-0.12em;}.jp-plain-bot{height:16px;}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:8px;line-height:.6;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;}
-.jp-dot-top{height:10px;justify-content:flex-end;}.jp-dot-bot{height:10px;justify-content:flex-start;}
+.jp-dot-top{height:8px;justify-content:flex-end;}.jp-dot-bot{height:8px;justify-content:flex-start;}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px;}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em;}
 .jp-aug{position:absolute;right:-0.46em;top:50%;transform:translateY(-50%);font-size:10px;line-height:1;pointer-events:none;}
 .jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
 .jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
-.jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
+.jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px;}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:50% 50% 0 0/100% 100% 0 0;}
-.jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
+.jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px;}
 .jp-slur-open::before{content:'';position:absolute;top:2px;left:15%;right:-4px;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-radius:50% 0 0 0/100% 0 0 0;}
-.jp-slur-close{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;}
+.jp-slur-close{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px;}
 .jp-slur-close::before{content:'';position:absolute;top:2px;left:-4px;right:15%;height:8px;border-top:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:0 50% 0 0/0 100% 0 0;}
-.jp-tuplet{display:inline-flex;align-items:flex-end;position:relative;padding-top:18px;margin-right:1px;}
+.jp-tuplet{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px;margin-right:1px;}
 .jp-tuplet-br{position:absolute;top:2px;left:2px;right:2px;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:3px 3px 0 0;pointer-events:none;}
 .jp-tuplet-num{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:8px;line-height:1;padding:0 3px;background:var(--bg);color:var(--ink);pointer-events:none;}
 
@@ -494,8 +494,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jp-dual{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;vertical-align:bottom;line-height:1;margin:0 .04em;}
 .jp-dual-top,.jp-dual-bot{display:inline-flex;align-items:flex-end;}
 .jp-dual-top{margin-bottom:-2px;}
-.jp-dual-top .jp-dot-bot{height:9px;}
-.jp-dual-bot .jp-dot-top{height:9px;}
+.jp-dual-top .jp-dot-bot{height:7px;}
+.jp-dual-bot .jp-dot-top{height:7px;}
 
 /* ── 批量填歌词 modal ── */
 .lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
@@ -1275,7 +1275,9 @@ function segRenderLabelBlock(seg,row){
    配色规则：同根音共用一色（G/G7/Gsus4/Gm 同色），12 音名 12 色，
    色相按半音序直接展开（pc*30°）：常见进行（I-IV-V、关系小调）
    的根音相距纯四/五度或小三度，映射后色差足够大，
-   同一首歌里的常用和弦颜色能明显区分；低饱和低对比不刺眼；
+   同一首歌里的常用和弦颜色能明显区分；
+   填充色醒目但文字对比度优先：浅色主题浅底深字、深色主题深底浅字
+   （同色相配对，保证和弦文字一眼可辨）；
    深浅主题分别取色：优先 html[data-resolved-theme]，
    无该属性的宿主回退 prefers-color-scheme。 */
 var CHORD_STYLE_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
@@ -1318,8 +1320,8 @@ function chordStyleEnsureCss(){
   var light='',dark='',i,h;
   for(i=0;i<12;i++){
     h=chordStyleHue(i);
-    light+='.chord-chip.chord-pc'+i+'{background:hsla('+h+',52%,46%,0.12);outline-color:hsla('+h+',42%,42%,0.4);}';
-    dark+='.chord-chip.chord-pc'+i+'{background:hsla('+h+',48%,64%,0.16);outline-color:hsla('+h+',40%,68%,0.38);}';
+    light+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',65%,86%);outline-color:hsl('+h+',48%,60%);color:hsl('+h+',90%,20%);}';
+    dark+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',42%,26%);outline-color:hsl('+h+',45%,48%);color:hsl('+h+',72%,84%);}';
   }
   var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"] .chord-chip.');
   var darkAuto=dark.split('.chord-chip.').join('html:not([data-resolved-theme="light"]) .chord-chip.');
