@@ -542,6 +542,29 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .check-ok{color:var(--green);}.check-warn{color:#f0c040;}
 .check-total{margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;font-family:'Space Mono',monospace;color:var(--ink);}
 
+/* ── 编辑体验增强（搜索 / 移动 / 定位） ── */
+:root{--flash-bg:rgba(124,106,247,0.32);}
+.seg-search{display:flex;align-items:center;gap:6px;padding:10px 12px 0;flex-shrink:0;}
+.seg-search input{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--ink);font-family:'Space Mono',monospace;font-size:11px;padding:6px 8px;outline:none;}
+.seg-search input:focus{border-color:var(--accent);}
+.seg-search-count{font-size:9px;color:var(--ink3);font-family:'Space Mono',monospace;white-space:nowrap;min-width:30px;text-align:center;}
+.sec-btn:disabled{opacity:.3;cursor:default;pointer-events:none;}
+.seg-vcol{display:inline-flex;flex-direction:column;opacity:0;transition:opacity .12s;}
+.seg-row:hover .seg-vcol,.seg-vcol:focus-within{opacity:1;}
+.btn-seg-vert{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:7px;line-height:1.3;padding:1px 2px;font-family:'Space Mono',monospace;}
+.btn-seg-vert:hover{color:var(--accent2);}
+.btn-seg-vert:disabled{opacity:.25;cursor:default;pointer-events:none;}
+.seg-del-wrap{display:flex;align-items:center;gap:2px;justify-content:flex-end;}
+.row-block.row-empty{background:rgba(240,192,64,0.05);}
+.row-empty-tag{font-size:8px;color:var(--sel);border:1px dashed rgba(240,192,64,0.5);border-radius:4px;padding:0 4px;line-height:1.5;}
+@keyframes segFlashKF{0%{background-color:var(--flash-bg);}100%{background-color:rgba(124,106,247,0);}}
+.seg-flash{animation:segFlashKF 1.2s ease-out;}
+.seg-hit{background:rgba(240,192,64,0.10);}
+.seg-hit-cur{background:rgba(240,192,64,0.26);outline:1px solid rgba(240,192,64,0.55);}
+#previewWrap .prev-seg{cursor:pointer;border-radius:4px;}
+#previewWrap .prev-seg:hover{background:rgba(124,106,247,0.10);box-shadow:0 0 0 1px rgba(124,106,247,0.38);}
+#previewWrap .sec-label{cursor:pointer;}
+
 @media (prefers-color-scheme: light){
   :root{
     --bg:#f3f6fc;--panel:#ffffff;--panel2:#ebf0fa;
@@ -583,6 +606,11 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
     border-right:1px solid rgba(17,24,39,0.16);
   }
   #previewWrap::before{color:rgba(17,24,39,0.30);}
+  :root{--flash-bg:rgba(74,108,255,0.24);}
+  .seg-hit{background:rgba(192,138,16,0.12);}
+  .seg-hit-cur{background:rgba(192,138,16,0.28);outline-color:rgba(192,138,16,0.55);}
+  #previewWrap .prev-seg:hover{background:rgba(74,108,255,0.10);box-shadow:0 0 0 1px rgba(74,108,255,0.35);}
+  .row-block.row-empty{background:rgba(192,138,16,0.06);}
 }
 
 @media (max-width: 1100px){
@@ -735,6 +763,12 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
       <option value="Outro"></option>
       <option value="To Chorus"></option>
     </datalist>
+    <div class="seg-search">
+      <input id="segSearchInput" placeholder="搜索歌词 / 和弦 / 简谱 / 段落名… (⌘F)" autocomplete="off">
+      <span class="seg-search-count" id="segSearchCount"></span>
+      <button class="sec-btn" onclick="segSearchPrev()" title="上一个 (Shift+Enter)" type="button">↑</button>
+      <button class="sec-btn" onclick="segSearchNext()" title="下一个 (Enter)" type="button">↓</button>
+    </div>
     <div class="seg-pane-inner" id="sectionsWrap"></div>
     <button class="add-sec-btn" onclick="addSection()">+ 新增段落</button>
     <button class="add-sec-btn" onclick="openBulkLyric()" style="color:var(--accent2);border-color:rgba(124,106,247,0.3);">⌨ 批量填歌词</button>
@@ -1992,35 +2026,47 @@ function buildSpacerTok(){
 ════════════════════════════════════════ */
 // 拖动状态
 var dragSrc={si:-1,li:-1,gi:-1};
+// 拖完统一收回 draggable（替代每次 mousedown 挂 once 监听）
+document.addEventListener('dragend',function(){
+  document.querySelectorAll('.seg-row[draggable="true"]').forEach(function(r){r.draggable=false;});
+});
 
 function renderEditor(){
-  var wrap=document.getElementById('sectionsWrap');wrap.innerHTML='';
+  var wrap=document.getElementById('sectionsWrap');
+  var _keepScroll=wrap.scrollTop;
+  wrap.innerHTML='';
   data.forEach(function(sec,si){
     var sb=document.createElement('div');sb.className='sec-block';
+    sb.setAttribute('data-si',si);
     var sh=document.createElement('div');sh.className='sec-head';
     sh.innerHTML='<input class="sec-name-input" value="'+esc(sec.name)+'" oninput="data['+si+'].name=this.value;renderPreview()">'+
       '<button class="sec-btn" onclick="addLine('+si+')">+行</button>'+
+      '<button class="sec-btn" onclick="moveSection('+si+',-1)" title="段落上移"'+(si===0?' disabled':'')+'>↑</button>'+
+      '<button class="sec-btn" onclick="moveSection('+si+',1)" title="段落下移"'+(si===data.length-1?' disabled':'')+'>↓</button>'+
       '<button class="sec-btn del" onclick="delSection('+si+')">删</button>';
     sb.appendChild(sh);
 
     sec.lines.forEach(function(line,li){
-      var rb=document.createElement('div');rb.className='row-block';
+      var rb=document.createElement('div');rb.className='row-block'+(line.segs.length?'':' row-empty');
+      rb.setAttribute('data-row',si+'-'+li);
       var rm=document.createElement('div');rm.className='row-meta';
       rm.innerHTML='<span class="row-idx">ROW '+(li+1)+'</span>'+
+        (line.segs.length?'':'<span class="row-empty-tag">空行</span>')+
         '<label class="bold-toggle"><input type="checkbox" '+(line.bold?'checked':'')+' onchange="data['+si+'].lines['+li+'].bold=this.checked;renderPreview()"> 副歌</label>'+
-        '<button class="sec-btn" onclick="moveLine('+si+','+li+',-1)" title="上移">↑</button>'+
-        '<button class="sec-btn" onclick="moveLine('+si+','+li+',1)" title="下移">↓</button>'+
+        '<button class="sec-btn" onclick="moveLine('+si+','+li+',-1)" title="上移"'+(li===0?' disabled':'')+'>↑</button>'+
+        '<button class="sec-btn" onclick="moveLine('+si+','+li+',1)" title="下移"'+(li===sec.lines.length-1?' disabled':'')+'>↓</button>'+
         '<button class="row-del" onclick="delLine('+si+','+li+')">✕</button>';
       rb.appendChild(rm);
 
       var tbl=document.createElement('table');tbl.className='seg-table';
-      tbl.innerHTML='<tr><th style="width:16px;"></th><th style="width:64px;">和弦</th><th>简谱</th><th style="width:76px;">歌词</th><th style="width:18px;"></th></tr>';
+      tbl.innerHTML='<tr><th style="width:16px;"></th><th style="width:64px;">和弦</th><th>简谱</th><th style="width:76px;">歌词</th><th style="width:34px;"></th></tr>';
 
       line.segs.forEach(function(seg,gi){
         var key=si+'-'+li+'-'+gi;
         var isActive=(si===curSi&&li===curLi&&gi===curGi);
         var tr=document.createElement('tr');
         tr.className='seg-row';
+        tr.setAttribute('data-loc',key);
 
         // 拖动
         tr.addEventListener('dragstart',function(e){
@@ -2059,7 +2105,6 @@ function renderEditor(){
         tr.draggable=false;
         h.addEventListener('mousedown',function(){tr.draggable=true;});
         h.addEventListener('mouseup',function(){tr.draggable=false;});
-        document.addEventListener('dragend',function(){tr.draggable=false;},{once:true});
         tdH.appendChild(h);tr.appendChild(tdH);
 
         // 段落标记行（label 块专属 UI）
@@ -2108,9 +2153,12 @@ function renderEditor(){
           wrapLab.appendChild(jmpWrap);
           tdLab.appendChild(wrapLab);tr.appendChild(tdLab);
           var tdDelLab=document.createElement('td');
+          var delWrapLab=document.createElement('div');delWrapLab.className='seg-del-wrap';
+          delWrapLab.appendChild(mkSegVCol(si,li,gi));
           var btnDelLab=document.createElement('button');btnDelLab.className='btn-del-seg';btnDelLab.textContent='✕';
           btnDelLab.onclick=(function(si,li,gi){return function(){saveUndo();delSeg(si,li,gi);renderPreview();};})(si,li,gi);
-          tdDelLab.appendChild(btnDelLab);tr.appendChild(tdDelLab);
+          delWrapLab.appendChild(btnDelLab);
+          tdDelLab.appendChild(delWrapLab);tr.appendChild(tdDelLab);
           tbl.appendChild(tr);
           return;
         }
@@ -2244,11 +2292,14 @@ function renderEditor(){
         inpL4.oninput=(function(si,li,gi){return function(){data[si].lines[li].segs[gi].lyric4=this.value;renderPreview();};})(si,li,gi);
         tdL.appendChild(mtWrapWithSpBtn(inpL4,(function(si,li,gi){return function(v){data[si].lines[li].segs[gi].lyric4=v;renderPreview();};})(si,li,gi)));tr.appendChild(tdL);
 
-        // 删除
+        // 删除 + 上下移
         var tdD=document.createElement('td');
+        var delWrap=document.createElement('div');delWrap.className='seg-del-wrap';
+        delWrap.appendChild(mkSegVCol(si,li,gi));
         var btnD=document.createElement('button');btnD.className='btn-del-seg';btnD.textContent='✕';
         btnD.onclick=(function(si,li,gi){return function(){saveUndo();delSeg(si,li,gi);};})(si,li,gi);
-        tdD.appendChild(btnD);tr.appendChild(tdD);
+        delWrap.appendChild(btnD);
+        tdD.appendChild(delWrap);tr.appendChild(tdD);
         tbl.appendChild(tr);
       });
 
@@ -2273,32 +2324,228 @@ function renderEditor(){
     sb.appendChild(arb);
     wrap.appendChild(sb);
   });
+  wrap.scrollTop=_keepScroll;
+  segSearchRefresh();
   renderPreview();
+}
+
+/* ▲▼ 格子跨行移动按钮列 */
+function mkSegVCol(si,li,gi){
+  var col=document.createElement('span');col.className='seg-vcol';
+  var up=document.createElement('button');up.className='btn-seg-vert';up.textContent='▲';up.title='移到上一行末尾';up.type='button';
+  if(li===0)up.disabled=true;
+  up.onclick=(function(si,li,gi){return function(e){e.stopPropagation();moveSegVert(si,li,gi,-1);};})(si,li,gi);
+  var dn=document.createElement('button');dn.className='btn-seg-vert';dn.textContent='▼';dn.title='移到下一行开头';dn.type='button';
+  if(li>=data[si].lines.length-1)dn.disabled=true;
+  dn.onclick=(function(si,li,gi){return function(e){e.stopPropagation();moveSegVert(si,li,gi,1);};})(si,li,gi);
+  col.appendChild(up);col.appendChild(dn);
+  return col;
 }
 
 function addSection(){saveUndo();data.push({name:'新段落',lines:[{bold:false,segs:[{chord:'',n:'',lyric:''}]}]});renderEditor();}
 function moveSection(si,dir){
   var ni=si+dir;
   if(ni<0||ni>=data.length)return;
+  var oldTopA=elTop('.sec-block[data-si="'+si+'"]');
+  var oldTopB=elTop('.sec-block[data-si="'+ni+'"]');
   saveUndo();
   var tmp=data[si];data[si]=data[ni];data[ni]=tmp;
   if(curSi===si)curSi=ni;else if(curSi===ni)curSi=si;
   renderEditor();if(curSi>=0)reactivate();
+  var movedEl=document.querySelector('.sec-block[data-si="'+ni+'"]');
+  var otherEl=document.querySelector('.sec-block[data-si="'+si+'"]');
+  flipFromTops([{el:movedEl,oldTop:oldTopA},{el:otherEl,oldTop:oldTopB}]);
+  revealMoved(movedEl);
 }
 function delSection(si){saveUndo();data.splice(si,1);if(curSi===si){curSi=-1;curLi=-1;curGi=-1;}renderEditor();}
 function addLine(si){saveUndo();data[si].lines.push({bold:false,segs:[{chord:'',n:'',lyric:''}]});renderEditor();}
 function moveLine(si,li,dir){
   var ni=li+dir;
   if(ni<0||ni>=data[si].lines.length)return;
+  var oldTopA=elTop('.row-block[data-row="'+si+'-'+li+'"]');
+  var oldTopB=elTop('.row-block[data-row="'+si+'-'+ni+'"]');
   saveUndo();
   var tmp=data[si].lines[li];data[si].lines[li]=data[si].lines[ni];data[si].lines[ni]=tmp;
   if(curSi===si&&curLi===li)curLi=ni;else if(curSi===si&&curLi===ni)curLi=li;
   renderEditor();if(curSi>=0)reactivate();
+  var movedEl=document.querySelector('.row-block[data-row="'+si+'-'+ni+'"]');
+  var otherEl=document.querySelector('.row-block[data-row="'+si+'-'+li+'"]');
+  flipFromTops([{el:movedEl,oldTop:oldTopA},{el:otherEl,oldTop:oldTopB}]);
+  revealMoved(movedEl);
 }
 function delLine(si,li){saveUndo();data[si].lines.splice(li,1);renderEditor();}
 function addSeg(si,li){data[si].lines[li].segs.push({chord:'',n:'',lyric:''});renderEditor();}
 function addLabelSeg(si,li){data[si].lines[li].segs.push({label:'Chorus'});renderEditor();renderPreview();}
 function delSeg(si,li,gi){data[si].lines[li].segs.splice(gi,1);renderEditor();}
+/* 格子跨行上下移动：dir=-1 移到上一行末尾，dir=+1 移到下一行开头 */
+function moveSegVert(si,li,gi,dir){
+  var lines=data[si]&&data[si].lines;
+  if(!lines)return;
+  var ti=li+dir;
+  if(ti<0||ti>=lines.length)return;
+  saveUndo();
+  var seg=lines[li].segs.splice(gi,1)[0];
+  var ngi;
+  if(dir<0){lines[ti].segs.push(seg);ngi=lines[ti].segs.length-1;}
+  else{lines[ti].segs.unshift(seg);ngi=0;}
+  if(curSi===si){
+    if(curLi===li){
+      if(curGi===gi){curLi=ti;curGi=ngi;}
+      else if(curGi>gi)curGi--;
+    }else if(curLi===ti&&dir>0){curGi++;}
+  }
+  renderEditor();if(curSi>=0)reactivate();
+  revealMoved(document.querySelector('.seg-row[data-loc="'+si+'-'+ti+'-'+ngi+'"]'));
+}
+
+/* ════════════════════════════════════════
+   移动/定位可视反馈：flash + FLIP + 滚动跟随
+════════════════════════════════════════ */
+function elTop(sel){
+  var el=document.querySelector(sel);
+  return el?el.getBoundingClientRect().top:null;
+}
+function flashEl(el){
+  if(!el)return;
+  el.classList.remove('seg-flash');
+  void el.offsetWidth;
+  el.classList.add('seg-flash');
+  setTimeout(function(){el.classList.remove('seg-flash');},1300);
+}
+function revealMoved(el){
+  if(!el)return;
+  flashEl(el);
+  // 等 FLIP 过渡（180ms）结束后再跟随滚动，避免按旧位置计算
+  setTimeout(function(){
+    if(el.isConnected)el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  },230);
+}
+/* FLIP：先记录旧位置，重渲染后反向位移再过渡归零 */
+function flipFromTops(items){
+  var moved=[];
+  items.forEach(function(it){
+    if(!it.el||it.oldTop==null)return;
+    var d=it.oldTop-it.el.getBoundingClientRect().top;
+    if(Math.abs(d)<1)return;
+    it.el.style.transition='none';
+    it.el.style.transform='translateY('+d+'px)';
+    moved.push(it.el);
+  });
+  if(!moved.length)return;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    moved.forEach(function(el){
+      el.style.transition='transform 180ms ease';
+      el.style.transform='';
+    });
+    setTimeout(function(){
+      moved.forEach(function(el){el.style.transition='';el.style.transform='';});
+    },240);
+  });});
+}
+/* 预览点击 → 编辑区定位 */
+function previewSegClick(si,li,gi){
+  var seg=data[si]&&data[si].lines[li]&&data[si].lines[li].segs[gi];
+  if(!seg)return;
+  if(!segIsLabelBlock(seg))focusSeg(si,li,gi,true);
+  var row=document.querySelector('.seg-row[data-loc="'+si+'-'+li+'-'+gi+'"]');
+  if(row){
+    row.scrollIntoView({block:'center',behavior:'smooth'});
+    flashEl(row);
+  }
+}
+
+/* ════════════════════════════════════════
+   编辑器内搜索定位
+════════════════════════════════════════ */
+var segSearchTerm='';
+var segSearchHits=[];
+var segSearchIdx=-1;
+var segSearchTimer=null;
+function segSearchCollect(){
+  segSearchHits=[];
+  var t=segSearchTerm.toLowerCase();
+  if(!t)return;
+  function has(v){return typeof v==='string'&&v.toLowerCase().indexOf(t)>=0;}
+  data.forEach(function(sec,si){
+    if(has(sec.name))segSearchHits.push({type:'sec',si:si});
+    sec.lines.forEach(function(line,li){
+      line.segs.forEach(function(seg,gi){
+        var hit=segIsLabelBlock(seg)
+          ?has(seg.label)
+          :(has(seg.lyric)||has(seg.lyric2)||has(seg.lyric3)||has(seg.lyric4)||has(seg.chord)||has(seg.n));
+        if(hit)segSearchHits.push({type:'seg',si:si,li:li,gi:gi});
+      });
+    });
+  });
+}
+function segSearchHitEl(h){
+  if(!h)return null;
+  if(h.type==='sec')return document.querySelector('.sec-block[data-si="'+h.si+'"] .sec-head');
+  return document.querySelector('.seg-row[data-loc="'+h.si+'-'+h.li+'-'+h.gi+'"]');
+}
+function segSearchMark(){
+  document.querySelectorAll('.seg-hit,.seg-hit-cur').forEach(function(el){
+    el.classList.remove('seg-hit');el.classList.remove('seg-hit-cur');
+  });
+  segSearchHits.forEach(function(h,i){
+    var el=segSearchHitEl(h);
+    if(el)el.classList.add(i===segSearchIdx?'seg-hit-cur':'seg-hit');
+  });
+  var cnt=document.getElementById('segSearchCount');
+  if(cnt)cnt.textContent=segSearchTerm?(segSearchHits.length?(segSearchIdx+1)+'/'+segSearchHits.length:'0/0'):'';
+}
+function segSearchJump(){
+  var h=segSearchHits[segSearchIdx];
+  segSearchMark();
+  if(!h)return;
+  if(h.type==='seg'){
+    var seg=data[h.si]&&data[h.si].lines[h.li]&&data[h.si].lines[h.li].segs[h.gi];
+    if(seg&&!segIsLabelBlock(seg))focusSeg(h.si,h.li,h.gi,true);
+  }
+  var el=segSearchHitEl(h);
+  if(el)el.scrollIntoView({block:'center',behavior:'smooth'});
+}
+function segSearchStep(d){
+  if(!segSearchTerm)return;
+  segSearchCollect();
+  var len=segSearchHits.length;
+  if(!len){segSearchIdx=-1;segSearchMark();return;}
+  segSearchIdx=((segSearchIdx+d)%len+len)%len;
+  segSearchJump();
+}
+function segSearchNext(){segSearchStep(1);}
+function segSearchPrev(){segSearchStep(-1);}
+function segSearchClear(){
+  segSearchTerm='';segSearchHits=[];segSearchIdx=-1;
+  var inp=document.getElementById('segSearchInput');
+  if(inp)inp.value='';
+  segSearchMark();
+}
+/* renderEditor 重建 DOM 后按当前搜索词重新标注 */
+function segSearchRefresh(){
+  if(!segSearchTerm)return;
+  segSearchCollect();
+  if(segSearchIdx>=segSearchHits.length)segSearchIdx=segSearchHits.length?0:-1;
+  segSearchMark();
+}
+function initSegSearch(){
+  var inp=document.getElementById('segSearchInput');
+  if(!inp)return;
+  inp.addEventListener('input',function(){
+    if(segSearchTimer)clearTimeout(segSearchTimer);
+    segSearchTimer=setTimeout(function(){
+      segSearchTerm=inp.value.trim();
+      segSearchIdx=segSearchTerm?0:-1;
+      segSearchCollect();
+      if(!segSearchHits.length)segSearchIdx=-1;
+      segSearchJump();
+    },150);
+  });
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();if(e.shiftKey)segSearchPrev();else segSearchNext();return;}
+    if(e.key==='Escape'){e.preventDefault();segSearchClear();inp.blur();return;}
+  });
+}
 
 /* ════════════════════════════════════════
    音符渲染
@@ -2600,16 +2847,24 @@ function renderPreview(){
     si.appendChild(img);inner.appendChild(si);
   }
 
-  data.forEach(function(sec){
+  data.forEach(function(sec,psi){
     var ps=document.createElement('div');ps.className='prev-sec';
     var pn=document.createElement('div');pn.className='prev-sec-name';pn.textContent=sec.name;ps.appendChild(pn);
-    sec.lines.forEach(function(line){
+    sec.lines.forEach(function(line,pli){
       var row=document.createElement('div');row.className='prev-row'+(line.bold?' bold':'');
       var voltaWrap=null;
-      line.segs.forEach(function(seg){
+      line.segs.forEach(function(seg,pgi){
         if(!segIsRenderableBlock(seg))return;
-        if(segIsLabelBlock(seg)){(voltaWrap||row).appendChild(segRenderLabelBlock(seg,row));return;}
+        if(segIsLabelBlock(seg)){
+          var lb=segRenderLabelBlock(seg,row);
+          var lbTag=lb.firstChild;
+          if(lbTag&&lbTag.addEventListener)lbTag.addEventListener('click',function(){previewSegClick(psi,pli,pgi);});
+          (voltaWrap||row).appendChild(lb);
+          return;
+        }
         var s=document.createElement('div');s.className='prev-seg';
+        s.setAttribute('data-loc',psi+'-'+pli+'-'+pgi);
+        s.addEventListener('click',function(){previewSegClick(psi,pli,pgi);});
         var c=document.createElement('div');c.className='p-chord'+(seg.chord?'':' empty');setChordContentEx(c,seg.chord||String.fromCharCode(160),mtSetPlainText);chordChipDecorate(c);s.appendChild(c);
         s.appendChild(renderNStr(seg.n||'',{inlineTimeSign:getSegInlineTimeSign(seg)}));
         var l=document.createElement('div');l.className='p-lyric'+(line.bold?' bold':'');setLyricContentEx(l,seg.lyric||'',mtSetPlainText);s.appendChild(l);
@@ -2798,6 +3053,11 @@ function bindToolActions(){
 ════════════════════════════════════════ */
 document.addEventListener('keydown',function(e){
   var el=document.activeElement;
+  // ⌘F / Ctrl+F → 聚焦编辑器搜索框（含焦点在输入框内时）
+  if((e.metaKey||e.ctrlKey)&&(e.key==='f'||e.key==='F')){
+    var sInp=document.getElementById('segSearchInput');
+    if(sInp){e.preventDefault();sInp.focus();sInp.select();return;}
+  }
   if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')return;
   var isMeta=e.metaKey||e.ctrlKey;
   var k=e.key;
@@ -3186,6 +3446,10 @@ Object.assign(window, {
   addLine: addLine,
   delSection: delSection,
   moveLine: moveLine,
+  moveSection: moveSection,
+  moveSegVert: moveSegVert,
+  segSearchNext: segSearchNext,
+  segSearchPrev: segSearchPrev,
   delLine: delLine,
   setOct: setOct,
   setDur: setDur,
@@ -3227,6 +3491,7 @@ Object.assign(window, {
 bindTopbarActions();
 bindToolActions();
 refreshTupletBtns();
+initSegSearch();
 renderEditor();
 updateInputState();
 initDualBuilder();
