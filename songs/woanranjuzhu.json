@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/woanranjuzhu.lrc",
   "youtube": "https://youtu.be/kNOuWvdPgiA?si=CzILpatpgFDfH9Px",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/woanranjuzhuG.jpg",
-  "sections": [
+ "sections": [
   {
     "name": "我安然居住",
     "lines": [
@@ -63,7 +63,7 @@
         {"chord":"{sp}{sp}{sp} G","n":"6_ ( 5_ 5 ) sp","lyric":"呼求，"},
         {"chord":"D/F#","n":"0_ 6__ 7__ sp | sp","lyric":"{sp}享受"},
         {"chord":"Em7","n":"1'_ 3_","lyric":"在祢"},
-        {"chord":"{sp}{sp}{sp}{sp}{sp}Bm7","n":"1'_ ( 7_ sp 7_ ) ( 6__ 5__ 5 ) sp | sp","lyric":"的荣 {sp} 耀"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}Bm7","n":"1'_ ( 7_ sp 7_ ) 6__ 5__ ~2 ~ 5 sp | sp","lyric":"的荣 {sp} 耀"},
         {"chord":"Am7","n":"( 6_ 1'_ )","lyric":"圣"},
         {"chord":"{sp}{sp}{sp}Dsus4","n":"3'_ ( 2'_ 2' ) - sp |","lyric":"洁中。"},
         {"label":"Chorus","dx":75},
@@ -90,7 +90,7 @@
         {"chord":"Em7","n":"2'_ ( 1'_ 1' ) -","lyric":"靠，"},
         {"label":"尾句"},
         {"chord":"","n":"0_ 6__ 7__ sp | sp","lyric":"{sp}耶和"},
-        {"chord":"Am7","n":"( 1· sp 1'__ ) 1'__","lyric":"华{sp}{sp}使"},
+        {"chord":"Am7","n":"1· sp 1'__ ~2 ~ 1'__","lyric":"华{sp}{sp}使"},
         {"chord":"C/D","n":"1'_ 2'_","lyric":"我安"},
         {"chord":"","n":"6__ 7·_ sp | sp","lyric":"然居"},
         {"chord":"G","n":"1' sp - sp - sp - sp ||/","lyric":"住。"}
