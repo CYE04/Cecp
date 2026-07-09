@@ -564,7 +564,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .seg-row-sel{background:rgba(240,192,64,0.16);}
 #previewWrap .prev-seg{cursor:pointer;border-radius:4px;}
 #previewWrap .prev-seg:hover{background:rgba(124,106,247,0.10);box-shadow:0 0 0 1px rgba(124,106,247,0.38);}
-#previewWrap .sec-label{cursor:pointer;}
+#previewWrap .sec-label{cursor:grab;touch-action:none;}
+#previewWrap .sec-label:active{cursor:grabbing;}
 /* 和弦/歌词输入框：聚焦时原地浮起放大，方便编辑长内容 */
 .seg-table .inp-chord:focus,.seg-table .inp-lyric:focus{
   position:absolute;top:-2px;z-index:40;
@@ -1274,7 +1275,8 @@ function segRenderLabelBlock(seg,row){
   var jump=seg.style==='jump';
   tag.className='sec-label'+(jump?' sec-label-jump':'');
   var color=secLabelColor(seg.label);
-  var base='display:inline-block;position:absolute;left:0;top:16px;white-space:nowrap;line-height:1.4;font-size:0.58em;padding:0 7px;border-radius:999px;box-sizing:border-box;letter-spacing:0.4px;z-index:2;';
+  var dx=Number(seg.dx)||0;
+  var base='display:inline-block;position:absolute;left:'+dx+'px;top:16px;white-space:nowrap;line-height:1.4;font-size:0.58em;padding:0 7px;border-radius:999px;box-sizing:border-box;letter-spacing:0.4px;z-index:2;';
   if(jump){
     tag.style.cssText=base+'font-style:italic;font-weight:600;color:'+color+';border:1px solid '+color+';background:transparent;opacity:0.92;';
   }else{
@@ -2224,9 +2226,29 @@ function renderEditor(){
           };})(si,li,gi);
           jmpWrap.appendChild(jmpCb);
           jmpWrap.appendChild(document.createTextNode('跳转样式'));
+          // 横向偏移（px，可负；不影响锚点格子，只微调标记位置）
+          var dxWrap=document.createElement('label');
+          dxWrap.style.cssText='display:flex;align-items:center;gap:3px;font-size:9px;color:var(--ink3);white-space:nowrap;flex:none;';
+          dxWrap.appendChild(document.createTextNode('偏移'));
+          var dxInp=document.createElement('input');
+          dxInp.type='number';
+          dxInp.step='5';
+          dxInp.placeholder='0';
+          dxInp.value=(seg.dx!=null&&seg.dx!=='')?seg.dx:'';
+          dxInp.title='标记横向偏移（px，正右负左；也可先用拖动/▲▼换锚点格子再微调）';
+          dxInp.style.cssText='width:56px;';
+          dxInp.oninput=(function(si,li,gi){return function(){
+            var v=Number(this.value);
+            if(this.value===''||isNaN(v)||v===0)delete data[si].lines[li].segs[gi].dx;
+            else data[si].lines[li].segs[gi].dx=v;
+            renderPreview();
+          };})(si,li,gi);
+          dxWrap.appendChild(dxInp);
+          dxWrap.appendChild(document.createTextNode('px'));
           wrapLab.appendChild(pill);
           wrapLab.appendChild(inpLab);
           wrapLab.appendChild(jmpWrap);
+          wrapLab.appendChild(dxWrap);
           tdLab.appendChild(wrapLab);tr.appendChild(tdLab);
           var tdDelLab=document.createElement('td');
           var delWrapLab=document.createElement('div');delWrapLab.className='seg-del-wrap';
@@ -2537,6 +2559,40 @@ function flipFromTops(items){
       moved.forEach(function(el){el.style.transition='';el.style.transform='';});
     },240);
   });});
+}
+/* 预览里直接拖动段落标记：水平拖 = 调整 dx 偏移；原地点击 = 定位编辑行 */
+function startLabelDrag(ev,si,li,gi,tag){
+  var seg=data[si]&&data[si].lines[li]&&data[si].lines[li].segs[gi];
+  if(!seg||!segIsLabelBlock(seg))return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  var startX=ev.clientX;
+  var baseDx=Number(seg.dx)||0;
+  // 预览可能被 fitPreview 整体缩放，把屏幕位移换算回内容像素
+  var scale=1;
+  var inner=document.querySelector('#previewWrap .prev-inner');
+  if(inner&&inner.offsetWidth){
+    var ir=inner.getBoundingClientRect();
+    if(ir.width)scale=ir.width/inner.offsetWidth;
+  }
+  var moved=false;
+  function delta(e2){return (e2.clientX-startX)/scale;}
+  function onMove(e2){
+    var d=delta(e2);
+    if(Math.abs(d)>3)moved=true;
+    if(moved)tag.style.left=(baseDx+d)+'px';
+  }
+  function onUp(e2){
+    document.removeEventListener('pointermove',onMove);
+    document.removeEventListener('pointerup',onUp);
+    if(!moved){previewSegClick(si,li,gi);return;}
+    var nv=Math.round(baseDx+delta(e2));
+    saveUndo();
+    if(nv===0)delete seg.dx;else seg.dx=nv;
+    renderEditor();
+  }
+  document.addEventListener('pointermove',onMove);
+  document.addEventListener('pointerup',onUp);
 }
 /* 预览点击 → 编辑区定位 */
 function previewSegClick(si,li,gi){
@@ -2954,7 +3010,10 @@ function renderPreview(){
         if(segIsLabelBlock(seg)){
           var lb=segRenderLabelBlock(seg,row);
           var lbTag=lb.firstChild;
-          if(lbTag&&lbTag.addEventListener)lbTag.addEventListener('click',function(){previewSegClick(psi,pli,pgi);});
+          if(lbTag){
+            lbTag.title='按住左右拖动调整位置 · 点击定位编辑行';
+            lbTag.addEventListener('pointerdown',function(ev){startLabelDrag(ev,psi,pli,pgi,lbTag);});
+          }
           (voltaWrap||row).appendChild(lb);
           return;
         }
@@ -3015,6 +3074,7 @@ function renderCode(){
         if(segIsLabelBlock(seg)){
           var lobj={label:seg.label};
           if(seg.style)lobj.style=seg.style;
+          if(Number(seg.dx))lobj.dx=Number(seg.dx);
           lines.push('        '+JSON.stringify(lobj)+(lastSeg?'':','));
           return;
         }
