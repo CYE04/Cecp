@@ -561,9 +561,22 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .seg-flash{animation:segFlashKF 1.2s ease-out;}
 .seg-hit{background:rgba(240,192,64,0.10);}
 .seg-hit-cur{background:rgba(240,192,64,0.26);outline:1px solid rgba(240,192,64,0.55);}
+.seg-row-sel{background:rgba(240,192,64,0.16);}
 #previewWrap .prev-seg{cursor:pointer;border-radius:4px;}
 #previewWrap .prev-seg:hover{background:rgba(124,106,247,0.10);box-shadow:0 0 0 1px rgba(124,106,247,0.38);}
 #previewWrap .sec-label{cursor:pointer;}
+/* 和弦/歌词输入框：聚焦时原地浮起放大，方便编辑长内容 */
+.seg-table .inp-chord:focus,.seg-table .inp-lyric:focus{
+  position:absolute;top:-2px;z-index:40;
+  max-width:none;width:230px;
+  font-size:13px!important;opacity:1!important;
+  padding:5px 7px;
+  background:var(--panel);
+  border-color:var(--accent);
+  box-shadow:0 6px 18px rgba(0,0,0,0.45),0 0 0 1px var(--accent);
+}
+.seg-table .inp-chord:focus{left:0;}
+.seg-table .inp-lyric:focus{right:0;}
 
 @media (prefers-color-scheme: light){
   :root{
@@ -609,8 +622,12 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   :root{--flash-bg:rgba(74,108,255,0.24);}
   .seg-hit{background:rgba(192,138,16,0.12);}
   .seg-hit-cur{background:rgba(192,138,16,0.28);outline-color:rgba(192,138,16,0.55);}
+  .seg-row-sel{background:rgba(192,138,16,0.18);}
   #previewWrap .prev-seg:hover{background:rgba(74,108,255,0.10);box-shadow:0 0 0 1px rgba(74,108,255,0.35);}
   .row-block.row-empty{background:rgba(192,138,16,0.06);}
+  .seg-table .inp-chord:focus,.seg-table .inp-lyric:focus{
+    box-shadow:0 6px 18px rgba(15,23,42,0.20),0 0 0 1px var(--accent);
+  }
 }
 
 @media (max-width: 1100px){
@@ -1013,7 +1030,7 @@ var inlineDualTop='1', inlineDualBot='5';
 var accidental='';
 var inputMode='insert';
 var tokClipboard=[]; // 存 token 数组
-var segClipboard=null; // 存整格子
+var segClipboard=null; // 存格子数组（单格 = 长度 1）
 
 /* ════════════════════════════════════════
    撤销
@@ -1027,6 +1044,7 @@ function undoAction(){
   if(!undoStack.length)return;
   var s=JSON.parse(undoStack.pop());
   data=s.d; curSi=s.si; curLi=s.li; curGi=s.gi; curTok=s.ct; selA=s.sa; selB=s.sb;
+  clearSegSel();
   renderEditor();
   if(curSi>=0)reactivate();
 }
@@ -1457,7 +1475,8 @@ function mtMakeSpBtn(inp,commit){
 }
 function mtWrapWithSpBtn(inp,commit){
   var wrap=document.createElement('div');
-  wrap.style.cssText='display:flex;align-items:center;gap:2px;';
+  wrap.className='sp-wrap';
+  wrap.style.cssText='display:flex;align-items:center;gap:2px;position:relative;min-height:23px;';
   wrap.appendChild(inp);
   wrap.appendChild(mtMakeSpBtn(inp,commit));
   return wrap;
@@ -1828,32 +1847,82 @@ function cutToks(){copyToks();deleteSelected();}
 function pasteToks(){
   if(tokClipboard.length)insertToks(tokClipboard.slice());
 }
+/* ── 格子多选（Shift+点击同一行的另一个格子） ── */
+var segSelAnchor=-1, segSelEnd=-1;
+function getSegSelRange(){
+  if(segSelAnchor<0||segSelEnd<0)return null;
+  return {lo:Math.min(segSelAnchor,segSelEnd),hi:Math.max(segSelAnchor,segSelEnd)};
+}
+function clearSegSel(){segSelAnchor=-1;segSelEnd=-1;}
+function segSelectTo(gi){
+  if(curSi<0)return;
+  if(segSelAnchor<0)segSelAnchor=curGi;
+  segSelEnd=gi;
+  markSegSel();
+  updateStatus();
+}
+function markSegSel(){
+  document.querySelectorAll('.seg-row-sel').forEach(function(el){el.classList.remove('seg-row-sel');});
+  var r=getSegSelRange();
+  if(!r||curSi<0)return;
+  for(var g=r.lo;g<=r.hi;g++){
+    var row=document.querySelector('.seg-row[data-loc="'+curSi+'-'+curLi+'-'+g+'"]');
+    if(row)row.classList.add('seg-row-sel');
+  }
+}
+/* segClipboard 现在是数组：单格 = 长度 1 */
 function copySeg(){
   if(curSi<0)return;
-  segClipboard=JSON.parse(JSON.stringify(data[curSi].lines[curLi].segs[curGi]));
+  var segs=data[curSi].lines[curLi].segs;
+  var r=getSegSelRange();
+  if(r){
+    var hi=Math.min(r.hi,segs.length-1);
+    segClipboard=JSON.parse(JSON.stringify(segs.slice(r.lo,hi+1)));
+  }else{
+    segClipboard=JSON.parse(JSON.stringify([segs[curGi]]));
+  }
   updateStatus();
 }
 function cutSeg(){
-  copySeg();
   if(curSi<0)return;
+  copySeg();
   saveUndo();
-  delSeg(curSi,curLi,curGi);
-  curSi=-1;curLi=-1;curGi=-1;
+  var segs=data[curSi].lines[curLi].segs;
+  var r=getSegSelRange();
+  if(r){
+    var hi=Math.min(r.hi,segs.length-1);
+    segs.splice(r.lo,hi-r.lo+1);
+    clearSegSel();
+    if(segs.length){curGi=Math.min(r.lo,segs.length-1);renderEditor();reactivate();}
+    else{curSi=-1;curLi=-1;curGi=-1;renderEditor();updateStatus();}
+  }else{
+    segs.splice(curGi,1);
+    if(segs.length){curGi=Math.min(curGi,segs.length-1);renderEditor();reactivate();}
+    else{curSi=-1;curLi=-1;curGi=-1;renderEditor();updateStatus();}
+  }
 }
 function pasteSeg(){
-  if(!segClipboard||curSi<0)return;
+  if(!segClipboard||!segClipboard.length||curSi<0)return;
   saveUndo();
-  var copy=JSON.parse(JSON.stringify(segClipboard));
+  var copies=JSON.parse(JSON.stringify(segClipboard));
   // 粘贴到当前格子后面
-  data[curSi].lines[curLi].segs.splice(curGi+1,0,copy);
-  curGi=curGi+1;
+  var segs=data[curSi].lines[curLi].segs;
+  Array.prototype.splice.apply(segs,[curGi+1,0].concat(copies));
+  curGi=curGi+copies.length;
+  clearSegSel();
   renderEditor();reactivate();
 }
 function pasteSegReplace(){
-  if(!segClipboard||curSi<0)return;
+  if(!segClipboard||!segClipboard.length||curSi<0)return;
   saveUndo();
-  var copy=JSON.parse(JSON.stringify(segClipboard));
-  data[curSi].lines[curLi].segs[curGi]=copy;
+  var copies=JSON.parse(JSON.stringify(segClipboard));
+  var segs=data[curSi].lines[curLi].segs;
+  var r=getSegSelRange();
+  var lo=r?r.lo:curGi;
+  var cnt=r?(Math.min(r.hi,segs.length-1)-r.lo+1):1;
+  Array.prototype.splice.apply(segs,[lo,cnt].concat(copies));
+  curGi=Math.min(lo+copies.length-1,segs.length-1);
+  clearSegSel();
   renderEditor();reactivate();
 }
 
@@ -1878,7 +1947,7 @@ function moveCursor(dir){
    focusSeg + 状态栏
 ════════════════════════════════════════ */
 function focusSeg(si,li,gi,reset){
-  if(reset||(si!==curSi||li!==curLi||gi!==curGi)){curTok=-1;clearSel();}
+  if(reset||(si!==curSi||li!==curLi||gi!==curGi)){curTok=-1;clearSel();clearSegSel();markSegSel();}
   curSi=si;curLi=li;curGi=gi;
   reactivate();
   updateStatus();
@@ -1900,23 +1969,30 @@ function updateStatus(){
   var tip=document.getElementById('statusTip');
   var selectStat=document.getElementById('is-select');
   var clipStat=document.getElementById('is-clip');
+  var segClipTxt=(segClipboard&&segClipboard.length)?segClipboard.length+' 格':(tokClipboard.length?tokClipboard.length+' 项':'空');
   if(curSi<0){
     loc.textContent='点击左边格子开始编辑';
     sel.textContent=''; tip.textContent='';
     if(selectStat)selectStat.textContent='0';
-    if(clipStat)clipStat.textContent=segClipboard?'整格':(tokClipboard.length?tokClipboard.length+' 项':'空');
+    if(clipStat)clipStat.textContent=segClipTxt;
     return;
   }
   loc.textContent=data[curSi].name+' 行'+(curLi+1)+' 格'+(curGi+1);
+  var segRange=getSegSelRange();
   var range=getSelRange();
   var toks=getToks();
-  if(range){
+  if(segRange){
+    var scnt=segRange.hi-segRange.lo+1;
+    sel.textContent='已选 '+scnt+' 格';
+    tip.textContent='Alt+C复制 Alt+X剪切 Alt+R覆盖替换 | Esc取消';
+    if(selectStat)selectStat.textContent=String(scnt);
+  } else if(range){
     var cnt=Math.min(range.hi,toks.length-1)-range.lo+1;
     sel.textContent='已选 '+cnt+' 个';
     tip.textContent='⌘C复制 ⌘X剪切 ⌘V粘贴 | Alt+C/V/R 格子操作';
     if(selectStat)selectStat.textContent=String(cnt);
-  } else if(segClipboard){
-    sel.textContent='格子已复制';
+  } else if(segClipboard&&segClipboard.length){
+    sel.textContent='已复制 '+segClipboard.length+' 格';
     tip.textContent='Alt+V插到后面 Alt+R覆盖当前 | 剪贴板: '+(tokClipboard.length?tokClipboard.join(' '):'空');
     if(selectStat)selectStat.textContent='0';
   } else if(tokClipboard.length){
@@ -1924,11 +2000,11 @@ function updateStatus(){
     tip.textContent='剪贴板: '+tokClipboard.join(' ');
     if(selectStat)selectStat.textContent='0';
   } else {
-    sel.textContent=''; tip.textContent='Alt+C 复制格子';
+    sel.textContent=''; tip.textContent='Alt+C 复制格子 · Shift+点击另一格可多选';
     if(selectStat)selectStat.textContent='0';
   }
   if(clipStat){
-    clipStat.textContent=segClipboard?'整格':(tokClipboard.length?tokClipboard.length+' 项':'空');
+    clipStat.textContent=segClipTxt;
   }
 }
 
@@ -2177,6 +2253,7 @@ function renderEditor(){
         tf.setAttribute('data-key',key);
         tf.onclick=(function(si,li,gi){return function(e){
           if(e.target===tf){
+            if(e.shiftKey&&curSi===si&&curLi===li&&curGi!==gi){segSelectTo(gi);return;}
             if(curSi===si&&curLi===li&&curGi===gi)clickEnd(e.shiftKey);
             else focusSeg(si,li,gi,true);
           }
@@ -2193,6 +2270,7 @@ function renderEditor(){
             chip.className=classes;chip.textContent=tok;
             chip.onclick=(function(si,li,gi,ti){return function(e){
               e.stopPropagation();
+              if(e.shiftKey&&curSi===si&&curLi===li&&curGi!==gi){segSelectTo(gi);return;}
               if(curSi===si&&curLi===li&&curGi===gi)clickToken(ti,e.shiftKey);
               else{curSi=si;curLi=li;curGi=gi;selA=ti;selB=ti;curTok=ti;renderEditor();reactivate();}
             };})(si,li,gi,ti);
@@ -2204,6 +2282,7 @@ function renderEditor(){
         endSpan.textContent='▏';
         endSpan.onclick=(function(si,li,gi){return function(e){
           e.stopPropagation();
+          if(e.shiftKey&&curSi===si&&curLi===li&&curGi!==gi){segSelectTo(gi);return;}
           if(curSi===si&&curLi===li&&curGi===gi)clickEnd(e.shiftKey);
           else focusSeg(si,li,gi,true);
         };})(si,li,gi);
@@ -2326,17 +2405,19 @@ function renderEditor(){
   });
   wrap.scrollTop=_keepScroll;
   segSearchRefresh();
+  markSegSel();
   renderPreview();
 }
 
-/* ▲▼ 格子跨行移动按钮列 */
+/* ▲▼ 格子上下移动按钮列 */
 function mkSegVCol(si,li,gi){
   var col=document.createElement('span');col.className='seg-vcol';
-  var up=document.createElement('button');up.className='btn-seg-vert';up.textContent='▲';up.title='移到上一行末尾';up.type='button';
-  if(li===0)up.disabled=true;
+  var segCnt=data[si].lines[li].segs.length;
+  var up=document.createElement('button');up.className='btn-seg-vert';up.textContent='▲';up.title='上移一格（行首时移到上一行末尾）';up.type='button';
+  if(li===0&&gi===0)up.disabled=true;
   up.onclick=(function(si,li,gi){return function(e){e.stopPropagation();moveSegVert(si,li,gi,-1);};})(si,li,gi);
-  var dn=document.createElement('button');dn.className='btn-seg-vert';dn.textContent='▼';dn.title='移到下一行开头';dn.type='button';
-  if(li>=data[si].lines.length-1)dn.disabled=true;
+  var dn=document.createElement('button');dn.className='btn-seg-vert';dn.textContent='▼';dn.title='下移一格（行尾时移到下一行开头）';dn.type='button';
+  if(li>=data[si].lines.length-1&&gi>=segCnt-1)dn.disabled=true;
   dn.onclick=(function(si,li,gi){return function(e){e.stopPropagation();moveSegVert(si,li,gi,1);};})(si,li,gi);
   col.appendChild(up);col.appendChild(dn);
   return col;
@@ -2376,26 +2457,41 @@ function moveLine(si,li,dir){
 function delLine(si,li){saveUndo();data[si].lines.splice(li,1);renderEditor();}
 function addSeg(si,li){data[si].lines[li].segs.push({chord:'',n:'',lyric:''});renderEditor();}
 function addLabelSeg(si,li){data[si].lines[li].segs.push({label:'Chorus'});renderEditor();renderPreview();}
-function delSeg(si,li,gi){data[si].lines[li].segs.splice(gi,1);renderEditor();}
-/* 格子跨行上下移动：dir=-1 移到上一行末尾，dir=+1 移到下一行开头 */
+function delSeg(si,li,gi){clearSegSel();data[si].lines[li].segs.splice(gi,1);renderEditor();}
+/* 格子上下移动一格：同一行内与相邻格子交换；行首再上移→上一行末尾，行尾再下移→下一行开头 */
 function moveSegVert(si,li,gi,dir){
   var lines=data[si]&&data[si].lines;
-  if(!lines)return;
-  var ti=li+dir;
-  if(ti<0||ti>=lines.length)return;
-  saveUndo();
-  var seg=lines[li].segs.splice(gi,1)[0];
-  var ngi;
-  if(dir<0){lines[ti].segs.push(seg);ngi=lines[ti].segs.length-1;}
-  else{lines[ti].segs.unshift(seg);ngi=0;}
-  if(curSi===si){
-    if(curLi===li){
-      if(curGi===gi){curLi=ti;curGi=ngi;}
-      else if(curGi>gi)curGi--;
-    }else if(curLi===ti&&dir>0){curGi++;}
+  if(!lines||!lines[li])return;
+  var segs=lines[li].segs;
+  var nli,ngi;
+  var swapWith=gi+dir;
+  if(swapWith>=0&&swapWith<segs.length){
+    // 同行内交换
+    saveUndo();
+    var tmp=segs[swapWith];segs[swapWith]=segs[gi];segs[gi]=tmp;
+    if(curSi===si&&curLi===li){
+      if(curGi===gi)curGi=swapWith;
+      else if(curGi===swapWith)curGi=gi;
+    }
+    nli=li;ngi=swapWith;
+  }else{
+    // 跨行：行首上移 / 行尾下移
+    var ti=li+dir;
+    if(ti<0||ti>=lines.length)return;
+    saveUndo();
+    var seg=segs.splice(gi,1)[0];
+    if(dir<0){lines[ti].segs.push(seg);ngi=lines[ti].segs.length-1;}
+    else{lines[ti].segs.unshift(seg);ngi=0;}
+    nli=ti;
+    if(curSi===si){
+      if(curLi===li){
+        if(curGi===gi){curLi=ti;curGi=ngi;}
+        else if(curGi>gi)curGi--;
+      }else if(curLi===ti&&dir>0){curGi++;}
+    }
   }
   renderEditor();if(curSi>=0)reactivate();
-  revealMoved(document.querySelector('.seg-row[data-loc="'+si+'-'+ti+'-'+ngi+'"]'));
+  revealMoved(document.querySelector('.seg-row[data-loc="'+si+'-'+nli+'-'+ngi+'"]'));
 }
 
 /* ════════════════════════════════════════
@@ -3093,7 +3189,7 @@ document.addEventListener('keydown',function(e){
   if(k===' '){e.preventDefault();appendTok(buildSpacerTok());return;}
   if(k==='\\\\' || k==='-'){e.preventDefault();inputSpecial('-');return;}
   if(k==='Backspace'){e.preventDefault();deleteSelected();return;}
-  if(k==='Escape'){e.preventDefault();clearSel();renderEditor();reactivate();updateStatus();return;}
+  if(k==='Escape'){e.preventDefault();clearSel();clearSegSel();renderEditor();reactivate();updateStatus();return;}
   if(k==='ArrowLeft'){e.preventDefault();moveCursor('left');return;}
   if(k==='ArrowRight'){e.preventDefault();moveCursor('right');return;}
   if(k==='ArrowUp'){e.preventDefault();var os=['low2','low1','mid','high1','high2'];var i=os.indexOf(oct);if(i<os.length-1)setOct(os[i+1]);return;}
@@ -3419,7 +3515,7 @@ function updateInputState(){
     voltaPill.classList.toggle('accent',voltaStr==='无');
   }
   var clip=document.getElementById('is-clip');
-  if(clip)clip.textContent=segClipboard?'整格':(tokClipboard.length?tokClipboard.length+' 项':'空');
+  if(clip)clip.textContent=(segClipboard&&segClipboard.length)?segClipboard.length+' 格':(tokClipboard.length?tokClipboard.length+' 项':'空');
   syncAccidentalUI();
 }
 
