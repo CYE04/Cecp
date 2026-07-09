@@ -1,0 +1,101 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-07-09 21:30:35",
+  "id": "woanranjuzhu",
+  "title": "我安然居住",
+  "artist": "约书亚乐团",
+  "sub": "约书亚乐团【主你是我们的太阳】(2017) 郑薇、杨丽珊词 郑嫂薇曲",
+  "origKey": "G",
+  "timeSign": "4/4",
+  "bpm": 65,
+  "mp3": "/upload/woanranzhuju.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/zhunishiwomendetaiyang.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/woanranjuzhu.lrc",
+  "youtube": "https://youtu.be/kNOuWvdPgiA?si=CzILpatpgFDfH9Px",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/woanranjuzhuG.jpg",
+  "sections": [
+  {
+    "name": "我安然居住",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"0_ 1__ 2__ sp | sp","lyric":"{sp}我来"},
+        {"chord":"G","n":"3_ 2_","lyric":"到祢"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}D/F#","n":"1_ ( 5_ sp 5 )","lyric":"宝座，"},
+        {"chord":"","n":"0_ 6__ 7__ sp | sp","lyric":"{sp}献上"},
+        {"chord":"Em7","n":"1'_ 7_","lyric":"我的"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}Bm7","n":"6_ ( 5_ sp 5 )","lyric":"祷告，"},
+        {"chord":"","n":"0_ 3__ 5__ sp | sp","lyric":"{sp}在这"},
+        {"chord":"C2","n":"6_ 5_","lyric":"宁静"},
+        {"chord":"","n":"4_ 5_","lyric":"时刻,"},
+        {"chord":"G/B","n":"0_ 4_","lyric":"{sp}我"},
+        {"chord":"","n":"3_ 1_ sp |","lyric":"听见"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"Am7","n":"1_ sp_ 2_","lyric":"祢{sp}的"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp}C/D","n":"3_ sp_ ( 2_ sp 2 )","lyric":"声{sp}音。"},
+        {"chord":"","n":"0_ 1__ 2__ sp | sp","lyric":"{sp}因为"},
+        {"chord":"G2","n":"( 3_ sp_ 2_ )","lyric":"祢"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}D/F#","n":"1_ ( 5_ sp 5 )","lyric":"的爱，"},
+        {"chord":"","n":"0_ 6__ 7__ sp | sp","lyric":"{sp}已经"},
+        {"chord":"Em7","n":"1'_ sp_ 7_","lyric":"找{sp}到"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}Bm7","n":"6_ sp_ ( 5_ sp 5 )","lyric":"了{sp}我，"},
+        {"chord":"","n":"0_ 3__ 5__ sp |","lyric":"{sp}使我"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"C2","n":"6_ sp_ 5_","lyric":"配{sp}得"},
+        {"chord":"","n":"4_ sp_ 5_","lyric":"走{sp}进"},
+        {"chord":"G/B","n":"0_ ( 4_ sp 3_ ) 1_ sp | sp","lyric":"{sp}祢{sp}{sp}的"},
+        {"chord":"","lyric":""},
+        {"chord":"Am7","n":"( 1_ sp_ 2_ )","lyric":"同"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}C/D","n":"3_ ( 2_ sp 2 ) sp","lyric":"在里。"},
+        {"chord":"B/D#","n":"0_ 6__ 7__ sp | sp","lyric":"{sp}在这"},
+        {"chord":"Em7","n":"1'_ sp_ 3_","lyric":"安{sp}静"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}Bm7","n":"1_ ( 7_ sp 7 )","lyric":"时刻，"},
+        {"chord":"","n":"0_ 6__ 5__ sp |","lyric":"{sp}祢聆"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"C2","n":"6_ 1_","lyric":"听我"},
+        {"chord":"{sp}{sp}{sp} G","n":"6_ ( 5_ 5 ) sp","lyric":"呼求，"},
+        {"chord":"D/F#","n":"0_ 6__ 7__ sp | sp","lyric":"{sp}享受"},
+        {"chord":"Em7","n":"1'_ 3_","lyric":"在祢"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}Bm7","n":"1'_ ( 7_ sp 7_ ) ( 6__ 5__ 5 ) sp | sp","lyric":"的荣 {sp} 耀"},
+        {"chord":"Am7","n":"( 6_ 1'_ )","lyric":"圣"},
+        {"chord":"{sp}{sp}{sp}Dsus4","n":"3'_ ( 2'_ 2' ) - sp |","lyric":"洁中。"},
+        {"label":"Chorus","dx":75},
+        {"chord":"{sp}{sp}{sp}{sp}D","timeSign":"2/4","n":"0_ 5__ ( 5__ sp 5_ ) 4'_ sp ||","lyric":"{sp}{sp}{sp}求你{sp}{sp}仰"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"G","n":"3'","lyric":"起"},
+        {"chord":"","n":"5'","lyric":"脸"},
+        {"chord":"","n":"7_ 1'_","lyric":"来光"},
+        {"chord":"D/F#{sp}{sp}Em7","n":"2'_ ( 2'_ | 2'_ ) 1'_","lyric":"照我"},
+        {"chord":"","n":"7_ 1'_","lyric":"的心,"},
+        {"chord":"","n":"0_ 6__ ( 6__ sp 6_ ) 5'_ sp |","lyric":"{sp}祢使{sp}{sp}我"},
+        {"chord":"Am7","n":"4' -","lyric":"心"},
+        {"chord":"Am(maj7)","n":"6_ 7__ ( 1'__ sp 1'_ ) ( 3'__ 4'/2'__ ) |","lyric":"充满了 {sp} 快"},
+        {"chord":"C/D","n":"( 3'/2'_ 2'/2'_ ) ( 2' )","lyric":"乐。"},
+        {"chord":"","n":"0_ 5__ ( 5__ sp 5_ ) ( 4'__ 3'__ ) sp |","lyric":"{sp}主啊, {sp} 祢"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"G","n":"3'·","lyric":"是"},
+        {"chord":"","n":"3'_","lyric":"我"},
+        {"chord":"B7{sp}{sp}{sp}{sp}{sp}B/D#","n":"( 6'_ 5'__ ) ( 3'__ sp 3'_ ) 2'_ sp | sp","lyric":"全{sp}然{sp}{sp}信"},
+        {"chord":"Em7","n":"2'_ ( 1'_ 1' ) -","lyric":"靠，"},
+        {"label":"尾句"},
+        {"chord":"","n":"0_ 6__ 7__ sp | sp","lyric":"{sp}耶和"},
+        {"chord":"Am7","n":"( 1· sp 1'__ ) 1'__","lyric":"华{sp}{sp}使"},
+        {"chord":"C/D","n":"1'_ 2'_","lyric":"我安"},
+        {"chord":"","n":"6__ 7·_ sp | sp","lyric":"然居"},
+        {"chord":"G","n":"1' sp - sp - sp - sp ||/","lyric":"住。"}
+      ]}
+    ]
+  }
+]
+}
