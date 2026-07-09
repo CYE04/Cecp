@@ -2870,6 +2870,7 @@ function parseJpToken(tok,opts){
   if(tok==='sp'||tok==='sp_'||tok==='sp__'){
     var fk=tok==='sp__'?'0__':tok==='sp_'?'0_':'0';
     var el=parseJpToken(fk);
+    el.className+=' jp-sp';
     var ns=el.querySelector('.jp-num')||el.querySelector('.jp-plain-sym');
     if(ns)ns.style.visibility='hidden';
     return el;
@@ -2921,9 +2922,11 @@ function makeTuplet(n){
   var nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);
   return w;
 }
-/* 双连音线锚点：零宽零高、底部对齐，渲染后用 rAF 实测邻居。
-   span=1 连接前一个音→后一个音；span=2 连接前第 2 个音→后一个音（跨过中间音，弧线抬高避让），以此类推。
-   弧线两端对齐两音水平中心、画在覆盖范围内最高元素（含高音点/时值线/连音组）上方。 */
+/* 双连音线锚点：零宽零高，渲染后用 rAF 实测定位。
+   计数规则：只数"看得见的音"（音符/休止/延音线/双行音），自动跳过 sp 占位、小节线、拍号、其他 tie，
+   并深入 ( ) 连音组与三连音内部逐音计数。
+   span=1 连接前一个音→后一个音；span=2 连接前第 2 个音→后一个音（跨过中间音，弧线抬高避让）。
+   弧线两端对齐两音水平中心、画在覆盖范围内最高元素（含高音点/时值线/连音组弧线）上方。 */
 function makeJpTie(span){
   span=span>0?span:1;
   var tie=document.createElement('span');
@@ -2931,19 +2934,32 @@ function makeJpTie(span){
   if(typeof requestAnimationFrame==='function'){
     requestAnimationFrame(function(){
       if(!tie.isConnected)return;
-      function isTie(el){return !!el&&String(el.className).indexOf('jp-tie')>=0;}
-      function descLast(el){while(el&&el.lastElementChild&&(String(el.className).indexOf('jp-slur')>=0||String(el.className).indexOf('jp-tuplet')>=0))el=el.lastElementChild;return el;}
-      function descFirst(el){while(el&&el.firstElementChild&&(String(el.className).indexOf('jp-slur')>=0||String(el.className).indexOf('jp-tuplet')>=0))el=el.firstElementChild;return el;}
-      var next=tie.nextElementSibling;
-      while(next&&isTie(next))next=next.nextElementSibling;
-      var prev=tie.previousElementSibling,cnt=0;
-      while(prev){if(!isTie(prev)){cnt++;if(cnt>=span)break;}prev=prev.previousElementSibling;}
-      if(!prev||!next||cnt<span){tie.style.display='none';return;}
-      var minTop=Infinity,walk=prev;
-      while(walk){if(!isTie(walk)){var wr=walk.getBoundingClientRect();if(wr.top<minTop)minTop=wr.top;}if(walk===next)break;walk=walk.nextElementSibling;}
-      var pEl=descLast(prev),nEl=descFirst(next);
-      var pr=pEl.getBoundingClientRect(),nr=nEl.getBoundingClientRect(),tr=tie.getBoundingClientRect();
-      var scale=pEl.offsetWidth?(pr.width/pEl.offsetWidth):1;
+      var root=(tie.closest&&tie.closest('.p-n'))||tie.parentElement;
+      if(!root){tie.style.display='none';return;}
+      var flat=[],tiePos=-1;
+      (function walk(node){
+        for(var c=node.firstElementChild;c;c=c.nextElementSibling){
+          if(c===tie){tiePos=flat.length;continue;}
+          var cn=String(c.className||'');
+          if(cn.indexOf('jp-tie')>=0||cn.indexOf('jp-bar')>=0||cn.indexOf('jp-timesig')>=0||cn.indexOf('jp-sp')>=0)continue;
+          if(cn.indexOf('jp-slur')>=0||cn.indexOf('jp-tuplet')>=0){walk(c);continue;}
+          if(cn.indexOf('jp-wrap')>=0||cn.indexOf('jp-plain')>=0||cn.indexOf('jp-dual')>=0)flat.push(c);
+        }
+      })(root);
+      var prev=(tiePos>=span)?flat[tiePos-span]:null;
+      var next=(tiePos>=0&&tiePos<flat.length)?flat[tiePos]:null;
+      if(!prev||!next){tie.style.display='none';return;}
+      var minTop=Infinity;
+      for(var k=tiePos-span;k<=tiePos;k++){
+        var el2=flat[k];
+        while(el2&&el2!==root){
+          var r2=el2.getBoundingClientRect();
+          if(r2.top<minTop)minTop=r2.top;
+          el2=el2.parentElement;
+        }
+      }
+      var pr=prev.getBoundingClientRect(),nr=next.getBoundingClientRect(),tr=tie.getBoundingClientRect();
+      var scale=prev.offsetWidth?(pr.width/prev.offsetWidth):1;
       if(!scale)scale=1;
       var x1=(pr.left+pr.width/2-tr.left)/scale;
       var x2=(nr.left+nr.width/2-tr.left)/scale;
@@ -2971,6 +2987,8 @@ function renderNStr(nStr,opts){
   if(headTimeSign)div.appendChild(makeTimeSignature(headTimeSign));
   if(!nStr||!nStr.trim())return div;
   function appendRenderedTok(parent,tk){
+    var ts2=jpTieSpan(tk);
+    if(ts2){parent.appendChild(makeJpTie(ts2));return;}
     var inlineTs=extractInlineTimeSignToken(tk);
     parent.appendChild(inlineTs?makeTimeSignature(inlineTs):parseJpToken(tk));
   }
