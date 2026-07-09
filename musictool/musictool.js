@@ -466,6 +466,9 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .jp-slur-open::before{content:'';position:absolute;top:2px;left:15%;right:-4px;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-radius:50% 0 0 0/100% 0 0 0;}
 .jp-slur-close{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px;}
 .jp-slur-close::before{content:'';position:absolute;top:2px;left:-4px;right:15%;height:8px;border-top:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:0 50% 0 0/0 100% 0 0;}
+/* ── 双连音线（~ token：连接左右相邻两音，可与连音组共享音符） ── */
+.jp-tie{display:inline-flex;width:0;height:0;position:relative;overflow:visible;pointer-events:none;}
+.jp-tie::before{content:'';position:absolute;left:var(--tie-l,-0.75em);top:var(--tie-t,-34px);width:var(--tie-w,1.5em);height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:50% 50% 0 0/100% 100% 0 0;}
 .jp-tuplet{display:inline-flex;align-items:flex-end;position:relative;padding-top:12px;margin-right:1px;}
 .jp-tuplet-br{position:absolute;top:2px;left:2px;right:2px;height:8px;border-top:1.5px solid var(--ink);border-left:1.5px solid var(--ink);border-right:1.5px solid var(--ink);border-radius:3px 3px 0 0;pointer-events:none;}
 .jp-tuplet-num{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:8px;line-height:1;padding:0 3px;background:var(--bg);color:var(--ink);pointer-events:none;}
@@ -879,6 +882,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
               <button class="kbd-btn" onclick="appendTok('|:|')" style="padding:6px 8px;">|:| 反复段</button>
               <button class="kbd-btn" onclick="appendInlineTimeSignToken()" style="padding:6px 8px;">拍号记号</button>
               <button class="kbd-btn slur-btn" id="slur-btn" onclick="toggleSlur()" style="padding:6px 8px;">( ) 连音<span class="shortcut">[ / S</span></button>
+              <button class="kbd-btn slur-btn" onclick="appendTok('~')" title="双连音线：插在两个音之间，弧线连接左右相邻两音" style="padding:6px 8px;">⌒ 双连音<span class="shortcut">N</span></button>
+              <button class="kbd-btn slur-btn" onclick="appendTok('~2')" title="跨音连线：越过中间 1 个音，连接前第 2 个音与后一个音（~3 跨 2 个音）" style="padding:6px 8px;">⌒² 跨音连<span class="shortcut">⇧N</span></button>
               <button class="kbd-btn slur-btn" id="xslur-btn" onclick="toggleXSlur()" style="padding:6px 8px;">跨线开<span class="shortcut">]</span></button>
               <button class="kbd-btn slur-btn" onclick="closeXSlur()" style="padding:6px 8px;">跨线结<span class="shortcut">X</span></button>
               <button class="kbd-btn slur-btn" id="t3-btn" onclick="toggleTuplet(3)" style="padding:6px 8px;">3连</button>
@@ -2916,6 +2921,49 @@ function makeTuplet(n){
   var nm=document.createElement('span');nm.className='jp-tuplet-num';nm.textContent=String(n);w.appendChild(nm);
   return w;
 }
+/* 双连音线锚点：零宽零高、底部对齐，渲染后用 rAF 实测邻居。
+   span=1 连接前一个音→后一个音；span=2 连接前第 2 个音→后一个音（跨过中间音，弧线抬高避让），以此类推。
+   弧线两端对齐两音水平中心、画在覆盖范围内最高元素（含高音点/时值线/连音组）上方。 */
+function makeJpTie(span){
+  span=span>0?span:1;
+  var tie=document.createElement('span');
+  tie.className='jp-tie';
+  if(typeof requestAnimationFrame==='function'){
+    requestAnimationFrame(function(){
+      if(!tie.isConnected)return;
+      function isTie(el){return !!el&&String(el.className).indexOf('jp-tie')>=0;}
+      function descLast(el){while(el&&el.lastElementChild&&(String(el.className).indexOf('jp-slur')>=0||String(el.className).indexOf('jp-tuplet')>=0))el=el.lastElementChild;return el;}
+      function descFirst(el){while(el&&el.firstElementChild&&(String(el.className).indexOf('jp-slur')>=0||String(el.className).indexOf('jp-tuplet')>=0))el=el.firstElementChild;return el;}
+      var next=tie.nextElementSibling;
+      while(next&&isTie(next))next=next.nextElementSibling;
+      var prev=tie.previousElementSibling,cnt=0;
+      while(prev){if(!isTie(prev)){cnt++;if(cnt>=span)break;}prev=prev.previousElementSibling;}
+      if(!prev||!next||cnt<span){tie.style.display='none';return;}
+      var minTop=Infinity,walk=prev;
+      while(walk){if(!isTie(walk)){var wr=walk.getBoundingClientRect();if(wr.top<minTop)minTop=wr.top;}if(walk===next)break;walk=walk.nextElementSibling;}
+      var pEl=descLast(prev),nEl=descFirst(next);
+      var pr=pEl.getBoundingClientRect(),nr=nEl.getBoundingClientRect(),tr=tie.getBoundingClientRect();
+      var scale=pEl.offsetWidth?(pr.width/pEl.offsetWidth):1;
+      if(!scale)scale=1;
+      var x1=(pr.left+pr.width/2-tr.left)/scale;
+      var x2=(nr.left+nr.width/2-tr.left)/scale;
+      var topY=(minTop-tr.top)/scale-9-(span-1)*5;
+      tie.style.setProperty('--tie-l',x1.toFixed(1)+'px');
+      tie.style.setProperty('--tie-w',Math.max(8,x2-x1).toFixed(1)+'px');
+      tie.style.setProperty('--tie-t',topY.toFixed(1)+'px');
+    });
+  }
+  return tie;
+}
+/* ~ token 解析：~ =1；~~ / ~2 =2；~~~ / ~3 =3 … 返回 0 表示不是 tie token */
+function jpTieSpan(t){
+  if(!t||t.charAt(0)!=='~')return 0;
+  var rest=t.slice(1);
+  if(!rest)return 1;
+  if(/^~+$/.test(rest))return rest.length+1;
+  if(/^[0-9]+$/.test(rest)){var n=parseInt(rest,10);return n>0?n:0;}
+  return 0;
+}
 function renderNStr(nStr,opts){
   opts=opts||{};
   var div=document.createElement('div');div.className='p-n';
@@ -2927,7 +2975,7 @@ function renderNStr(nStr,opts){
     parent.appendChild(inlineTs?makeTimeSignature(inlineTs):parseJpToken(tk));
   }
   function isDualAtom(tk){
-    if(!tk||tk==='/'||tk==='／')return false;
+    if(!tk||tk==='/'||tk==='／'||tk.charAt(0)==='~')return false;
     if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
     if(tk==='|'||tk==='||'||tk==='||/'||tk==='|]'||tk==='|:'||tk===':|'||tk==='|:|')return false;
     if(/^\\{(3|5)$/.test(tk))return false;
@@ -2950,6 +2998,8 @@ function renderNStr(nStr,opts){
     var t=toks[i];
     var inlineTs=extractInlineTimeSignToken(t);
     if(inlineTs){div.appendChild(makeTimeSignature(inlineTs));i++;continue;}
+    var tieSpan=jpTieSpan(t);
+    if(tieSpan){div.appendChild(makeJpTie(tieSpan));i++;continue;}
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')appendRenderedTok(sl,toks[i++]);div.appendChild(sl);i++;continue;}
     if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') appendRenderedTok(so,toks[i++]);div.appendChild(so);i++;continue;}
     if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)appendRenderedTok(sc,toks[i++]);div.appendChild(sc);continue;}
@@ -3271,6 +3321,8 @@ document.addEventListener('keydown',function(e){
   if(k==='f' || k==='F'){e.preventDefault();toggleFermata();return;}
   if(k==='b' || k==='B'){e.preventDefault();appendTok('|');return;}
   if(k==='m' || k==='M'){e.preventDefault();appendTok('||');return;}
+  if(k==='n'){e.preventDefault();appendTok('~');return;}
+  if(k==='N'){e.preventDefault();appendTok('~2');return;}
   if(k==='i'||k==='I'){e.preventDefault();setInputMode('insert');return;}
   if(k==='o'||k==='O'){e.preventDefault();setInputMode('overwrite');return;}
   if(k==='q'||k==='Q'){e.preventDefault();setDur('whole');return;}
@@ -3519,6 +3571,7 @@ function playTokens(tokens){
   var key=(document.getElementById('meta-key')||{}).value||'C';
   var t=ac.currentTime+0.06;
   tokens.forEach(function(tok){
+    if(tok.charAt(0)==='~')return; // 连音线不占时值
     var dur=tokDuration(tok,bpm),midi=tokenToMidi(tok,key);
     if(midi!=null)playMidi(midi,t,Math.min(dur,1.2));
     t+=dur;
