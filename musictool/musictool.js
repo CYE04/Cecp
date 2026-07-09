@@ -578,6 +578,14 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 }
 .seg-table .inp-chord:focus{left:0;}
 .seg-table .inp-lyric:focus{right:0;}
+/* 输入框浮起时，{sp} 按钮挪到浮层旁边并压在浮层之上，保持可点 */
+.seg-table .inp-chord:focus + .btn-ins-sp,
+.seg-table .inp-lyric:focus + .btn-ins-sp{
+  position:absolute;top:4px;z-index:41;
+  background:var(--panel);color:var(--accent2);border-color:var(--accent2);
+}
+.seg-table .inp-chord:focus + .btn-ins-sp{left:234px;}
+.seg-table .inp-lyric:focus + .btn-ins-sp{right:-26px;}
 
 @media (prefers-color-scheme: light){
   :root{
@@ -1463,6 +1471,8 @@ function mtMakeSpBtn(inp,commit){
   b.className='btn-ins-sp';
   b.textContent='{sp}';
   b.title='在光标处插入 {sp} 占位空格';
+  // 按下时不抢焦点：输入框保持聚焦（浮层不收起），光标位置保留
+  b.addEventListener('pointerdown',function(e){e.preventDefault();});
   b.onclick=function(){
     var v=inp.value;
     var start=inp.selectionStart,end=inp.selectionEnd;
