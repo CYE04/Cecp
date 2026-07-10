@@ -16,7 +16,7 @@
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/zhaodaowoF.jpg",
  "sections": [
   {
-    "name": "找到我",
+    "name": "主歌",
     "lines": [
       { "b": true, "line": [
         {"chord":"","lyric":""},
@@ -32,6 +32,7 @@
         {"chord":"","n":"sp 0 sp |","lyric":"{sp}","lyric2":"{sp}"}
       ]},
       { "b": true, "line": [
+        {"chord":"","lyric":""},
         {"chord":"Dm7","n":"7,_ 1__ ( 7,__ sp 7,·_ )","lyric":"不断地","lyric2":"牵引着"},
         {"chord":"{sp} {sp}Csus4","n":"( 5,__ sp 5,__ ) 3·_","lyric":"测{sp}{sp}量。","lyric2":"我{sp}{sp}心。"},
         {"chord":"","n":"sp 0 sp | sp","lyric":"{sp}","lyric2":"{sp}"},
