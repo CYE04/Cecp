@@ -35,6 +35,9 @@
     '4:3': { width: 1350, height: 1800, fileTag: '4x3', frameClass: 'is-r4x3' },
     '16:9': { width: 1920, height: 1080, fileTag: '16x9', frameClass: 'is-r16x9' }
   };
+  // 导出清晰度：目标 3x，并按 canvas 单边安全上限做 clamp（保守取 8192px）
+  // 注意：必须放在 IIFE 顶部（下方有 early return，晚声明的 var 赋值不会执行）
+  var EXPORT_MAX_CANVAS_SIDE = 8192;
 
   var TYPE_C = {
     '主日下午': { accent:'#fbff00', bg:'#b9a50d', tx:'#fffa9f'},
@@ -49,6 +52,15 @@
     ['#35556b','#73c4ff'],['#39543b','#7ad87e'],['#674848','#f08d8d'],['#5f5333','#d9c04f'],
     ['#4d5865','#b7c3d3'],['#2c6171','#7fd8f2'],['#66553f','#dbb07f'],['#4f4761','#b6a0ef'],
     ['#416746','#9be28e'],['#6b5038','#efad59'],['#5f4450','#e7a4bb'],['#355a56','#75d1c2']
+  ];
+
+  // 导出用淡彩色板：与 PAL 同索引同色系（浅底 / 同色系深字 / 描边），保证同一个人页面内外颜色对应
+  var PAL_SOFT = [
+    ['#eaf1f9','#35567c','#d3e1f0'],['#e6f4f1','#23685c','#cfe7e1'],['#f6edec','#7a4a42','#e8d5d2'],['#ecf2f7','#3d5a74','#d7e3ee'],
+    ['#f0f5e8','#4f6a2a','#dde9c9'],['#f8f0e5','#7a5626','#ecdcc4'],['#f1edfa','#5b4494','#ded3f2'],['#f9eef6','#85436f','#eed6e6'],
+    ['#e9f3fb','#2c587a','#d2e6f5'],['#eaf6ea','#2f6b33','#d2ead3'],['#faeded','#8a4040','#f0d6d6'],['#f8f4e2','#74622a','#eae0bd'],
+    ['#eef1f5','#46566a','#dbe2ea'],['#e7f5f9','#22606f','#cfe9f0'],['#f8f1e7','#6f5426','#ecdec9'],['#f0edf9','#55447e','#dfd6f1'],
+    ['#ebf6ec','#38663e','#d5ead6'],['#faf1e4','#7d5a23','#f0dfc3'],['#f9eef2','#7d4258','#eed7df'],['#e8f4f2','#2b5f58','#d0e8e4']
   ];
 
   var lockedName = null;
@@ -179,8 +191,8 @@
 }
 .cec-tbl th,.cec-tbl td{
   border-right:1px solid var(--cec-border);border-bottom:1px solid var(--cec-border);
-  vertical-align:middle;
 }
+.cec-tbl th{vertical-align:middle}
 .cec-tbl tr th:last-child,.cec-tbl tr td:last-child{border-right:none}
 .cec-corner,.cec-h{
   position:sticky;top:0;z-index:2;
@@ -195,17 +207,22 @@
   color:var(--cec-ink);
   font-size:13px;font-weight:800;
   padding:14px 12px;
+  vertical-align:middle;
   white-space:nowrap;
 }
 .cec-cell{
   min-width:140px;height:82px;padding:10px;
-  text-align:center;background:var(--cec-bg);
+  vertical-align:top;text-align:center;background:var(--cec-bg);
 }
 .cec-cell:hover{background:var(--cec-bg2)}
+.cec-cellbox{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;width:100%;height:100%;min-height:56px;
+}
 .cec-empty{color:var(--cec-ink4);font-size:14px}
 .cec-badges{
   display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
-  gap:8px;min-height:56px;
+  gap:8px;width:100%;
 }
 .cec-badge{
   display:inline-flex;align-items:center;justify-content:center;
@@ -230,7 +247,7 @@
 }
 .cec-badge.ldim{opacity:.10}
 .cec-note,.cec-reading{
-  min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;
 }
 .cec-ref{font-size:12px;font-weight:800;color:var(--cec-ref)}
 .cec-npfx{font-size:11px;font-weight:800;color:var(--cec-npfx)}
@@ -243,17 +260,15 @@
 }
 .cec-export-frame{
   position:relative;overflow:hidden;
-  background:#ffffff;
+  background:#ffffff;color:#1c2330;
 }
 .cec-export-frame,
 .cec-export-frame *{
-  color:#111111!important;
   text-shadow:none!important;
-  -webkit-text-fill-color:#111111!important;
 }
 .cec-export-watermark{
   position:absolute;left:50%;top:52%;width:72%;max-width:960px;
-  transform:translate(-50%,-50%);opacity:.075;pointer-events:none;z-index:0;
+  transform:translate(-50%,-50%);opacity:.03;pointer-events:none;z-index:0;
 }
 .cec-export-stage{
   position:absolute;inset:22px;padding:18px;border-radius:0;overflow:hidden;
@@ -271,14 +286,14 @@
   --cec-bg2:#ffffff;
   --cec-bg3:#f0f2f6;
   --cec-btn-bg:#eaecf1;
-  --cec-border:#d0d5df;
-  --cec-border2:#bcc3d1;
+  --cec-border:#e9edf3;
+  --cec-border2:#e9edf3;
   --cec-ink:#1a1d24;
   --cec-ink2:#5a6275;
   --cec-ink3:#8a94a6;
   --cec-ink4:#9aa0ad;
-  --cec-ref:#1a7a3c;
-  --cec-npfx:#7a5500;
+  --cec-ref:#3e5c8f;
+  --cec-npfx:#6b7688;
   width:max-content;max-width:none;min-width:0;padding:0;
   border-radius:0;border:0;
   background:#ffffff;
@@ -288,28 +303,26 @@
 }
 .cec-export-head{
   display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;
-  margin:0;padding:18px 22px 16px;
+  margin:0;padding:30px 34px 22px;
   background:#ffffff;
-  border-bottom:1px solid #dde5f2;
+  border-bottom:1px solid #edf0f5;
 }
-.cec-export-head-left{display:flex;flex-direction:column;gap:8px}
+.cec-export-head-left{display:flex;flex-direction:column;gap:10px}
 .cec-export-eyebrow{
-  font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#7b879c;
+  font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#a3adbd;
 }
-.cec-export-month{font-size:38px;font-weight:900;letter-spacing:.02em;line-height:1.04;color:#1b2433}
+.cec-export-month{font-size:42px;font-weight:800;letter-spacing:.01em;line-height:1.04;color:#161c26}
 .cec-export-meta{
-  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
-  align-items:center;justify-content:flex-end;gap:8px;width:max-content;
+  display:flex;align-items:baseline;justify-content:flex-end;gap:14px;
+  padding-bottom:4px;
 }
 .cec-export-chip{
-  display:inline-flex;align-items:center;justify-content:center;min-height:30px;
-  box-sizing:border-box;min-width:96px;width:calc(var(--cec-export-chip-cols,8) * 1em + 34px);
-  padding:0 12px;border-radius:999px;border:1px solid #d8e1ee;
-  background:#ffffff;color:#4b5a73;font-size:11px;font-weight:900;letter-spacing:.06em;
-  text-align:center;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:0;background:transparent;padding:0;min-width:0;
+  color:#8b95a7;font-size:12px;font-weight:700;letter-spacing:.1em;
 }
 .cec-export-chip.is-ratio{
-  border-color:#c8d4ea;background:#eef4ff;color:#2c4f96;
+  border:0;background:transparent;color:#3e5c8f;
 }
 .cec-export-sub{
   font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cec-ink3);
@@ -321,38 +334,42 @@
   background:transparent;
 }
 .cec-export-panel{
-  display:flex;flex-direction:column;overflow:hidden;border:1px solid #e2e8f3;
-  border-radius:0;background:#ffffff;box-shadow:none;
+  display:flex;flex-direction:column;overflow:hidden;border:1px solid #e9edf3;
+  border-radius:12px;background:#ffffff;box-shadow:none;
 }
 .cec-export-section{
   margin-top:0;border:none;border-radius:0;overflow:hidden;background:var(--cec-bg2);
 }
 .cec-export-label{
-  display:flex;align-items:center;gap:10px;padding:11px 14px 10px;
-  border-bottom:1px solid #e2e8f3;background:#ffffff;
-  font-size:15px;font-weight:900;color:var(--cec-ink);
+  display:flex;align-items:center;gap:10px;padding:13px 16px 12px;
+  border-bottom:1px solid #edf0f5;background:#ffffff;
+  font-size:15px;font-weight:800;color:#252d3a;
 }
+.cec-export-label .cec-dot{width:7px;height:7px;background:#3e5c8f!important}
 .cec-export-empty{
   padding:18px 16px;color:var(--cec-ink2);font-size:13px;font-weight:700;
 }
-.cec-export-card .cec-wrap{overflow:visible}
+.cec-export-card .cec-wrap{overflow:visible;background:transparent}
 .cec-export-card .cec-tbl{min-width:0;width:max-content}
 .cec-export-badge-img{
   display:block;flex:0 0 auto;overflow:visible;
 }
 .cec-export-card .cec-corner,
 .cec-export-card .cec-h{
-  position:static;padding:10px 10px;background:#f6f8fc;color:#6a778e;
-  font-size:14px;font-weight:900;
+  position:static;padding:10px 10px;background:#fafbfd;color:#7d8798;
+  font-size:14px;font-weight:800;
 }
 .cec-export-card .cec-rowlbl{
-  padding:10px 12px;background:#fbfcfe;font-size:13px;font-weight:900;line-height:1.14;
+  padding:10px 12px;background:#ffffff;font-size:13px;font-weight:800;line-height:1.14;
 }
 .cec-export-card .cec-cell{
-  min-width:132px;height:auto;padding:8px 8px;background:#ffffff;
+  min-width:132px;height:72px;padding:8px 8px;background:#ffffff;
+}
+.cec-export-card .cec-cellbox{
+  min-height:56px;gap:6px;
 }
 .cec-export-card tbody tr:nth-child(2n) .cec-rowlbl,
-.cec-export-card tbody tr:nth-child(2n) .cec-cell{background:#fcfdff}
+.cec-export-card tbody tr:nth-child(2n) .cec-cell{background:#fbfcfd}
 .cec-export-card .cec-cell:hover{background:#ffffff}
 .cec-export-card .cec-cell,
 .cec-export-card .cec-empty,
@@ -361,11 +378,11 @@
   text-align:center;
 }
 .cec-export-card .cec-badges{
-  min-height:56px;gap:8px;justify-content:center;align-items:center;align-content:center;
+  gap:8px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-badge{
   display:inline-flex;box-sizing:border-box;
-  min-height:32px;padding:6px 12px;border-radius:7px;
+  min-height:32px;padding:6px 12px;border-radius:8px;
   font-size:11px;font-weight:800;line-height:1.2;letter-spacing:0;text-align:center;
   justify-content:center;align-items:center;vertical-align:middle;
   white-space:nowrap;
@@ -375,7 +392,7 @@
 }
 .cec-export-card .cec-note,
 .cec-export-card .cec-reading{
-  min-height:56px;gap:6px;justify-content:center;align-items:center;align-content:center;
+  gap:6px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-ref,
 .cec-export-card .cec-npfx,
@@ -403,18 +420,22 @@
 .cec-tbl-all .cec-typecell .cec-type-pill{
   display:flex;width:100%;max-width:100%;
 }
-.cec-export-frame.is-r16x9 .cec-export-head{
-  padding:14px 18px 13px;
+.cec-export-card .cec-type-pill{
+  background:#f4f6fa!important;color:#3e4a5e!important;border:1px solid #e2e7ef;
 }
-.cec-export-frame.is-r16x9 .cec-export-month{font-size:32px}
+.cec-export-card .cec-tbl-all .cec-typecell{background:#fbfcfd}
+.cec-export-frame.is-r16x9 .cec-export-head{
+  padding:20px 26px 15px;
+}
+.cec-export-frame.is-r16x9 .cec-export-month{font-size:34px}
 .cec-export-frame.is-r16x9 .cec-export-grid{
   gap:12px;padding:12px;
 }
 .cec-export-frame.is-r16x9 .cec-export-panel{
-  border-radius:16px;
+  border-radius:12px;
 }
 .cec-export-frame.is-r16x9 .cec-export-label{
-  padding:9px 12px 8px;font-size:13px;
+  padding:10px 14px 9px;font-size:13px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-corner,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-h{
@@ -427,10 +448,13 @@
   padding:7px 9px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-cell{
-  min-width:114px;padding:5px 5px;
+  min-width:114px;height:52px;padding:5px 5px;
+}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-cellbox{
+  min-height:42px;gap:4px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badges{
-  min-height:42px;gap:5px;
+  gap:5px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge{
   min-height:24px;padding:4px 9px;border-radius:7px;
@@ -441,7 +465,7 @@
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-note,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-reading{
-  min-height:42px;gap:4px;
+  gap:4px;
 }
 .cec-export-frame.is-r16x9 .cec-type-pill{
   min-height:26px;padding:5px 10px;font-size:10px;
@@ -455,6 +479,59 @@
 }
 @keyframes cecspin{to{transform:rotate(360deg)}}
 .cec-err{padding:24px;color:var(--cec-err);line-height:1.8}
+.cec-zoombar{
+  display:none;padding:8px 12px;
+  border-bottom:1px solid var(--cec-border2);background:var(--cec-bg3);
+}
+.cec-btn-zoom{
+  width:100%;height:36px;gap:8px;padding:0 14px;border-radius:10px;
+  border:1px solid var(--cec-border);background:var(--cec-btn-bg);
+  color:var(--cec-ink2);font-size:13px;font-weight:700;
+}
+.cec-btn-zoom:hover{background:var(--cec-hover);color:var(--cec-ink)}
+.cec-btn-zoom-icon{width:16px;height:16px;flex-shrink:0}
+.cec-zoom-mask{
+  position:fixed;inset:0;z-index:9999;background:rgba(10,13,18,.72);
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+}
+.cec-zoom-panel{
+  position:absolute;inset:10px;display:flex;flex-direction:column;overflow:hidden;
+  border:1px solid var(--cec-border);border-radius:16px;background:var(--cec-bg);
+  font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+}
+.cec-zoom-panel *{box-sizing:border-box}
+.cec-zoom-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;border-bottom:1px solid var(--cec-border2);background:var(--cec-bg2);
+}
+.cec-zoom-title{font-size:14px;font-weight:800;color:var(--cec-ink)}
+.cec-zoom-hint{margin-top:2px;font-size:11px;color:var(--cec-ink3)}
+.cec-zoom-close{
+  width:34px;height:34px;flex:0 0 auto;border-radius:50%;
+  border:1px solid var(--cec-border);background:var(--cec-btn-bg);
+  color:var(--cec-ink2);font-size:15px;font-weight:800;
+}
+.cec-zoom-close:hover{background:var(--cec-hover);color:var(--cec-ink)}
+.cec-zoom-scroll{
+  flex:1;overflow:auto;-webkit-overflow-scrolling:touch;
+  touch-action:pan-x pan-y;background:var(--cec-bg);
+}
+.cec-zoom-spacer{position:relative;margin:0 auto}
+.cec-zoom-body{
+  position:absolute;left:0;top:0;padding:12px;width:max-content;
+  transform-origin:0 0;
+}
+.cec-zoom-body .cec-tbl{min-width:0;width:max-content}
+.cec-zoom-body .cec-corner,
+.cec-zoom-body .cec-h{position:static;padding:14px 10px;font-size:13px}
+.cec-zoom-body .cec-rowlbl{padding:14px 12px;font-size:14px}
+.cec-zoom-body .cec-cell{min-width:150px;height:88px;padding:10px}
+.cec-zoom-body .cec-cellbox{min-height:60px}
+.cec-zoom-body .cec-badges{gap:8px}
+.cec-zoom-body .cec-badge{font-size:13px;padding:7px 13px;min-height:34px}
+.cec-zoom-body .cec-ref{font-size:13px}
+.cec-zoom-body .cec-npfx{font-size:12px}
+.cec-zoom-body .cec-empty{font-size:14px}
 @media(max-width:760px){
   .cec-top{align-items:flex-start}
   .cec-nav,.cec-tools{width:100%}
@@ -467,6 +544,7 @@
   .cec-corner,.cec-h,.cec-rowlbl{padding:10px 8px}
   .cec-badges{gap:6px}
   .cec-badge{font-size:10px;padding:5px 10px}
+  .cec-zoombar{display:flex}
   }
 `;
     document.head.appendChild(st);
@@ -579,7 +657,13 @@
         ? renderPrayerMatrix(monthRows)
         : renderServiceMatrix(monthRows, activeType);
 
-      EL.innerHTML = top + typebar + body;
+      var zoombar = '<div class="cec-zoombar">' +
+        '<button class="cec-btn cec-btn-zoom" id="zoomOpen" type="button">' +
+        '<svg class="cec-btn-zoom-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path d="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm9.5 16-4.4-4.4M10.5 8v5M8 10.5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>' +
+        '</svg>点击放大查看</button></div>';
+
+      EL.innerHTML = top + typebar + zoombar + body;
 
       bind('#mPrev', function () {
         if (activeMonthIdx > 0) { activeMonthIdx--; render(); }
@@ -598,6 +682,10 @@
         e.stopPropagation();
         exportMenuOpen = !exportMenuOpen;
         render();
+      });
+      bind('#zoomOpen', function (e) {
+        e.stopPropagation();
+        openZoomModal();
       });
 
       EL.querySelectorAll('[data-type]').forEach(function (btn) {
@@ -744,17 +832,17 @@
 
   function renderPrayerCell(item, opt) {
     opt = opt || {};
-    if (!item) return '<td class="cec-cell"><span class="cec-empty">—</span></td>';
+    if (!item) return renderEmptyCell();
 
     var name = tv(item.leader);
     var time = tv(item.time);
     var note = tv(item.note);
 
-    var html = '<td class="cec-cell"><div class="cec-note">';
+    var html = '<td class="cec-cell"><div class="cec-cellbox"><div class="cec-note">';
     if (name) html += mkBadge(name);
     if (time) html += '<span class="cec-npfx">' + esc(time) + '</span>';
     if (note && !opt.compact) html += '<span style="font-size:11px;color:#aeb6c3;line-height:1.3">' + esc(note) + '</span>';
-    html += '</div></td>';
+    html += '</div></div></td>';
     return html;
   }
 
@@ -834,31 +922,35 @@
     return visible.length ? visible : defs;
   }
 
+  function renderEmptyCell() {
+    return '<td class="cec-cell"><div class="cec-cellbox"><span class="cec-empty">—</span></div></td>';
+  }
+
   function renderMatrixCell(kind, val) {
     val = tv(val);
 
     if (kind === 'reading') {
-      if (!val) return '<td class="cec-cell"><span class="cec-empty">—</span></td>';
+      if (!val) return renderEmptyCell();
       var rd = parseReading(val);
-      return '<td class="cec-cell"><div class="cec-reading">' +
+      return '<td class="cec-cell"><div class="cec-cellbox"><div class="cec-reading">' +
         '<span class="cec-ref">' + esc(rd.ref) + '</span>' +
         (rd.name ? mkBadge(rd.name) : '') +
-        '</div></td>';
+        '</div></div></td>';
     }
 
     if (kind === 'note') {
-      if (!val) return '<td class="cec-cell"><span class="cec-empty">—</span></td>';
+      if (!val) return renderEmptyCell();
       var m = val.match(/^(证道[：:]\s*)(.+)$/);
       if (m) {
-        return '<td class="cec-cell"><div class="cec-note"><span class="cec-npfx">' + esc(m[1]) + '</span>' + mkBadge(m[2]) + '</div></td>';
+        return '<td class="cec-cell"><div class="cec-cellbox"><div class="cec-note"><span class="cec-npfx">' + esc(m[1]) + '</span>' + mkBadge(m[2]) + '</div></div></td>';
       }
-      return '<td class="cec-cell"><div class="cec-note">' + mkBadge(val) + '</div></td>';
+      return '<td class="cec-cell"><div class="cec-cellbox"><div class="cec-note">' + mkBadge(val) + '</div></div></td>';
     }
 
-    if (!val) return '<td class="cec-cell"><span class="cec-empty">—</span></td>';
+    if (!val) return renderEmptyCell();
 
     var parts = String(val).split(/[\/\n]/).map(function (x) { return x.trim(); }).filter(Boolean);
-    return '<td class="cec-cell"><div class="cec-badges">' + parts.map(mkBadge).join('') + '</div></td>';
+    return '<td class="cec-cell"><div class="cec-cellbox"><div class="cec-badges">' + parts.map(mkBadge).join('') + '</div></div></td>';
   }
 
   function parseReading(v) {
@@ -873,10 +965,14 @@
     return '<span class="cec-badge" data-name="' + esc(name) + '" style="background:' + c[0] + ';color:' + c[1] + '"><span class="cec-badge-txt">' + esc(name) + '</span></span>';
   }
 
-  function badgeColor(name) {
+  function palIndex(name) {
     var h = 0;
     for (var i = 0; i < name.length; i++) h = (Math.imul(31, h) + name.charCodeAt(i)) | 0;
-    return PAL[Math.abs(h) % PAL.length];
+    return Math.abs(h) % PAL.length;
+  }
+
+  function badgeColor(name) {
+    return PAL[palIndex(name)];
   }
 
   function bindHighlight() {
@@ -931,6 +1027,113 @@
     badges.forEach(function (b) {
       b.classList.remove('lit', 'dim', 'locked', 'ldim');
     });
+  }
+
+  function openZoomModal() {
+    var srcTbl = EL.querySelector('.cec-wrap .cec-tbl');
+    if (!srcTbl) return;
+    if (document.querySelector('.cec-zoom-mask')) return;
+
+    var mask = document.createElement('div');
+    mask.className = 'cec-zoom-mask';
+    mask.innerHTML =
+      '<div class="cec-zoom-panel">' +
+      '<div class="cec-zoom-head">' +
+      '<div><div class="cec-zoom-title">放大查看</div><div class="cec-zoom-hint">已显示整表 · 双指缩放或双击放大细看</div></div>' +
+      '<button class="cec-btn cec-zoom-close" type="button" aria-label="关闭">✕</button>' +
+      '</div>' +
+      '<div class="cec-zoom-scroll"><div class="cec-zoom-spacer"><div class="cec-zoom-body"></div></div></div>' +
+      '</div>';
+
+    var scroll = mask.querySelector('.cec-zoom-scroll');
+    var spacer = mask.querySelector('.cec-zoom-spacer');
+    var zBody = mask.querySelector('.cec-zoom-body');
+    zBody.appendChild(srcTbl.cloneNode(true));
+
+    var prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(mask);
+
+    var natW = 1, natH = 1, zoom = 1, fitZoom = 1;
+    function measure() {
+      zBody.style.transform = 'none';
+      var rect = zBody.getBoundingClientRect();
+      natW = Math.max(1, Math.ceil(rect.width));
+      natH = Math.max(1, Math.ceil(rect.height));
+    }
+    function applyZoom() {
+      zBody.style.transform = 'scale(' + zoom + ')';
+      spacer.style.width = Math.ceil(natW * zoom) + 'px';
+      spacer.style.height = Math.ceil(natH * zoom) + 'px';
+    }
+    function fitToScreen() {
+      // 打开时先让整张表完整地缩放进屏幕，再由用户放大看细节
+      var availW = Math.max(1, scroll.clientWidth);
+      var availH = Math.max(1, scroll.clientHeight);
+      fitZoom = Math.min(availW / natW, availH / natH);
+      if (!isFinite(fitZoom) || fitZoom <= 0) fitZoom = 1;
+      zoom = fitZoom;
+      applyZoom();
+    }
+    measure();
+    fitToScreen();
+
+    function onKey(e) {
+      if (e.key === 'Escape') close();
+    }
+    function close() {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+      mask.remove();
+    }
+    document.addEventListener('keydown', onKey);
+
+    mask.addEventListener('click', function (e) {
+      if (e.target === mask) close();
+    });
+    mask.querySelector('.cec-zoom-close').addEventListener('click', close);
+
+    function toggleZoom() {
+      // 在「整表」和「可读放大」两档之间切换
+      zoom = zoom <= fitZoom + 0.01 ? Math.max(fitZoom * 2, 1) : fitZoom;
+      applyZoom();
+    }
+    scroll.addEventListener('dblclick', function (e) {
+      e.preventDefault();
+      toggleZoom();
+    });
+
+    var lastTap = 0;
+    scroll.addEventListener('touchend', function (e) {
+      if (e.touches.length) return;
+      var now = Date.now();
+      if (now - lastTap < 300) {
+        e.preventDefault();
+        toggleZoom();
+        lastTap = 0;
+      } else {
+        lastTap = now;
+      }
+    });
+
+    var pinchDist = 0, pinchZoom = 1;
+    function touchDist(e) {
+      var a = e.touches[0], b = e.touches[1];
+      return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    }
+    scroll.addEventListener('touchstart', function (e) {
+      if (e.touches.length === 2) {
+        pinchDist = touchDist(e);
+        pinchZoom = zoom;
+      }
+    }, { passive: true });
+    scroll.addEventListener('touchmove', function (e) {
+      if (e.touches.length === 2 && pinchDist > 0) {
+        e.preventDefault();
+        zoom = Math.min(4, Math.max(Math.min(fitZoom, 1), pinchZoom * touchDist(e) / pinchDist));
+        applyZoom();
+      }
+    }, { passive: false });
   }
 
   function hasTypeRows(rows, type) {
@@ -1038,22 +1241,19 @@
     var naturalW = Math.max(1, Math.ceil(card.scrollWidth));
     var naturalH = Math.max(1, Math.ceil(card.scrollHeight));
     var viewportW = Math.max(1, Math.ceil(viewport.clientWidth));
+    var viewportH = Math.max(1, Math.ceil(viewport.clientHeight));
 
-    // Fill width exactly, then grow frame height to show all content — no white borders, no clipping
-    var scale = viewportW / naturalW;
+    // 严格保持画布比例：内容整体等比缩放塞进 viewport 并居中，frame 尺寸不变
+    var scale = Math.min(viewportW / naturalW, viewportH / naturalH);
     if (!isFinite(scale) || scale <= 0) scale = 1;
 
-    var scaledH = Math.max(1, Math.ceil(naturalH * scale));
+    var scaledW = Math.max(1, Math.round(naturalW * scale));
+    var scaledH = Math.max(1, Math.round(naturalH * scale));
 
-    // overhead = stage insets + padding (stays constant, derived from initial frame/viewport sizes)
-    if (frame) {
-      var overhead = Math.max(0, frame.offsetHeight - viewport.offsetHeight);
-      frame.style.height = (scaledH + overhead) + 'px';
-    }
-
-    viewport.style.height = scaledH + 'px';
-    scaleWrap.style.width = viewportW + 'px';
+    scaleWrap.style.width = scaledW + 'px';
     scaleWrap.style.height = scaledH + 'px';
+    scaleWrap.style.marginLeft = Math.max(0, Math.floor((viewportW - scaledW) / 2)) + 'px';
+    scaleWrap.style.marginTop = Math.max(0, Math.floor((viewportH - scaledH) / 2)) + 'px';
     card.style.position = 'absolute';
     card.style.left = '0px';
     card.style.top = '0px';
@@ -1075,6 +1275,17 @@
     }));
   }
 
+  function applyExportBadgeTheme(root) {
+    if (!root) return;
+    root.querySelectorAll('.cec-badge').forEach(function (badge) {
+      var name = tv(badge.getAttribute('data-name') || badge.textContent);
+      var c = PAL_SOFT[palIndex(name)];
+      badge.style.background = c[0];
+      badge.style.color = c[1];
+      badge.style.border = '1px solid ' + c[2];
+    });
+  }
+
   function replaceExportBadgesWithSvg(root) {
     if (!root) return;
 
@@ -1094,9 +1305,14 @@
       var fontFamily = textCs.fontFamily || badgeCs.fontFamily || 'system-ui,sans-serif';
       var bg = badgeCs.backgroundColor || '#4b5563';
       var fg = badgeCs.color || '#f8fafc';
+      var bw = parseFloat(badgeCs.borderTopWidth) || 0;
+      var bc = bw > 0 ? (badgeCs.borderTopColor || '') : '';
+      var inset = bw / 2;
       var svg = [
         '<svg xmlns="http://www.w3.org/2000/svg" width="', width, '" height="', height, '" viewBox="0 0 ', width, ' ', height, '">',
-        '<rect x="0" y="0" width="', width, '" height="', height, '" rx="', radius, '" ry="', radius, '" fill="', bg, '"></rect>',
+        '<rect x="', inset, '" y="', inset, '" width="', Math.max(1, width - bw), '" height="', Math.max(1, height - bw), '" rx="', radius, '" ry="', radius, '" fill="', bg, '"',
+        bc ? ' stroke="' + bc + '" stroke-width="' + bw + '"' : '',
+        '></rect>',
         '<text x="', width / 2, '" y="', height / 2, '" fill="', fg, '" font-size="', fontSize, '" font-weight="', esc(fontWeight), '" font-family="', esc(fontFamily), '" text-anchor="middle" dominant-baseline="central" text-rendering="geometricPrecision">',
         esc(label),
         '</text></svg>'
@@ -1165,11 +1381,8 @@
     bodyWrap.className = 'cec-export-body';
 
     if (types.length > 1) {
-      if (ratioKey === '16:9') {
-        bodyWrap.innerHTML = renderLandscapePanels(rows, types);
-      } else {
-        bodyWrap.innerHTML = renderAllMatrix(rows, types, { trimEmptyRows: true });
-      }
+      // 严格保持画布比例后，单列长表会被整体缩得过小，两种比例统一用双列面板布局
+      bodyWrap.innerHTML = renderLandscapePanels(rows, types);
     } else {
       var type = types[0];
       var section = document.createElement('section');
@@ -1204,6 +1417,7 @@
     host.appendChild(frame);
     document.body.appendChild(host);
 
+    applyExportBadgeTheme(card);
     replaceExportBadgesWithSvg(card);
     fitExportFrame(card, scaleWrap, viewport, frame);
 
@@ -1263,6 +1477,14 @@
     return _cecH2cPromise;
   }
 
+  function getExportScale(width, height) {
+    var w = Math.max(1, width);
+    var h = Math.max(1, height);
+    var scale = Math.min(3, EXPORT_MAX_CANVAS_SIDE / w, EXPORT_MAX_CANVAS_SIDE / h);
+    if (!isFinite(scale) || scale <= 0) scale = 1;
+    return scale;
+  }
+
   function canvasToPngBlob(canvas) {
     return new Promise(function (resolve, reject) {
       if (canvas.toBlob) {
@@ -1287,10 +1509,10 @@
   function nodeToPngBlobByHtml2Canvas(node, bgColor) {
     return loadHtml2Canvas()
       .then(function (html2canvas) {
-        var dpr = Math.max(1, window.devicePixelRatio || 1);
+        var rect = node.getBoundingClientRect();
         return html2canvas(node, {
           backgroundColor: bgColor || '#f4f6f9',
-          scale: Math.min(2, dpr),
+          scale: getExportScale(Math.ceil(rect.width), Math.ceil(rect.height)),
           foreignObjectRendering: false,
           useCORS: true,
           logging: false
@@ -1355,9 +1577,7 @@
 
       img.onload = function () {
         URL.revokeObjectURL(svgUrl);
-        var maxSide = 4096;
-        var scale = Math.min(2, maxSide / width, maxSide / height);
-        if (!isFinite(scale) || scale <= 0) scale = 1;
+        var scale = getExportScale(width, height);
 
         var canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(width * scale));
