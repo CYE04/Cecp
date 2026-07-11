@@ -330,8 +330,11 @@
 .cec-export-body{background:var(--cec-bg2)}
 .cec-export-card *{box-sizing:border-box}
 .cec-export-grid{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px;
+  display:flex;align-items:flex-start;gap:14px;padding:14px;
   background:transparent;
+}
+.cec-export-col{
+  display:flex;flex-direction:column;gap:14px;flex:0 1 auto;min-width:0;
 }
 .cec-export-panel{
   display:flex;flex-direction:column;overflow:hidden;border:1px solid #e9edf3;
@@ -401,7 +404,7 @@
 }
 .cec-export-card .cec-ref{font-size:12px}
 .cec-export-card .cec-npfx{font-size:11px}
-.cec-export-card .cec-empty{font-size:12px}
+.cec-export-card .cec-empty{font-size:12px;color:#ccd3dd}
 .cec-tbl-all .cec-corner,
 .cec-tbl-all .cec-typecell{
   width:var(--cec-type-col,112px);min-width:var(--cec-type-col,112px);
@@ -431,6 +434,7 @@
 .cec-export-frame.is-r16x9 .cec-export-grid{
   gap:12px;padding:12px;
 }
+.cec-export-frame.is-r16x9 .cec-export-col{gap:12px}
 .cec-export-frame.is-r16x9 .cec-export-panel{
   border-radius:12px;
 }
@@ -1216,9 +1220,29 @@
 
   function renderLandscapePanels(rows, types) {
     var ordered = (types || TYPE_ORDER).filter(function (type) { return hasTypeRows(rows, type); });
+    var sections = [];
+    ordered.forEach(function (type, idx) {
+      var html = renderExportTypeSection(rows, type, { compact: true, dense: true, trimEmptyRows: true });
+      if (!html) return;
+      sections.push({ idx: idx, html: html, weight: (html.match(/<tr/g) || []).length });
+    });
+
+    // 按行数贪心分配到较矮的一列：面板不再被拉伸，避免框内出现大片空白
+    var cols = [{ h: 0, items: [] }, { h: 0, items: [] }];
+    sections.slice().sort(function (a, b) { return b.weight - a.weight; }).forEach(function (s) {
+      var col = cols[0].h <= cols[1].h ? cols[0] : cols[1];
+      col.items.push(s);
+      col.h += s.weight;
+    });
+    cols.forEach(function (col) {
+      col.items.sort(function (a, b) { return a.idx - b.idx; });
+    });
+
     return '<div class="cec-export-grid">' +
-      ordered.map(function (type) {
-        return renderExportTypeSection(rows, type, { compact: true, dense: true, trimEmptyRows: true });
+      cols.filter(function (col) { return col.items.length; }).map(function (col) {
+        return '<div class="cec-export-col">' +
+          col.items.map(function (s) { return s.html; }).join('') +
+          '</div>';
       }).join('') +
       '</div>';
   }
@@ -1430,8 +1454,16 @@
 
   function waitPaint2() {
     return new Promise(function (resolve) {
+      var settled = false;
+      function done() {
+        if (settled) return;
+        settled = true;
+        resolve();
+      }
+      // 后台/不渲染的标签页里 rAF 不触发，用定时器兜底避免导出卡死
+      setTimeout(done, 350);
       requestAnimationFrame(function () {
-        requestAnimationFrame(resolve);
+        requestAnimationFrame(done);
       });
     });
   }
@@ -1451,19 +1483,36 @@
     if (_cecH2cPromise) return _cecH2cPromise;
 
     _cecH2cPromise = new Promise(function (resolve, reject) {
+      var settled = false;
+      function done() {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(window.html2canvas);
+      }
+      function fail(err) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        _cecH2cPromise = null; // 失败后允许下次导出重试
+        reject(err);
+      }
+      // CDN 请求可能长时间挂起（弱网/断网），超时后交给 svg 兜底，避免导出永远卡住
+      var timer = setTimeout(function () { fail(new Error('html2canvas load timeout')); }, 8000);
+
       function inject(src, next) {
         var s = document.createElement('script');
         s.src = src;
         s.async = true;
         s.onload = function () {
-          if (window.html2canvas) resolve(window.html2canvas);
+          if (window.html2canvas) done();
           else if (next) inject(next, null);
-          else reject(new Error('html2canvas unavailable'));
+          else fail(new Error('html2canvas unavailable'));
         };
         s.onerror = function () {
           s.remove();
           if (next) inject(next, null);
-          else reject(new Error('html2canvas load failed'));
+          else fail(new Error('html2canvas load failed'));
         };
         document.head.appendChild(s);
       }
