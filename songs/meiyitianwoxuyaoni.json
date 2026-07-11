@@ -1,0 +1,111 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-07-11 12:18:08",
+  "id": "meiyitianwoxuyaoni",
+  "title": "每一天我需要你",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉【我要看见】(2016) (启2:4，来4:16) 曾祥怡词曲",
+  "origKey": "C",
+  "timeSign": "4/4",
+  "bpm": 66,
+  "mp3": "/upload/meiyitianwoxuyaoni.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/woyaokanjian.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/meiyitianwoxuyaoni.lrc",
+  "youtube": "https://youtu.be/IBeDhW5uET0?si=AqrgSGpprEv5TUwS",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/meiyitianwoxuyaoniC.jpg",
+  "sections": [
+  {
+    "name": "每一天我需要你",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"C{sp}{sp}{sp}G/B","n":"3' - 2' - |","lyric":""},
+        {"chord":"Am {sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp} F","n":"1' - 1'_ 2'_ 3'_ 4'_ | ~ ( 4' - 4'_ ) 6_","lyric":""},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp}G","n":"7_ 1'_ | 2' - - - |","lyric":""},
+        {"chord":"C{sp}{sp}G/E","n":"5' - 4' - |","lyric":""},
+        {"chord":"Am","n":"3' - 1'_ 2'_","lyric":""},
+        {"chord":"{sp}{sp}{sp}{sp}F{sp}{sp}{sp}{sp}{sp}{sp}G","n":"3'_ ( 4'_ | 4' ) - - 1' | 7 - - - |","lyric":""}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"C","n":"0_ 5_","lyric":"{sp}让"},
+        {"chord":"","n":"5_ 4__ ( 4__ sp 4_ ) 3_","lyric":"我坦然 {sp} 无"},
+        {"chord":"G/B","n":"2_ 1_ sp | sp","lyric":"惧来"},
+        {"chord":"Am","n":"2_ 2_","lyric":"到施"},
+        {"chord":"","n":"2__ 3·_","lyric":"恩座"},
+        {"chord":"","n":"1 - sp | sp","lyric":"前，"},
+        {"chord":"F","n":"0_ 6_","lyric":"{sp}用"},
+        {"chord":"","n":"6_ 5__ ( 5__ sp 5_ ) 4_","lyric":"心灵诚 {sp} 实"},
+        {"chord":"","n":"3_ 4_ sp |","lyric":"寻求"},
+        {"chord":"","n":"2 - sp - sp - sp |","lyric":"祢。"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"C","n":"0_ 5_","lyric":"{sp}亲"},
+        {"chord":"","n":"5_ 4__ ( 4__ sp 4_ ) 3_","lyric":"爱的天 {sp} 父"},
+        {"chord":"G/B","n":"2_ 1_ sp | sp","lyric":"我何"},
+        {"chord":"Am","n":"2_ 2_","lyric":"等地"},
+        {"chord":"","n":"2__ 3·_","lyric":"需要"},
+        {"chord":"","n":"1","lyric":"祢，"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}Dm","n":"1__ 2__ 3__ ( 4__ sp | sp 4_ ) 4__ sp__ ( 4__ sp 4__ ) 3·_","lyric":"需要更多 {sp} {sp} 祢{sp}的 {sp} 同"},
+        {"chord":"F/G","n":"2·_ sp_ 2__","lyric":"在，在"},
+        {"chord":"","n":"1_ sp_ 7,_ sp |","lyric":"我{sp}生"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"C","n":"1 - - - sp || sp","lyric":"命。"},
+        {"label":"Pre-Chorus","dx":-10},
+        {"chord":"C{sp}{sp}{sp}G/B","n":"3 - 2 - sp | sp","lyric":"每 {sp}一"},
+        {"chord":"Am","n":"1 -","lyric":"天，"},
+        {"chord":"C/G","n":"1_ 2_","lyric":"我需"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp}F","n":"3_ ( 4_ sp | sp 4· )","lyric":"要祢，"},
+        {"chord":"","n":"3_","lyric":"祢"},
+        {"chord":"G","n":"2_ 2__ ( 5__ sp 5_ ) 4_ sp | sp","lyric":"话语如 {sp} 甘"},
+        {"chord":"C{sp}{sp}{sp}{sp}{sp}{sp}F/G{sp}{sp}G","n":"3 sp - sp - sp -","lyric":"霖。"},
+        {"chord":"","n":"|","lyric":"{sp}"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"C{sp}{sp}{sp}G/B","n":"3 - 2 - sp | sp","lyric":"每{sp}时"},
+        {"chord":"Am","n":"1 -","lyric":"刻，"},
+        {"chord":"C/G","n":"1_ 2_","lyric":"我需"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp}F","n":"3_ ( 4_ sp | sp 4· )","lyric":"要祢"},
+        {"chord":"","n":"3_","lyric":"圣"},
+        {"chord":"G","n":"2_ 2__ ( 1__ sp 2_ ) 7,_ sp | sp","lyric":"灵如雨{sp}{sp}降"},
+        {"chord":"C{sp}{sp}{sp}{sp}{sp}F/G","n":"1 - - - sp ||","lyric":"临。"},
+        {"label":"Chorus","dx":-5},
+        {"chord":"C{sp}{sp}{sp}G/B","n":"( 5 - 5_ ) 5_","lyric":"这{sp} {sp}是"},
+        {"chord":"","n":"{3 5_ 6_ 7_ } sp |","lyric":"我的祷"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"Am{sp}{sp}C/G","n":"( 1' - 1'_ ) 1_","lyric":"告，{sp}愿"},
+        {"chord":"","n":"1'_ 7_ sp | sp","lyric":"我生"},
+        {"chord":"F","n":"6","lyric":"命"},
+        {"chord":"","n":"( 6·_ sp_ 5__ )","lyric":"单"},
+        {"chord":"C/E","n":"5","lyric":"单"},
+        {"chord":"","n":"4_ 3_ sp | sp","lyric":"归荣"},
+        {"chord":"Dm","n":"5·_ sp_ 5__","lyric":"耀{sp}给"},
+        {"chord":"","n":"4_ sp_ 3_","lyric":"祢，耶"},
+        {"chord":"G","n":"2 - sp | sp","lyric":"稣。"},
+        {"chord":"C{sp}{sp}{sp}{sp}{sp}{sp}G/B","n":"( 5 sp - sp 5_ ) 5_","lyric":"这{sp}{sp}{sp} {sp}是"},
+        {"chord":"","n":"{3 5_ 6_ 7_ } sp |","lyric":"我的祷"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"Am{sp}{sp}C/G","n":"( 1' - 1'_ ) 1_","lyric":"求，{sp}每"},
+        {"chord":"","n":"1'_ 7_ sp | sp","lyric":"天都"},
+        {"chord":"F","n":"6","lyric":"更"},
+        {"chord":"","n":"( 6·_ sp_ 5__ )","lyric":"爱"},
+        {"chord":"C/E","n":"5","lyric":"祢,"},
+        {"chord":"","n":"4_ 3_ sp | sp","lyric":"永不"},
+        {"chord":"Dm","n":"5·_ sp_ 5__","lyric":"失{sp}去"},
+        {"chord":"","n":"4_ 3_","lyric":"起初"},
+        {"chord":"G","n":"2 -","lyric":"爱"},
+        {"chord":"","n":"3_ 2_ sp | sp","lyric":"祢的"},
+        {"chord":"C","n":"1 sp - sp - sp - sp ||/","lyric":"心。"}
+      ]}
+    ]
+  }
+]
+}
