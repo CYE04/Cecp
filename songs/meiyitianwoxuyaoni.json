@@ -1,7 +1,7 @@
 {
   "version": "1",
   "created": "YuEn",
-  "createdTime": "2026-07-11 12:18:08",
+  "createdTime": "2026-07-11 12:36:36",
   "id": "meiyitianwoxuyaoni",
   "title": "每一天我需要你",
   "artist": "赞美之泉",
@@ -35,9 +35,9 @@
         {"chord":"","n":"2__ 3·_","lyric":"恩座"},
         {"chord":"","n":"1 - sp | sp","lyric":"前，"},
         {"chord":"F","n":"0_ 6_","lyric":"{sp}用"},
-        {"chord":"","n":"6_ 5__ ( 5__ sp 5_ ) 4_","lyric":"心灵诚 {sp} 实"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp}Dm","n":"6_ 5__ ( 5__ sp 5_ ) 4_","lyric":"心灵诚 {sp} 实"},
         {"chord":"","n":"3_ 4_ sp |","lyric":"寻求"},
-        {"chord":"","n":"2 - sp - sp - sp |","lyric":"祢。"}
+        {"chord":"G","n":"2 - sp - sp - sp |","lyric":"祢。"}
       ]},
       { "b": true, "line": [
         {"chord":"","lyric":""},
