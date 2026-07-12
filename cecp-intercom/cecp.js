@@ -351,7 +351,7 @@
     '.cf-stage{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}',
 
     /* ── 悬浮球（贴角圆角语言 + 玻璃材质；不支持 backdrop-filter 时退回实色）── */
-    '.cf.is-floating .cf-launcher{position:fixed;z-index:2147483640;width:58px;height:58px;',
+    '.cf.is-floating .cf-launcher{position:fixed;z-index:2147483644;width:58px;height:58px;',
     '  background:var(--card);',
     '  border:1px solid var(--border);box-shadow:var(--shadow-soft),0 12px 32px rgba(0,0,0,.1);color:var(--text);',
     '  display:flex;align-items:center;justify-content:center;',
@@ -377,15 +377,16 @@
     '  background:var(--red);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;',
     '  box-shadow:0 1px 4px rgba(0,0,0,.25)}',
 
-    /* ── 悬浮面板：从停靠角长出来（面板本体永远实色不透底）── */
-    '.cf.is-floating .cf-panel{position:fixed;z-index:2147483642;box-shadow:var(--shadow);border:1px solid var(--border);',
+    /* ── 悬浮面板：贴角小弹窗，高度「刚好包住内容」，封顶不超视口（本体永远实色不透底）── */
+    '.cf.is-floating .cf-panel{position:fixed;z-index:2147483646;box-shadow:var(--shadow);border:1px solid var(--border);',
+    '  height:auto;min-height:160px;',
+    '  max-height:calc(100vh - var(--dy,20px) - var(--sat) - var(--sab) - 88px);max-height:calc(100dvh - var(--dy,20px) - var(--sat) - var(--sab) - 88px);',
     '  opacity:0;transform:scale(.92);pointer-events:none;',
     '  transition:opacity .26s cubic-bezier(.32,.72,0,1),transform .32s cubic-bezier(.32,.72,0,1),border-radius .3s ease}',
     '.cf.is-floating.is-open .cf-panel{opacity:1;transform:none;pointer-events:auto}',
-    /* 尺寸全自动：纵向视口 = 整张 sheet（见下方 orient-p 规则）；',
-       横向视口 = 高度吃满可用空间、宽度随视口比例伸缩，无固定像素 */
-    '.cf.orient-l.is-floating .cf-panel{width:clamp(400px,62vw,880px);max-width:calc(100vw - 40px);',
-    '  height:calc(100vh - var(--dy,20px) - var(--sab) - 92px);height:calc(100dvh - var(--dy,20px) - var(--sab) - 92px)}',
+    /* 宽度随视口方向：纵向窄弹窗、横向宽弹窗（内容多列）；高度都由内容决定 */
+    '.cf.orient-p.is-floating .cf-panel{width:min(380px,calc(100vw - 24px - var(--sal) - var(--sar)))}',
+    '.cf.orient-l.is-floating .cf-panel{width:clamp(400px,62vw,880px);max-width:calc(100vw - 40px)}',
     /* 四角锚定：--dx / --dy 由 JS 写入（含避让偏移）；叠加刘海/手势条安全区 */
     '.cf{--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}',
     '.cf.dock-br .cf-launcher{right:calc(var(--dx,20px) + var(--sar));bottom:calc(var(--dy,20px) + var(--sab))}',
@@ -405,11 +406,8 @@
     '.cf.dock-bl .cf-launcher{border-radius:19px 19px 19px 8px}',
     '.cf.dock-tr .cf-launcher{border-radius:19px 8px 19px 19px}',
     '.cf.dock-tl .cf-launcher{border-radius:8px 19px 19px 19px}',
-    /* 纵向视口：整张 sheet 自动吃满屏幕（只留安全边距，无固定像素），带遮罩 */
+    /* 弹窗外不加遮罩：面板外的页面随便滑（触摸隔离只管面板内部） */
     '.cf-mask{display:none}',
-    '.cf.orient-p.is-floating .cf-panel{left:max(8px,var(--sal));right:max(8px,var(--sar));top:max(8px,var(--sat));bottom:max(8px,var(--sab));width:auto;height:auto;max-height:none}',
-    '.cf.orient-p.is-floating.is-open .cf-mask{display:block;position:fixed;inset:0;z-index:2147483641;',
-    '  background:rgba(0,0,0,.32)}',
 
     /* ── 标题栏（实色打底；支持毛玻璃的环境才启用半透明+blur，页面内容绝不透出）── */
     '.cf-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;',
@@ -687,7 +685,7 @@
     '.cf-target-chip.is-on{border-color:var(--acc);background:var(--acc-soft);color:var(--acc);font-weight:600}',
 
     /* ── Toast（跟随停靠角）── */
-    '.cf-toasts{position:fixed;z-index:2147483643;display:flex;flex-direction:column;gap:10px;',
+    '.cf-toasts{position:fixed;z-index:2147483647;display:flex;flex-direction:column;gap:10px;',
     '  max-width:min(340px,calc(100vw - 32px));pointer-events:none}',
     '.cf.dock-br .cf-toasts{right:calc(16px + var(--sar));bottom:calc(var(--dy,20px) + var(--sab) + 74px);align-items:flex-end}',
     '.cf.dock-bl .cf-toasts{left:calc(16px + var(--sal));bottom:calc(var(--dy,20px) + var(--sab) + 74px);align-items:flex-start}',
@@ -904,7 +902,7 @@
     try { stack = document.elementsFromPoint(x, y) || []; } catch (err) { return null; }
     for (var i = 0; i < stack.length; i++) {
       var el = stack[i];
-      if (!el || el === this.host || el === document.documentElement || el === document.body) continue;
+      if (!el || el === this.host || el === this.portal || el === document.documentElement || el === document.body) continue;
       var cs;
       try { cs = getComputedStyle(el); } catch (err) { continue; }
       if (cs.position !== 'fixed' && cs.position !== 'sticky') continue;
@@ -1020,7 +1018,20 @@
   /* ── Shadow DOM 外壳 ── */
 
   CecpApp.prototype.buildShell = function () {
-    this.shadow = this.host.shadowRoot || this.host.attachShadow({ mode: 'open' });
+    /* 悬浮模式：UI 传送到 document.body 的独立宿主（portal）。
+       CMS 文章会被 youth-engine 等脚本加 transform/filter 动画，
+       position:fixed 元素若留在文章 DOM 里会被变换祖先「困住」——
+       坐标基准变成祖先、z-index 也被压进祖先的层叠上下文，
+       表现为面板与站点顶栏重合、被标签弹层/灯箱盖住。 */
+    if (this.isFloating) {
+      if (!this.portal) {
+        this.portal = document.createElement('cecp-intercom-layer');
+        (document.body || document.documentElement).appendChild(this.portal);
+      }
+      this.shadow = this.portal.shadowRoot || this.portal.attachShadow({ mode: 'open' });
+    } else {
+      this.shadow = this.host.shadowRoot || this.host.attachShadow({ mode: 'open' });
+    }
     this.shadow.innerHTML = '';
 
     var style = document.createElement('style');
@@ -2744,6 +2755,10 @@
       this.themeMediaHandler = null;
     }
     if (this.shadow) this.shadow.innerHTML = '';
+    if (this.portal && this.portal.parentNode) {
+      this.portal.parentNode.removeChild(this.portal);
+      this.portal = null;
+    }
     this.host.__cecpApp = null;
   };
 
