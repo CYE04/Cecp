@@ -293,30 +293,9 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 .rt7-hl   { z-index:2147483633; pointer-events:none; }
 .rt7-ring { z-index:2147483634; pointer-events:none; }
 .rt7-tip  { z-index:2147483635; }
-.rt7-fab{
-  position:fixed; left:16px; bottom:16px;
-  display:none; align-items:center; gap:10px;
-  padding:10px 15px 10px 11px; border-radius:999px;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(18,20,24,.78); color:var(--rttx);
-  box-shadow:0 14px 40px rgba(0,0,0,.4);
-  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-  cursor:pointer; user-select:none;
-  transition:transform .15s, opacity .2s;
-}
-.rt7-fab:hover{ transform:translateY(-2px); }
-.rt7-fab:active{ transform:scale(.97); }
-.rt7-dot{
-  width:9px; height:9px; border-radius:999px;
-  background:var(--rtac); box-shadow:0 0 0 4px rgba(120,255,210,.16);
-  flex:0 0 auto;
-}
-.rt7-fname{ font-weight:900; font-size:13px; letter-spacing:.2px; }
-.rt7-ftip { font-size:10px; color:var(--rtsub); margin-top:1px; }
-@media(max-width:520px){
-  .rt7-fab{ left:10px; bottom:10px; }
-  .rt7-ftip{ display:none; }
-}
+/* .rt7-fab 视觉样式统一在 CECP-FAB-SYSTEM 块（与 .ccf-fab 共用同一套 Apple 风），
+   这里只管定位；display 由 updateFab() 随滚动切换 */
+.rt7-fab{ position:fixed; left:16px; bottom:16px; display:none; }
 .rt7-mask{
   position:fixed; inset:0; display:none;
   background:rgba(0,0,0,.3); opacity:0; transition:opacity .2s;
@@ -565,59 +544,70 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 .hbw-act[data-fs][aria-pressed="true"] .cfi-max{ display:none; }
 .hbw-act[data-fs][aria-pressed="true"] .cfi-min{ display:block; }
 
-/* 工具导游悬浮按钮：罗盘轻摆 + 薄荷光晕呼吸 */
-.rt7-ico{ width:20px; height:20px; flex:0 0 auto; color:var(--rtac); display:grid; place-items:center; position:relative; }
-.rt7-ico .cfi{ width:20px; height:20px; animation:cfi-compass 5s ease-in-out infinite; }
-.rt7-fab:hover .rt7-ico .cfi{ animation-duration:1.6s; }
-@keyframes cfi-compass{ 0%,100%{ transform:rotate(-14deg); } 50%{ transform:rotate(14deg); } }
-.rt7-ico::after{
-  content:""; position:absolute; inset:-3px; border-radius:999px; pointer-events:none;
-  animation:rt7glow 2.4s ease-out infinite;
-}
-@keyframes rt7glow{
-  0%  { box-shadow:0 0 0 0    rgba(120,255,210,.30); }
-  70% { box-shadow:0 0 0 8px  rgba(120,255,210,0);   }
-  100%{ box-shadow:0 0 0 0    rgba(120,255,210,0);   }
-}
-
 /* 导览 hub / 步骤气泡的关闭按钮与"开始教程"胶囊 */
 .rt7-hx .cfi,.rt7-tipx .cfi{ width:15px; height:15px; transition:transform .32s cubic-bezier(.34,1.56,.64,1); }
 .rt7-hx:hover .cfi,.rt7-tipx:hover .cfi{ transform:rotate(90deg); }
 .rt7-play{ width:10px !important; height:10px !important; color:var(--rtac); flex:0 0 auto; }
 .rt7-hcard:hover .rt7-play{ transform:scale(1.25); transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
 
-/* ===== CECP-CONTACT-FAB：Intercom 风格联系入口（与 CECP-FOOTER-ICONS 同套动效） ===== */
-.ccf-fab{
-  position:fixed; right:20px; bottom:20px; z-index:2147483629;
-  width:58px; height:58px; border-radius:999px;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(18,20,24,.78); color:rgba(255,255,255,.92);
-  box-shadow:0 14px 40px rgba(0,0,0,.4);
-  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-  display:grid; place-items:center; cursor:pointer; user-select:none;
-  -webkit-tap-highlight-color:transparent; padding:0;
-  transition:transform .22s cubic-bezier(.34,1.56,.64,1), bottom .25s ease, background .15s ease;
+/* ===== CECP-FAB-SYSTEM：悬浮按钮统一系统（Apple 风 · 明暗双主题） =====
+   工具导游/帮助（.rt7-fab，左下）与 联系我们（.ccf-fab，右下）共用同一套视觉与动效，
+   设计令牌对齐 cecp-intercom 的悬浮球：中性卡片色 + 单一强调色 + 柔和阴影 + 呼吸光环。 */
+.rt7-fab, .ccf-fab{
+  --fab-card:#ffffff;
+  --fab-border:rgba(0,0,0,.08);
+  --fab-ink:#1d1d1f;
+  --fab-acc:#0071e3;
+  --fab-acc-rgb:0,113,227;
+  --fab-shadow:0 2px 12px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.1);
+  position:fixed; z-index:2147483630;
+  width:56px; height:56px; padding:0; border-radius:999px;
+  align-items:center; justify-content:center;
+  border:1px solid var(--fab-border);
+  background:var(--fab-card); color:var(--fab-ink);
+  box-shadow:var(--fab-shadow);
+  cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
+  transition:transform .45s cubic-bezier(.34,1.56,.64,1), color .2s ease,
+             background .25s ease, border-color .25s ease, box-shadow .25s ease,
+             bottom .3s cubic-bezier(.34,1.4,.64,1);
 }
-.ccf-fab:hover{ transform:translateY(-2px); background:rgba(24,28,34,.9); }
-.ccf-fab:active{ transform:scale(.94); }
-.ccf-fab .cfi{ width:26px; height:26px; transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
-.ccf-fab:hover .cfi{ transform:rotate(-8deg) scale(1.1); }
-/* 首次出现时描边绘制入场 */
-.ccf-fab .cfi [pathLength]{ animation:cfi-draw 1.1s cubic-bezier(.4,0,.2,1) .25s both; }
-/* 薄荷光晕呼吸（与工具导游罗盘一致） */
-.ccf-fab::after{
-  content:""; position:absolute; inset:-2px; border-radius:999px; pointer-events:none;
-  animation:rt7glow 2.4s ease-out infinite;
+.rt7-fab.rt7-dark, .ccf-fab.ccf-dark{
+  --fab-card:#1d1d1f;
+  --fab-border:rgba(255,255,255,.1);
+  --fab-ink:#f5f5f7;
+  --fab-acc:#2997ff;
+  --fab-acc-rgb:41,151,255;
+  --fab-shadow:0 2px 12px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.5);
 }
-/* 主题"回到顶部"按钮出现时上移避让 */
-.ccf-fab.ccf-lift{ bottom:88px; }
+@media (hover:hover){
+  .rt7-fab:hover, .ccf-fab:hover{ transform:scale(1.06); color:var(--fab-acc); }
+}
+.rt7-fab:active, .ccf-fab:active{ transform:scale(.9); }
+.rt7-fab .cfi, .ccf-fab .cfi{ width:26px; height:26px; transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+.rt7-fab:hover .cfi, .ccf-fab:hover .cfi{ transform:scale(1.08); }
+/* 出现时描边绘制（导游随滚动出现、联系我们载入时各触发一次） */
+.rt7-fab .cfi [pathLength], .ccf-fab .cfi [pathLength]{ animation:cfi-draw 1s cubic-bezier(.4,0,.2,1) both; }
+/* 常驻呼吸光环：Apple 未读 ripple 的柔和常驻版，强调色随主题 */
+.rt7-fab::after, .ccf-fab::after{
+  content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none;
+  border:1.5px solid rgba(var(--fab-acc-rgb),.5);
+  animation:fab-breathe 3s ease-out infinite;
+}
+@keyframes fab-breathe{
+  0%  { transform:scale(1);    opacity:.5; }
+  70% { transform:scale(1.35); opacity:0; }
+  100%{ transform:scale(1.35); opacity:0; }
+}
+/* 定位：联系我们右下（导游定位/显隐见上方 tour 块 + updateFab） */
+.ccf-fab{ right:20px; bottom:20px; display:flex; }
 @media (max-width:520px){
-  .ccf-fab{ width:52px; height:52px; right:14px; bottom:14px; }
-  .ccf-fab .cfi{ width:24px; height:24px; }
-  .ccf-fab.ccf-lift{ bottom:78px; }
+  .rt7-fab, .ccf-fab{ width:52px; height:52px; }
+  .rt7-fab{ left:12px; bottom:12px; }
+  .ccf-fab{ right:14px; bottom:14px; }
+  .rt7-fab .cfi, .ccf-fab .cfi{ width:24px; height:24px; }
 }
 
 /* 无障碍：用户偏好减少动态时全部静止 */
 @media (prefers-reduced-motion:reduce){
-  .cfi, .cfi *, .rt7-ico::after, .ccf-fab::after{ animation:none !important; transition:none !important; }
+  .cfi, .cfi *, .rt7-fab::after, .ccf-fab::after{ animation:none !important; transition:none !important; }
 }

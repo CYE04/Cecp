@@ -671,6 +671,34 @@ document.addEventListener('keydown', function(e) {
   }, true);
 })();
 
+/* ===== CECP 悬浮按钮主题探测（明暗双主题，复用 HBW 的正文亮度判断） ===== */
+(function(){
+  if(window.CECPFooterTheme) return;
+  var subs=[], cur;
+  function isDark(){
+    try{
+      var c=getComputedStyle(document.body).color;
+      var m=c.match(/(\d+)[,\s]+(\d+)[,\s]+(\d+)/);
+      if(m){ var L=0.2126*+m[1]+0.7152*+m[2]+0.0722*+m[3]; if(L>165)return true; if(L<105)return false; }
+    }catch(e){}
+    return window.matchMedia?window.matchMedia('(prefers-color-scheme:dark)').matches:false;
+  }
+  function apply(){ var d=isDark(); if(d===cur)return; cur=d; for(var i=0;i<subs.length;i++){ try{subs[i](d);}catch(e){} } }
+  window.CECPFooterTheme={
+    isDark:isDark,
+    subscribe:function(fn){ subs.push(fn); try{fn(isDark());}catch(e){} },
+    refresh:apply
+  };
+  if(window.matchMedia){ try{ window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',apply); }catch(e){ try{window.matchMedia('(prefers-color-scheme:dark)').addListener(apply);}catch(_){} } }
+  (function watch(){
+    if(!document.body){ setTimeout(watch,60); return; }
+    var mo=new MutationObserver(apply);
+    mo.observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme','style']});
+    mo.observe(document.body,{attributes:true,attributeFilter:['class','data-theme','style']});
+    apply();
+  })();
+})();
+
 /* ===== Ring Coach Tour v7.1 ===== */
 (function(){
 'use strict';
@@ -894,16 +922,15 @@ function mk(tag,cls,html){ var e=document.createElement(tag||'div'); if(cls) e.c
 /* ── 动态图标（与 HBW 同一套 Iconify/Tabler 线条风格） ── */
 function rtIco(p,cls){ return '<svg class="cfi'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+p+'</svg>'; }
 var RT_ICONS={
-  compass: rtIco('<path pathLength="1" d="M8 16l2 -6l6 -2l-2 6z"/><circle pathLength="1" cx="12" cy="12" r="9"/>'),
+  help: rtIco('<circle pathLength="1" cx="12" cy="12" r="9"/><path pathLength="1" d="M12 16v.01"/><path pathLength="1" d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"/>'),
   x: rtIco('<path pathLength="1" d="M18 6l-12 12"/><path pathLength="1" d="M6 6l12 12"/>'),
   play: '<svg class="cfi rt7-play" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true" focusable="false"><path d="M7 4.5a1 1 0 0 1 1.54 -.84l11 7.5a1 1 0 0 1 0 1.68l-11 7.5a1 1 0 0 1 -1.54 -.84z"/></svg>'
 };
 
 var fab=mk('button','rt7-fab'); fab.type='button';
-fab.innerHTML='<span class="rt7-ico">'+RT_ICONS.compass+'</span>'
-  +'<div style="display:flex;flex-direction:column;line-height:1.1;">'
-  +'<div class="rt7-fname">工具导游</div>'
-  +'<div class="rt7-ftip">选择功能逐步讲解</div></div>';
+fab.title='功能导览 · 使用帮助';
+fab.setAttribute('aria-label','功能导览 · 使用帮助');
+fab.innerHTML=RT_ICONS.help;
 
 var mask=mk('div','rt7-mask');
 var hub=mk('div','rt7-hub');
@@ -936,6 +963,7 @@ tip.innerHTML=''
   +'</div></div>';
 
 document.body.append(mask,hub,hl,ring,tip,fab);
+if(window.CECPFooterTheme) window.CECPFooterTheme.subscribe(function(d){ fab.classList.toggle('rt7-dark',d); });
 
 var $hx  = hub.querySelector('.rt7-hx');
 var $tipx= tip.querySelector('.rt7-tipx');
@@ -1120,16 +1148,33 @@ function boot(){
   });
   document.body.appendChild(b);
 
-  /* 避让主题的"回到顶部"按钮（同在右下角，滚动后出现） */
-  var stt = document.getElementById('btn-scroll-to-top');
-  if(stt){
-    var sync = function(){
-      var vis = !stt.classList.contains('opacity-0') && getComputedStyle(stt).display !== 'none';
-      b.classList.toggle('ccf-lift', vis);
-    };
-    new MutationObserver(sync).observe(stt, {attributes:true, attributeFilter:['class','style']});
-    sync();
+  /* 明暗双主题：与工具导游共用同一探测器 */
+  if(window.CECPFooterTheme) window.CECPFooterTheme.subscribe(function(d){ b.classList.toggle('ccf-dark',d); });
+
+  /* 避让主题的"回到顶部"按钮（同在右下角，滚动后出现）：
+     实测其可见位置，动态把联系按钮抬到它上方，而不是靠猜 class 名。 */
+  var raf = 0;
+  function reflow(){
+    if(raf) return;
+    raf = requestAnimationFrame(function(){
+      raf = 0;
+      var stt = document.getElementById('btn-scroll-to-top');
+      if(stt){
+        var cs = getComputedStyle(stt);
+        var vis = cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity || '0') > 0.1;
+        if(vis){
+          var r = stt.getBoundingClientRect();
+          if(r.height){ b.style.bottom = Math.round(window.innerHeight - r.top + 12) + 'px'; return; }
+        }
+      }
+      b.style.bottom = '';
+    });
   }
+  window.addEventListener('scroll', reflow, {passive:true});
+  window.addEventListener('resize', reflow, {passive:true});
+  var stt0 = document.getElementById('btn-scroll-to-top');
+  if(stt0) new MutationObserver(reflow).observe(stt0, {attributes:true, attributeFilter:['class','style']});
+  reflow();
 }
 
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
