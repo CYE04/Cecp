@@ -186,7 +186,7 @@
   display:flex; align-items:center; gap:8px;
   cursor:pointer; user-select:none; font-weight:900; font-size:13px; touch-action:manipulation;
 }
-.hbw-act-icon{ font-size:16px; line-height:1; }
+.hbw-act-icon{ width:18px; height:18px; display:inline-grid; place-items:center; line-height:1; }
 @media (max-width:520px){
   .hbw-act .txt{ display:none; }
   .hbw-act{ width:44px; padding:0; justify-content:center; }
@@ -535,4 +535,89 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 }
 .hbw.hbw-pres .hbw-vn {
   color: rgba(255,255,255,0.35) !important;
+}
+
+/* ===== CECP-FOOTER-ICONS：动态图标统一动效 =====
+   图标来源：Iconify/Tabler（yesicon.app），内联描边 SVG，pathLength=1。
+   动效方案：入场描边绘制 + hover 弹性微动，全站图标共用这一套。 */
+.cfi{ width:18px; height:18px; display:block; }
+.cfi [pathLength]{ stroke-dasharray:1; stroke-dashoffset:0; }
+@keyframes cfi-draw{ from{ stroke-dashoffset:1; } to{ stroke-dashoffset:0; } }
+
+/* 圣经卡片 / 弹窗标题图标 */
+.hbw-title-ico{ display:inline-flex; align-self:center; color:var(--sub); flex:0 0 auto; }
+.hbw-title-ico .cfi{ width:20px; height:20px; }
+.hbw-card:hover .hbw-title-ico .cfi [pathLength]{ animation:cfi-draw .9s cubic-bezier(.4,0,.2,1) both; }
+
+/* 弹窗操作按钮（投屏 / 全屏 / 关闭） */
+.hbw-act,.hbw-x{ transition:background .15s ease, border-color .15s ease, transform .15s ease; }
+.hbw-act:hover,.hbw-x:hover{ background:var(--chip2); transform:translateY(-1px); }
+.hbw-act:active,.hbw-x:active{ transform:scale(.95); }
+.hbw-act .cfi{ transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
+.hbw-act:hover .cfi{ transform:scale(1.15); }
+.hbw-x .cfi{ width:18px; height:18px; transition:transform .32s cubic-bezier(.34,1.56,.64,1); }
+.hbw-x:hover .cfi{ transform:rotate(90deg); }
+/* 弹窗打开时顶栏图标做一次描边绘制 */
+.hbw-modal.is-open .hbw-panelbar .cfi [pathLength]{ animation:cfi-draw .8s cubic-bezier(.4,0,.2,1) both; }
+
+/* 全屏按钮状态切换：默认显示放大图标，全屏中显示还原图标 */
+.hbw-act[data-fs] .cfi-min{ display:none; }
+.hbw-act[data-fs][aria-pressed="true"] .cfi-max{ display:none; }
+.hbw-act[data-fs][aria-pressed="true"] .cfi-min{ display:block; }
+
+/* 工具导游悬浮按钮：罗盘轻摆 + 薄荷光晕呼吸 */
+.rt7-ico{ width:20px; height:20px; flex:0 0 auto; color:var(--rtac); display:grid; place-items:center; position:relative; }
+.rt7-ico .cfi{ width:20px; height:20px; animation:cfi-compass 5s ease-in-out infinite; }
+.rt7-fab:hover .rt7-ico .cfi{ animation-duration:1.6s; }
+@keyframes cfi-compass{ 0%,100%{ transform:rotate(-14deg); } 50%{ transform:rotate(14deg); } }
+.rt7-ico::after{
+  content:""; position:absolute; inset:-3px; border-radius:999px; pointer-events:none;
+  animation:rt7glow 2.4s ease-out infinite;
+}
+@keyframes rt7glow{
+  0%  { box-shadow:0 0 0 0    rgba(120,255,210,.30); }
+  70% { box-shadow:0 0 0 8px  rgba(120,255,210,0);   }
+  100%{ box-shadow:0 0 0 0    rgba(120,255,210,0);   }
+}
+
+/* 导览 hub / 步骤气泡的关闭按钮与"开始教程"胶囊 */
+.rt7-hx .cfi,.rt7-tipx .cfi{ width:15px; height:15px; transition:transform .32s cubic-bezier(.34,1.56,.64,1); }
+.rt7-hx:hover .cfi,.rt7-tipx:hover .cfi{ transform:rotate(90deg); }
+.rt7-play{ width:10px !important; height:10px !important; color:var(--rtac); flex:0 0 auto; }
+.rt7-hcard:hover .rt7-play{ transform:scale(1.25); transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
+
+/* ===== CECP-CONTACT-FAB：Intercom 风格联系入口（与 CECP-FOOTER-ICONS 同套动效） ===== */
+.ccf-fab{
+  position:fixed; right:20px; bottom:20px; z-index:2147483629;
+  width:58px; height:58px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(18,20,24,.78); color:rgba(255,255,255,.92);
+  box-shadow:0 14px 40px rgba(0,0,0,.4);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  display:grid; place-items:center; cursor:pointer; user-select:none;
+  -webkit-tap-highlight-color:transparent; padding:0;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1), bottom .25s ease, background .15s ease;
+}
+.ccf-fab:hover{ transform:translateY(-2px); background:rgba(24,28,34,.9); }
+.ccf-fab:active{ transform:scale(.94); }
+.ccf-fab .cfi{ width:26px; height:26px; transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
+.ccf-fab:hover .cfi{ transform:rotate(-8deg) scale(1.1); }
+/* 首次出现时描边绘制入场 */
+.ccf-fab .cfi [pathLength]{ animation:cfi-draw 1.1s cubic-bezier(.4,0,.2,1) .25s both; }
+/* 薄荷光晕呼吸（与工具导游罗盘一致） */
+.ccf-fab::after{
+  content:""; position:absolute; inset:-2px; border-radius:999px; pointer-events:none;
+  animation:rt7glow 2.4s ease-out infinite;
+}
+/* 主题"回到顶部"按钮出现时上移避让 */
+.ccf-fab.ccf-lift{ bottom:88px; }
+@media (max-width:520px){
+  .ccf-fab{ width:52px; height:52px; right:14px; bottom:14px; }
+  .ccf-fab .cfi{ width:24px; height:24px; }
+  .ccf-fab.ccf-lift{ bottom:78px; }
+}
+
+/* 无障碍：用户偏好减少动态时全部静止 */
+@media (prefers-reduced-motion:reduce){
+  .cfi, .cfi *, .rt7-ico::after, .ccf-fab::after{ animation:none !important; transition:none !important; }
 }

@@ -44,6 +44,16 @@ document.addEventListener('keydown', function(e) {
   const PRIMARY_YV="YV:";
   const DEFAULT_PRIMARY=PRIMARY_LOCAL;
 
+  /* ── 动态图标（Iconify/Tabler 线条集，内联 SVG，pathLength=1 供描边动画） ── */
+  const CFI=(p,cls)=>`<svg class="cfi${cls?" "+cls:""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+  const ICONS={
+    book: CFI('<path pathLength="1" d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path pathLength="1" d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path pathLength="1" d="M3 6v13"/><path pathLength="1" d="M12 6v13"/><path pathLength="1" d="M21 6v13"/>'),
+    cast: CFI('<path pathLength="1" d="M3 19h.01"/><path pathLength="1" d="M7 19a4 4 0 0 0 -4 -4"/><path pathLength="1" d="M11 19a8 8 0 0 0 -8 -8"/><path pathLength="1" d="M15 19h3a2 2 0 0 0 2 -2v-10a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2v1"/>'),
+    max: CFI('<path pathLength="1" d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path pathLength="1" d="M4 16v2a2 2 0 0 0 2 2h2"/><path pathLength="1" d="M16 4h2a2 2 0 0 1 2 2v2"/><path pathLength="1" d="M16 20h2a2 2 0 0 0 2 -2v-2"/>',"cfi-max"),
+    min: CFI('<path pathLength="1" d="M15 19v-2a2 2 0 0 1 2 -2h2"/><path pathLength="1" d="M15 5v2a2 2 0 0 0 2 2h2"/><path pathLength="1" d="M5 15h2a2 2 0 0 1 2 2v2"/><path pathLength="1" d="M5 9h2a2 2 0 0 0 2 -2v-2"/>',"cfi-min"),
+    x: CFI('<path pathLength="1" d="M18 6l-12 12"/><path pathLength="1" d="M6 6l12 12"/>'),
+  };
+
   const DESIRED_T2=[
     {code:"",label:"无第二译本"},
     {code:"YV:36",label:"CCB · 当代圣经 (简体)"},
@@ -259,12 +269,12 @@ document.addEventListener('keydown', function(e) {
       <div class="hbw-panel" role="dialog" aria-modal="true">
         <div class="hbw-handle" data-handle></div>
         <div class="hbw-panelbar">
-          <div class="hbw-title"><span data-title>经文</span></div>
+          <div class="hbw-title"><span class="hbw-title-ico">${ICONS.book}</span><span data-title>经文</span></div>
           <div class="hbw-actions">
             <div class="hbw-shortcut-badge" title="按等号键快速打开">按 <kbd>=</kbd> 快速打开</div>
-            <div class="hbw-act" data-pres title="投屏"><span class="hbw-act-icon">📺</span><span class="txt">投屏</span></div>
-            <div class="hbw-act" data-fs title="全屏"><span class="hbw-act-icon">⛶</span><span class="txt">全屏</span></div>
-            <div class="hbw-x" data-close="1">✕</div>
+            <div class="hbw-act" data-pres title="投屏"><span class="hbw-act-icon">${ICONS.cast}</span><span class="txt">投屏</span></div>
+            <div class="hbw-act" data-fs title="全屏" aria-pressed="false"><span class="hbw-act-icon">${ICONS.max}${ICONS.min}</span><span class="txt">全屏</span></div>
+            <div class="hbw-x" data-close="1">${ICONS.x}</div>
           </div>
         </div>
         <div class="hbw-scroll">
@@ -479,6 +489,7 @@ document.addEventListener('keydown', function(e) {
     const root=document.createElement("div");root.className="hbw hbw-card";root.__hbw_base_el=mount;applyTheme(root,mount);
     const hdr=document.createElement("div");hdr.className="hbw-header";
     const ttl=document.createElement("div");ttl.className="hbw-title";
+    const tIc=document.createElement("span");tIc.className="hbw-title-ico";tIc.innerHTML=ICONS.book;ttl.appendChild(tIc);
     const tM=document.createElement("span");const tS=document.createElement("small");ttl.appendChild(tM);ttl.appendChild(tS);
     const cps=document.createElement("div");cps.className="hbw-chips";
     const c1=document.createElement("div");c1.className="hbw-chip hbw-chip-strong";
@@ -879,8 +890,17 @@ var MODS={
 };
 
 function mk(tag,cls,html){ var e=document.createElement(tag||'div'); if(cls) e.className=cls; if(html) e.innerHTML=html; return e; }
+
+/* ── 动态图标（与 HBW 同一套 Iconify/Tabler 线条风格） ── */
+function rtIco(p,cls){ return '<svg class="cfi'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+p+'</svg>'; }
+var RT_ICONS={
+  compass: rtIco('<path pathLength="1" d="M8 16l2 -6l6 -2l-2 6z"/><circle pathLength="1" cx="12" cy="12" r="9"/>'),
+  x: rtIco('<path pathLength="1" d="M18 6l-12 12"/><path pathLength="1" d="M6 6l12 12"/>'),
+  play: '<svg class="cfi rt7-play" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true" focusable="false"><path d="M7 4.5a1 1 0 0 1 1.54 -.84l11 7.5a1 1 0 0 1 0 1.68l-11 7.5a1 1 0 0 1 -1.54 -.84z"/></svg>'
+};
+
 var fab=mk('button','rt7-fab'); fab.type='button';
-fab.innerHTML='<span class="rt7-dot"></span>'
+fab.innerHTML='<span class="rt7-ico">'+RT_ICONS.compass+'</span>'
   +'<div style="display:flex;flex-direction:column;line-height:1.1;">'
   +'<div class="rt7-fname">工具导游</div>'
   +'<div class="rt7-ftip">选择功能逐步讲解</div></div>';
@@ -890,12 +910,12 @@ var hub=mk('div','rt7-hub');
 hub.innerHTML='<div class="rt7-hp">'
   +'<div class="rt7-hub-top"><div><h3 class="rt7-hub-title">功能导览</h3>'
   +'<p class="rt7-hub-desc">选择功能 · 小圆圈逐一指向每个按钮讲解</p></div>'
-  +'<button class="rt7-hx" type="button">✕</button></div>'
+  +'<button class="rt7-hx" type="button">'+RT_ICONS.x+'</button></div>'
   +'<div class="rt7-hub-body">'
   +Object.keys(MODS).map(function(k){
     var m=MODS[k];
     return '<div class="rt7-hcard" data-mod="'+k+'"><h4>'+m.label+'</h4>'
-      +'<p>'+m.desc+'</p><div class="rt7-chip"><i></i>开始教程</div></div>';
+      +'<p>'+m.desc+'</p><div class="rt7-chip">'+RT_ICONS.play+'开始教程</div></div>';
   }).join('')
   +'</div></div>';
 
@@ -907,7 +927,7 @@ tip.innerHTML=''
   +'<div class="rt7-tip-ico" id="r7ico"></div>'
   +'<div class="rt7-tip-htxt"><div class="rt7-tip-h1" id="r7h1"></div>'
   +'<div class="rt7-tip-h2" id="r7h2"></div></div>'
-  +'<button class="rt7-tipx" type="button">✕</button></div>'
+  +'<button class="rt7-tipx" type="button">'+RT_ICONS.x+'</button></div>'
   +'<div class="rt7-tip-body" id="r7bd"></div>'
   +'<div class="rt7-tip-foot"><div class="rt7-prog" id="r7pg"></div>'
   +'<div class="rt7-btns">'
@@ -1064,5 +1084,55 @@ else updateFab();
 
 } // end initTour
 initTourWhenReady();
+})();
+
+/* ===== CECP 联系入口悬浮按钮 v1.0（Intercom 风格，方案 a：跳转联系页） ===== */
+(function(){
+'use strict';
+if(window.__CECP_CONTACT_FAB__) return; window.__CECP_CONTACT_FAB__=true;
+
+/* 配置钩子：以后接真客服系统时，在页面里提前定义
+   window.CECP_CONTACT = { action: function(){ ... } } 即可整体接管点击 */
+var CFG = window.CECP_CONTACT = Object.assign({
+  href: '/contacts',
+  title: '联系我们 · Contattaci',
+  action: null
+}, window.CECP_CONTACT || {});
+
+function boot(){
+  if(document.getElementById('cecp-contact-fab')) return;
+  /* 联系页本身不显示入口 */
+  if(location.pathname.replace(/\/+$/,'') === CFG.href.replace(/\/+$/,'')) return;
+
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.id = 'cecp-contact-fab';
+  b.className = 'ccf-fab';
+  b.title = CFG.title;
+  b.setAttribute('aria-label', CFG.title);
+  b.innerHTML = '<svg class="cfi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'
+    + '<path pathLength="1" d="M3 20l1.3 -3.9c-2.324 -3.437 -1.426 -7.872 2.1 -10.374c3.526 -2.501 8.59 -2.296 11.845 .48c3.255 2.777 3.695 7.266 1.029 10.501c-2.666 3.235 -7.615 4.215 -11.574 2.293z"/>'
+    + '<path pathLength="1" d="M9 11h.01"/><path pathLength="1" d="M12 11h.01"/><path pathLength="1" d="M15 11h.01"/>'
+    + '</svg>';
+  b.addEventListener('click', function(){
+    if(typeof CFG.action === 'function'){ CFG.action(); return; }
+    location.href = CFG.href;
+  });
+  document.body.appendChild(b);
+
+  /* 避让主题的"回到顶部"按钮（同在右下角，滚动后出现） */
+  var stt = document.getElementById('btn-scroll-to-top');
+  if(stt){
+    var sync = function(){
+      var vis = !stt.classList.contains('opacity-0') && getComputedStyle(stt).display !== 'none';
+      b.classList.toggle('ccf-lift', vis);
+    };
+    new MutationObserver(sync).observe(stt, {attributes:true, attributeFilter:['class','style']});
+    sync();
+  }
+}
+
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
+else boot();
 })();
 
