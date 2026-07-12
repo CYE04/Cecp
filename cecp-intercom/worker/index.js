@@ -23,11 +23,17 @@
 const DAILY_RESET_STAMP_KEY = 'daily_reset_stamp';
 const DEFAULT_DAILY_RESET_TZ = 'Europe/Rome';
 
+// 消息历史：音控台可能晚于成员上线，需把当天的舞台请求 / 群聊暂存，
+// operator 一注册就回放。持久化到 DO storage 以扛住 WebSocket 休眠回收。
+const HISTORY_KEY = 'msg_history_v1';
+const HISTORY_MAX = 120;
+
 export class WorshipRoom {
   constructor(state, env) {
     this.state = state;
     this.env = env;
     this.resetTimeZone = String((env && env.DAILY_RESET_TZ) || DEFAULT_DAILY_RESET_TZ).trim() || DEFAULT_DAILY_RESET_TZ;
+    this._history = null; // 懒加载缓存
   }
 
   async fetch(request) {
@@ -156,6 +162,11 @@ export class WorshipRoom {
           });
         }
 
+        // operator 晚上线：回放当天暂存的舞台请求 / 群聊，避免漏收。
+        if (regRole === 'operator') {
+          await this._replayHistoryTo(ws);
+        }
+
         break;
       }
 
@@ -167,7 +178,7 @@ export class WorshipRoom {
         const text = cleanText(msg.text, 500);
         if (!text) break;
 
-        this._broadcast({
+        const worshipPayload = {
           type: 'worship_msg',
           id: cleanId(msg.id, 'worship'),
           from: meta.name || '?',
@@ -176,7 +187,10 @@ export class WorshipRoom {
           priority: msg.priority === 'high' ? 'high' : 'normal',
           text,
           ts: Date.now(),
-        }, ws, 'operator');
+        };
+        this._broadcast(worshipPayload, ws, 'operator');
+        // 暂存供晚上线的 operator 回放（带初始状态）
+        await this._pushHistory({ ...worshipPayload, status: 'pending' });
 
         break;
       }
@@ -190,14 +204,16 @@ export class WorshipRoom {
         const text = cleanText(msg.text, 500);
         if (!text) break;
 
-        this._broadcast({
+        const chatPayload = {
           type: 'member_chat',
           id: cleanId(msg.id, 'member'),
           from: senderName,
           identityType: meta?.identityType || 'other',
           text,
           ts: Date.now(),
-        }, ws, null, (target) => target?.role === 'client' || target?.role === 'operator');
+        };
+        this._broadcast(chatPayload, ws, null, (target) => target?.role === 'client' || target?.role === 'operator');
+        await this._pushHistory(chatPayload);
 
         break;
       }
@@ -248,6 +264,9 @@ export class WorshipRoom {
           status,
           ts: Date.now(),
         }, null, null, (m) => m?.role === 'operator' || m?.role === 'client');
+
+        // 同步进历史，第二个 operator 回放时看到的是最新状态
+        await this._updateHistoryStatus(rawId, status);
 
         break;
       }
@@ -411,6 +430,46 @@ export class WorshipRoom {
     }, null, null, (meta) => meta?.role === 'client' || meta?.role === 'listener');
   }
 
+  // ── 消息历史（operator 晚上线也能看到之前的请求 / 群聊）──────
+  async _loadHistory() {
+    if (this._history == null) {
+      this._history = (await this.state.storage.get(HISTORY_KEY)) || [];
+    }
+    return this._history;
+  }
+
+  async _pushHistory(entry) {
+    const hist = await this._loadHistory();
+    hist.push(entry);
+    if (hist.length > HISTORY_MAX) hist.splice(0, hist.length - HISTORY_MAX);
+    await this.state.storage.put(HISTORY_KEY, hist);
+  }
+
+  async _updateHistoryStatus(id, status) {
+    const hist = await this._loadHistory();
+    let changed = false;
+    for (const e of hist) {
+      if (e.type === 'worship_msg' && e.id === id && e.status !== status) {
+        e.status = status;
+        changed = true;
+      }
+    }
+    if (changed) await this.state.storage.put(HISTORY_KEY, hist);
+  }
+
+  async _clearHistory() {
+    this._history = [];
+    await this.state.storage.delete(HISTORY_KEY);
+  }
+
+  // operator 注册后回放当天历史（按时间顺序，前端各自归类）
+  async _replayHistoryTo(ws) {
+    const hist = await this._loadHistory();
+    for (const entry of hist) {
+      safeSend(ws, { ...entry, replay: true });
+    }
+  }
+
   async _ensureDailyResetAlarm(force) {
     const currentAlarm = await this.state.storage.getAlarm();
     if (!force && currentAlarm != null && currentAlarm > Date.now() + 1000) return;
@@ -423,6 +482,7 @@ export class WorshipRoom {
     if (lastStamp === stamp) return;
 
     await this.state.storage.put(DAILY_RESET_STAMP_KEY, stamp);
+    await this._clearHistory();
 
     this._broadcast({
       type: 'daily_reset',
