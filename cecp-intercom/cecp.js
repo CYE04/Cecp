@@ -321,7 +321,7 @@
     '  --blue:var(--acc);--blue-soft:var(--acc-soft);',
     '  --bg:#f5f5f7;--card:#ffffff;--card2:#f5f5f7;--card3:#e8e8ed;',
     '  --text:#1d1d1f;--muted:#86868b;--border:rgba(0,0,0,.08);--border-strong:rgba(0,0,0,.16);',
-    '  --glass:rgba(255,255,255,.72);',
+    '  --glass:rgba(255,255,255,.86);',
     '  --shadow:0 22px 64px rgba(0,0,0,.13),0 2px 10px rgba(0,0,0,.05);--shadow-soft:0 2px 12px rgba(0,0,0,.06);',
     '  --r-lg:22px;--r-md:13px;--r-sm:10px;',
     '  --r-in:26px;--r-out:9px;',
@@ -339,7 +339,7 @@
     '  --orange:#ff9f0a;--orange-soft:rgba(255,159,10,.16);',
     '  --bg:#161617;--card:#1d1d1f;--card2:#28282a;--card3:#333336;',
     '  --text:#f5f5f7;--muted:#a1a1a6;--border:rgba(255,255,255,.1);--border-strong:rgba(255,255,255,.22);',
-    '  --glass:rgba(29,29,31,.72);',
+    '  --glass:rgba(29,29,31,.88);',
     '  --shadow:0 24px 70px rgba(0,0,0,.55),0 2px 12px rgba(0,0,0,.35);--shadow-soft:0 2px 12px rgba(0,0,0,.3);',
     '  --t-white:#aeaeb2;--t-black:#636366;',
     '}',
@@ -350,9 +350,9 @@
     '.cf.is-page{height:100%}',
     '.cf-stage{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}',
 
-    /* ── 悬浮球（贴角圆角语言 + 玻璃材质）── */
-    '.cf.is-floating .cf-launcher{position:fixed;z-index:2147482800;width:58px;height:58px;',
-    '  background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);',
+    /* ── 悬浮球（贴角圆角语言 + 玻璃材质；不支持 backdrop-filter 时退回实色）── */
+    '.cf.is-floating .cf-launcher{position:fixed;z-index:2147483640;width:58px;height:58px;',
+    '  background:var(--card);',
     '  border:1px solid var(--border);box-shadow:var(--shadow-soft),0 12px 32px rgba(0,0,0,.1);color:var(--text);',
     '  display:flex;align-items:center;justify-content:center;',
     '  transition:transform .45s cubic-bezier(.34,1.56,.64,1),color .2s ease,border-radius .3s ease}',
@@ -377,8 +377,8 @@
     '  background:var(--red);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;',
     '  box-shadow:0 1px 4px rgba(0,0,0,.25)}',
 
-    /* ── 悬浮面板：从停靠角长出来 ── */
-    '.cf.is-floating .cf-panel{position:fixed;z-index:2147482900;box-shadow:var(--shadow);border:1px solid var(--border);',
+    /* ── 悬浮面板：从停靠角长出来（面板本体永远实色不透底）── */
+    '.cf.is-floating .cf-panel{position:fixed;z-index:2147483642;box-shadow:var(--shadow);border:1px solid var(--border);',
     '  opacity:0;transform:scale(.92);pointer-events:none;',
     '  transition:opacity .26s cubic-bezier(.32,.72,0,1),transform .32s cubic-bezier(.32,.72,0,1),border-radius .3s ease}',
     '.cf.is-floating.is-open .cf-panel{opacity:1;transform:none;pointer-events:auto}',
@@ -387,15 +387,16 @@
     '  height:min(600px,calc(100vh - var(--dy,20px) - 96px));height:min(600px,calc(100dvh - var(--dy,20px) - 96px))}',
     '.cf.orient-l.is-floating .cf-panel{width:min(760px,calc(100vw - 44px));',
     '  height:min(520px,calc(100vh - var(--dy,20px) - 96px));height:min(520px,calc(100dvh - var(--dy,20px) - 96px))}',
-    /* 四角锚定：--dx / --dy 由 JS 写入（含避让偏移） */
-    '.cf.dock-br .cf-launcher{right:var(--dx,20px);bottom:var(--dy,20px)}',
-    '.cf.dock-bl .cf-launcher{left:var(--dx,20px);bottom:var(--dy,20px)}',
-    '.cf.dock-tr .cf-launcher{right:var(--dx,20px);top:var(--dy,20px)}',
-    '.cf.dock-tl .cf-launcher{left:var(--dx,20px);top:var(--dy,20px)}',
-    '.cf.dock-br .cf-panel{right:var(--dx,20px);bottom:calc(var(--dy,20px) + 70px);transform-origin:100% 100%}',
-    '.cf.dock-bl .cf-panel{left:var(--dx,20px);bottom:calc(var(--dy,20px) + 70px);transform-origin:0 100%}',
-    '.cf.dock-tr .cf-panel{right:var(--dx,20px);top:calc(var(--dy,20px) + 70px);transform-origin:100% 0}',
-    '.cf.dock-tl .cf-panel{left:var(--dx,20px);top:calc(var(--dy,20px) + 70px);transform-origin:0 0}',
+    /* 四角锚定：--dx / --dy 由 JS 写入（含避让偏移）；叠加刘海/手势条安全区 */
+    '.cf{--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}',
+    '.cf.dock-br .cf-launcher{right:calc(var(--dx,20px) + var(--sar));bottom:calc(var(--dy,20px) + var(--sab))}',
+    '.cf.dock-bl .cf-launcher{left:calc(var(--dx,20px) + var(--sal));bottom:calc(var(--dy,20px) + var(--sab))}',
+    '.cf.dock-tr .cf-launcher{right:calc(var(--dx,20px) + var(--sar));top:calc(var(--dy,20px) + var(--sat))}',
+    '.cf.dock-tl .cf-launcher{left:calc(var(--dx,20px) + var(--sal));top:calc(var(--dy,20px) + var(--sat))}',
+    '.cf.dock-br .cf-panel{right:calc(var(--dx,20px) + var(--sar));bottom:calc(var(--dy,20px) + var(--sab) + 70px);transform-origin:100% 100%}',
+    '.cf.dock-bl .cf-panel{left:calc(var(--dx,20px) + var(--sal));bottom:calc(var(--dy,20px) + var(--sab) + 70px);transform-origin:0 100%}',
+    '.cf.dock-tr .cf-panel{right:calc(var(--dx,20px) + var(--sar));top:calc(var(--dy,20px) + var(--sat) + 70px);transform-origin:100% 0}',
+    '.cf.dock-tl .cf-panel{left:calc(var(--dx,20px) + var(--sal));top:calc(var(--dy,20px) + var(--sat) + 70px);transform-origin:0 0}',
     /* 贴角形状：靠屏幕角一侧圆角小、朝内三角圆角大；球与面板同语言 */
     '.cf.dock-br.is-floating .cf-panel{border-radius:var(--r-in) var(--r-in) var(--r-out) var(--r-in)}',
     '.cf.dock-bl.is-floating .cf-panel{border-radius:var(--r-in) var(--r-in) var(--r-in) var(--r-out)}',
@@ -405,18 +406,19 @@
     '.cf.dock-bl .cf-launcher{border-radius:19px 19px 19px 8px}',
     '.cf.dock-tr .cf-launcher{border-radius:19px 8px 19px 19px}',
     '.cf.dock-tl .cf-launcher{border-radius:8px 19px 19px 19px}',
-    /* 小屏竖屏：近全屏 sheet（保留贴角圆角），带遮罩 */
+    /* 小屏竖屏：近全屏 sheet（保留贴角圆角），带遮罩；尊重安全区 */
     '.cf-mask{display:none}',
-    '.cf.is-compact.is-floating .cf-panel{left:10px;right:10px;top:10px;bottom:10px;width:auto;height:auto;max-height:none}',
-    '.cf.is-compact.is-floating.is-open .cf-mask{display:block;position:fixed;inset:0;z-index:2147482850;',
-    '  background:rgba(0,0,0,.32);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}',
-    /* 横向视口：敬拜端快捷信息横着铺开（4 列），只保留纵向滚动 */
-    '.cf.orient-l.is-floating .cf-cue-grid{grid-template-columns:repeat(4,minmax(0,1fr))}',
+    '.cf.is-compact.is-floating .cf-panel{left:max(8px,var(--sal));right:max(8px,var(--sar));top:max(8px,var(--sat));bottom:max(8px,var(--sab));width:auto;height:auto;max-height:none}',
+    '.cf.is-compact.is-floating.is-open .cf-mask{display:block;position:fixed;inset:0;z-index:2147483641;',
+    '  background:rgba(0,0,0,.32)}',
 
-    /* ── 标题栏（玻璃材质）── */
+    /* ── 标题栏（实色打底；支持毛玻璃的环境才启用半透明+blur，页面内容绝不透出）── */
     '.cf-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;',
-    '  background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);',
-    '  border-bottom:1px solid var(--border)}',
+    '  background:var(--card);border-bottom:1px solid var(--border)}',
+    '@supports ((backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px))){',
+    '  .cf-bar{background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}',
+    '  .cf.is-floating .cf-launcher{background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}',
+    '}',
     '.cf.is-floating .cf-bar{display:flex}',
     '.cf-bar-title{font-weight:600;font-size:14px;letter-spacing:-.01em}',
     '.cf-bar-kicker{display:block;font-size:11px;color:var(--muted);letter-spacing:.02em}',
@@ -464,24 +466,40 @@
     '.tone-white{--tone:var(--t-white)}.tone-black{--tone:var(--t-black)}.tone-brown{--tone:var(--t-brown)}',
     '.tone-gold{--tone:var(--t-gold)}.tone-default{--tone:var(--t-default)}',
 
-    /* ── 选设备（setup）── */
-    '.cf-setup{flex:1;overflow-y:auto;padding:22px 18px 26px;-webkit-overflow-scrolling:touch}',
-    '.cf-setup-kicker{display:inline-block;font-size:12px;font-weight:600;color:var(--acc);letter-spacing:.01em}',
-    '.cf-setup h2{margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em}',
-    '.cf-setup-sub{color:var(--muted);font-size:14px;margin-bottom:18px}',
-    '.cf-preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}',
-    '.cf-preset{position:relative;display:flex;align-items:center;gap:10px;min-height:58px;padding:10px 12px;border-radius:var(--r-md);',
-    '  border:1px solid transparent;background:var(--card);box-shadow:var(--shadow-soft);text-align:left;',
-    '  transition:border-color .15s,transform .15s cubic-bezier(.32,.72,0,1);--tone:var(--t-default)}',
-    '.cf-preset:active{transform:scale(.97)}',
-    '.cf-preset.sel{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft),var(--shadow-soft)}',
-    '.cf-preset.taken{opacity:.45;cursor:not-allowed;box-shadow:none}',
-    '.cf-preset-led{width:9px;height:9px;border-radius:50%;background:var(--tone);flex:none}',
-    '.cf-preset-icon{font-size:20px;flex:none}',
-    '.cf-preset-copy{display:flex;flex-direction:column;min-width:0}',
-    '.cf-preset-name{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.cf-preset-sub{font-size:11px;color:var(--muted)}',
-    '.cf-preset-taken-badge{position:absolute;top:6px;right:8px;font-size:10px;color:var(--red);font-weight:600}',
+    /* ── 选设备（setup）：颜色是主体的紧凑网格；尺寸随组件自身宽度（cqi）缩放 ── */
+    '.cf-setup{flex:1;overflow-y:auto;padding:clamp(14px,4cqi,24px) clamp(12px,4cqi,24px) clamp(16px,4cqi,26px);-webkit-overflow-scrolling:touch}',
+    '.cf-setup-kicker{display:inline-block;font-size:clamp(10.5px,2.6cqi,12px);font-weight:600;color:var(--acc);letter-spacing:.02em}',
+    '.cf-setup h2{margin:4px 0 2px;font-size:clamp(17px,5cqi,23px);font-weight:700;letter-spacing:-.02em}',
+    '.cf-setup-sub{color:var(--muted);font-size:clamp(11.5px,3cqi,13.5px);margin-bottom:clamp(10px,3cqi,18px)}',
+    '.cf-preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(88px,26cqi,116px),1fr));gap:clamp(6px,1.6cqi,9px)}',
+    '.cf-preset{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;',
+    '  padding:clamp(8px,2.4cqi,13px) 4px clamp(7px,2cqi,11px);border-radius:var(--r-md);',
+    '  border:1px solid transparent;background:var(--card);box-shadow:var(--shadow-soft);text-align:center;',
+    '  transition:box-shadow .15s,transform .15s cubic-bezier(.32,.72,0,1)}',
+    '.cf-preset:active{transform:scale(.95)}',
+    /* 色环 + 着色图形：颜色一眼可辨 */
+    '.cf-preset-swatch{width:clamp(34px,10cqi,44px);height:clamp(34px,10cqi,44px);border-radius:50%;flex:none;',
+    '  display:flex;align-items:center;justify-content:center;color:var(--tone);',
+    '  background:color-mix(in srgb,var(--tone) 14%,var(--card));',
+    '  box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--tone) 55%,transparent)}',
+    '.cf-preset-swatch .cf-mic{width:58%;height:58%}',
+    '.cf-preset-swatch .cf-preset-emoji{font-size:clamp(17px,5cqi,21px);line-height:1}',
+    /* 白色/黄色话筒在浅色底上的可辨性特例 */
+    '.tone-white .cf-preset-swatch{background:#55555a;color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)}',
+    '.cf:not(.is-dark) .tone-yellow .cf-preset-swatch{color:#a8850a}',
+    '.cf-preset-name{max-width:100%;font-size:clamp(11.5px,3cqi,13px);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.cf-preset-sub{font-size:clamp(9.5px,2.4cqi,10.5px);color:var(--muted)}',
+    /* 选中：强调环 + 右上角对勾 */
+    '.cf-preset.sel{border-color:var(--acc);box-shadow:0 0 0 2.5px var(--acc-soft),var(--shadow-soft)}',
+    '.cf-preset-check{position:absolute;top:5px;right:5px;width:17px;height:17px;border-radius:50%;',
+    '  background:var(--acc);color:#fff;font-size:10.5px;font-weight:700;display:none;align-items:center;justify-content:center}',
+    '.cf-preset.sel .cf-preset-check{display:flex}',
+    /* 占用：整卡淡出置灰 + 「使用中」 */
+    '.cf-preset.taken{cursor:not-allowed;box-shadow:none;background:var(--card2)}',
+    '.cf-preset.taken .cf-preset-swatch{filter:grayscale(.85);opacity:.45}',
+    '.cf-preset.taken .cf-preset-name{color:var(--muted)}',
+    '.cf-preset.taken .cf-preset-sub{color:var(--red)}',
+    '.cf-preset-taken-badge{display:none}',
     '.cf-name-panel{display:none;margin-top:16px;padding:14px;border-radius:var(--r-md);background:var(--card);box-shadow:var(--shadow-soft)}',
     '.cf-name-panel.show{display:block}',
     '.cf-name-label{display:block;font-size:12.5px;font-weight:600;margin-bottom:8px}',
@@ -520,11 +538,25 @@
     '.cf-tab-badge{position:absolute;top:4px;right:8px;min-width:17px;height:17px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}',
     '.cf-pane{flex:1;display:none;flex-direction:column;min-height:0}',
     '.cf-pane.is-active{display:flex}',
+    /* 宽容器（桌面/横屏）：敬拜端双栏——快捷信息 + 群聊并排，Tab 收起 */
+    '@container (min-width:720px){',
+    '  .cf-app.is-client{display:grid!important;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr)}',
+    '  .cf-app.is-client .cf-client-head{grid-column:1/-1}',
+    '  .cf-app.is-client .cf-banner{grid-column:1/-1}',
+    '  .cf-app.is-client .cf-tabs{display:none}',
+    '  .cf-app.is-client .cf-pane{display:flex;grid-row:3}',
+    '  .cf-app.is-client .cf-pane-cues{grid-column:1}',
+    '  .cf-app.is-client .cf-pane-chat{grid-column:2;border-left:1px solid var(--border)}',
+    '  .cf-app.is-client .cf-pane-cues:last-child{grid-column:1/-1}',
+    '}',
 
     '.cf-cues-scroll{flex:1;overflow-y:auto;padding:14px 14px 6px;-webkit-overflow-scrolling:touch}',
     '.cf-cue-group{margin-bottom:18px}',
-    '.cf-cue-group-label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em;margin-bottom:8px}',
-    '.cf-cue-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}',
+    '.cf-cue-group-label{font-size:clamp(11px,2.8cqi,12px);font-weight:600;color:var(--muted);letter-spacing:.02em;margin-bottom:8px}',
+    /* 列数随组件宽度自适应（容器查询，不看视口） */
+    '.cf-cue-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
+    '@container (min-width:560px){.cf-cue-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}',
+    '@container (min-width:900px){.cf-cue-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}',
     '.cf-cue{position:relative;display:flex;align-items:center;gap:10px;min-height:58px;padding:9px 12px;border-radius:var(--r-md);',
     '  border:1px solid transparent;background:var(--card);box-shadow:var(--shadow-soft);text-align:left;',
     '  transition:transform .15s cubic-bezier(.32,.72,0,1);overflow:hidden}',
@@ -577,10 +609,10 @@
 
     /* ── 音控台 ── */
     '.cf-op{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}',
-    '.cf-op-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px 0}',
-    '.cf-stat{padding:12px 14px;border-radius:var(--r-md);background:var(--card);box-shadow:var(--shadow-soft)}',
-    '.cf-stat-label{font-size:11.5px;color:var(--muted);font-weight:500}',
-    '.cf-stat-value{font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}',
+    '.cf-op-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(6px,1.5cqi,10px);padding:12px 16px 0}',
+    '.cf-stat{padding:clamp(8px,2cqi,12px) clamp(10px,2.4cqi,14px);border-radius:var(--r-md);background:var(--card);box-shadow:var(--shadow-soft)}',
+    '.cf-stat-label{font-size:clamp(10.5px,2.4cqi,11.5px);color:var(--muted);font-weight:500}',
+    '.cf-stat-value{font-size:clamp(20px,4.6cqi,26px);font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}',
     '.cf-stat.is-alert .cf-stat-value{color:var(--red)}',
     /* 三栏按面板自身宽度断点（容器查询），嵌进窄容器也不挤扁 */
     '.cf-op-grid{flex:1;display:grid;grid-template-columns:240px minmax(0,1fr) 280px;gap:12px;padding:12px 16px 16px;min-height:0}',
@@ -656,15 +688,18 @@
     '.cf-target-chip.is-on{border-color:var(--acc);background:var(--acc-soft);color:var(--acc);font-weight:600}',
 
     /* ── Toast（跟随停靠角）── */
-    '.cf-toasts{position:fixed;z-index:2147483000;display:flex;flex-direction:column;gap:10px;',
+    '.cf-toasts{position:fixed;z-index:2147483643;display:flex;flex-direction:column;gap:10px;',
     '  max-width:min(340px,calc(100vw - 32px));pointer-events:none}',
-    '.cf.dock-br .cf-toasts{right:16px;bottom:calc(var(--dy,20px) + 74px);align-items:flex-end}',
-    '.cf.dock-bl .cf-toasts{left:16px;bottom:calc(var(--dy,20px) + 74px);align-items:flex-start}',
-    '.cf.dock-tr .cf-toasts{right:16px;top:calc(var(--dy,20px) + 74px);align-items:flex-end}',
-    '.cf.dock-tl .cf-toasts{left:16px;top:calc(var(--dy,20px) + 74px);align-items:flex-start}',
+    '.cf.dock-br .cf-toasts{right:calc(16px + var(--sar));bottom:calc(var(--dy,20px) + var(--sab) + 74px);align-items:flex-end}',
+    '.cf.dock-bl .cf-toasts{left:calc(16px + var(--sal));bottom:calc(var(--dy,20px) + var(--sab) + 74px);align-items:flex-start}',
+    '.cf.dock-tr .cf-toasts{right:calc(16px + var(--sar));top:calc(var(--dy,20px) + var(--sat) + 74px);align-items:flex-end}',
+    '.cf.dock-tl .cf-toasts{left:calc(16px + var(--sal));top:calc(var(--dy,20px) + var(--sat) + 74px);align-items:flex-start}',
     '.cf-toast{pointer-events:auto;display:flex;gap:10px;padding:12px 14px;border-radius:var(--r-md);cursor:pointer;',
-    '  background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);',
+    '  background:var(--card);',
     '  border:1px solid var(--border);box-shadow:var(--shadow);animation:cf-toast-in .32s cubic-bezier(.32,.72,0,1)}',
+    '@supports ((backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px))){',
+    '  .cf-toast{background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8)}',
+    '}',
     '.cf-toast-icon{font-size:18px;flex:none}',
     '.cf-toast-body{flex:1;min-width:0}',
     '.cf-toast-head{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--acc)}',
@@ -704,6 +739,13 @@
   var ICON_SVG = '<svg class="cf-ic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">'
     + '<path fill="currentColor" d="M2 12.124C2 6.533 6.477 2 12 2s10 4.533 10 10.124v5.243c0 .817 0 1.378-.143 1.87a3.52 3.52 0 0 1-1.847 2.188c-.458.22-1.004.307-1.801.434l-.13.02a13 13 0 0 1-.727.105c-.209.02-.422.027-.64-.016a2.1 2.1 0 0 1-1.561-1.35a2.2 2.2 0 0 1-.116-.639c-.012-.204-.012-.452-.012-.742v-4.173c0-.425 0-.791.097-1.105a2.1 2.1 0 0 1 1.528-1.43c.316-.073.677-.044 1.096-.01l.093.007l.11.01c.783.062 1.32.104 1.775.275q.481.181.883.487v-1.174c0-4.811-3.853-8.711-8.605-8.711s-8.605 3.9-8.605 8.711v1.174c.267-.203.563-.368.883-.487c.455-.17.992-.213 1.775-.276l.11-.009l.093-.007c.42-.034.78-.063 1.096.01a2.1 2.1 0 0 1 1.528 1.43c.098.314.097.68.097 1.105v4.172c0 .291 0 .54-.012.743c-.012.213-.04.427-.116.638a2.1 2.1 0 0 1-1.56 1.35a2.2 2.2 0 0 1-.641.017c-.201-.02-.444-.059-.727-.104l-.13-.02c-.797-.128-1.344-.215-1.801-.436a3.52 3.52 0 0 1-1.847-2.188c-.118-.405-.139-.857-.142-1.461L2 17.58z"/>'
     + '<path class="cf-ic-bars" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12 5.75a.75.75 0 0 1 .75.75v5a.75.75 0 1 1-1.5 0v-5a.75.75 0 0 1 .75-.75m3 1.5a.75.75 0 0 1 .75.75v2a.75.75 0 1 1-1.5 0V8a.75.75 0 0 1 .75-.75m-6 0a.75.75 0 0 1 .75.75v2a.75.75 0 0 1-1.5 0V8A.75.75 0 0 1 9 7.25"/>'
+    + '</svg>';
+
+  /* 话筒图形（着 --tone 色，选身份卡片用） */
+  var MIC_SVG = '<svg class="cf-mic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'
+    + '<rect x="9" y="2.5" width="6" height="11" rx="3" fill="currentColor" stroke="none"/>'
+    + '<path d="M5.5 11a6.5 6.5 0 0 0 13 0"/>'
+    + '<path d="M12 17.5V21"/><path d="M8.5 21h7"/>'
     + '</svg>';
 
   /* 四角停靠 */
@@ -842,6 +884,15 @@
     };
     window.addEventListener('resize', this.viewportHandler);
     window.addEventListener('orientationchange', this.viewportHandler);
+    /* 双保险：部分 WebView 只报 visualViewport / matchMedia */
+    try {
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', this.viewportHandler);
+    } catch (err) {}
+    try {
+      this.orientMedia = window.matchMedia('(orientation: portrait)');
+      if (this.orientMedia.addEventListener) this.orientMedia.addEventListener('change', this.viewportHandler);
+      else if (this.orientMedia.addListener) this.orientMedia.addListener(this.viewportHandler);
+    } catch (err) {}
   };
 
   /* ── 四角停靠 + 避让页面固定元素 ── */
@@ -991,7 +1042,7 @@
     }
     html += '<section class="cf-panel" role="' + (this.isFloating ? 'dialog' : 'region') + '" aria-label="' + esc(this.widgetTitle) + '">'
       + '<div class="cf-bar">'
-      + '  <div><span class="cf-bar-kicker">CECP · ' + esc(this.room) + '</span><span class="cf-bar-title">' + esc(this.widgetTitle) + '</span></div>'
+      + '  <div><span class="cf-bar-kicker">CECP 敬拜团</span><span class="cf-bar-title">' + esc(this.widgetTitle) + '</span></div>'
       + '  <div class="cf-bar-tools">'
       + '    <span class="cf-status"><span class="cf-dot"></span><span class="cf-status-label">未连接</span></span>'
       + (this.isFloating
@@ -1722,7 +1773,7 @@
 
     var html = '<div class="cf-app is-setup" style="display:flex;flex-direction:column;flex:1;min-height:0">'
       + '<div class="cf-head">'
-      + '  <div class="cf-head-copy"><span class="cf-head-title">CECP 敬拜团内通</span><span class="cf-head-sub">' + esc(this.room) + ' 房间</span></div>'
+      + '  <div class="cf-head-copy"><span class="cf-head-title">CECP 敬拜团内通</span><span class="cf-head-sub">与音控台实时连线</span></div>'
       + '  <div class="cf-head-tools">' + this.statusHtml() + '</div>'
       + '</div>'
       + '<div class="cf-setup">'
@@ -1768,13 +1819,12 @@
     var isTaken = this.isDeviceTaken(preset);
     return '<button class="cf-preset tone-' + meta.tone + (isSel ? ' sel' : '') + (isTaken ? ' taken' : '') + '" type="button"'
       + ' data-action="pick-device" data-name="' + esc(preset) + '"' + (isTaken ? ' disabled aria-disabled="true"' : '') + '>'
-      + '<span class="cf-preset-led"></span>'
-      + '<span class="cf-preset-icon">' + esc(meta.icon) + '</span>'
-      + '<span class="cf-preset-copy">'
-      + '  <span class="cf-preset-name">' + esc(meta.title) + '</span>'
-      + '  <span class="cf-preset-sub">' + (isTaken ? '已有人使用' : (meta.type === 'mic' ? '无线话筒' : '乐器通道')) + '</span>'
+      + '<span class="cf-preset-swatch">'
+      + (meta.section === 'mic' ? MIC_SVG : '<span class="cf-preset-emoji">' + esc(meta.icon) + '</span>')
       + '</span>'
-      + (isTaken ? '<span class="cf-preset-taken-badge">占用中</span>' : '')
+      + '<span class="cf-preset-name">' + esc(meta.title) + '</span>'
+      + '<span class="cf-preset-sub">' + (isTaken ? '已有人使用' : (meta.type === 'mic' ? '无线话筒' : '乐器通道')) + '</span>'
+      + '<span class="cf-preset-check" aria-hidden="true">✓</span>'
       + '</button>';
   };
 
@@ -2635,6 +2685,12 @@
     if (this.viewportHandler) {
       window.removeEventListener('resize', this.viewportHandler);
       window.removeEventListener('orientationchange', this.viewportHandler);
+      try { if (window.visualViewport) window.visualViewport.removeEventListener('resize', this.viewportHandler); } catch (err) {}
+      try {
+        if (this.orientMedia && this.orientMedia.removeEventListener) this.orientMedia.removeEventListener('change', this.viewportHandler);
+        else if (this.orientMedia && this.orientMedia.removeListener) this.orientMedia.removeListener(this.viewportHandler);
+      } catch (err) {}
+      this.orientMedia = null;
       this.viewportHandler = null;
     }
     if (this.dockObserver) {
