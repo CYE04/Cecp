@@ -345,7 +345,7 @@
     '}',
 
     /* ── 面板骨架 ── */
-    '.cf-panel{display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--border);overflow:hidden;container-type:inline-size}',
+    '.cf-panel{display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--border);overflow:hidden;container-type:inline-size;overscroll-behavior:contain}',
     '.cf.is-page .cf-panel{position:relative;width:100%;height:100%;min-height:520px;border-radius:var(--r-lg)}',
     '.cf.is-page{height:100%}',
     '.cf-stage{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}',
@@ -382,11 +382,10 @@
     '  opacity:0;transform:scale(.92);pointer-events:none;',
     '  transition:opacity .26s cubic-bezier(.32,.72,0,1),transform .32s cubic-bezier(.32,.72,0,1),border-radius .3s ease}',
     '.cf.is-floating.is-open .cf-panel{opacity:1;transform:none;pointer-events:auto}',
-    /* 尺寸：纵向视口 = 竖排；横向视口 = 横铺（宽面板，内容多列） */
-    '.cf.orient-p.is-floating .cf-panel{width:min(392px,calc(100vw - 24px));',
-    '  height:min(600px,calc(100vh - var(--dy,20px) - 96px));height:min(600px,calc(100dvh - var(--dy,20px) - 96px))}',
-    '.cf.orient-l.is-floating .cf-panel{width:min(760px,calc(100vw - 44px));',
-    '  height:min(520px,calc(100vh - var(--dy,20px) - 96px));height:min(520px,calc(100dvh - var(--dy,20px) - 96px))}',
+    /* 尺寸全自动：纵向视口 = 整张 sheet（见下方 orient-p 规则）；',
+       横向视口 = 高度吃满可用空间、宽度随视口比例伸缩，无固定像素 */
+    '.cf.orient-l.is-floating .cf-panel{width:clamp(400px,62vw,880px);max-width:calc(100vw - 40px);',
+    '  height:calc(100vh - var(--dy,20px) - var(--sab) - 92px);height:calc(100dvh - var(--dy,20px) - var(--sab) - 92px)}',
     /* 四角锚定：--dx / --dy 由 JS 写入（含避让偏移）；叠加刘海/手势条安全区 */
     '.cf{--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}',
     '.cf.dock-br .cf-launcher{right:calc(var(--dx,20px) + var(--sar));bottom:calc(var(--dy,20px) + var(--sab))}',
@@ -406,10 +405,10 @@
     '.cf.dock-bl .cf-launcher{border-radius:19px 19px 19px 8px}',
     '.cf.dock-tr .cf-launcher{border-radius:19px 8px 19px 19px}',
     '.cf.dock-tl .cf-launcher{border-radius:8px 19px 19px 19px}',
-    /* 小屏竖屏：近全屏 sheet（保留贴角圆角），带遮罩；尊重安全区 */
+    /* 纵向视口：整张 sheet 自动吃满屏幕（只留安全边距，无固定像素），带遮罩 */
     '.cf-mask{display:none}',
-    '.cf.is-compact.is-floating .cf-panel{left:max(8px,var(--sal));right:max(8px,var(--sar));top:max(8px,var(--sat));bottom:max(8px,var(--sab));width:auto;height:auto;max-height:none}',
-    '.cf.is-compact.is-floating.is-open .cf-mask{display:block;position:fixed;inset:0;z-index:2147483641;',
+    '.cf.orient-p.is-floating .cf-panel{left:max(8px,var(--sal));right:max(8px,var(--sar));top:max(8px,var(--sat));bottom:max(8px,var(--sab));width:auto;height:auto;max-height:none}',
+    '.cf.orient-p.is-floating.is-open .cf-mask{display:block;position:fixed;inset:0;z-index:2147483641;',
     '  background:rgba(0,0,0,.32)}',
 
     /* ── 标题栏（实色打底；支持毛玻璃的环境才启用半透明+blur，页面内容绝不透出）── */
@@ -467,7 +466,7 @@
     '.tone-gold{--tone:var(--t-gold)}.tone-default{--tone:var(--t-default)}',
 
     /* ── 选设备（setup）：颜色是主体的紧凑网格；尺寸随组件自身宽度（cqi）缩放 ── */
-    '.cf-setup{flex:1;overflow-y:auto;padding:clamp(14px,4cqi,24px) clamp(12px,4cqi,24px) clamp(16px,4cqi,26px);-webkit-overflow-scrolling:touch}',
+    '.cf-setup{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:clamp(14px,4cqi,24px) clamp(12px,4cqi,24px) clamp(16px,4cqi,26px);-webkit-overflow-scrolling:touch}',
     '.cf-setup-kicker{display:inline-block;font-size:clamp(10.5px,2.6cqi,12px);font-weight:600;color:var(--acc);letter-spacing:.02em}',
     '.cf-setup h2{margin:4px 0 2px;font-size:clamp(17px,5cqi,23px);font-weight:700;letter-spacing:-.02em}',
     '.cf-setup-sub{color:var(--muted);font-size:clamp(11.5px,3cqi,13.5px);margin-bottom:clamp(10px,3cqi,18px)}',
@@ -550,7 +549,7 @@
     '  .cf-app.is-client .cf-pane-cues:last-child{grid-column:1/-1}',
     '}',
 
-    '.cf-cues-scroll{flex:1;overflow-y:auto;padding:14px 14px 6px;-webkit-overflow-scrolling:touch}',
+    '.cf-cues-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:14px 14px 6px;-webkit-overflow-scrolling:touch}',
     '.cf-cue-group{margin-bottom:18px}',
     '.cf-cue-group-label{font-size:clamp(11px,2.8cqi,12px);font-weight:600;color:var(--muted);letter-spacing:.02em;margin-bottom:8px}',
     /* 列数随组件宽度自适应（容器查询，不看视口） */
@@ -590,7 +589,7 @@
     '.cf-compose button:active{transform:scale(.95)}',
 
     /* ── 聊天 ── */
-    '.cf-thread{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px}',
+    '.cf-thread{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:14px;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px}',
     '.cf-empty{color:var(--muted);font-size:13px;text-align:center;padding:26px 10px}',
     '.cf-msg{max-width:86%;display:flex;flex-direction:column;gap:3px;align-self:flex-start}',
     '.cf-msg.mine{align-self:flex-end;align-items:flex-end}',
@@ -623,7 +622,7 @@
     '.cf-op-panel{display:flex;flex-direction:column;min-height:0;border-radius:var(--r-md);background:var(--card);box-shadow:var(--shadow-soft);overflow:hidden;border:1px solid transparent}',
     '.cf-op-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px;border-bottom:1px solid var(--border)}',
     '.cf-op-panel-title{font-size:13px;font-weight:600;letter-spacing:-.01em}',
-    '.cf-op-scroll{flex:1;overflow-y:auto;padding:10px 12px;-webkit-overflow-scrolling:touch}',
+    '.cf-op-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:10px 12px;-webkit-overflow-scrolling:touch}',
     '.cf-member{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}',
     '.cf-member:last-child{border-bottom:none}',
     '.cf-kick{flex:none;padding:4px 10px;border-radius:999px;background:var(--red-soft);color:var(--red);font-size:11.5px;font-weight:600}',
@@ -868,7 +867,6 @@
     var landscape = window.innerWidth > window.innerHeight;
     this.$root.classList.toggle('orient-l', landscape);
     this.$root.classList.toggle('orient-p', !landscape);
-    this.$root.classList.toggle('is-compact', !landscape && window.innerWidth <= 520);
   };
 
   CecpApp.prototype.startViewportWatch = function () {
@@ -1169,6 +1167,37 @@
       if (event.key === 'Escape' && self.isFloating && self.open) self.closeWidget();
     };
     document.addEventListener('keydown', this.docKeyHandler);
+
+    /* 触摸/滚轮隔离：面板打开时，手指落在面板里就只作用于面板——
+       能滚的内部区域自己滚（overscroll-contain 挡边界串联），
+       落在不可滚区域的滑动直接吞掉，绝不透给底下的网页；
+       遮罩上的滑动同样吞掉。页面模式（嵌入文档流）不拦截。 */
+    var guardScroll = function (event) {
+      if (!self.isFloating || !self.open) return;
+      var node = event.target;
+      var scrollable = null;
+      while (node && node !== self.$panel) {
+        if (node.nodeType === 1) {
+          var cs;
+          try { cs = getComputedStyle(node); } catch (err) { break; }
+          if (/(auto|scroll)/.test(cs.overflowY) && node.scrollHeight > node.clientHeight + 1) {
+            scrollable = node;
+            break;
+          }
+        }
+        node = node.parentNode;
+      }
+      if (!scrollable) event.preventDefault();
+    };
+    if (this.$panel) {
+      this.$panel.addEventListener('touchmove', guardScroll, { passive: false });
+      this.$panel.addEventListener('wheel', guardScroll, { passive: false });
+    }
+    var mask = this.$root.querySelector('.cf-mask');
+    if (mask) {
+      mask.addEventListener('touchmove', function (event) { event.preventDefault(); }, { passive: false });
+      mask.addEventListener('wheel', function (event) { event.preventDefault(); }, { passive: false });
+    }
   };
 
   CecpApp.prototype.onAction = function (action, el) {
