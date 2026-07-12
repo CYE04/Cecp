@@ -1,16 +1,23 @@
 // ============================================================
 //  CECP Worship Team Intercom — Cloudflare Worker
 //  Durable Object: WorshipRoom
-//  Final deploy version
 //
 //  Frontend:
 //    data-ws-url="wss://你的-worker域名"
-//    data-mode="client" | "operator"
+//    data-mode="client" | "operator" | "listener" | "auto"
+//    data-room="cecp-main"（可选，房间名 → ?room=xxx）
 //
 //  Routes:
-//    GET /         -> health check page
-//    GET /health   -> json health check
-//    WebSocket     -> Durable Object room
+//    GET /            -> health check page
+//    GET /health      -> json health check
+//    WebSocket ?room= -> Durable Object room（缺省 cecp-main）
+//
+//  v2 协议新增（全部向后兼容，旧客户端安全忽略）：
+//    register.role 支持 'listener'（只收广播，不占设备名）
+//    worship_msg.priority: 'normal' | 'high'
+//    msg_status: operator → 全体 operator + client（按 id 前端自行匹配）
+//    operator_reply: operator → 指定 name 的 client
+//    broadcast.target: 'all'（含 listener）| {names:[...]}（定向 client）
 // ============================================================
 
 const DAILY_RESET_STAMP_KEY = 'daily_reset_stamp';
@@ -71,6 +78,30 @@ export class WorshipRoom {
       case 'register': {
         const regName = cleanName(msg.name);
         const regRole = cleanRole(msg.role);
+
+        // listener：被动只收广播，不占设备名、不进 member_list / taken_devices，
+        // 允许匿名。用户选身份后会在同一连接上重新 register 成 client。
+        if (regRole === 'listener') {
+          ws.serializeAttachment({
+            name: regName || 'listener',
+            role: 'listener',
+            identityType: 'listener',
+            ts: Date.now(),
+          });
+          safeSend(ws, {
+            type: 'ack',
+            name: regName || 'listener',
+            role: 'listener',
+            ts: Date.now(),
+          });
+          // 补发占用列表：listener 升级为 client 前的选设备界面需要置灰已占设备
+          safeSend(ws, {
+            type: 'taken_devices',
+            names: this._takenNames(),
+            ts: Date.now(),
+          });
+          break;
+        }
 
         if (!regName) {
           safeSend(ws, {
@@ -142,6 +173,7 @@ export class WorshipRoom {
           from: meta.name || '?',
           identityType: meta.identityType || 'other',
           kind: String(msg.kind || 'custom').trim() || 'custom',
+          priority: msg.priority === 'high' ? 'high' : 'normal',
           text,
           ts: Date.now(),
         }, ws, 'operator');
@@ -171,19 +203,76 @@ export class WorshipRoom {
       }
 
       case 'broadcast': {
-        // Operator → all Members
+        // Operator → Members（含 listener）；target:{names:[...]} 时只投递给命中的 client
         const meta = safeMeta(ws);
         if (meta?.role !== 'operator') break;
 
         const text = cleanText(msg.text, 800);
         if (!text) break;
 
-        this._broadcast({
+        let targetNames = null;
+        if (msg.target && typeof msg.target === 'object' && Array.isArray(msg.target.names)) {
+          targetNames = msg.target.names.map(cleanName).filter(Boolean).slice(0, 100);
+          if (!targetNames.length) targetNames = null;
+        }
+
+        const payload = {
           type: 'broadcast',
           id: cleanId(msg.id, 'broadcast'),
           text,
+          target: targetNames ? { names: targetNames } : 'all',
           ts: Date.now(),
-        }, null, 'client');
+        };
+
+        if (targetNames) {
+          this._broadcast(payload, null, null, (m) => m?.role === 'client' && targetNames.indexOf(m?.name) >= 0);
+        } else {
+          this._broadcast(payload, null, null, (m) => m?.role === 'client' || m?.role === 'listener');
+        }
+
+        break;
+      }
+
+      case 'msg_status': {
+        // Operator 标记请求状态：广播给所有 operator（看板同步）+ 所有 client（前端按 id 匹配自己的请求）
+        const meta = safeMeta(ws);
+        if (meta?.role !== 'operator') break;
+
+        const rawId = String(msg.id || '').trim().slice(0, 120);
+        const status = ['pending', 'doing', 'done'].indexOf(msg.status) >= 0 ? msg.status : '';
+        if (!rawId || !status) break;
+
+        this._broadcast({
+          type: 'msg_status',
+          id: rawId,
+          status,
+          ts: Date.now(),
+        }, null, null, (m) => m?.role === 'operator' || m?.role === 'client');
+
+        break;
+      }
+
+      case 'operator_reply': {
+        // Operator → 指定 name 的 client 定向回复
+        const meta = safeMeta(ws);
+        if (meta?.role !== 'operator') break;
+
+        const to = cleanName(msg.to);
+        const text = cleanText(msg.text, 500);
+        if (!to || !text) break;
+
+        const payload = {
+          type: 'operator_reply',
+          id: cleanId(msg.id, 'reply'),
+          to,
+          text,
+          ts: Date.now(),
+        };
+
+        for (const s of this.state.getWebSockets()) {
+          const m = safeMeta(s);
+          if (m?.role === 'client' && m?.name === to) safeSend(s, payload);
+        }
 
         break;
       }
@@ -319,7 +408,7 @@ export class WorshipRoom {
       type: 'taken_devices',
       names: takenNames,
       ts: Date.now(),
-    }, null, 'client');
+    }, null, null, (meta) => meta?.role === 'client' || meta?.role === 'listener');
   }
 
   async _ensureDailyResetAlarm(force) {
@@ -394,7 +483,11 @@ export default {
       }, 500);
     }
 
-    const id = env.ROOM.idFromName('cecp-main');
+    // 房间路由：?room=xxx（字母/数字/下划线/连字符，最长 64），缺省 cecp-main
+    const roomParam = String(url.searchParams.get('room') || '').trim();
+    const roomName = /^[\w-]{1,64}$/.test(roomParam) ? roomParam : 'cecp-main';
+
+    const id = env.ROOM.idFromName(roomName);
     const room = env.ROOM.get(id);
     return room.fetch(request);
   },
@@ -522,7 +615,7 @@ strong{color:var(--gold)}
     <code class="code">${escapeHtml(wsUrl)}</code>
     <div class="row">
       <span class="badge">Durable Object: ROOM</span>
-      <span class="badge">Room: cecp-main</span>
+      <span class="badge">Room: ?room=xxx（默认 cecp-main）</span>
       <span class="badge">Health: /health</span>
     </div>
   </main>
@@ -556,12 +649,14 @@ function cleanName(value) {
 
 function cleanRole(value) {
   const role = String(value || 'client').trim();
-  return role === 'operator' ? 'operator' : 'client';
+  if (role === 'operator') return 'operator';
+  if (role === 'listener') return 'listener';
+  return 'client';
 }
 
 function cleanIdentityType(value) {
   const type = String(value || 'other').trim();
-  return ['operator', 'mic', 'instrument', 'other'].includes(type) ? type : 'other';
+  return ['operator', 'mic', 'instrument', 'listener', 'other'].includes(type) ? type : 'other';
 }
 
 function cleanText(value, maxLen = 500) {
