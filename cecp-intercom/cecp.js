@@ -368,8 +368,12 @@
     '.cf.is-floating .is-setup .cf-head{display:none}',
     '.cf.is-floating .cf-app .cf-status{display:none}',
     '.cf.is-floating .cf-client-head{padding:9px 14px}',
+    /* 吸附左侧（默认）：悬浮球/面板/toast 全部翻到左边 */
+    '.cf.is-floating.side-left .cf-launcher{right:auto;left:var(--cf-float-right,22px)}',
+    '.cf.is-floating.side-left .cf-panel{right:auto;left:var(--cf-float-right,22px)}',
+    '.cf.side-left .cf-toasts{right:auto;left:16px;align-items:flex-start}',
     '@media (max-width:700px){',
-    '  .cf.is-floating .cf-panel{inset:0;width:100vw;height:100vh;height:100dvh;border-radius:0;right:0;bottom:0}',
+    '  .cf.is-floating .cf-panel,.cf.is-floating.side-left .cf-panel{inset:0;width:100vw;height:100vh;height:100dvh;border-radius:0;left:0;right:0;bottom:0}',
     '  .cf.is-floating.is-open .cf-mask{display:block;position:fixed;inset:0;z-index:2147482850;background:rgba(20,16,8,.4)}',
     '}',
     /* 断线提示条 */
@@ -671,6 +675,8 @@
     this.enableChat = d.memberChat !== '0';
     this.floatRight = String(d.floatRight || '').trim();
     this.floatBottom = String(d.floatBottom || '').trim();
+    /* 默认吸附左下角：右下角通常被站点「回到顶部」按钮占用（cecp.it 实测） */
+    this.floatSide = d.floatSide === 'right' ? 'right' : 'left';
   };
 
   CecpApp.prototype.initState = function () {
@@ -731,9 +737,12 @@
     this.shadow.appendChild(style);
 
     var root = document.createElement('div');
-    root.className = 'cf ' + (this.isFloating ? 'is-floating' : 'is-page');
+    root.className = 'cf ' + (this.isFloating ? 'is-floating' : 'is-page')
+      + (this.floatSide === 'left' ? ' side-left' : '');
     if (this.floatRight) root.style.setProperty('--cf-float-right', this.floatRight);
     if (this.floatBottom) root.style.setProperty('--cf-float-bottom', this.floatBottom);
+    /* 左侧默认抬高，给 cecp-footer 左下角 FAB（约 36px 高）让位 */
+    else if (this.floatSide === 'left') root.style.setProperty('--cf-float-bottom', '60px');
 
     var html = '';
     if (this.isFloating) {

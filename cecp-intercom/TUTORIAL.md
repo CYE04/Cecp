@@ -77,13 +77,12 @@ https://cye04.github.io/Cecp/cecp-intercom/cecp.js
 ```html
 <cecp-intercom
   data-ws-url="wss://cecp-ws.cecp.workers.dev"
-  data-mode="auto"
-  data-float-bottom="96px"></cecp-intercom>
+  data-mode="auto"></cecp-intercom>
 <script src="https://cye04.github.io/Cecp/cecp-intercom/cecp.js"></script>
 ```
 
-- 页面加载即以 **listener** 身份静默连接：不弹窗、不选身份，音控广播到达时右下角弹 toast。
-- `data-float-bottom="96px"` 是给站点右下角「回到顶部」按钮让位；按主题实际按钮高度调整（默认 22px 会和它重叠）。
+- 页面加载即以 **listener** 身份静默连接：不弹窗、不选身份，音控广播到达时左下角弹 toast。
+- 悬浮球默认吸附**左下角**并抬高 60px（右下角被主题「回到顶部」按钮占用，左下角给 cecp-footer 的 FAB 让位）；要改回右侧加 `data-float-side="right"`，偏移用 `data-float-right` / `data-float-bottom` 微调。
 - 用户点开悬浮球 → 选设备身份 → 原地升级为正式成员，之后能完整收发。
 - 青年聚会想用独立房间（不和主日混）就加 `data-room="youth"`，音控端也开同样的 room 即可。
 - 样式在 Shadow DOM 内，与 youth-engine 的全局样式互不影响；可与其共存于同一页面。
@@ -108,7 +107,8 @@ https://cye04.github.io/Cecp/cecp-intercom/cecp.js
 | `data-broadcast-presets` | 内置 5 个 | JSON 数组，音控广播快捷词 |
 | `data-launcher-icon` / `-label` | 🎧 / 调音助手 | 悬浮球图标与无障碍标签 |
 | `data-widget-title` | CECP 敬拜团内通 | 悬浮面板标题 |
-| `data-float-right` / `-bottom` | 22px | 悬浮球偏移 |
+| `data-float-side` | `left` | 悬浮球吸附边：`left` / `right`（球、面板、toast 一起翻） |
+| `data-float-right` / `-bottom` | 22px / 左侧默认 60px | 悬浮球偏移（`-right` 指离吸附边的水平距离） |
 | `data-default-preset` | — | 自动选中的设备名 |
 | `data-page-key` | 页面路径 | localStorage 隔离键（同页多实例时必须各不相同） |
 | `data-member-chat` | 开 | `"0"` 关闭成员群聊 |
