@@ -1,5 +1,17 @@
 # cecp-intercom CHANGELOG
 
+## v2.1.0（2026-07）UI 重做：Apple 风 + 四角停靠 + 方向自适应
+
+纯前端改版（cecp.js），协议与 worker 无任何变化。
+
+- **视觉全面重做（Apple 官网风）**：中性近白/近黑双主题 + 单一强调蓝（light `#0071e3` / dark `#2997ff`）、SF/system-ui 字体层级、发丝线 + 弥散浅影替代边框色块、标题栏/悬浮球/toast 克制毛玻璃（`backdrop-filter`）、Tab 改 Apple 分段控件；旧暖米/金/绿全部移除。
+- **悬浮球图标**：Yesicon（Iconify `solar:headphones-round-sound-bold`）内联 SVG、`currentColor` 随主题；常驻声波条呼吸、悬停放大提亮、按下弹簧回弹、未读蓝色声波扩散 ripple + 角标、高优未解决红色急促 ripple；`prefers-reduced-motion` 下全部静止。
+- **四角停靠**：`data-corner` 四角可配，面板标题栏可手动换角并记住（localStorage）；初始化自动避让——「工具导游」（`rt5` 系固定元素）硬规则永不同角（MutationObserver 盯 DOM/样式变化实时重避让），回到顶部按钮、footer FAB 等软障碍自动纵向让位。
+- **贴角形状**：面板与悬浮球共用「从角长出来」的圆角语言——靠屏幕角一侧圆角小（9px/8px）、朝内三侧圆角大（26px/19px），四角镜像，展开动画以停靠角为 transform-origin。
+- **方向自适应**：按视口宽高比（非 UA）实时切换——横向视口面板横铺（≤760×520，快捷信息 4 列）、纵向视口竖排（≤392 宽）、小屏竖屏近全屏 sheet + 遮罩；resize/转屏即时生效，任何情况不超出视口，内部滚动。
+- 旧 `data-float-side` 属性继续兼容（映射为底部两角）。
+
+
 ## v2.0.0（2026-07）
 
 前端从 0 重写为单文件零依赖 Web Component（`<cecp-intercom>` + Shadow DOM，兼容旧 `#cecp-root` 嵌入）；worker 协议扩展。**所有 v1 消息类型原样保留，旧前端 + 新 worker 可正常混跑。**
