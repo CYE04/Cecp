@@ -304,6 +304,8 @@
 
   var CSS = [
     ':host{display:block}',
+    /* [hidden] 必须压过各角标类里的 display:flex（否则角标会显示 0） */
+    '[hidden]{display:none!important}',
     '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}',
     'button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}',
     'input,textarea{font:inherit;color:inherit}',

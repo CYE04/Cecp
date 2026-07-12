@@ -77,11 +77,13 @@ https://cye04.github.io/Cecp/cecp-intercom/cecp.js
 ```html
 <cecp-intercom
   data-ws-url="wss://cecp-ws.cecp.workers.dev"
-  data-mode="auto"></cecp-intercom>
+  data-mode="auto"
+  data-float-bottom="96px"></cecp-intercom>
 <script src="https://cye04.github.io/Cecp/cecp-intercom/cecp.js"></script>
 ```
 
 - 页面加载即以 **listener** 身份静默连接：不弹窗、不选身份，音控广播到达时右下角弹 toast。
+- `data-float-bottom="96px"` 是给站点右下角「回到顶部」按钮让位；按主题实际按钮高度调整（默认 22px 会和它重叠）。
 - 用户点开悬浮球 → 选设备身份 → 原地升级为正式成员，之后能完整收发。
 - 青年聚会想用独立房间（不和主日混）就加 `data-room="youth"`，音控端也开同样的 room 即可。
 - 样式在 Shadow DOM 内，与 youth-engine 的全局样式互不影响；可与其共存于同一页面。
