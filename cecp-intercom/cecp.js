@@ -350,6 +350,9 @@
     '.cf.is-page{height:100%}',
     '.cf-stage{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}',
 
+    /* 悬浮根不拦任何触摸；可交互的只有球、面板、toast 本身 */
+    '.cf.is-floating{pointer-events:none}',
+    '.cf.is-floating .cf-launcher,.cf.is-floating .cf-dock-pop{pointer-events:auto}',
     /* ── 悬浮球（贴角圆角语言 + 玻璃材质；不支持 backdrop-filter 时退回实色）── */
     '.cf.is-floating .cf-launcher{position:fixed;z-index:2147483644;width:58px;height:58px;',
     '  background:var(--card);',
@@ -631,6 +634,9 @@
     '.cf-feed-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px}',
     '.cf-feed-kindchip{padding:2px 8px;border-radius:999px;background:var(--card3);color:var(--muted);font-size:10.5px;font-weight:600}',
     '.cf-feed-kindchip.k-chat{background:var(--acc-soft);color:var(--acc)}',
+    '.cf-feed-kindchip.k-bcast{background:var(--orange-soft);color:var(--orange)}',
+    '.cf-feed-kindchip.k-reply{background:var(--acc-soft);color:var(--acc)}',
+    '.cf-feed-item.is-out{background:var(--acc-soft)}',
     '.cf-feed-text{font-size:14px;font-weight:500;word-break:break-word}',
     '.cf-feed-time{flex:none;font-size:10.5px;color:var(--muted)}',
     '.cf-bcast-presets{display:flex;flex-wrap:wrap;gap:7px;padding:10px 12px 4px}',
@@ -1026,6 +1032,8 @@
     if (this.isFloating) {
       if (!this.portal) {
         this.portal = document.createElement('cecp-intercom-layer');
+        /* 零干扰宿主：不占布局、不挡触摸——只有球/面板/toast 自身可交互 */
+        this.portal.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2147483644';
         (document.body || document.documentElement).appendChild(this.portal);
       }
       this.shadow = this.portal.shadowRoot || this.portal.attachShadow({ mode: 'open' });
@@ -1565,10 +1573,11 @@
       };
       if (!chatEntry.text) return;
       if (this.role === 'operator') {
-        this.opChat.unshift({ id: chatEntry.id, from: chatEntry.from, text: chatEntry.text, ts: chatEntry.ts });
-        if (this.opChat.length > 120) this.opChat.pop();
-        if (this.isFloating && !this.open) this.opUnread += 1;
-        if (this.opTab !== 'chat') this.opChatUnread += 1;
+        if (this.opChat.some(function (c) { return c.id === chatEntry.id; })) return; // 去重
+        this.opChat.unshift({ kind: 'member', id: chatEntry.id, from: chatEntry.from, text: chatEntry.text, ts: chatEntry.ts });
+        if (this.opChat.length > 200) this.opChat.pop();
+        if (this.isFloating && !this.open && !msg.replay) this.opUnread += 1;
+        if (this.opTab !== 'chat' && !msg.replay) this.opChatUnread += 1;
         this.renderOpChat();
         this.syncBadge();
       } else if (this.role === 'client') {
@@ -1580,20 +1589,23 @@
 
     if (type === 'worship_msg') {
       if (this.role !== 'operator') return;
+      var wId = String(msg.id || nowId('worship'));
+      if (this.opReqs.some(function (r) { return r.id === wId; })) return; // 去重（回放/重连）
       var newReq = {
-        id: String(msg.id || nowId('worship')),
+        id: wId,
         from: String(msg.from || '?'),
         kind: String(msg.kind || 'custom'),
         text: String(msg.text || ''),
         priority: msg.priority === 'high' ? 'high' : 'normal',
-        status: 'pending',
+        status: ['pending', 'doing', 'done'].indexOf(msg.status) >= 0 ? msg.status : 'pending',
         replied: '',
         ts: Number(msg.ts || Date.now())
       };
       this.opReqs.unshift(newReq);
       if (this.opReqs.length > 120) this.opReqs.pop();
-      if (this.isFloating && !this.open) this.opUnread += 1;
-      if (newReq.priority === 'high') this.playAlert();
+      if (this.isFloating && !this.open && !msg.replay) this.opUnread += 1;
+      /* 回放不响警报，只有实时高优才响 */
+      if (newReq.priority === 'high' && newReq.status !== 'done' && !msg.replay) this.playAlert();
       this.renderOpBoard();
       this.updateOpStats();
       this.syncBadge();
@@ -2471,9 +2483,30 @@
     var log = this.$stage.querySelector('.cf-op-chat');
     if (!log) return;
     if (!this.opChat.length) {
-      log.innerHTML = '<div class="cf-empty">成员群聊会显示在这里</div>';
+      log.innerHTML = '<div class="cf-empty">成员群聊、你发的广播和定向回复都会显示在这里</div>';
     } else {
       log.innerHTML = this.opChat.map(function (item) {
+        if (item.kind === 'broadcast') {
+          return '<div class="cf-feed-item is-out">'
+            + '<span class="cf-feed-icon">📢</span>'
+            + '<div class="cf-feed-body">'
+            + '<div class="cf-feed-meta"><span class="cf-feed-kindchip k-bcast">广播'
+            + (item.scope ? ' · ' + esc(item.scope) : ' · 全体') + '</span></div>'
+            + '<div class="cf-feed-text">' + esc(item.text) + '</div>'
+            + '</div>'
+            + '<span class="cf-feed-time">' + esc(fmtTime(item.ts)) + '</span>'
+            + '</div>';
+        }
+        if (item.kind === 'reply') {
+          return '<div class="cf-feed-item is-out">'
+            + '<span class="cf-feed-icon">↩️</span>'
+            + '<div class="cf-feed-body">'
+            + '<div class="cf-feed-meta"><span class="cf-feed-kindchip k-reply">回复 ' + esc(identityMeta(item.to).title) + '</span></div>'
+            + '<div class="cf-feed-text">' + esc(item.text) + '</div>'
+            + '</div>'
+            + '<span class="cf-feed-time">' + esc(fmtTime(item.ts)) + '</span>'
+            + '</div>';
+        }
         return '<div class="cf-feed-item">'
           + '<span class="cf-feed-icon">🗨️</span>'
           + '<div class="cf-feed-body">'
@@ -2489,6 +2522,12 @@
       badge.hidden = !this.opChatUnread;
       badge.textContent = String(this.opChatUnread);
     }
+  };
+
+  CecpApp.prototype.opChatPush = function (entry) {
+    this.opChat.unshift(entry);
+    if (this.opChat.length > 200) this.opChat.pop();
+    this.renderOpChat();
   };
 
   CecpApp.prototype.opSwitchTab = function (tab) {
@@ -2552,6 +2591,7 @@
     req.replied = text;
     this.opReplyOpenId = '';
     this.renderOpBoard();
+    this.opChatPush({ kind: 'reply', id: nowId('opreply'), to: req.from, text: text, ts: Date.now() });
     this.flash('已回复 ' + identityMeta(req.from).title + ' ✓');
   };
 
@@ -2671,6 +2711,7 @@
     this.opBcasts.unshift({ text: text, scope: scope, ts: Date.now() });
     if (this.opBcasts.length > 40) this.opBcasts.pop();
     this.renderOpBcastLog();
+    this.opChatPush({ kind: 'broadcast', id: nowId('opbcast'), text: text, scope: scope.replace(/^→ /, ''), ts: Date.now() });
     if (input && !presetText) input.value = '';
     this.flash(targets.length ? '已定向广播（' + targets.length + '人）✓' : '已广播全体 ✓');
   };
