@@ -294,8 +294,8 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 .rt7-ring { z-index:2147483634; pointer-events:none; }
 .rt7-tip  { z-index:2147483635; }
 /* .rt7-fab 视觉样式统一在 CECP-FAB-SYSTEM 块（与 .ccf-fab 共用同一套 Apple 风），
-   这里只管定位；display 由 updateFab() 随滚动切换 */
-.rt7-fab{ position:fixed; left:16px; bottom:16px; display:none; }
+   这里只管定位；display 由 updateFab() 随滚动切换。左下角对齐 cecp-intercom 悬浮球 */
+.rt7-fab{ position:fixed; left:20px; bottom:20px; display:none; }
 .rt7-mask{
   position:fixed; inset:0; display:none;
   background:rgba(0,0,0,.3); opacity:0; transition:opacity .2s;
@@ -561,7 +561,7 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   --fab-acc-rgb:0,113,227;
   --fab-shadow:0 2px 12px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.1);
   position:fixed; z-index:2147483630;
-  width:56px; height:56px; padding:0; border-radius:999px;
+  width:50px; height:50px; padding:0;
   align-items:center; justify-content:center;
   border:1px solid var(--fab-border);
   background:var(--fab-card); color:var(--fab-ink);
@@ -598,13 +598,15 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   70% { transform:scale(1.35); opacity:0; }
   100%{ transform:scale(1.35); opacity:0; }
 }
-/* 定位：联系我们右下（导游定位/显隐见上方 tour 块 + updateFab） */
-.ccf-fab{ right:20px; bottom:20px; display:flex; }
-@media (max-width:520px){
-  .rt7-fab, .ccf-fab{ width:52px; height:52px; }
-  .rt7-fab{ left:12px; bottom:12px; }
-  .ccf-fab{ right:14px; bottom:14px; }
-  .rt7-fab .cfi, .ccf-fab .cfi{ width:24px; height:24px; }
+/* 贴角圆角（方块+圆角）：靠屏幕角的那个角收紧，与 cecp-intercom 悬浮球同语言
+   —— 工具导游在左下 → 左下角收紧；联系我们在右下 → 右下角收紧 */
+.rt7-fab{ border-radius:16px 16px 16px 6px; }
+.ccf-fab{ right:20px; bottom:20px; display:flex; border-radius:16px 16px 6px 16px; }
+/* 把主题自带的"回到顶部"按钮也贴角圆角化 + 对齐，让右列（联系我们 / 回到顶部）整齐一致 */
+#btn-scroll-to-top{ border-radius:16px 16px 6px 16px !important; }
+/* 桌面端（Tailwind lg）主题按钮在 40px 边距，联系我们跟着对齐右边缘 */
+@media (min-width:1024px){
+  .ccf-fab{ right:40px; bottom:40px; }
 }
 
 /* 无障碍：用户偏好减少动态时全部静止 */
