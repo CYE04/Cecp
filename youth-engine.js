@@ -79,6 +79,10 @@ window.YouthEngine = {};
   /* radius / motion */
   --ym-r-btn:11px;--ym-r-card:14px;--ym-r-container:20px;
   --ym-ease:cubic-bezier(.4,0,.2,1);--ym-dur:.18s;
+  /* z-index scale (no scattered magic numbers): raised < chord-panel < lightbox < overlay < modal; FABs (footer) live at 2147483630, below youth overlays */
+  --ym-z-raised:10;--ym-z-chord:2147482000;--ym-z-lightbox:2147483640;--ym-z-overlay:2147483646;--ym-z-modal:2147483647;
+  /* bottom clearance so the last card / player clears the fixed FAB cluster + system safe area */
+  --ym-safe-bottom:calc(88px + env(safe-area-inset-bottom,0px));
   /* platform brand — fixed, non-themed */
   --ym-youtube:#ff0033;--ym-youtube-hover:#e6002e;
 
@@ -122,6 +126,7 @@ window.YouthEngine = {};
   }
 }
 *,*::before,*::after{box-sizing:border-box}
+.ym-bottom-safe{height:var(--ym-safe-bottom);flex:0 0 auto;pointer-events:none}
 :where(a,button,input,textarea,select,[role="button"],[tabindex]):focus-visible{outline:2px solid var(--ym-accent);outline-offset:2px}
 :where(a,button,input,textarea,select,[role="button"],[tabindex]):focus:not(:focus-visible){outline:none}
 .ym-tilt{position:relative;max-width:100%;transform-style:preserve-3d;transition:box-shadow .18s ease,border-color .18s ease}
@@ -135,8 +140,8 @@ window.YouthEngine = {};
 
 /* ── Welcome Modal ── */
 html.ym-open,html.ym-open body{overflow:hidden!important}
-#ymOverlay{position:fixed;inset:0;background:var(--ybk);backdrop-filter:blur(6px);z-index:2147483646;display:none}
-#ymModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,calc(100vw - 32px));max-height:min(85vh,760px);background:var(--yb);color:var(--yt);border:1px solid var(--ybr);border-radius:22px;box-shadow:0 40px 120px var(--ysh);overflow:hidden;z-index:2147483647;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:clamp(14px,.35vw + 12px,17px)}
+#ymOverlay{position:fixed;inset:0;background:var(--ybk);backdrop-filter:blur(6px);z-index:var(--ym-z-overlay);display:none}
+#ymModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,calc(100vw - 32px));max-height:min(85vh,760px);background:var(--yb);color:var(--yt);border:1px solid var(--ybr);border-radius:22px;box-shadow:0 40px 120px var(--ysh);overflow:hidden;z-index:var(--ym-z-modal);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:clamp(14px,.35vw + 12px,17px)}
 #ymModal .yLayout{display:flex;flex-direction:column;height:100%;max-height:inherit}
 #ymModal .yBody{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px}
 #ymModal .yGrid{display:grid;grid-template-columns:1.2fr .9fr;gap:12px}
@@ -211,12 +216,12 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .ym-tl-body{display:flex;align-items:center;gap:16px;min-height:66px;min-width:0;padding:16px 24px;background:var(--ym-chip);border:1px solid var(--ym-line);border-radius:16px;box-shadow:var(--ym-sh);transition:transform var(--ym-dur) var(--ym-ease),background var(--ym-dur) var(--ym-ease),border-color var(--ym-dur) var(--ym-ease),box-shadow var(--ym-dur) var(--ym-ease)}
 .ym-tl-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:4px}
 .ym-tl-event{margin:0;font-size:clamp(20px,2.9vw,25px);font-weight:700;letter-spacing:-.015em;color:var(--ym-ink);line-height:1.18;word-break:break-word}
-.ym-tl-side{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
-.ym-tl-time{font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:13px;font-weight:600;letter-spacing:.02em;white-space:nowrap;color:var(--ym-accent-hover);background:color-mix(in srgb,var(--ym-accent) 13%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ym-accent) 22%,transparent);padding:4px 11px;border-radius:8px}
-.ym-tl-dur{font-size:12px;font-weight:600;letter-spacing:.01em;color:var(--ym-ink3);white-space:nowrap}
+.ym-tl-side{flex:0 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
+.ym-tl-time{flex:0 1 auto;min-width:0;max-width:100%;font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:13px;font-weight:600;letter-spacing:.02em;white-space:nowrap;color:var(--ym-accent-hover);background:color-mix(in srgb,var(--ym-accent) 13%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ym-accent) 22%,transparent);padding:4px 11px;border-radius:8px}
+.ym-tl-dur{min-width:0;font-size:12px;font-weight:600;letter-spacing:.01em;color:var(--ym-ink3)}
 .ym-tl-step:hover .ym-tl-body{transform:translateX(3px);background:var(--ym-chip-hover);border-color:var(--ym-border-md);box-shadow:var(--ym-sh-lg)}
 .ym-tl-step:hover .ym-tl-node{border-color:color-mix(in srgb,var(--ym-accent) 46%,transparent);box-shadow:var(--ym-sh-lg)}
-@media(max-width:640px){.ym-tl-hd{padding:18px 16px 8px;gap:12px}.ym-tl-ic{width:46px;height:46px;font-size:24px}.ym-tl-list{padding:16px 16px 18px}.ym-tl-step{grid-template-columns:48px 1fr;gap:13px}.ym-tl-rail{width:48px}.ym-tl-node{width:48px;height:48px;font-size:23px}.ym-tl-rail::before{top:48px}.ym-tl-body{flex-direction:column;align-items:flex-start;gap:10px;padding:14px 16px}.ym-tl-side{flex-direction:row;align-items:center;text-align:left;gap:10px}}
+@media(max-width:640px){.ym-tl-hd{padding:18px 16px 8px;gap:12px}.ym-tl-ic{width:46px;height:46px;font-size:24px}.ym-tl-list{padding:16px 16px 18px}.ym-tl-step{grid-template-columns:48px 1fr;gap:13px}.ym-tl-rail{width:48px}.ym-tl-node{width:48px;height:48px;font-size:23px}.ym-tl-rail::before{top:48px}.ym-tl-body{flex-direction:column;align-items:flex-start;gap:10px;padding:14px 16px}.ym-tl-side{flex-direction:row;flex-wrap:wrap;align-items:center;align-self:stretch;justify-content:flex-start;text-align:left;gap:4px 10px}}
 
 /* ── Roster ── */
 /* ── Roster / team board ── */
@@ -391,7 +396,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .ym-song-list{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
 
 /* ── Lightbox ── */
-.sw-lb-overlay{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s,visibility .25s;padding:18px}
+.sw-lb-overlay{position:fixed;inset:0;z-index:var(--ym-z-lightbox);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s,visibility .25s;padding:18px}
 .sw-lb-overlay.open{opacity:1;visibility:visible;pointer-events:auto}
 .sw-lb-box{position:relative;max-width:95vw;max-height:95vh;transform:scale(.92);transition:transform .28s cubic-bezier(.22,1,.36,1)}
 .sw-lb-overlay.open .sw-lb-box{transform:scale(1)}
@@ -5194,6 +5199,9 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
 
     // Ring Coach Tour trigger
     frag.appendChild(el('div',{id:'rt5-enable'}));
+
+    // bottom clearance so the last card / audio player clears the fixed FAB cluster + system safe area
+    frag.appendChild(el('div',{class:'ym-bottom-safe','aria-hidden':'true'}));
 
     ROOT.appendChild(frag);
   }

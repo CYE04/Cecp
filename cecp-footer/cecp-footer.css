@@ -295,7 +295,7 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
 .rt7-tip  { z-index:2147483635; }
 /* .rt7-fab 视觉样式统一在 CECP-FAB-SYSTEM 块（与 .ccf-fab 共用同一套 Apple 风），
    这里只管定位；display 由 updateFab() 随滚动切换。左下角对齐 cecp-intercom 悬浮球 */
-.rt7-fab{ position:fixed; left:20px; bottom:20px; display:none; }
+.rt7-fab{ position:fixed; left:20px; bottom:calc(20px + env(safe-area-inset-bottom, 0px)); display:none; }
 .rt7-mask{
   position:fixed; inset:0; display:none;
   background:rgba(0,0,0,.3); opacity:0; transition:opacity .2s;
