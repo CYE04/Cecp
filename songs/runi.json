@@ -14,79 +14,81 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/runi.lrc",
   "youtube": "https://youtu.be/kMOg8x7ptz4?si=-mO_JNknpviRtoo7",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/runiA.jpg",
-  "sections": [
+   "sections": [
   {
     "name": "如祢",
     "lines": [
-      [
-        {"chord":"F#m","n":"|: 1' 5'","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"E/G#","n":"2' 5' sp | sp","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"Aadd9","n":"2' 3' sp - sp - sp | sp","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"Bm","n":"4' 5'","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"A/C#","n":"7 1' sp | sp","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"D","n":"6 sp - sp - sp - sp |:| sp","lyric":"ㅤ","lyric2":"ㅤ"},
+      { "b": true, "line": [
+        {"chord":"F#m","n":"|: 1' 5'","lyric":"{sp}","lyric2":"{sp}"},
+        {"chord":"E/G#","n":"2' 5' sp | sp","lyric":"{sp}","lyric2":"{sp}"},
+        {"chord":"Aadd9","n":"2' 3' sp - sp - sp | sp","lyric":"{sp}","lyric2":"{sp}"},
+        {"chord":"Bm","n":"4' 5'","lyric":"{sp}","lyric2":"{sp}"},
+        {"chord":"A/C#","n":"7 1' sp | sp","lyric":"{sp}","lyric2":"{sp}"},
+        {"chord":"D","n":"6 sp - sp - sp - sp |:| sp","lyric":"{sp}","lyric2":"{sp}"},
         {"chord":"F#m","n":"1","lyric":"站","lyric2":"光"},
         {"chord":"","n":"7,_ 1_","lyric":"立在","lyric2":"照在"},
         {"chord":"","n":"2","lyric":"祢","lyric2":"黑"},
         {"chord":"","n":"5,_ ( 3_ sp | )","lyric":"座前，","lyric2":"暗里，"}
-      ],
-      [
-        {"chord":"ㅤAadd9","n":"( sp 3 ) -","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"","n":"0_ 2_","lyric":"ㅤ站","lyric2":"ㅤ使"},
-        {"chord":"ㅤㅤㅤㅤㅤㅤF#m","n":"7,_ ( 1_ sp | sp 1 )","lyric":"立在","lyric2":"脸上"},
+      ]},
+      { "b": true, "line": [
+        {"chord":"{sp}Aadd9","n":"( sp 3 ) -","lyric":"{sp}","lyric2":"{sp}"},
+        {"chord":"","n":"0_ 2_","lyric":"{sp}站","lyric2":"{sp}使"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}F#m","n":"7,_ ( 1_ sp | sp 1 )","lyric":"立在","lyric2":"脸上"},
         {"chord":"","n":"7,_ 1_","lyric":"你信","lyric2":"帕子"},
         {"chord":"E/G#","n":"2 5 sp | sp","lyric":"实面","lyric2":"都挪"},
         {"chord":"Aadd9","n":"3 -","lyric":"前，","lyric2":"去，"},
-        {"chord":"","n":"0_ 1_","lyric":"ㅤ祢","lyric2":"ㅤ祢"},
+        {"chord":"","n":"0_ 1_","lyric":"{sp}祢","lyric2":"{sp}祢"},
         {"chord":"","n":"5_ 3_ sp | sp","lyric":"双手","lyric2":"话语"},
         {"chord":"D","n":"6 -","lyric":"领","lyric2":"如"},
         {"chord":"C#","n":"7 - sp | sp","lyric":"我","lyric2":"镜"},
         {"chord":"","n":"6_ 7_","lyric":"走出","lyric2":"炼净"},
         {"chord":"","n":"1'_ ( 6_ sp 6 ) - sp |","lyric":"旷野，","lyric2":"我心，"}
-      ],
-      [
-        {"chord":"Bm","n":"[v1 4_ sp_ 3__ ( 4__ sp 4_ ) 5_","lyric":"看ㅤ见你 ㅤ 为"},
+      ]},
+      { "b": true, "line": [
+        {"chord":"Bm","n":"[v1 4_ sp_ 3__ ( 4__ sp 4_ ) 5_","lyric":"看{sp}见你 {sp} 为"},
         {"chord":"","n":"6_ 1_","lyric":"我所"},
-        {"chord":"ㅤㅤㅤㅤㅤㅤEsus4ㅤE","n":"3_ ( 2_ sp | sp 2 ) - - - ]v :|","lyric":"预备。"},
-        {"chord":"Bm","n":"[v2 4_ sp_ 3__ ( 4__ sp 4_ ) 5_","lyric":"荣ㅤ上加 ㅤ 荣,"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}Esus4{sp}E","n":"3_ ( 2_ sp | sp 2 ) - - - ]v :|","lyric":"预备。"},
+        {"chord":"Bm","n":"[v2 4_ sp_ 3__ ( 4__ sp 4_ ) 5_","lyric":"荣{sp}上加 {sp} 荣,"},
         {"chord":"","n":"6_ 1_","lyric":"因你"},
-        {"chord":"ㅤㅤㅤㅤㅤEsus4ㅤE","n":"3_ ( 5_ sp | sp 5 ) -","lyric":"圣灵。"},
-        {"chord":"","n":"0_ 5_","lyric":"ㅤ我"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}Esus4{sp}E","n":"3_ ( 5_ sp | sp 5 ) -","lyric":"圣灵。"},
+        {"chord":"","n":"0_ 5_","lyric":"{sp}我"},
+        {"label":"Chorus","dx":-15},
         {"chord":"","n":"6_ 1__ ( 6__ sp || ) ]v","lyric":"要贴近，"}
-      ],
-      [
-        {"chord":"Dmaj7","n":"( || 6 ) -","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"","n":"0_ 5_","lyric":"ㅤ贴","lyric2":"ㅤ你"},
+      ]},
+      { "b": true, "line": [
+        {"chord":"Dmaj7","n":"( || 6 ) -","lyric":"{sp}","lyric2":"{sp}"},
+        {"chord":"","n":"0_ 5_","lyric":"{sp}贴","lyric2":"{sp}你"},
         {"chord":"","n":"6_ 1'_ sp |","lyric":"近祢","lyric2":"起初"},
         {"chord":"Dmaj7","n":"1'_ 7_","lyric":"心跳","lyric2":"对我"},
-        {"chord":"","n":"7_ 1'__ ( 7__ sp 7_ ) 5_","lyric":"的声音,ㅤ 思","lyric2":"的心意,ㅤ 我"},
-        {"chord":"ㅤㅤㅤㅤㅤㅤㅤ C#m","n":"6_ 1'__ ( 2'__ sp | sp 2'_ ) 5_","lyric":"绪如祢,ㅤㅤ 步","lyric2":"心渴望ㅤ ㅤ 荣"},
-        {"chord":"","n":"6_ 1'__ ( 2'__ sp 2'_ ) 5_","lyric":"伐如祢,ㅤ 更","lyric2":"耀如祢,ㅤ 圣"},
-        {"chord":"ㅤㅤㅤㅤㅤㅤㅤ F#m","n":"6_ 1'__ ( 1'__ sp | sp 1' ) - -","lyric":"靠近祢,","lyric2":"洁如祢,"},
+        {"chord":"","n":"7_ 1'__ ( 7__ sp 7_ ) 5_","lyric":"的声音,{sp} 思","lyric2":"的心意,{sp} 我"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp} C#m","n":"6_ 1'__ ( 2'__ sp | sp 2'_ ) 5_","lyric":"绪如祢,{sp}{sp} 步","lyric2":"心渴望{sp} {sp} 荣"},
+        {"chord":"","n":"6_ 1'__ ( 2'__ sp 2'_ ) 5_","lyric":"伐如祢,{sp} 更","lyric2":"耀如祢,{sp} 圣"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp} F#m","n":"6_ 1'__ ( 1'__ sp | sp 1' ) - -","lyric":"靠近祢,","lyric2":"洁如祢,"},
         {"chord":"","n":"3_ 1'_ sp |","lyric":"活出","lyric2":"基督"}
-      ],
-      [
-        {"chord":"ㅤBm7","n":"( sp 1' ) - -","lyric":"ㅤ","lyric2":"ㅤ"},
-        {"chord":"ㅤㅤㅤㅤㅤE","n":"2'_ ( 2'_ sp | 2' )","lyric":"像祢","lyric2":"耶稣，"},
-        {"chord":"","n":"0·_ sp_ 5'__","lyric":"ㅤㅤ丰","lyric2":"ㅤㅤ我"},
-        {"chord":"","n":"( 2'_ 1'__ ) ( 1'__ sp 1'_ ) ([ 7_","lyric":"盛ㅤ的ㅤㅤ生","lyric2":"全ㅤ属ㅤㅤ于"},
-        {"chord":"ㅤㅤAㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤEmㅤㅤㅤA","n":"| ]) 7_ [v1 ( 5_ 5 ) ( - - sp | sp 5· ) ( sp 5_ ) ( 5_ )","lyric":"ㅤㅤ命。ㅤㅤㅤㅤㅤㅤㅤㅤ我","lyric2":"ㅤ"},
-        {"chord":"","n":"6_ 1'__ ( 6__ sp :| ) ]v","lyric":"要领受","lyric2":"ㅤ"},
-        {"chord":"AㅤㅤㅤㅤFine","n":"1' - - - sp ||/ [v2 ]v","lyric":"祢。","lyric2":"ㅤ"}
-      ],
-      [
-        {"chord":"ㅤD","n":"|| 6 -","lyric":"我","lyric2":"永"},
+      ]},
+      { "b": true, "line": [
+        {"chord":"{sp}Bm7","n":"( sp 1' ) - -","lyric":"{sp}","lyric2":"{sp}"},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}E","n":"2'_ ( 2'_ sp | 2' )","lyric":"像祢","lyric2":"耶稣，"},
+        {"chord":"","n":"0·_ sp_ 5'__","lyric":"{sp}{sp}丰","lyric2":"{sp}{sp}我"},
+        {"chord":"","n":"( 2'_ 1'__ ) ( 1'__ sp 1'_ ) ([ 7_","lyric":"盛{sp}的{sp}{sp}生","lyric2":"全{sp}属{sp}{sp}于"},
+        {"chord":"{sp}{sp}A{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}Em{sp}{sp}{sp}A","n":"| ]) 7_ [v1 ( 5_ 5 ) ( - - sp | sp 5· ) ( sp 5_ ) ( 5_ )","lyric":"{sp}{sp}命。{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}我","lyric2":"{sp}"},
+        {"chord":"","n":"6_ 1'__ ( 6__ sp :| ) ]v sp sp","lyric":"要领受","lyric2":"{sp}"},
+        {"label":"Fine","dx":40},
+        {"chord":"A","n":"1' - - - sp ||/ [v2 ]v","lyric":"祢。","lyric2":"{sp}"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"{sp}D","n":"|| 6 -","lyric":"我","lyric2":"永"},
         {"chord":"E/D","n":"7 - sp | sp","lyric":"心","lyric2":"恒"},
         {"chord":"C#m","n":"7_ 1'_","lyric":"坦然","lyric2":"在祢"},
-        {"chord":"ㅤ F#m","n":"2'_ ( 1'_ 1' ) - sp | sp","lyric":"无惧，","lyric2":"手里，"},
-        {"chord":"Bm","n":"[v1 3_ 1'_","lyric":"敬拜","lyric2":"ㅤ"},
-        {"chord":"","n":"1' - - |","lyric":"祢","lyric2":"ㅤ"},
-        {"chord":"E","n":"5_ 2'_ 2' - - :| ]v","lyric":"跟随祢。","lyric2":"ㅤ"},
-        {"chord":"Bm","n":"[v2 3_ 1'_ 2'_","lyric":"我放","lyric2":"ㅤ"},
-        {"chord":"","n":"1' -","lyric":"下","lyric2":"ㅤ"},
-        {"chord":"ㅤㅤㅤ E","n":"2'_ ( 2'_ sp | 2' ) - - - ]v","lyric":"自己。","lyric2":"ㅤ"},
-        {"chord":"","n":"||","lyric":"ㅤ","lyric2":"ㅤ"}
-      ]
+        {"chord":"{sp} F#m","n":"2'_ ( 1'_ 1' ) - sp | sp","lyric":"无惧，","lyric2":"手里，"},
+        {"chord":"Bm","n":"[v1 3_ 1'_","lyric":"敬拜","lyric2":"{sp}"},
+        {"chord":"","n":"1' - - |","lyric":"祢","lyric2":"{sp}"},
+        {"chord":"E","n":"5_ 2'_ 2' - - :| ]v","lyric":"跟随祢。","lyric2":"{sp}"},
+        {"chord":"Bm","n":"[v2 3_ 1'_ 2'_","lyric":"我放","lyric2":"{sp}"},
+        {"chord":"","n":"1' -","lyric":"下","lyric2":"{sp}"},
+        {"label":"To Chorus","style":"jump","dx":55},
+        {"chord":"{sp}{sp}{sp} E","n":"2'_ ( 2'_ sp | 2' ) - - - ]v sp ||","lyric":"自己。","lyric2":"{sp}"}
+      ]}
     ]
   }
 ]
