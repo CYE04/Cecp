@@ -1,0 +1,100 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-07-15 19:14:37",
+  "id": "0062zhucifuruchunyu",
+  "title": "0062主赐福如春雨",
+  "artist": "诗歌本",
+  "sub": "诗歌本【赞美诗歌1608】作词:万美兰 作曲:游智婷",
+  "origKey": "C",
+  "timeSign": "3/4",
+  "bpm": 132,
+  "mp3": "0062zhucifuruchunyu.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/hongbenben.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/0062zhucifuruchunyu.lrc",
+  "youtube": "https://youtu.be/BvqsBBSqKAo?si=-TePmCpxpkKD8g9x",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/0062zhucifuruchunyuC.jpg",
+  "sections": [
+  {
+    "name": "0062主赐福如春雨",
+    "lines": [
+      [
+        {"chord":"","lyric":""},
+        {"chord":"C","n":"1' - - sp |","lyric":""},
+        {"chord":"Em","n":"7 - - sp |","lyric":""},
+        {"chord":"F","n":"6·","lyric":""},
+        {"chord":"","n":"5_","lyric":""},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp}G","n":"4_ ( 5_ sp | sp 5 )","lyric":""},
+        {"chord":"","n":"6 7 sp |","lyric":""},
+        {"chord":"C","n":"1'·","lyric":""},
+        {"chord":"","n":"5_ 1' sp |","lyric":""},
+        {"chord":"Em","n":"7·","lyric":""},
+        {"chord":"","n":"5_","lyric":""},
+        {"chord":"","n":"7 sp |","lyric":""},
+        {"chord":"F","n":"6·","lyric":""},
+        {"chord":"","n":"5_","lyric":""},
+        {"chord":"{sp}{sp}{sp}{sp}{sp}{sp}{sp}G","n":"4_ ( 5_ sp | sp 5 ) - - sp |","lyric":""}
+      ],
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"C","n":"3 3·","lyric":"主赐"},
+        {"chord":"","n":"4_ sp |","lyric":"的"},
+        {"chord":"Em","n":"5 - - sp | sp","lyric":"福"},
+        {"chord":"F","n":"6 - 1' sp | sp","lyric":"是{sp}泉"},
+        {"chord":"C/E","n":"5 - - sp | sp","lyric":"源，"},
+        {"chord":"F","n":"6 6·","lyric":"在我"},
+        {"chord":"","n":"1'_ sp | sp","lyric":"心"},
+        {"chord":"C/E","n":"5 - 3 |","lyric":"中{sp}更"},
+        {"chord":"Dm7{sp} G","n":"2 - 1 |","lyric":"新{sp}无"},
+        {"chord":"C","n":"1 0_ 5_","lyric":"穷。让"},
+        {"chord":"G/B","n":"6_ 7_ sp |","lyric":"我们"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"Am","n":"1'_ 7_","lyric":"张开"},
+        {"chord":"","n":"1'_ 7","lyric":"赞美"},
+        {"chord":"","n":"3_ |","lyric":"的"},
+        {"chord":"Em","n":"5 - - sp | sp","lyric":"口，"},
+        {"chord":"F","n":"6_ 5_","lyric":"举起"},
+        {"chord":"","n":"6_ 5","lyric":"敬拜"},
+        {"chord":"","n":"1_ |","lyric":"的"},
+        {"chord":"C","n":"3 - - sp | sp","lyric":"手"},
+        {"chord":"Dm7","n":"2 2·","lyric":"主将"},
+        {"chord":"","n":"3_ |","lyric":"赐"},
+        {"chord":"Dm7","n":"4 - 4 sp | sp","lyric":"福"},
+        {"chord":"G","n":"5 5·","lyric":"我们"},
+        {"chord":"","n":"6_ sp | sp","lyric":"之"},
+        {"chord":"G7","n":"7","lyric":"中."}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"0_ 5_","lyric":"{sp}让"},
+        {"chord":"","n":"6_ 7_ |","lyric":"我们"},
+        {"chord":"C","n":"1' 1' - sp | sp","lyric":"献上!"},
+        {"chord":"Em","n":"7 7 - sp | sp","lyric":"献上!"},
+        {"chord":"F","n":"6 6·","lyric":"将赞"},
+        {"chord":"","n":"6_ sp |","lyric":"美"},
+        {"chord":"C","n":"5 3 - sp |","lyric":"尊荣"},
+        {"chord":"Dm","n":"4 - 4 |","lyric":"全{sp}都"},
+        {"chord":"G7","n":"4","lyric":"向"},
+        {"chord":"","n":"5 6 |","lyric":"主献"},
+        {"chord":"C{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}G7","n":"( 5 - - sp | sp 5 )","lyric":"上。"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"0_ 5_","lyric":"{sp}而"},
+        {"chord":"","n":"6_ 7_ |","lyric":"主将"},
+        {"chord":"C","n":"1' 1' - sp | sp","lyric":"赐下!"},
+        {"chord":"Em","n":"7 7 - sp |","lyric":"赐下!"},
+        {"chord":"F","n":"6 6·","lyric":"主的"},
+        {"chord":"","n":"6_ sp |","lyric":"恩"},
+        {"chord":"C","n":"5 - - sp |","lyric":"典"},
+        {"chord":"F","n":"6 - 6 |","lyric":"将{sp}如"},
+        {"chord":"G7","n":"5","lyric":"春"},
+        {"chord":"","n":"3 2 |","lyric":"雨降"},
+        {"chord":"C{sp}{sp}{sp}{sp}{sp}{sp}{sp}{sp}C","n":"( 1 - - sp | sp 1 ) - - ||/","lyric":"下。"}
+      ]}
+    ]
+  }
+]
+}
