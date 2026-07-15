@@ -1,0 +1,82 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-07-15 18:30:50",
+  "id": "0061gechangyehehuadedaciai",
+  "title": "0061歌唱耶和华的大慈爱",
+  "artist": "诗歌本",
+  "sub": "诗歌本(取义 诗89:1) 颂赞：三一  作词:菲尔墨 作曲:菲尔量",
+  "origKey": "C",
+  "timeSign": "4/4",
+  "bpm": 61,
+  "mp3": "/upload/0061gechangyehehuadedaciai.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/hongbenben.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/0061gechangyehehuadedaciai.lrc",
+  "youtube": "https://youtu.be/F1FcO1bjMEM?si=c4lQhh4-Rc37MI2A",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/0061gechangyehehuadedaciaiC.jpg",
+  "sections": [
+  {
+    "name": "0061 歌唱耶和华的大慈爱",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"1_ 2_ sp | sp","lyric":"我要"},
+        {"chord":"C","n":"3 sp","lyric":"唱"},
+        {"chord":"","n":"3·_ sp_ 3__","lyric":"耶{sp}和"},
+        {"chord":"","n":"3_ 2_","lyric":"华的"},
+        {"chord":"","n":"3_ 4_ sp | sp","lyric":"大慈"},
+        {"chord":"C","n":"5","lyric":"爱"},
+        {"chord":"","n":"1'","lyric":"到"},
+        {"chord":"","n":"5_ 3_","lyric":"永远,"},
+        {"chord":"","n":"4_ 3_ sp | sp","lyric":"我要"},
+        {"chord":"G","n":"2 - -","lyric":"唱，"},
+        {"chord":"","n":"5_ 4_ sp | sp","lyric":"我要"},
+        {"chord":"C","n":"3 sp - sp - sp |","lyric":"唱；"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"1_ 2_ sp | sp","lyric":"我要"},
+        {"chord":"C","n":"3","lyric":"唱"},
+        {"chord":"","n":"3·_ sp_ 3__","lyric":"耶{sp}和"},
+        {"chord":"","n":"3_ 2_","lyric":"华的"},
+        {"chord":"","n":"3_ 4_ sp | sp","lyric":"大慈"},
+        {"chord":"C","n":"5","lyric":"爱"},
+        {"chord":"","n":"1'","lyric":"到"},
+        {"chord":"","n":"5_ 3_","lyric":"永远,"},
+        {"chord":"","n":"4_ 3_ sp |","lyric":"我要"},
+        {"chord":"G","n":"2","lyric":"唱,"},
+        {"chord":"","n":"5·_ sp_ 6__","lyric":"哈{sp}利"},
+        {"chord":"","n":"5_ 4_","lyric":"路亚!"},
+        {"chord":"","n":"3_ 2_ sp | ~","lyric":"我要"},
+        {"label":"Fine","dx":25},
+        {"chord":"C","n":"1 - - sp ||/","lyric":"唱。"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"5_ sp_ 5_ sp | sp","lyric":"用{sp}我"},
+        {"chord":"F","n":"( 6 - sp 6_ ) 1'_","lyric":"口{sp}{sp}{sp}叫"},
+        {"chord":"","n":"7_ 6_ sp | sp","lyric":"人知"},
+        {"chord":"C","n":"5 - - 3 sp | sp","lyric":"道{sp}{sp} 祢"},
+        {"chord":"G","n":"2·_ sp_ 3__","lyric":"大{sp}信"},
+        {"chord":"","n":"4 sp - sp","lyric":"实，"},
+        {"chord":"","n":"6 sp | sp","lyric":"祢"},
+        {"chord":"C","n":"5·_ sp_ 4__","lyric":"大{sp}信"},
+        {"chord":"","n":"3 sp - sp |","lyric":"实，"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"","lyric":""},
+        {"chord":"","n":"5_ sp_ 5_ sp | sp","lyric":"用{sp}我"},
+        {"chord":"F","n":"( 6 - sp 6_ ) 1'_","lyric":"口{sp}{sp}{sp}叫"},
+        {"chord":"","n":"7_ 6_ sp | sp","lyric":"人知"},
+        {"chord":"C","n":"5 - - 3 sp | sp","lyric":"道{sp}{sp} 祢"},
+        {"chord":"G","n":"2·_ sp_ 5__","lyric":"大{sp}信"},
+        {"chord":"","n":"5·_ sp_ 6__","lyric":"实，直"},
+        {"chord":"","n":"7","lyric":"到"},
+        {"chord":"","n":"6_ 7_ sp | sp","lyric":"永远"},
+        {"label":"D.C","style":"jump","dx":25},
+        {"chord":"D{sp}{sp}{sp}{sp}{sp}{sp} G","n":"6 sp - sp 5 sp ||/","lyric":"万{sp}{sp}{sp}代"}
+      ]}
+    ]
+  }
+]
+}
