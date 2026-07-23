@@ -4182,6 +4182,106 @@ Object.assign(window, {
   stopToolPlayback: stopToolPlayback
 });
 
+/* ══════════════════════════════════════════
+   草稿自动缓存 —— 防误触「返回上一页」丢失编辑
+   存 localStorage(同源,教程 key 已在用)；回来自动恢复 + 顶部提示 + 轻拦截返回。
+   本块在 srcdoc 模板内：不用反引号、不用正则。
+════════════════════════════════════════════ */
+var MT_DRAFT_KEY='mt_draft_v1';
+var MT_META_IDS=['id','title','artist','sub','key','timesign','bpm','mp3','cover','lrc','youtube','scoreimg'];
+function mtCollectMeta(){
+  var m={};
+  MT_META_IDS.forEach(function(k){var el=document.getElementById('meta-'+k);if(el)m[k]=el.value;});
+  return m;
+}
+function mtApplyMeta(m){
+  if(!m)return;
+  MT_META_IDS.forEach(function(k){var el=document.getElementById('meta-'+k);if(el&&m[k]!=null)el.value=m[k];});
+}
+function mtDraftMeaningful(p){
+  if(!p||!p.data)return false;
+  if(p.meta&&(p.meta.title||p.meta.artist||(p.meta.id&&p.meta.id!=='song-id')))return true;
+  var found=false;
+  (p.data||[]).forEach(function(sec){(sec.lines||[]).forEach(function(ln){(ln.segs||[]).forEach(function(sg){
+    if(!sg)return;
+    if((sg.n&&String(sg.n).trim())||(sg.lyric&&String(sg.lyric).trim())||(sg.chord&&String(sg.chord).trim())||sg.label)found=true;
+  });});});
+  return found;
+}
+function mtDraftSave(){
+  try{
+    var payload={v:1,t:Date.now(),strict:!!STRICT_MODE,meta:mtCollectMeta(),data:data};
+    if(!mtDraftMeaningful(payload)){localStorage.removeItem(MT_DRAFT_KEY);return;}
+    localStorage.setItem(MT_DRAFT_KEY,JSON.stringify(payload));
+  }catch(e){}
+}
+var mtDraftTimer=null;
+function mtDraftSaveSoon(){
+  if(mtDraftTimer)clearTimeout(mtDraftTimer);
+  mtDraftTimer=setTimeout(mtDraftSave,600);
+}
+function mtDraftLoad(){
+  try{var raw=localStorage.getItem(MT_DRAFT_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}
+}
+function mtDraftClear(){try{localStorage.removeItem(MT_DRAFT_KEY);}catch(e){}}
+function mtDraftBanner(text,onClear){
+  var old=document.getElementById('mt-draft-banner');if(old)old.remove();
+  var bar=document.createElement('div');
+  bar.id='mt-draft-banner';
+  bar.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:10px;z-index:99999;display:flex;align-items:center;gap:10px;background:rgba(20,22,28,0.94);color:#eaf2ff;border:1px solid rgba(120,180,255,0.35);border-radius:12px;padding:8px 14px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,0.35);max-width:92vw;';
+  var span=document.createElement('span');span.textContent=text;bar.appendChild(span);
+  if(onClear){
+    var clr=document.createElement('button');
+    clr.textContent='清空重来';
+    clr.style.cssText='cursor:pointer;background:rgba(255,90,90,0.18);color:#ff9c9c;border:1px solid rgba(255,90,90,0.4);border-radius:8px;padding:4px 10px;font-size:12px;';
+    clr.onclick=function(){onClear();bar.remove();};
+    bar.appendChild(clr);
+  }
+  var x=document.createElement('button');
+  x.textContent='×';
+  x.style.cssText='cursor:pointer;background:transparent;color:#9fb3d0;border:none;font-size:18px;line-height:1;padding:0 4px;';
+  x.onclick=function(){bar.remove();};
+  bar.appendChild(x);
+  document.body.appendChild(bar);
+  setTimeout(function(){var b=document.getElementById('mt-draft-banner');if(b===bar)bar.remove();},9000);
+}
+function mtResetFresh(){
+  saveUndo();
+  data=[{name:'主歌',lines:[{bold:false,segs:[{chord:'',n:'',lyric:''}]}]}];
+  curSi=-1;curLi=-1;curGi=-1;curTok=-1;clearSel();
+  STRICT_MODE=false;
+  MT_META_IDS.forEach(function(k){if(k==='key'||k==='timesign'||k==='bpm')return;var el=document.getElementById('meta-'+k);if(el)el.value='';});
+  mtDraftClear();
+  renderEditor();renderPreview();if(typeof updateStrictUi==='function')updateStrictUi();
+}
+function mtDraftRestoreOnBoot(){
+  var p=mtDraftLoad();
+  if(!mtDraftMeaningful(p))return;
+  try{data=p.data;STRICT_MODE=!!p.strict;mtApplyMeta(p.meta);curSi=-1;curLi=-1;curGi=-1;curTok=-1;clearSel();}catch(e){}
+  try{renderEditor();}catch(e){}
+  try{renderPreview();}catch(e){}
+  try{if(typeof updateStrictUi==='function')updateStrictUi();}catch(e){}
+  // banner 延后一拍再加：冷启动时外层打开简谱的代码可能还会动 body/iframe，同步加会被冲掉
+  setTimeout(function(){try{mtDraftBanner('已恢复上次未保存的编辑',mtResetFresh);}catch(e){}},180);
+}
+/* 轻拦截误触返回：常驻一个历史态吸收一次返回；被吸收后下次编辑自动重新武装 */
+var mtGuardActive=false;
+function mtArmBackGuard(){if(mtGuardActive)return;try{history.pushState({mtGuard:1},'');mtGuardActive=true;}catch(e){}}
+window.addEventListener('popstate',function(){
+  mtDraftSave();
+  if(mtGuardActive){mtGuardActive=false;mtDraftBanner('已存草稿 · 再返回一次即退出编辑',null);}
+});
+/* 把自动保存 + 重新武装挂到 renderEditor（包裹，不动大函数本体） */
+if(typeof renderEditor==='function'){
+  var _mtOrigRenderEditor=renderEditor;
+  renderEditor=function(){var r=_mtOrigRenderEditor.apply(this,arguments);mtDraftSaveSoon();mtArmBackGuard();return r;};
+}
+/* meta 输入框改动也触发自动保存 */
+MT_META_IDS.forEach(function(k){var el=document.getElementById('meta-'+k);if(el)el.addEventListener('input',mtDraftSaveSoon);});
+/* 切走/隐藏/卸载那一刻立即存一次兜底 */
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')mtDraftSave();});
+window.addEventListener('pagehide',mtDraftSave);
+
 /* 初始化 */
 bindTopbarActions();
 bindToolActions();
@@ -4190,6 +4290,8 @@ initSegSearch();
 renderEditor();
 updateInputState();
 initDualBuilder();
+mtArmBackGuard();
+mtDraftRestoreOnBoot();
 </script>
 <!-- ── 批量填歌词 modal ── -->
 <div class="lyfill-overlay" id="lyfillOverlay">
