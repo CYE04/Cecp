@@ -1464,6 +1464,23 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       return canvasToPngBlob(canvas);
     });
   }
+  /* §4 导出锁 A4 · 12 调稳定：移调只给根音/斜杠低音多出一个升降号，后缀不变。
+     给每个"根音/低音没有升降号"的和弦各预留一个升降号宽，使导出内容宽度在 12 个调下恒定，
+     竖版/横版判断因此不随调变。只作用于导出克隆，屏幕渲染逐像素不变。复用 {sp} 的 spMeasureWidth 量宽。 */
+  function reserveChordAccidentalWidth(scope){
+    if(!scope)return;
+    [].forEach.call(scope.querySelectorAll('.p-chord'),function(ch){
+      var txt=(ch.textContent||'').replace(/ㅤ/g,'').trim();  // 去 {sp} 补位符再解析
+      if(!txt)return;
+      var parts=txt.split('/'),need=0,root=parts[0].trim();
+      if(/^[A-G]/.test(root)&&!/^[A-G][#b♯♭]/.test(root))need++;       // 根音无升降号 → 预留 1
+      if(parts.length>1){var bass=parts[1].trim();
+        if(/^[A-G]/.test(bass)&&!/^[A-G][#b♯♭]/.test(bass))need++;}    // 有斜杠低音且无升降号 → 再预留 1
+      if(!need)return;
+      var w=spMeasureWidth(ch,'#');
+      if(w>0){var sp=document.createElement('span');sp.setAttribute('aria-hidden','true');sp.style.cssText='display:inline-block;width:'+(w*need).toFixed(2)+'px;';ch.appendChild(sp);}
+    });
+  }
   function exportSongAsFittedPng(panelInner,opt){
     opt=opt||{};
     if(!panelInner)return Promise.reject(new Error('panel missing'));
@@ -1477,11 +1494,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         if(keyZone) keyZone.remove();
       }
       normalizeExportNotation(snap.node);
+      reserveChordAccidentalWidth(snap.node);   // §4：12 调导出宽度恒定
       makeExportTextBlack(snap.node);
       lyricHlPrepareExport(snap.node);
       snap.node.style.setProperty('background','#ffffff','important');
       return waitPaint2()
         .then(function(){
+          // strict: 克隆里的梁/弧是屏幕坐标, 导出按 max-content 重新排版了, 得按新布局重排(非 strict 为 no-op)
+          snap.node.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);
+          layoutStrictArcsAll(snap.node);
           var r1=snap.node.getBoundingClientRect();
           var cw=Math.max(1,r1.width),ch=Math.max(1,r1.height);
           var lyricPx=exportMeasureLyricFont(snap.node);
@@ -1496,6 +1517,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
           }
           exportApplyTwoColumns(snap.node,cw);
           return waitPaint2().then(function(){
+            snap.node.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);   // 双栏重排后再排一次梁/弧
+            layoutStrictArcsAll(snap.node);
             var r2=snap.node.getBoundingClientRect();
             var cw2=Math.max(1,r2.width),ch2=Math.max(1,r2.height);
             var L=EXPORT_FIT.landscape;
@@ -5051,8 +5074,13 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       var natural=measureNaturalScore();
       if(!natural)return;
 
-      var availableWidth=parent.clientWidth||natural.width;
-      if(!availableWidth)return;
+      // 版面居中：内容最大宽度 SCORE_MAXW，窄屏两侧留 SCORE_PAD；曲谱缩放到此宽度并水平居中。
+      // 不锁 A4、不额外整页 transform（沿用既有 fit 缩放）。导出克隆已 transform:none，故不受影响。
+      var SCORE_MAXW=1000,SCORE_PAD=16;   // ← 平板实测后可调这个数
+      var rawAvail=parent.clientWidth||natural.width;
+      if(!rawAvail)return;
+      var availableWidth=Math.max(1,Math.min(rawAvail-SCORE_PAD*2,SCORE_MAXW));
+      var centerX=Math.max(0,(rawAvail-availableWidth)/2);
 
       var scaleX=availableWidth/natural.width;
       if(!isFinite(scaleX)||scaleX<=0)scaleX=1;
@@ -5068,7 +5096,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       }
       if(!isFinite(scaleY)||scaleY<=0)scaleY=scaleX;
 
-      lbDiv.style.transform='scale('+scaleX+','+scaleY+')';
+      lbDiv.style.transform='translateX('+centerX.toFixed(1)+'px) scale('+scaleX+','+scaleY+')';
       lbDiv.style.transformOrigin='left top';
       lbDiv.style.width=natural.width+'px';
       lbDiv.style.marginBottom=(natural.height*(scaleY-1)+18)+'px';

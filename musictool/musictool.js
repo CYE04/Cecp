@@ -3186,22 +3186,26 @@ function fitPreview(){
     else justifyScoreRowsClear(inner);
     if(STRICT_MODE)inner.querySelectorAll('.prev-row').forEach(connectStrictBeams);
     if(STRICT_MODE)layoutStrictArcsAll(inner);
-    var avail=wrap.clientWidth;
-    if(!avail)return;
+    // 版面居中：内容最大宽度 SCORE_MAXW，窄屏两侧留 SCORE_PAD；内容缩到 ≤ 此宽度并水平居中。
+    // 编辑预览只缩小、不放大真实尺寸。导出在 musiclib，与本预览无关。
+    var rawAvail=wrap.clientWidth;
+    if(!rawAvail)return;
+    var SCORE_MAXW=1000,SCORE_PAD=16;   // ← 平板实测后可调这个数
+    var avail=Math.max(1,Math.min(rawAvail-SCORE_PAD*2,SCORE_MAXW));
     var maxW=0;
     inner.querySelectorAll('.prev-row').forEach(function(row){
       row.style.display='inline-flex';
       if(row.scrollWidth>maxW)maxW=row.scrollWidth;
       row.style.display='';
     });
-    if(maxW>avail){
-      var scale=avail/maxW;
-      inner.style.transform='scale('+scale+')';
-      inner.style.transformOrigin='left top';
-      inner.style.width=maxW+'px';
-      var h=inner.offsetHeight;
-      inner.style.marginBottom=(h*(scale-1))+'px';
-    }
+    if(!maxW)return;
+    var scale=maxW>avail?avail/maxW:1;
+    var visualW=maxW*scale;
+    var centerX=Math.max(0,(rawAvail-visualW)/2);
+    inner.style.transform='translateX('+centerX.toFixed(1)+'px)'+(scale<1?(' scale('+scale+')'):'');
+    inner.style.transformOrigin='left top';
+    inner.style.width=maxW+'px';
+    if(scale<1){var h=inner.offsetHeight;inner.style.marginBottom=(h*(scale-1))+'px';}
   });
 }
 function normalizePreviewRowHeights(scope){
