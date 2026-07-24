@@ -4994,13 +4994,14 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       if(document.getElementById('ye-strict-css'))return;
       var s=document.createElement('style');s.id='ye-strict-css';
       s.textContent=[
-        '.prev-seg.p-slot{align-items:center;min-width:1.2em;margin:0 2px;}',
+        '.prev-seg.p-slot{align-items:center !important;min-width:1.2em;margin:0 2px;}',
         '.prev-seg.p-slot .p-chord{text-align:center;white-space:normal;min-width:100%;}',
         '.prev-seg.p-slot .p-chord.p-chord-multi{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;line-height:1.1;}',
         '.prev-seg.p-slot .p-chord-multi .p-chord-stk{display:block;line-height:1.2;}',
         '.prev-seg.p-slot .p-chord-multi .chord-chip{font-size:.85em;}',
         '.prev-seg.p-slot .p-lyric{text-align:center;padding:0 1px;}',
         '.prev-seg.p-slot .p-lyric .p-punct{display:inline-block;width:0;overflow:visible;white-space:pre;pointer-events:none;}',
+        '.prev-seg.p-slot.p-punct-gap{margin-right:0.5em !important;}',
         '.prev-seg.p-barslot{min-width:0;margin:0 3px;}'
       ].join('');
       document.head.appendChild(s);
@@ -5047,12 +5048,15 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
             var l=div('p-lyric'+(j?' p-lyric'+(j+1):'')+(bold?' bold':''));
             if(lv==null){ setLyricContentEx(l,' ',setLyricContent); }
             else {
-              var lsp=CecpStrictAlign.splitTrailingPunct(lv);   // 尾标点悬挂：字居中对位、标点挂右不占宽
-              setLyricContentEx(l, normLyricText(lsp.base||' '), setLyricContent);
-              if(lsp.punct){var pun=document.createElement('span');pun.className='p-punct';pun.textContent=lsp.punct;l.appendChild(pun);}
+              var lsp=CecpStrictAlign.splitTrailingPunct(lv);   // 标点永远悬挂：对中点保留在字上；列级 p-punct-gap 在标点后留空隙防撞后字
+              if(lsp.punct){
+                setLyricContentEx(l, normLyricText(lsp.base||' '), setLyricContent);
+                var pun=document.createElement('span');pun.className='p-punct';pun.textContent=lsp.punct;l.appendChild(pun);
+              } else { setLyricContentEx(l, normLyricText(lv), setLyricContent); }
             }
             col.appendChild(l);
           });
+          if(col.querySelector('.p-punct'))col.classList.add('p-punct-gap');   // 悬挂标点后留一点空间
           container.appendChild(col);
           slot++;lastSlotCol=col;
         } else if(STRICT_BARS[tok]){
