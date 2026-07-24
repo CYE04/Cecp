@@ -1,0 +1,39 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-07-24 18:38:03",
+  "id": "0233jialueshandeai",
+  "title": "0233加略山的爱",
+  "artist": "诗歌本",
+  "sub": "诗歌本 【赞美诗歌 1608】",
+  "origKey": "E",
+  "timeSign": "4/4",
+  "bpm": 70,
+  "mp3": "/upload/0233jialueshandeai.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/hongbenben.np3",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/0233jialueshandeai.lrc",
+  "youtube": "https://youtu.be/dFMzgcc2EiI?si=JRDm7vdujrYWaNTT",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/0233jialueshandeaiE.jpg",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "0233加略山的爱",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"Em @ @ Am @ @ @ @ C @ @ @ @ @ @ @ @ @ @ D7 @ @ @ G @ @ @ @ @ @ @","n":"6, 3_ 3_ 2 ( 3_ 2_ ) sp | sp 1 ( 1_ 7,_ ) 6, - sp | sp 6, 3_ 3_ ! 2_ 3 4_ sp | sp 3 sp - sp - sp - sp |","lyric":"为什么不说@@@一句@话？@@背负着沉重十@@@架，@@@@@@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"为什么流出@@@宝贝@血,@@背负着世人罪@@孽；@@@@@@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Em@@Am@@@@C@@@B7 @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"6, 3_ 3_ 2 ( 3_ 2_ ) sp | sp 1 ( 1_ 7,_ ) 6, 1 sp | sp","lyric":"一步步走向@@@各各@他甘@@ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"为什么受苦@@@直到命绝默@@ @ @ @ @ @ @ @ @ @ @ @ @ @ @"},
+        {"chord":"@@@@@@@Em @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"7,· 7,_ ! 7,_ 6, #5, sp | sp 6, sp - sp - sp - sp |","lyric":"心为我们被@@杀。@@@@@@ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"默无声地爱@@我。@@@@@@ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Em@@@@@@C@@@D@@@Em@@@@@@@@C@@@D @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"3 ( 3_ 2_ ) 3 - sp | sp 6,_ 1_ ! 2_ 3_ 2 - sp | sp 3 ( 3__ 2__ 3__ 2__ ) 3 - sp | sp 6,_ 1_ ! 2_ 3_ 2 sp - sp |","lyric":"哦！耶@稣，@@@亲爱的耶稣，@@@哦！耶@@@稣，@@@受苦的耶稣， @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Em@@Am@@@@C@@@B7 @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"6, 3_ 3_ 2 3_ 2_ sp | sp 1 ( 1_ 7,_ ) 6, 1 sp | sp","lyric":"为什么仍不说@@一句@话，甘 @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"为什么受苦直@@到命@绝， 默 @ @ @ @ @ @ @ @ @ @ @ @ @"},
+        {"chord":"@@@@@@@Em @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"7,· 7,_ ! 7,_ 6, #5, sp | sp 6, sp - sp - sp - sp |","lyric":"心为我们被@@杀？ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"默无声地爱@@我？ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]}
+    ]
+  }
+]
+}
