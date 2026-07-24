@@ -164,6 +164,7 @@ root.innerHTML = `
     <div class="mt-tut-footer">
       <div class="mt-tut-dots" id="mt-tut-dots"></div>
       <div class="mt-tut-btns">
+        <button class="mt-tut-nevershow" id="mt-tut-atlas" style="display:none;">📖 记号图鉴</button>
         <button class="mt-tut-nevershow" id="mt-tut-never">以后不再显示</button>
         <button class="mt-tut-skip" id="mt-tut-skip">跳过</button>
         <button class="mt-tut-next" id="mt-tut-next">下一步 →</button>
@@ -1196,8 +1197,24 @@ function saSplitTrailingPunct(s){
   if(i===0)return {base:s,punct:''};
   return {base:s.slice(0,i),punct:s.slice(i)};
 }
+/* 和弦智能分词（仅 chord）：空格分隔 + @ 自分隔，使 C@@@G@ = C @ @ @ G @；真和弦整体保留、C,G 不拆。同 shared/strict-align.js。 */
+function saTokenizeChord(str){
+  var s=String(str==null?'':str).trim();
+  if(!s)return [];
+  var raw=s.split(/\\s+/),out=[];
+  for(var i=0;i<raw.length;i++){
+    var t=raw[i],buf='';
+    for(var j=0;j<t.length;j++){
+      var ch=t.charAt(j);
+      if(ch==='@'){if(buf){out.push(buf);buf='';}out.push('@');}
+      else buf+=ch;
+    }
+    if(buf)out.push(buf);
+  }
+  return out;
+}
 function saAlignField(raw,slotCount,isLyric){
-  var toks=isLyric?saTokenizeLyric(raw):saParseFieldTokens(raw),vals=[];
+  var toks=isLyric?saTokenizeLyric(raw):saTokenizeChord(raw),vals=[];
   for(var i=0;i<slotCount;i++){var t=i<toks.length?toks[i]:null;vals.push((t==='@'||t==null)?null:t);}
   return {vals:vals,count:toks.length};
 }
@@ -4827,6 +4844,7 @@ function tutRender(){
 
   const isLast = tutIdx === tutSteps.length - 1;
   $('mt-tut-next').textContent = isLast ? '开始使用 ✓' : '下一步 →';
+  const atlas = $('mt-tut-atlas'); if(atlas) atlas.style.display = 'none';  // 图鉴只属于简谱教程
 }
 
 function tutOpen(){
@@ -4910,6 +4928,16 @@ function tutRenderJF(){
     `<div class="mt-tut-dot${i===tutIdxJF?' active':''}"></div>`
   ).join('');
   $('mt-tut-next').textContent = tutIdxJF === tutStepsJF.length-1 ? '开始使用 ✓' : '下一步 →';
+  // 记号图鉴入口（只在简谱教程显示）→ 打开与 musictool.js 同目录的 教程.html
+  const atlas = $('mt-tut-atlas');
+  if(atlas){
+    atlas.style.display = '';
+    atlas.onclick = () => {
+      const s = document.querySelector('script[src*="musictool.js"]');
+      const url = s ? s.src.replace(/musictool\.js(\?.*)?$/, '教程.html') : '教程.html';
+      window.open(url, '_blank', 'noopener');
+    };
+  }
 }
 
 function tutOpenJF(){
