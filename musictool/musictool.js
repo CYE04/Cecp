@@ -216,11 +216,41 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 .top-tab{padding:6px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--ink2);font-family:'Space Mono',monospace;transition:.12s;}
 .top-tab.on{background:var(--accent);color:#fff;border-color:var(--accent);}
 
-.top-area{flex:1 1 42%;min-height:280px;overflow:hidden;display:flex;flex-direction:column;padding:14px 16px 10px;}
+/* 左右布局：预览（top-area）在左，编辑区（mid-bar + bottom-area）在右；中间分隔条可拖动改比例 */
+.work-wrap{flex:1;min-height:0;display:flex;flex-direction:row;overflow:hidden;}
+.work-right{flex:1 1 0;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
+.top-area{flex:0 0 auto;width:var(--split-x,55%);min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:14px 16px 10px;position:relative;}
 .top-panel{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));display:none;position:relative;box-shadow:0 18px 40px rgba(0,0,0,0.24);}
 .top-panel.on{display:block;}
 
-.bottom-area{flex:1 1 58%;min-height:0;display:grid;grid-template-columns:minmax(460px,1.45fr) minmax(360px,1fr);gap:14px;padding:0 16px 16px;align-items:stretch;}
+/* 左右对调：预览换到右边 */
+.work-wrap.swap .top-area{order:3;}
+.work-wrap.swap .split-x{order:2;}
+.work-wrap.swap .work-right{order:1;}
+
+/* 预览拖动把手：抓住它拖到另一侧即可换边 */
+.preview-grip{position:absolute;top:10px;left:10px;z-index:5;display:inline-flex;align-items:center;gap:5px;padding:4px 9px;font-size:10px;letter-spacing:1px;color:var(--ink2);background:var(--panel2);border:1px solid var(--border2);border-radius:8px;cursor:grab;touch-action:none;user-select:none;opacity:.6;transition:opacity .12s,color .12s,border-color .12s;}
+.preview-grip:hover{opacity:1;color:var(--accent);border-color:var(--accent);}
+.preview-grip:active{cursor:grabbing;opacity:1;}
+.work-wrap.moving .top-area{outline:2px dashed var(--accent);outline-offset:-3px;}
+.work-wrap.moving .top-panel{pointer-events:none;}
+body.mt-moving,body.mt-moving *{user-select:none !important;cursor:grabbing !important;}
+
+/* 竖向分隔条（预览 ↔ 编辑区），拖动改左右比例 */
+.split-x{flex:0 0 12px;align-self:stretch;position:relative;cursor:col-resize;touch-action:none;background:transparent;z-index:3;}
+.split-x::before{content:"";position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:2px;border-radius:2px;background:var(--border2);transition:background .12s,width .12s;}
+.split-x:hover::before,.split-x.on::before{background:var(--accent);width:3px;}
+
+/* 编辑区竖排：段落编辑在上，音符键盘在下，中间分隔条拖动改高度 */
+.bottom-area{flex:1;min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:var(--split-y,54%) 12px minmax(0,1fr);padding:10px 16px 16px;}
+
+/* 横向分隔条（段落 ↔ 键盘） */
+.split-y{position:relative;cursor:row-resize;touch-action:none;background:transparent;z-index:3;}
+.split-y::before{content:"";position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:2px;border-radius:2px;background:var(--border2);transition:background .12s,height .12s;}
+.split-y:hover::before,.split-y.on::before{background:var(--accent);height:3px;}
+
+/* 拖动分隔条时禁止选中，避免误选文字 */
+body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 
 /* ── 左：段落编辑 ── */
 .seg-pane{min-width:0;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015));box-shadow:0 18px 40px rgba(0,0,0,0.2);}
@@ -657,6 +687,11 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
 }
 
 @media (max-width: 1100px){
+  .work-wrap{flex-direction:column;}
+  .top-area{flex:1 1 42%;width:auto;min-width:0;min-height:280px;}
+  .work-right{flex:1 1 58%;}
+  .split-x,.split-y,.preview-grip{display:none;}
+  .work-wrap.swap .top-area,.work-wrap.swap .work-right{order:0;}
   .bottom-area{grid-template-columns:1fr;grid-template-rows:minmax(320px,1fr) minmax(320px,1fr);}
   .kbd-toolbar{grid-template-columns:1fr;}
   .tool-grid{grid-template-columns:1fr;}
@@ -688,6 +723,7 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
     <button class="top-tab" data-action="bulk-lyric" type="button" title="批量填歌词">⌨ 填歌词</button>
     <button class="top-tab" data-action="check" type="button" title="检查音符与歌词数量">⚑ 检查</button>
     <button class="top-tab on" data-action="justify" type="button" title="预览行两端对齐（只影响预览排版，不改数据）">⇔ 对齐</button>
+    <button class="top-tab" id="btnSwapSides" type="button" title="左右对调：预览与编辑区互换左右">⇆ 对调</button>
     <button class="top-tab on" data-top-tab="preview" type="button">预览</button>
     <button class="top-tab" data-top-tab="tools" type="button">工具</button>
     <button class="top-tab" data-top-tab="code" type="button">代码</button>
@@ -708,7 +744,9 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   </div>
 </div>
 
+<div class="work-wrap">
 <div class="top-area">
+  <div class="preview-grip" id="previewGrip" title="拖动把预览移到另一侧">⠿ 换边</div>
   <div class="top-panel on" id="top-preview"><div id="previewWrap"></div></div>
   <div class="top-panel" id="top-code">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
@@ -783,6 +821,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
   </div>
 </div>
 
+<div class="split-x" id="splitX" title="拖动调整预览 / 编辑区宽度"></div>
+<div class="work-right">
 <!-- ── 中间状态 + 位置栏 ── -->
 <div class="mid-bar">
   <span class="mid-pill accent"><strong id="statusLoc">点击左边格子开始编辑</strong></span>
@@ -819,6 +859,8 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
     <button class="add-sec-btn" onclick="addSection()">+ 新增段落</button>
     <button class="add-sec-btn" onclick="openBulkLyric()" style="color:var(--accent2);border-color:rgba(124,106,247,0.3);">⌨ 批量填歌词</button>
   </div>
+
+  <div class="split-y" id="splitY" title="拖动调整段落 / 键盘高度"></div>
 
   <div class="kbd-pane">
     <div class="kbd-toolbar">
@@ -1016,7 +1058,9 @@ color:var(--ink);font-family:'Space Mono',monospace;height:100vh;overflow:hidden
       <span><kbd>Alt+C/V/R</kbd> 格子复制 / 粘贴 / 覆盖</span>
     </div>
   </div>
-</div>
+</div><!-- bottom-area -->
+</div><!-- work-right -->
+</div><!-- work-wrap -->
 
 <script>
 /* ════════════════════════════════════════
@@ -4292,6 +4336,100 @@ updateInputState();
 initDualBuilder();
 mtArmBackGuard();
 mtDraftRestoreOnBoot();
+
+/* ── 可拖动分隔条：预览↔编辑区（左右）、段落↔键盘（上下）+ 左右对调，尺寸记忆 ── */
+(function initSplitters(){
+  var root=document.documentElement;
+  var wrap=document.querySelector('.work-wrap');
+  if(!wrap)return;
+  var splitX=document.getElementById('splitX');
+  var splitY=document.getElementById('splitY');
+  var bottom=document.querySelector('.bottom-area');
+  var LS_X='mt-split-x',LS_Y='mt-split-y',LS_SWAP='mt-swap';
+  function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+  /* 恢复上次尺寸 / 对调状态 */
+  try{
+    var vx=localStorage.getItem(LS_X); if(vx)root.style.setProperty('--split-x',vx);
+    var vy=localStorage.getItem(LS_Y); if(vy)root.style.setProperty('--split-y',vy);
+    if(localStorage.getItem(LS_SWAP)==='1')wrap.classList.add('swap');
+  }catch(e){}
+  function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+  function bindDrag(handle,onMove,onEnd){
+    if(!handle)return;
+    handle.addEventListener('pointerdown',function(e){
+      e.preventDefault();
+      try{handle.setPointerCapture(e.pointerId);}catch(_){}
+      handle.classList.add('on');
+      document.body.classList.add('mt-resizing');
+      function mv(ev){onMove(ev);}
+      function up(){
+        try{handle.releasePointerCapture(e.pointerId);}catch(_){}
+        handle.classList.remove('on');
+        document.body.classList.remove('mt-resizing');
+        handle.removeEventListener('pointermove',mv);
+        handle.removeEventListener('pointerup',up);
+        handle.removeEventListener('pointercancel',up);
+        onEnd&&onEnd();
+      }
+      handle.addEventListener('pointermove',mv);
+      handle.addEventListener('pointerup',up);
+      handle.addEventListener('pointercancel',up);
+    });
+  }
+  /* 左右：拖动改预览宽度（对调后预览在右，按右缘计算） */
+  bindDrag(splitX,function(e){
+    var r=wrap.getBoundingClientRect(); if(!r.width)return;
+    var pct=wrap.classList.contains('swap')
+      ? (r.right-e.clientX)/r.width*100
+      : (e.clientX-r.left)/r.width*100;
+    root.style.setProperty('--split-x',clamp(pct,22,74).toFixed(2)+'%');
+  },function(){save(LS_X,root.style.getPropertyValue('--split-x'));if(typeof fitPreview==='function')fitPreview();});
+  /* 上下：拖动改段落编辑高度 */
+  bindDrag(splitY,function(e){
+    var r=bottom.getBoundingClientRect(); if(!r.height)return;
+    var pct=(e.clientY-r.top)/r.height*100;
+    root.style.setProperty('--split-y',clamp(pct,20,80).toFixed(2)+'%');
+  },function(){save(LS_Y,root.style.getPropertyValue('--split-y'));});
+  /* 双击分隔条恢复默认比例 */
+  if(splitX)splitX.addEventListener('dblclick',function(){root.style.removeProperty('--split-x');save(LS_X,'');});
+  if(splitY)splitY.addEventListener('dblclick',function(){root.style.removeProperty('--split-y');save(LS_Y,'');});
+  /* 左右对调 */
+  var swapBtn=document.getElementById('btnSwapSides');
+  function applySwap(on){
+    wrap.classList.toggle('swap',on);
+    if(swapBtn)swapBtn.classList.toggle('on',on);
+    save(LS_SWAP,on?'1':'0');
+    if(typeof fitPreview==='function')fitPreview();
+  }
+  if(swapBtn){
+    swapBtn.classList.toggle('on',wrap.classList.contains('swap'));
+    swapBtn.addEventListener('click',function(){applySwap(!wrap.classList.contains('swap'));});
+  }
+  /* 抓住预览把手拖到另一侧即换边：拖过中线实时吸附，松手落定 */
+  var grip=document.getElementById('previewGrip');
+  if(grip)grip.addEventListener('pointerdown',function(e){
+    e.preventDefault();
+    try{grip.setPointerCapture(e.pointerId);}catch(_){}
+    document.body.classList.add('mt-moving');
+    wrap.classList.add('moving');
+    function mv(ev){
+      var r=wrap.getBoundingClientRect(); if(!r.width)return;
+      wrap.classList.toggle('swap', ev.clientX > r.left+r.width/2);
+    }
+    function up(){
+      try{grip.releasePointerCapture(e.pointerId);}catch(_){}
+      document.body.classList.remove('mt-moving');
+      wrap.classList.remove('moving');
+      grip.removeEventListener('pointermove',mv);
+      grip.removeEventListener('pointerup',up);
+      grip.removeEventListener('pointercancel',up);
+      applySwap(wrap.classList.contains('swap'));
+    }
+    grip.addEventListener('pointermove',mv);
+    grip.addEventListener('pointerup',up);
+    grip.addEventListener('pointercancel',up);
+  });
+})();
 </script>
 <!-- ── 批量填歌词 modal ── -->
 <div class="lyfill-overlay" id="lyfillOverlay">
