@@ -1506,8 +1506,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     headerH:250,bottomH:118,sideM:150,
     minLyricPx:24,maxScale:2.6,ss:1.5
   };
-  /* 导出图纸张底色：淡纸黄，比纯白柔和、久看不刺眼（只作用于「下载歌谱图」，屏幕与移调面板导出不变） */
-  var EXPORT_PAPER_BG='#f7f2e4';
+  /* 导出图纸张底色：暖白，比纯白柔和、久看不刺眼（只作用于「下载歌谱图」，屏幕与移调面板导出不变） */
+  var EXPORT_PAPER_BG='#faf7f1';
   function exportMeasureLyricFont(scope){
     var el=scope.querySelector('.p-lyric');
     if(!el)return 19;
