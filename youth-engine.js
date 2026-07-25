@@ -1291,6 +1291,27 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     });
   }
 
+  /* 导出专用：和弦芯片固定用「浅色主题」配色（内联 !important），不受当前明暗主题影响。
+     必须在 makeExportTextBlack 之后调用——它会把所有元素刷成黑字，这里再把和弦改回来。 */
+  function exportForceLightChordChips(scope){
+    if(!scope||!scope.querySelectorAll)return;
+    var chips=scope.querySelectorAll('.chord-chip');
+    for(var i=0;i<chips.length;i++){
+      var el=chips[i],cls=String(el.className||''),pc=-1;
+      var parts=cls.split(/\s+/);
+      for(var j=0;j<parts.length;j++){
+        if(parts[j].indexOf('chord-pc')===0){pc=parseInt(parts[j].slice(8),10);break;}
+      }
+      if(!(pc>=0&&pc<=11))continue;
+      var h=(pc*30+210)%360;
+      el.style.setProperty('background','hsl('+h+',34%,94%)','important');
+      el.style.setProperty('outline-color','hsl('+h+',38%,74%)','important');
+      el.style.setProperty('color','hsl('+h+',90%,20%)','important');
+      el.style.setProperty('-webkit-text-fill-color','hsl('+h+',90%,20%)','important');
+    }
+  }
+
+
   function composeA4SongImage(scoreBlob,opt){
     opt=opt||{};
     return Promise.all([blobToImage(scoreBlob),loadImageForExport(YM_LOGO_SRC)]).then(function(items){
@@ -1333,7 +1354,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         var logoW=1180;
         var logoH=logoW*(logoImg.naturalHeight||logoImg.height)/(logoImg.naturalWidth||logoImg.width);
         ctx.save();
-        ctx.globalAlpha=0.07;
+        ctx.globalAlpha=0.045;
         ctx.drawImage(logoImg,(W-logoW)/2,(H-logoH)/2,logoW,logoH);
         ctx.restore();
       }
@@ -1446,6 +1467,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         }
         normalizeExportNotation(snap.node);
         if(opt.a4) makeExportTextBlack(snap.node);
+      exportForceLightChordChips(snap.node);
         lyricHlPrepareExport(snap.node);
         if(opt.a4) snap.node.style.setProperty('background','#ffffff','important');
         return waitPaint2()
@@ -1533,7 +1555,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         var logoW=1180;
         var logoH=logoW*(logoImg.naturalHeight||logoImg.height)/(logoImg.naturalWidth||logoImg.width);
         ctx.save();
-        ctx.globalAlpha=0.07;
+        ctx.globalAlpha=0.045;
         ctx.drawImage(logoImg,(W-logoW)/2,(H-logoH)/2,logoW,logoH);
         ctx.restore();
       }
@@ -1572,6 +1594,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       normalizeExportNotation(snap.node);
       reserveChordAccidentalWidth(snap.node);   // §4：12 调导出宽度恒定
       makeExportTextBlack(snap.node);
+      exportForceLightChordChips(snap.node);
       lyricHlPrepareExport(snap.node);
       snap.node.style.setProperty('background','#ffffff','important');
       return waitPaint2()
