@@ -1281,6 +1281,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     var nodes=[scope].concat(Array.prototype.slice.call(scope.querySelectorAll('*')));
     nodes.forEach(function(n){
       if(!n.style) return;
+      if(n.closest&&n.closest('.sec-label')) return;   // 段落标记保留自己的配色（否则边框被刷成黑色）
       n.style.setProperty('color','#111','important');
       n.style.setProperty('-webkit-text-fill-color','#111','important');
       n.style.setProperty('border-color','#111','important');
@@ -1505,6 +1506,8 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     headerH:250,bottomH:118,sideM:150,
     minLyricPx:24,maxScale:2.6,ss:1.5
   };
+  /* 导出图纸张底色：淡纸黄，比纯白柔和、久看不刺眼（只作用于「下载歌谱图」，屏幕与移调面板导出不变） */
+  var EXPORT_PAPER_BG='#f7f2e4';
   function exportMeasureLyricFont(scope){
     var el=scope.querySelector('.p-lyric');
     if(!el)return 19;
@@ -1529,7 +1532,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       canvas.width=W;canvas.height=H;
       var ctx=canvas.getContext('2d');
       if(!ctx)throw new Error('canvas unavailable');
-      ctx.fillStyle='#ffffff';
+      ctx.fillStyle=EXPORT_PAPER_BG;
       ctx.fillRect(0,0,W,H);
       var song=opt.song||{};
       var title=song.title||opt.title||'';
@@ -1576,7 +1579,12 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
         if(/^[A-G]/.test(bass)&&!/^[A-G][#b♯♭]/.test(bass))need++;}    // 有斜杠低音且无升降号 → 再预留 1
       if(!need)return;
       var w=spMeasureWidth(ch,'#');
-      if(w>0){var sp=document.createElement('span');sp.setAttribute('aria-hidden','true');sp.style.cssText='display:inline-block;width:'+(w*need).toFixed(2)+'px;';ch.appendChild(sp);}
+      if(w>0){
+        // 左右各留一半：总宽不变(12调稳定)，但和弦本体仍居中对齐音符（全加右边会把和弦挤向左）
+        var half=(w*need/2).toFixed(2);
+        var mkSp=function(){var x=document.createElement('span');x.setAttribute('aria-hidden','true');x.style.cssText='display:inline-block;width:'+half+'px;';return x;};
+        ch.insertBefore(mkSp(),ch.firstChild);ch.appendChild(mkSp());
+      }
     });
   }
   function exportSongAsFittedPng(panelInner,opt){
@@ -1596,7 +1604,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       makeExportTextBlack(snap.node);
       exportForceLightChordChips(snap.node);
       lyricHlPrepareExport(snap.node);
-      snap.node.style.setProperty('background','#ffffff','important');
+      snap.node.style.setProperty('background',EXPORT_PAPER_BG,'important');
       return waitPaint2()
         .then(function(){
           // strict: 克隆里的梁/弧是屏幕坐标, 导出按 max-content 重新排版了, 得按新布局重排(非 strict 为 no-op)
@@ -1612,7 +1620,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
             EXPORT_FIT.maxScale
           );
           if(sPort*lyricPx>=EXPORT_FIT.minLyricPx){
-            return nodeToPngBlobRobust(snap.node,'#ffffff',{scale:sPort*EXPORT_FIT.ss}).then(function(blob){return {blob:blob,page:P};});
+            return nodeToPngBlobRobust(snap.node,EXPORT_PAPER_BG,{scale:sPort*EXPORT_FIT.ss}).then(function(blob){return {blob:blob,page:P};});
           }
           exportApplyTwoColumns(snap.node,cw);
           return waitPaint2().then(function(){
@@ -1626,7 +1634,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
               (L.H-EXPORT_FIT.headerH-EXPORT_FIT.bottomH)/ch2,
               EXPORT_FIT.maxScale
             );
-            return nodeToPngBlobRobust(snap.node,'#ffffff',{scale:sLand*EXPORT_FIT.ss}).then(function(blob){return {blob:blob,page:L};});
+            return nodeToPngBlobRobust(snap.node,EXPORT_PAPER_BG,{scale:sLand*EXPORT_FIT.ss}).then(function(blob){return {blob:blob,page:L};});
           });
         })
         .finally(function(){ snap.cleanup(); });
