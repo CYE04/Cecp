@@ -559,17 +559,17 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   --fab-ink:#1d1d1f;
   --fab-acc:#0071e3;
   --fab-acc-rgb:0,113,227;
-  --fab-shadow:0 2px 12px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.1);
+  --fab-shadow:0 1px 5px rgba(0,0,0,.04), 0 6px 16px rgba(0,0,0,.06);
   position:fixed; z-index:2147483630;
   width:50px; height:50px; padding:0;
   align-items:center; justify-content:center;
   border:1px solid var(--fab-border);
   background:var(--fab-card); color:var(--fab-ink);
-  box-shadow:var(--fab-shadow);
+  box-shadow:var(--fab-shadow); opacity:.62;
   cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
   transition:transform .45s cubic-bezier(.34,1.56,.64,1), color .2s ease,
              background .25s ease, border-color .25s ease, box-shadow .25s ease,
-             bottom .3s cubic-bezier(.34,1.4,.64,1);
+             opacity .25s ease, bottom .3s cubic-bezier(.34,1.4,.64,1);
 }
 .rt7-fab.rt7-dark, .ccf-fab.ccf-dark{
   --fab-card:#1d1d1f;
@@ -577,27 +577,20 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   --fab-ink:#f5f5f7;
   --fab-acc:#2997ff;
   --fab-acc-rgb:41,151,255;
-  --fab-shadow:0 2px 12px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.5);
+  --fab-shadow:0 1px 6px rgba(0,0,0,.24), 0 6px 18px rgba(0,0,0,.4);
 }
+/* discreet by default; come forward only on interaction */
 @media (hover:hover){
-  .rt7-fab:hover, .ccf-fab:hover{ transform:scale(1.06); color:var(--fab-acc); }
+  .rt7-fab:hover, .ccf-fab:hover{ transform:scale(1.06); color:var(--fab-acc); opacity:1; }
 }
-.rt7-fab:active, .ccf-fab:active{ transform:scale(.9); }
+.rt7-fab:active, .ccf-fab:active{ transform:scale(.9); opacity:1; }
+.rt7-fab:focus-visible, .ccf-fab:focus-visible{ opacity:1; }
 .rt7-fab .cfi, .ccf-fab .cfi{ width:26px; height:26px; transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
 .rt7-fab:hover .cfi, .ccf-fab:hover .cfi{ transform:scale(1.08); }
 /* 出现时描边绘制（导游随滚动出现、联系我们载入时各触发一次） */
 .rt7-fab .cfi [pathLength], .ccf-fab .cfi [pathLength]{ animation:cfi-draw 1s cubic-bezier(.4,0,.2,1) both; }
-/* 常驻呼吸光环：Apple 未读 ripple 的柔和常驻版，强调色随主题 */
-.rt7-fab::after, .ccf-fab::after{
-  content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none;
-  border:1.5px solid rgba(var(--fab-acc-rgb),.5);
-  animation:fab-breathe 3s ease-out infinite;
-}
-@keyframes fab-breathe{
-  0%  { transform:scale(1);    opacity:.5; }
-  70% { transform:scale(1.35); opacity:0; }
-  100%{ transform:scale(1.35); opacity:0; }
-}
+/* 呼吸光环已移除：常驻脉冲太抢眼，改为安静的默认态（见上方 opacity 低透明度） */
+.rt7-fab::after, .ccf-fab::after{ display:none; }
 /* 贴角圆角（方块+圆角）：靠屏幕角的那个角收紧，与 cecp-intercom 悬浮球同语言
    —— 工具导游在左下 → 左下角收紧；联系我们在右下 → 右下角收紧 */
 .rt7-fab{ border-radius:16px 16px 16px 6px; }

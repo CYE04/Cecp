@@ -354,16 +354,17 @@
     '.cf.is-floating{pointer-events:none}',
     '.cf.is-floating .cf-launcher,.cf.is-floating .cf-dock-pop{pointer-events:auto}',
     /* ── 悬浮球（贴角圆角语言 + 玻璃材质；不支持 backdrop-filter 时退回实色）── */
-    '.cf.is-floating .cf-launcher{position:fixed;z-index:2147483644;width:58px;height:58px;',
+    '.cf.is-floating .cf-launcher{position:fixed;z-index:2147483644;width:58px;height:58px;opacity:.62;',
     '  background:var(--card);',
-    '  border:1px solid var(--border);box-shadow:var(--shadow-soft),0 12px 32px rgba(0,0,0,.1);color:var(--text);',
+    '  border:1px solid var(--border);box-shadow:var(--shadow-soft),0 6px 18px rgba(0,0,0,.07);color:var(--text);',
     '  display:flex;align-items:center;justify-content:center;',
-    '  transition:transform .45s cubic-bezier(.34,1.56,.64,1),color .2s ease,border-radius .3s ease}',
-    '.cf.is-floating .cf-launcher:active{transform:scale(.88)}',
-    '@media (hover:hover){.cf.is-floating .cf-launcher:hover{transform:scale(1.06);color:var(--acc)}}',
+    '  transition:transform .45s cubic-bezier(.34,1.56,.64,1),color .2s ease,border-radius .3s ease,opacity .25s ease}',
+    '.cf.is-floating .cf-launcher:active{transform:scale(.88);opacity:1}',
+    '.cf.is-floating .cf-launcher.has-unread,.cf.is-floating .cf-launcher.is-alert,.cf.is-floating .cf-launcher:focus-visible{opacity:1}',
+    '@media (hover:hover){.cf.is-floating .cf-launcher:hover{transform:scale(1.06);color:var(--acc);opacity:1}}',
     '.cf-ic{width:27px;height:27px;display:block}',
-    /* 常驻：声波条轻微呼吸 */
-    '.cf-ic-bars{transform-box:fill-box;transform-origin:center;animation:cf-eq 3.8s ease-in-out infinite}',
+    /* 声波条静止（去掉常驻呼吸，避免抢眼） */
+    '.cf-ic-bars{transform-box:fill-box;transform-origin:center}',
     '@keyframes cf-eq{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.8)}}',
     /* 未读：声波扩散 ripple（强调蓝） */
     '.cf-launcher::before,.cf-launcher::after{content:"";position:absolute;inset:-1px;border-radius:inherit;',
