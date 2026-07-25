@@ -485,7 +485,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .prev-seg.p-slot .p-chord-multi .chord-chip{font-size:.85em;}
 .prev-seg.p-slot .p-lyric{text-align:center;padding:0 1px;}
 .prev-seg.p-slot .p-lyric .p-punct{display:inline-block;width:0;overflow:visible;white-space:pre;pointer-events:none;}
-.prev-seg.p-slot.p-punct-gap{margin-right:0.5em !important;}
+.prev-seg.p-slot.p-punct-gap{margin-right:0.5em;}
 .prev-seg.p-barslot{min-width:0;margin:0 3px;}
 .strict-label-row{display:block;margin:0 0 2px;line-height:1;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
@@ -1646,7 +1646,10 @@ function justifyScoreRows(rowList,opts){
   var widths=rows.map(function(row){
     var prev=row.style.display;
     row.style.display='inline-flex';
-    var w=row.scrollWidth;
+    /* 必须用 offsetWidth：flex 容器的 scrollWidth 不含子项 margin，
+       而最终行宽是含 margin 的，两者不是同一个量 -> 严格模式每列都有 margin
+       (列间距/悬挂标点间隙)，列数越多误差越大，各行拉不齐(实测差 15px)。 */
+    var w=row.offsetWidth;
     row.style.display=prev;
     return w;
   });
