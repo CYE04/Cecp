@@ -540,7 +540,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:16px;line-height:.563;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
 .jp-dot-top{height:8px;justify-content:flex-end;top:-2px}.jp-dot-bot{height:8px;justify-content:flex-start}
 /* 八度点画成 CSS 实心圆：比字形的 · 更粗更清楚，尺寸与水平对中都不受字体影响 */
-.jp-dot-top>span,.jp-dot-bot>span{display:block;width:4.5px;height:4.5px;border-radius:50%;background:currentColor;font-size:0;line-height:0;flex:0 0 auto}
+.jp-dot-top>span,.jp-dot-bot>span{display:block;width:4px;height:4px;border-radius:50%;background:currentColor;font-size:0;line-height:0;flex:0 0 auto}
 /* 低音点贴近数字；有减时线(8分/16分)时改为贴近下划线。只用 top 位移，盒高恒定 → 不影响整体排版 */
 .jp-wrap .jp-dot-bot{top:-10.5px}
 .jp-wrap:has(.jp-u1-line) .jp-dot-bot{top:-1px}
@@ -549,7 +549,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em}
 /* 附点/延音点：同款实心圆；上下对准数字墨迹中心，左右保持原来的间距 */
-.jp-aug{position:absolute;right:-4.92px;top:50%;transform:translateY(-50%) translateY(0.5px);width:4.5px;height:4.5px;border-radius:50%;background:currentColor;font-size:0;line-height:0;pointer-events:none}
+.jp-aug{position:absolute;right:-4.42px;top:50%;transform:translateY(-50%) translateY(0.5px);width:4px;height:4px;border-radius:50%;background:currentColor;font-size:0;line-height:0;pointer-events:none}
 .jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ym-ink);pointer-events:none;z-index:1}
 .jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ym-ink);pointer-events:none;z-index:1}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:18px}
@@ -2062,11 +2062,11 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function styleJpAugEl(el){
     if(!el)return;
     el.style.position='absolute';
-    el.style.right='-4.92px';
+    el.style.right='-4.42px';
     el.style.top='50%';
     el.style.transform='translateY(-50%) translateY(0.5px)';
-    el.style.width='4.5px';
-    el.style.height='4.5px';
+    el.style.width='4px';
+    el.style.height='4px';
     el.style.borderRadius='50%';
     el.style.background='currentColor';
     el.style.fontSize='0';
@@ -5269,10 +5269,17 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       if(!parent||!lbDiv.isConnected)return;
 
       if(YE_JUSTIFY_ROWS)justifyScoreRows(lbDiv.querySelectorAll('.sw-lrow'));
-      if(song.align==='strict')lbDiv.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);
-      if(song.align==='strict')layoutStrictArcsAll(lbDiv);
       var natural=measureNaturalScore();
       if(!natural)return;
+      /* ⚠️ 梁/弧必须排在 measureNaturalScore() 之后：它才把 lbDiv 撑到自然宽度。
+         在那之前行还被容器挤着(.sw-lrow 是 flex，窄屏上音位列会被 flex-shrink 压扁)，
+         此时量到的音位坐标是压缩过的，撑开后弧线就整体左移——屏幕越窄偏得越多，
+         桌面宽屏因为容器≈自然宽所以看不出来。 */
+      if(song.align==='strict'){
+        lbDiv.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);
+        layoutStrictArcsAll(lbDiv);
+        natural.height=lbDiv.scrollHeight||natural.height;   // 弧线给和弦加了 marginBottom，行会变高
+      }
 
       // 版面居中：内容最大宽度 SCORE_MAXW，窄屏两侧留 SCORE_PAD；曲谱缩放到此宽度并水平居中。
       // 不锁 A4、不额外整页 transform（沿用既有 fit 缩放）。导出克隆已 transform:none，故不受影响。

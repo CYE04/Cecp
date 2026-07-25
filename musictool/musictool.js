@@ -502,7 +502,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .jp-dot-top,.jp-dot-bot{width:1em;font-size:15px;line-height:.32;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;}
 .jp-dot-top{height:8px;justify-content:flex-end;top:-2px;}.jp-dot-bot{height:8px;justify-content:flex-start;}
 /* 八度点画成 CSS 实心圆：比字形的 · 更粗更清楚，尺寸与水平对中都不受字体影响 */
-.jp-dot-top>span,.jp-dot-bot>span{display:block;width:4.5px;height:4.5px;border-radius:50%;background:currentColor;font-size:0;line-height:0;flex:0 0 auto;}
+.jp-dot-top>span,.jp-dot-bot>span{display:block;width:4px;height:4px;border-radius:50%;background:currentColor;font-size:0;line-height:0;flex:0 0 auto;}
 /* 低音点贴近数字；有减时线(8分/16分)时改为贴近下划线。只用 top 位移，盒高恒定 → 不影响整体排版 */
 .jp-wrap .jp-dot-bot{top:-10.5px;}
 .jp-wrap:has(.jp-u1-line) .jp-dot-bot{top:-1px;}
@@ -511,7 +511,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px;}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em;}
 /* 附点/延音点：同款实心圆；上下对准数字墨迹中心，左右保持原来的间距 */
-.jp-aug{position:absolute;right:-5.5px;top:50%;transform:translateY(-50%) translateY(0.5px);width:4.5px;height:4.5px;border-radius:50%;background:currentColor;font-size:0;line-height:0;pointer-events:none;}
+.jp-aug{position:absolute;right:-5px;top:50%;transform:translateY(-50%) translateY(0.5px);width:4px;height:4px;border-radius:50%;background:currentColor;font-size:0;line-height:0;pointer-events:none;}
 .jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
 .jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:var(--slur-pad,12px);}
@@ -3070,11 +3070,11 @@ function styleJpNumEl(el){
 function styleJpAugEl(el){
   if(!el)return;
   el.style.position='absolute';
-  el.style.right='-5.5px';
+  el.style.right='-5px';
   el.style.top='50%';
   el.style.transform='translateY(-50%) translateY(0.5px)';
-  el.style.width='4.5px';
-  el.style.height='4.5px';
+  el.style.width='4px';
+  el.style.height='4px';
   el.style.borderRadius='50%';
   el.style.background='currentColor';
   el.style.fontSize='0';
@@ -3361,8 +3361,6 @@ function fitPreview(){
     inner.style.transform='';inner.style.transformOrigin='';inner.style.width='';inner.style.marginBottom='';
     if(justifyRowsOn)justifyScoreRows(inner.querySelectorAll('.prev-row'));
     else justifyScoreRowsClear(inner);
-    if(STRICT_MODE)inner.querySelectorAll('.prev-row').forEach(connectStrictBeams);
-    if(STRICT_MODE)layoutStrictArcsAll(inner);
     // 版面居中：内容最大宽度 SCORE_MAXW，窄屏两侧留 SCORE_PAD；内容缩到 ≤ 此宽度并水平居中。
     // 编辑预览只缩小、不放大真实尺寸。导出在 musiclib，与本预览无关。
     var rawAvail=wrap.clientWidth;
@@ -3376,12 +3374,19 @@ function fitPreview(){
       row.style.display='';
     });
     if(!maxW)return;
+    inner.style.width=maxW+'px';
+    /* ⚠️ 梁/弧必须排在 inner.style.width 定死之后：之前行还被容器挤着
+       (.prev-row 是 flex，窄屏上音位列会被 flex-shrink 压扁)，那时量到的坐标是压缩过的，
+       撑开后弧线会整体左移——屏幕越窄偏得越多，宽屏因为容器≈自然宽所以看不出来。 */
+    if(STRICT_MODE){
+      inner.querySelectorAll('.prev-row').forEach(connectStrictBeams);
+      layoutStrictArcsAll(inner);
+    }
     var scale=maxW>avail?avail/maxW:1;
     var visualW=maxW*scale;
     var centerX=Math.max(0,(rawAvail-visualW)/2);
     inner.style.transform='translateX('+centerX.toFixed(1)+'px)'+(scale<1?(' scale('+scale+')'):'');
     inner.style.transformOrigin='left top';
-    inner.style.width=maxW+'px';
     if(scale<1){var h=inner.offsetHeight;inner.style.marginBottom=(h*(scale-1))+'px';}
   });
 }
