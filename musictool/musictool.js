@@ -946,11 +946,11 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
             </div>
             <div class="kbd-label" style="margin-top:10px;">导航记号</div>
             <div class="kbd-row">
-              <button class="kbd-btn" onclick="appendTok('fine')" title="曲终：终止线 + Fine（只放在小节线处）" style="padding:6px 8px;">Fine 曲终</button>
-              <button class="kbd-btn" onclick="appendTok('dc')" title="D.C. 从头反复（Da Capo）" style="padding:6px 8px;">D.C. 从头</button>
-              <button class="kbd-btn" onclick="appendTok('ds')" title="D.S. 回到记号（Dal Segno）" style="padding:6px 8px;">D.S. 大反复</button>
-              <button class="kbd-btn" onclick="appendTok('coda')" title="Coda 尾声记号（大跳跃）" style="padding:6px 8px;">Coda 尾声</button>
-              <button class="kbd-btn" onclick="appendTok('segno')" title="Segno 记号（配合 D.S. 使用）" style="padding:6px 8px;">Segno 记号</button>
+              <button class="kbd-btn" onclick="appendNavTok('fine')" title="曲终：终止线 + Fine（只放在小节线处）" style="padding:6px 8px;">Fine 曲终</button>
+              <button class="kbd-btn" onclick="appendNavTok('dc')" title="D.C. 从头反复（Da Capo）" style="padding:6px 8px;">D.C. 从头</button>
+              <button class="kbd-btn" onclick="appendNavTok('ds')" title="D.S. 回到记号（Dal Segno）" style="padding:6px 8px;">D.S. 大反复</button>
+              <button class="kbd-btn" onclick="appendNavTok('coda')" title="Coda 尾声记号（大跳跃）" style="padding:6px 8px;">Coda 尾声</button>
+              <button class="kbd-btn" onclick="appendNavTok('segno')" title="Segno 记号（配合 D.S. 使用）" style="padding:6px 8px;">Segno 记号</button>
             </div>
             <div class="kbd-label" style="margin-top:10px;">连音 · 连音符 · 拍号</div>
             <div class="kbd-row">
@@ -958,7 +958,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
               <button class="kbd-btn slur-btn" id="slur-btn" onclick="toggleSlur()" style="padding:6px 8px;">( ) 连音<span class="shortcut">[ / S</span></button>
               <button class="kbd-btn slur-btn" onclick="appendTok('~')" title="双连音线：插在两个音之间，弧线连接左右相邻两音" style="padding:6px 8px;">⌒ 双连音<span class="shortcut">N</span></button>
               <button class="kbd-btn slur-btn" onclick="appendTok('~2')" title="跨音连线：越过中间 1 个音，连接前第 2 个音与后一个音（~3 跨 2 个音）" style="padding:6px 8px;">⌒² 跨音连<span class="shortcut">⇧N</span></button>
-              <button class="kbd-btn slur-btn" id="xslur-btn" onclick="toggleXSlur()" style="padding:6px 8px;">跨线开<span class="shortcut">]</span></button>
+              <button class="kbd-btn slur-btn" id="xslur-btn" onclick="toggleXSlur()" style="padding:6px 8px;">跨线开<span class="shortcut">D</span></button>
               <button class="kbd-btn slur-btn" onclick="closeXSlur()" style="padding:6px 8px;">跨线结<span class="shortcut">X</span></button>
               <button class="kbd-btn slur-btn" id="t3-btn" onclick="toggleTuplet(3)" style="padding:6px 8px;">3连</button>
               <button class="kbd-btn slur-btn" id="t5-btn" onclick="toggleTuplet(5)" style="padding:6px 8px;">5连</button>
@@ -1143,7 +1143,7 @@ function extractInlineTimeSignToken(tok){
 function saIsDualAtom(tk){
   if(!tk||tk==='/'||tk==='／'||tk==='!'||tk.charAt(0)==='~')return false;
   if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
-  if(tk==='|'||tk==='||'||tk==='||/'||tk==='|]'||tk==='|:'||tk===':|'||tk==='|:|'||tk==='fine'||tk==='dc'||tk==='ds'||tk==='coda'||tk==='segno')return false;
+  if(isBarlineTok(tk))return false;
   if(/^\\{(3|5)$/.test(tk))return false;
   if(extractInlineTimeSignToken(tk))return false;
   if(/^\\[v:(.+)\\]$/.test(tk))return false;
@@ -1529,7 +1529,7 @@ function chordStyleEnsureCss(){
   var light='',dark='',i,h;
   for(i=0;i<12;i++){
     h=chordStyleHue(i);
-    light+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',65%,86%);outline-color:hsl('+h+',48%,60%);color:hsl('+h+',90%,20%);}';
+    light+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',34%,94%);outline-color:hsl('+h+',38%,74%);color:hsl('+h+',90%,20%);}';
     dark+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',42%,26%);outline-color:hsl('+h+',45%,48%);color:hsl('+h+',72%,84%);}';
   }
   var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"] .chord-chip.');
@@ -1803,6 +1803,23 @@ function clickEnd(shiftKey){
    插入 / 覆盖
 ════════════════════════════════════════ */
 function appendTok(tok){ insertToks([tok]); }
+/* 导航记号按钮：若插入点前一个 token 是小节线，就合并成「小节线+记号」(如 ||coda)，
+   这样任意小节线都能配任意导航记号；否则按老样子单独插入(用各自默认小节线)。 */
+function appendNavTok(nav){
+  if(curSi<0){ appendTok(nav); return; }
+  var toks=getToks();
+  var at=(curTok>=0?curTok:toks.length);
+  var prev=at>0?toks[at-1]:'';
+  var BARS={'|':1,'||':1,'||/':1,'|]':1,'|:':1,':|':1,'|:|':1};
+  if(BARS[prev]){
+    saveUndo();
+    toks[at-1]=prev+nav;
+    setToks(toks);
+    renderEditor();reactivate();
+    return;
+  }
+  appendTok(nav);
+}
 function inputSpecial(tok){ insertToks([tok]); }
 function appendCustomVolta(){
   var label=prompt('输入房线标签，例如 1.2、1.3、2.3');
@@ -2941,7 +2958,26 @@ function initSegSearch(){
 /* ════════════════════════════════════════
    音符渲染
 ════════════════════════════════════════ */
+/* 导航记号可与任意小节线组合：写法 = 小节线token + 记号名 连写，如 ||coda、:|fine、|:|segno。
+   单写 coda/dc/... 时用各自的默认小节线（向后兼容）。不用正则(musictool 模板内禁反斜杠)。 */
+function barNavOf(tok){
+  var NAVS={fine:'||/',dc:'||',ds:'||',coda:'|',segno:'|'};
+  var t=String(tok||'');
+  for(var n in NAVS){
+    if(t.length>=n.length&&t.slice(-n.length)===n){
+      var pre=t.slice(0,t.length-n.length);
+      if(pre==='')return {bar:NAVS[n],nav:n};
+      if(pre==='|'||pre==='||'||pre==='||/'||pre==='|]'||pre==='|:'||pre===':|'||pre==='|:|')return {bar:pre,nav:n};
+    }
+  }
+  return {bar:t,nav:''};
+}
+function isBarlineTok(tok){
+  var b=barNavOf(tok).bar;
+  return b==='|'||b==='||'||b==='||/'||b==='|]'||b==='|:'||b===':|'||b==='|:|';
+}
 function makeBarline(tok){
+  var _bn=barNavOf(tok),bar=_bn.bar,nav=_bn.nav;
   var o=document.createElement('span');o.className='jp-bar';
   var top=document.createElement('span');top.className='jp-bar-top';o.appendChild(top);
   var mid=document.createElement('span');mid.className='jp-bar-mid';
@@ -2949,25 +2985,23 @@ function makeBarline(tok){
   function thick(){var l=document.createElement('span');l.className='jb-thick';return l;}
   function gap(px){var g=document.createElement('span');g.style.width=px+'px';g.style.flexShrink='0';return g;}
   function dots(){var d=document.createElement('span');d.className='jb-dots';var d1=document.createElement('span');d1.className='jb-dot';var d2=document.createElement('span');d2.className='jb-dot';d.appendChild(d1);d.appendChild(d2);return d;}
-  if(tok==='|'){mid.appendChild(thin());}
-  else if(tok==='||'){mid.appendChild(thin());mid.appendChild(gap(2));mid.appendChild(thin());}
-  else if(tok==='||/'||tok==='|]'){mid.appendChild(thin());mid.appendChild(gap(2));mid.appendChild(thick());}
-  else if(tok==='|:'){mid.appendChild(thick());mid.appendChild(gap(1.5));mid.appendChild(thin());mid.appendChild(gap(3));mid.appendChild(dots());}
-  else if(tok===':|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thin());mid.appendChild(gap(1.5));mid.appendChild(thick());}
-  else if(tok==='|:|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thin());mid.appendChild(gap(1.5));mid.appendChild(thick());mid.appendChild(gap(2));mid.appendChild(thick());mid.appendChild(gap(1.5));mid.appendChild(thin());mid.appendChild(gap(3));mid.appendChild(dots());}
-  else if(tok==='fine'){mid.appendChild(thin());mid.appendChild(gap(2));mid.appendChild(thick());}
-  else if(tok==='dc'||tok==='ds'){mid.appendChild(thin());mid.appendChild(gap(2));mid.appendChild(thin());}
-  else if(tok==='coda'||tok==='segno'){mid.appendChild(thin());}
+  if(bar==='|'){mid.appendChild(thin());}
+  else if(bar==='||'){mid.appendChild(thin());mid.appendChild(gap(2));mid.appendChild(thin());}
+  else if(bar==='||/'||bar==='|]'){mid.appendChild(thin());mid.appendChild(gap(2));mid.appendChild(thick());}
+  else if(bar==='|:'){mid.appendChild(thick());mid.appendChild(gap(1.5));mid.appendChild(thin());mid.appendChild(gap(3));mid.appendChild(dots());}
+  else if(bar===':|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thin());mid.appendChild(gap(1.5));mid.appendChild(thick());}
+  else if(bar==='|:|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thin());mid.appendChild(gap(1.5));mid.appendChild(thick());mid.appendChild(gap(2));mid.appendChild(thick());mid.appendChild(gap(1.5));mid.appendChild(thin());mid.appendChild(gap(3));mid.appendChild(dots());}
+  else if(nav==='coda'||nav==='segno'){mid.appendChild(thin());}
   o.appendChild(mid);
   var bot=document.createElement('span');bot.className='jp-bar-bot';o.appendChild(bot);
-  if(tok==='coda'||tok==='segno'){
+  if(nav==='coda'||nav==='segno'){
     top.style.cssText='display:flex;align-items:flex-end;justify-content:center;height:22px;line-height:1;';
-    if(tok==='coda'){
+    if(nav==='coda'){
       top.innerHTML='<svg viewBox="0 0 26 30" width="18" height="18" style="display:block;overflow:visible"><ellipse cx="13" cy="15" rx="6.4" ry="9.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="13" y1="2.6" x2="13" y2="27.4" stroke="currentColor" stroke-width="1.7"/><line x1="2.6" y1="15" x2="23.4" y2="15" stroke="currentColor" stroke-width="1.7"/></svg>';
     }else{ top.innerHTML='<svg viewBox="4 -759 546 786" width="10" height="14" style="display:block;overflow:visible"><path transform="scale(1,-1)" d="M135 665C141 665 148 663 151 652L153 645C160 618 175 559 226 559C267 559 295 583 295 626C295 641 292 657 287 673C271 719 204 736 153 736C83 736 4 650 4 551C4 527 9 502 20 477C52 404 197 315 205 312C209 310 211 308 211 304C211 300 209 295 205 288C198 274 54 15 54 15C52 11 51 6 51 2C51 -14 63 -27 79 -27C89 -27 99 -21 104 -12C104 -12 259 268 262 274C262 273 270 279 274 279C289 276 489 217 489 122C489 83 465 57 431 52L428 51C407 51 390 65 390 96V107C390 145 365 173 337 173C333 173 329 172 325 171C288 162 254 146 254 106C254 45 316 -8 375 -8C388 -8 402 -6 417 -1C497 26 550 91 550 174C550 183 549 193 548 203C533 313 375 402 363 408C351 415 346 419 346 424C346 426 347 428 348 430C353 438 508 717 508 717C511 722 512 726 512 731C512 747 499 759 484 759C474 759 464 754 459 745C459 745 300 458 294 449C291 444 289 441 285 441C282 441 279 442 275 444C266 447 115 505 89 550C83 561 75 582 75 603C75 630 87 658 129 665ZM415 466C415 435 441 409 472 409C504 409 529 435 529 466C529 498 504 523 472 523C441 523 415 498 415 466ZM140 264C140 295 115 321 83 321C52 321 26 295 26 264C26 232 52 207 83 207C115 207 140 232 140 264Z" fill="currentColor"/></svg>'; }
     o.style.alignItems='center';
-  } else if(tok==='fine'||tok==='dc'||tok==='ds'){
-    bot.textContent=(tok==='fine')?'Fine':(tok==='dc'?'D.C.':'D.S.');
+  } else if(nav==='fine'||nav==='dc'||nav==='ds'){
+    bot.textContent=(nav==='fine')?'Fine':(nav==='dc'?'D.C.':'D.S.');
     bot.style.cssText='display:flex;align-items:flex-start;justify-content:center;height:16px;font-family:"Noto Serif SC",Georgia,serif;font-style:italic;font-size:9.5px;line-height:1;white-space:nowrap;padding-top:2px;';
     o.style.alignItems='center';
   }
@@ -3099,7 +3133,7 @@ function hasVoltaEnd(nStr){
 function parseJpToken(tok,opts){
   opts=opts||{};
   tok=String(tok||'');
-  if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|'||tok==='fine'||tok==='dc'||tok==='ds'||tok==='coda'||tok==='segno')return makeBarline(tok);
+  if(isBarlineTok(tok))return makeBarline(tok);
   var dual=!opts.inDual?parseDualJpToken(tok):null;
   if(dual)return makeDualJpToken(dual);
   if(!tok||tok==='-'||tok===' ')return makeJpPlain(tok);
@@ -3269,7 +3303,7 @@ function renderNStr(nStr,opts){
   function isDualAtom(tk){
     if(!tk||tk==='/'||tk==='／'||tk==='!'||tk.charAt(0)==='~')return false;
     if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
-    if(tk==='|'||tk==='||'||tk==='||/'||tk==='|]'||tk==='|:'||tk===':|'||tk==='|:|'||tk==='fine'||tk==='dc'||tk==='ds'||tk==='coda'||tk==='segno')return false;
+    if(isBarlineTok(tk))return false;
     if(/^\\{(3|5)$/.test(tk))return false;
     if(extractInlineTimeSignToken(tk))return false;
     if(/^\\[v:(.+)\\]$/.test(tk))return false;
@@ -3416,7 +3450,7 @@ function buildStrictSegColumnsMT(seg, container, psi, pli, pgi, bold){
       for(var j=0;j<nLy;j++){col.appendChild(lyRow(aligned.lyrics[j][slot],j));}
       if(col.querySelector('.p-punct'))col.classList.add('p-punct-gap');
       container.appendChild(col);slot++;lastSlotCol=col;
-    } else if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|'||tok==='fine'||tok==='dc'||tok==='ds'||tok==='coda'||tok==='segno'){
+    } else if(isBarlineTok(tok)){
       var b=document.createElement('div');b.className='prev-seg p-slot p-barslot';b.setAttribute('data-loc',psi+'-'+pli+'-'+pgi);b.addEventListener('click',onClick);
       var bc=document.createElement('div');bc.className='p-chord empty';setChordContentEx(bc,NB,mtSetPlainText);b.appendChild(bc);
       var bn=document.createElement('div');bn.className='p-n';bn.appendChild(makeBarline(tok));b.appendChild(bn);
@@ -3874,7 +3908,7 @@ document.addEventListener('keydown',function(e){
   if(k==='ArrowDown'){e.preventDefault();var os=['low2','low1','mid','high1','high2'];var i=os.indexOf(oct);if(i>0)setOct(os[i-1]);return;}
   if(k===','){e.preventDefault();toggleDot();return;}
   if(k==='[' || k==='s' || k==='S'){e.preventDefault();toggleSlur();return;}
-  if(k===']'){e.preventDefault();toggleXSlur();return;}
+  if(k==='d'||k==='D'){e.preventDefault();toggleXSlur();return;}
   if(k==='x' || k==='X'){e.preventDefault();closeXSlur();return;}
   if(k==='f' || k==='F'){e.preventDefault();toggleFermata();return;}
   if(k==='b' || k==='B'){e.preventDefault();appendTok('|');return;}
@@ -4242,6 +4276,7 @@ Object.assign(window, {
   inputNote: inputNote,
   inputSpecial: inputSpecial,
   appendTok: appendTok,
+  appendNavTok: appendNavTok,
   appendInlineTimeSignToken: appendInlineTimeSignToken,
   appendCustomVolta: appendCustomVolta,
   appendCustomToken: appendCustomToken,
