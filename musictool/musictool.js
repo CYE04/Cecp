@@ -1430,7 +1430,8 @@ function segRenderLabelBlock(seg,row){
   tag.className='sec-label'+(jump?' sec-label-jump':'');
   var color=secLabelColor(seg.label);
   var dx=Number(seg.dx)||0;
-  var base='display:inline-block;position:absolute;left:'+dx+'px;top:16px;white-space:nowrap;line-height:1.4;font-size:0.58em;padding:0 7px;border-radius:999px;box-sizing:border-box;letter-spacing:0.4px;z-index:2;';
+  var dy=Number(seg.dy)||0;   // 上下偏移(可拖)：正=往下,可把标记拖到谱下方当 Fine 用
+  var base='display:inline-block;position:absolute;left:'+dx+'px;top:'+(16+dy)+'px;white-space:nowrap;line-height:1.4;font-size:0.58em;padding:0 7px;border-radius:999px;box-sizing:border-box;letter-spacing:0.4px;z-index:2;';
   if(jump){
     tag.style.cssText=base+'font-style:italic;font-weight:600;color:'+color+';border:1px solid '+color+';background:transparent;opacity:0.92;';
   }else{
@@ -1461,7 +1462,7 @@ function segRenderLabelBlock(seg,row){
         var cr=ch.getBoundingClientRect();
         var scale=(holder.offsetHeight&&hr.height)?(hr.height/holder.offsetHeight):1;
         if(!scale)scale=1;
-        tag.style.top=((cr.bottom-hr.top)/scale+SEC_LABEL_TOP_GAP_PX)+'px';
+        tag.style.top=((cr.bottom-hr.top)/scale+SEC_LABEL_TOP_GAP_PX+dy)+'px';
       }
     });
   }
@@ -2798,8 +2799,8 @@ function startLabelDrag(ev,si,li,gi,tag){
   if(!seg||!segIsLabelBlock(seg))return;
   ev.preventDefault();
   ev.stopPropagation();
-  var startX=ev.clientX;
-  var baseDx=Number(seg.dx)||0;
+  var startX=ev.clientX, startY=ev.clientY;
+  var baseDx=Number(seg.dx)||0, baseDy=Number(seg.dy)||0;
   // 预览可能被 fitPreview 整体缩放，把屏幕位移换算回内容像素
   var scale=1;
   var inner=document.querySelector('#previewWrap .prev-inner');
@@ -2807,20 +2808,23 @@ function startLabelDrag(ev,si,li,gi,tag){
     var ir=inner.getBoundingClientRect();
     if(ir.width)scale=ir.width/inner.offsetWidth;
   }
+  var baseTop=(parseFloat(tag.style.top)||0)-baseDy;   // 当前 top 已含 dy，取出基线
   var moved=false;
   function delta(e2){return (e2.clientX-startX)/scale;}
+  function deltaY(e2){return (e2.clientY-startY)/scale;}
   function onMove(e2){
-    var d=delta(e2);
-    if(Math.abs(d)>3)moved=true;
-    if(moved)tag.style.left=(baseDx+d)+'px';
+    var d=delta(e2),dy2=deltaY(e2);
+    if(Math.abs(d)>3||Math.abs(dy2)>3)moved=true;
+    if(moved){tag.style.left=(baseDx+d)+'px';tag.style.top=(baseTop+baseDy+dy2)+'px';}
   }
   function onUp(e2){
     document.removeEventListener('pointermove',onMove);
     document.removeEventListener('pointerup',onUp);
     if(!moved){previewSegClick(si,li,gi);return;}
-    var nv=Math.round(baseDx+delta(e2));
+    var nv=Math.round(baseDx+delta(e2)), nvy=Math.round(baseDy+deltaY(e2));
     saveUndo();
     if(nv===0)delete seg.dx;else seg.dx=nv;
+    if(nvy===0)delete seg.dy;else seg.dy=nvy;
     renderEditor();
   }
   document.addEventListener('pointermove',onMove);
@@ -3468,7 +3472,8 @@ function layoutStrictArcs(row){
   if(probe&&probe.offsetWidth){var pr=probe.getBoundingClientRect();scale=pr.width/probe.offsetWidth;}
   if(!scale)scale=1;
   var rr=row.getBoundingClientRect();
-  function box(col){var el=col.querySelector('.jp-num')||col.querySelector('.p-n')||col;var r=el.getBoundingClientRect(),rr=row.getBoundingClientRect();return {cx:(r.left+r.width/2-rr.left)/scale,top:(r.top-rr.top)/scale};}
+  function box(col){var el=col.querySelector('.jp-num')||col.querySelector('.p-n')||col;var r=el.getBoundingClientRect(),rr=row.getBoundingClientRect();var _t=r.top,_od=col.querySelector('.jp-dot-top');if(_od){var _or=_od.getBoundingClientRect();if(_or.height&&_or.top<_t)_t=_or.top;}   // 高音点在数字上方：弧线要抬到点之上,免得压住看不清
+      return {cx:(r.left+r.width/2-rr.left)/scale,top:(_t-rr.top)/scale};}
   function ix(c){return slots.indexOf(c);}
   var NS='http://www.w3.org/2000/svg';
   var svg=document.createElementNS(NS,'svg');svg.setAttribute('class','strict-arc-svg');
@@ -3539,7 +3544,8 @@ function layoutStrictArcsAll(scope){
     var cols=[].slice.call(row.querySelectorAll('.prev-seg.p-slot')).filter(function(c){return !c.classList.contains('p-barslot');});
     var probe=cols[0]&&cols[0].querySelector('.jp-num'),scale=1;
     if(probe&&probe.offsetWidth){var pr=probe.getBoundingClientRect();scale=pr.width/probe.offsetWidth;}if(!scale)scale=1;
-    function box(col){var el=col.querySelector('.jp-num')||col.querySelector('.p-n')||col;var r=el.getBoundingClientRect(),rr=row.getBoundingClientRect();return {cx:(r.left+r.width/2-rr.left)/scale,top:(r.top-rr.top)/scale};}
+    function box(col){var el=col.querySelector('.jp-num')||col.querySelector('.p-n')||col;var r=el.getBoundingClientRect(),rr=row.getBoundingClientRect();var _t=r.top,_od=col.querySelector('.jp-dot-top');if(_od){var _or=_od.getBoundingClientRect();if(_or.height&&_or.top<_t)_t=_or.top;}   // 高音点在数字上方：弧线要抬到点之上,免得压住看不清
+      return {cx:(r.left+r.width/2-rr.left)/scale,top:(_t-rr.top)/scale};}
     function rowW(){return row.getBoundingClientRect().width/scale;}
     // 旧渲染器 .jp-slur 同款：CSS 边框拱形(border-top/left/right + border-radius:50%/100% = 半椭圆拱)。全=拱、open=左半(左圆右平)、close=右半。三连音括号仍用 SVG。
     var host=document.createElement('div');host.className='strict-arc-svg';host.style.cssText='position:absolute;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:4;color:currentColor;';
@@ -3547,7 +3553,7 @@ function layoutStrictArcsAll(scope){
     function edge(col,side){var el=col.querySelector('.jp-num')||col.querySelector('.p-n')||col;var r=el.getBoundingClientRect(),rr=row.getBoundingClientRect();return ((side==='r'?r.right:r.left)-rr.left)/scale;}
     here.forEach(function(it){
       var g=it.g,lift=maxD-g._d,L,W,nt,cls;
-      if(it.m==='full'){var a=box(all[g.s].col),b=box(all[g.e].col);var pad=g.tie?0:2;L=a.cx-pad;W=(b.cx-a.cx)+pad*2;nt=Math.min(a.top,b.top);cls='f';}
+      if(it.m==='full'){var a=box(all[g.s].col),b=box(all[g.e].col);var pad=g.tie?0:2;L=a.cx-pad;W=(b.cx-a.cx)+pad*2;nt=Math.min(a.top,b.top);for(var _k=g.s+1;_k<g.e;_k++){var _mt=box(all[_k].col).top;if(_mt<nt)nt=_mt;}cls='f';}
       else if(it.m==='open'){var a2=box(all[g.s].col);L=a2.cx;W=(edge(lastCol,'r')+4)-a2.cx;nt=a2.top;cls='o';}
       else if(it.m==='close'){var b2=box(all[g.e].col);L=edge(firstCol,'l')-4;W=b2.cx-L;nt=b2.top;cls='c';}
       else {L=edge(firstCol,'l')-4;W=(edge(lastCol,'r')+4)-L;nt=box(cols[0]).top;cls='t';}
@@ -3599,7 +3605,7 @@ function renderPreview(){
           }
           if(STRICT_MODE){   // 严格模式：段落标记独立一行(不与弧线/和弦挤)
             var lwRow=document.createElement('div');lwRow.className='strict-label-row';
-            if(lbTag){lbTag.style.position='relative';lbTag.style.top='';lbTag.style.fontSize='13px';lwRow.appendChild(lbTag);}
+            if(lbTag){lbTag.style.position='relative';lbTag.style.top=((Number(seg.dy)||0))+'px';lbTag.style.fontSize='13px';lwRow.appendChild(lbTag);}
             else lwRow.appendChild(lb);
             ps.appendChild(lwRow);
             return;
@@ -3673,6 +3679,7 @@ function renderCode(){
           var lobj={label:seg.label};
           if(seg.style)lobj.style=seg.style;
           if(Number(seg.dx))lobj.dx=Number(seg.dx);
+          if(Number(seg.dy))lobj.dy=Number(seg.dy);
           lines.push('        '+JSON.stringify(lobj)+(lastSeg?'':','));
           return;
         }
