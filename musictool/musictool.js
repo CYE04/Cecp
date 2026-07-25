@@ -478,14 +478,16 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .prev-row.has-volta{--volta-rail:18px;}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
 /* 严格对位（align:"strict"）预览：每音位一列、三层居中共轴，与 youth/musiclib 成品一致 */
-.prev-seg.p-slot{align-items:center;min-width:1.2em;margin:0 2px;}
+.prev-seg.p-slot{align-items:center !important;min-width:1.2em;margin:0 2px;}
 .prev-seg.p-slot .p-chord{text-align:center;white-space:normal;min-width:100%;}
 .prev-seg.p-slot .p-chord.p-chord-multi{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;line-height:1.1;}
 .prev-seg.p-slot .p-chord-multi .p-chord-stk{display:block;line-height:1.2;}
 .prev-seg.p-slot .p-chord-multi .chord-chip{font-size:.85em;}
 .prev-seg.p-slot .p-lyric{text-align:center;padding:0 1px;}
 .prev-seg.p-slot .p-lyric .p-punct{display:inline-block;width:0;overflow:visible;white-space:pre;pointer-events:none;}
+.prev-seg.p-slot.p-punct-gap{margin-right:0.5em !important;}
 .prev-seg.p-barslot{min-width:0;margin:0 3px;}
+.strict-label-row{display:block;margin:0 0 2px;line-height:1;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;min-height:var(--row-note-height);}
@@ -3384,14 +3386,16 @@ function buildStrictSegColumnsMT(seg, container, psi, pli, pgi, bold){
   if(seg.lyric3!=null)lyricFields.push(seg.lyric3);
   if(seg.lyric4!=null)lyricFields.push(seg.lyric4);
   var aligned=saAlignRow(seg.n||'', seg.chord||'', lyricFields);
-  var nLy=aligned.lyrics.length, slot=0, pendingSlurOpen=0, pendingTupletN=0, lastSlotCol=null;
+  var nLy=aligned.lyrics.length, slot=0, pendingSlurOpen=0, pendingSlurClose=0, pendingTupletN=0, lastSlotCol=null;
   function onClick(){previewSegClick(psi,pli,pgi);}
-  function lyRow(val,j){var l=document.createElement('div');l.className='p-lyric'+(j?' p-lyric'+(j+1):'')+(bold?' bold':'');var lsp=saSplitTrailingPunct(String(val==null?'':val));setLyricContentEx(l,lsp.base||NB,mtSetPlainText);if(lsp.punct){var pun=document.createElement('span');pun.className='p-punct';pun.textContent=lsp.punct;l.appendChild(pun);}return l;}
+  function lyRow(val,j){var l=document.createElement('div');l.className='p-lyric'+(j?' p-lyric'+(j+1):'')+(bold?' bold':'');if(val==null){setLyricContentEx(l,NB,mtSetPlainText);return l;}var lsp=saSplitTrailingPunct(String(val));if(lsp.punct){setLyricContentEx(l,lsp.base||NB,mtSetPlainText);var pun=document.createElement('span');pun.className='p-punct';pun.textContent=lsp.punct;l.appendChild(pun);}else{setLyricContentEx(l,String(val),mtSetPlainText);}return l;}
   toks.forEach(function(tok){
     if(tok==='!'){var lc=container.lastElementChild;if(lc)lc.setAttribute('data-bb','1');return;}  // 断梁标记
     if(saIsDualAtom(tok)){
       var col=document.createElement('div');col.className='prev-seg p-slot';col.setAttribute('data-loc',psi+'-'+pli+'-'+pgi);col.addEventListener('click',onClick);
       if(pendingSlurOpen){col.setAttribute('data-slur-open',pendingSlurOpen);pendingSlurOpen=0;}
+      var _isSp=(tok==='sp'||tok==='sp_'||tok==='sp__');if(_isSp)col.setAttribute('data-sp','1');
+      if(pendingSlurClose&&!_isSp){col.setAttribute('data-slur-close',((+col.getAttribute('data-slur-close'))||0)+pendingSlurClose);pendingSlurClose=0;}   // ~ 收口跳过 sp(同老版 layoutJpArcs：原子不含 sp)
       if(pendingTupletN){col.setAttribute('data-tuplet-open',pendingTupletN);pendingTupletN=0;}
       var chVal=aligned.chords[slot];
       var c=document.createElement('div');c.className='p-chord'+(chVal?'':' empty');
@@ -3402,7 +3406,8 @@ function buildStrictSegColumnsMT(seg, container, psi, pli, pgi, bold){
       } else { setChordContentEx(c, NB, mtSetPlainText); }
       col.appendChild(c);
       var nWrap=document.createElement('div');nWrap.className='p-n';nWrap.appendChild(parseJpToken(tok));col.appendChild(nWrap);
-      for(var j=0;j<nLy;j++){var lv=aligned.lyrics[j][slot];col.appendChild(lyRow(lv==null?NB:lv,j));}
+      for(var j=0;j<nLy;j++){col.appendChild(lyRow(aligned.lyrics[j][slot],j));}
+      if(col.querySelector('.p-punct'))col.classList.add('p-punct-gap');
       container.appendChild(col);slot++;lastSlotCol=col;
     } else if(tok==='|'||tok==='||'||tok==='||/'||tok==='|]'||tok==='|:'||tok===':|'||tok==='|:|'||tok==='fine'||tok==='dc'||tok==='ds'||tok==='coda'||tok==='segno'){
       var b=document.createElement('div');b.className='prev-seg p-slot p-barslot';b.setAttribute('data-loc',psi+'-'+pli+'-'+pgi);b.addEventListener('click',onClick);
@@ -3418,6 +3423,7 @@ function buildStrictSegColumnsMT(seg, container, psi, pli, pgi, bold){
     else if(tok===')'||tok==='])'){ if(lastSlotCol)lastSlotCol.setAttribute('data-slur-close',((+lastSlotCol.getAttribute('data-slur-close'))||0)+1); }
     else if(tok==='{3'||tok==='{5'){ pendingTupletN=parseInt(tok.slice(1),10); }
     else if(tok==='}'){ if(lastSlotCol)lastSlotCol.setAttribute('data-tuplet-close','1'); }
+        else if(tok.charAt(0)==='~'){var tieSpan=jpTieSpan(tok)||1;var tieCols=[].slice.call(container.querySelectorAll('.prev-seg.p-slot')).filter(function(c){return !c.classList.contains('p-barslot')&&!c.getAttribute('data-sp');});var tieStart=tieCols[tieCols.length-tieSpan];if(tieStart){tieStart.setAttribute('data-slur-open',((+tieStart.getAttribute('data-slur-open'))||0)+1);pendingSlurClose++;}}
   });
 }
 /* 严格对位「连梁」：相邻下划线音位补齐减时线贴上；小节线/sp/非下划线天然断开。
@@ -3508,7 +3514,8 @@ function layoutStrictArcsAll(scope){
     if(to)tstack.push({i:i,n:to});
     if(tc){var tt=tstack.pop();if(tt)tgroups.push({s:tt.i,e:i,n:tt.n});}
   });
-  if(!sgroups.length&&!tgroups.length)return;
+  var dangles=[];while(sstack.length){var _ds=sstack.pop();if(_ds!=null)dangles.push(_ds);}   // 未闭合的 ( ：先画到行尾的开口半弧，边写边可见
+    if(!sgroups.length&&!tgroups.length&&!dangles.length)return;
   sgroups.forEach(function(g){g._d=0;sgroups.forEach(function(h){if(h===g)return;if(h.s<=g.s&&g.e<=h.e&&(h.e-h.s)>(g.e-g.s))g._d++;});});
   var maxD=0;sgroups.forEach(function(g){if(g._d>maxD)maxD=g._d;});
   var STEP=7,BASE=9,NS='http://www.w3.org/2000/svg';
@@ -3521,7 +3528,8 @@ function layoutStrictArcsAll(scope){
       else if(er===row)here.push({g:g,m:'close'});
       else if(ri>si&&ri<ei)here.push({g:g,m:'thru'});
     });
-    var tHere=tgroups.filter(function(g){return all[g.s].row===row&&all[g.e].row===row;});
+    dangles.forEach(function(_ds){if(all[_ds].row===row)here.push({g:{s:_ds,e:_ds,_d:0},m:'open'});});
+      var tHere=tgroups.filter(function(g){return all[g.s].row===row&&all[g.e].row===row;});
     if(!here.length&&!tHere.length)return;
     var reserve=0;if(here.length)reserve=Math.max(reserve,13+maxD*8);if(tHere.length)reserve=Math.max(reserve,20);
     [].forEach.call(row.querySelectorAll('.prev-seg.p-slot .p-chord'),function(ch){if(reserve)ch.style.marginBottom=reserve+'px';});
@@ -3585,6 +3593,13 @@ function renderPreview(){
           if(lbTag){
             lbTag.title='按住左右拖动调整位置 · 点击定位编辑行';
             lbTag.addEventListener('pointerdown',function(ev){startLabelDrag(ev,psi,pli,pgi,lbTag);});
+          }
+          if(STRICT_MODE){   // 严格模式：段落标记独立一行(不与弧线/和弦挤)
+            var lwRow=document.createElement('div');lwRow.className='strict-label-row';
+            if(lbTag){lbTag.style.position='static';lbTag.style.left='';lbTag.style.top='';lbTag.style.fontSize='13px';lwRow.appendChild(lbTag);}
+            else lwRow.appendChild(lb);
+            ps.appendChild(lwRow);
+            return;
           }
           (voltaWrap||row).appendChild(lb);
           return;

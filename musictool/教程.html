@@ -126,7 +126,7 @@ var C = [
   {ex:{title:'音位对齐 + @ 占空位', strict:true, syntax:'chord: C @ @ @ G @\nn:     1 2 3 3 5 6\nlyric: 我爱你@主啊', chord:'C @ @ @ G @', n:'1 2 3 3 5 6', lyric:'我爱你@主啊', note:'和弦/歌词第 i 个对第 i 个音位。没内容写 @，渲染成透明空白（第4个音是拖腔）。和弦的 @ 也能内联写 C@@@G@（免空格），真和弦间仍用空格。'}},
   {ex:{title:'中文直接连写（不用每字空格）', strict:true, syntax:"lyric: 耶稣是我主  → 每字一个音位", chord:'@ @ @ @ @', n:'1 2 3 4 5', lyric:'耶稣是我主', note:'中文连着写，自动每字一个音位。老的「每字空格」写法结果一样。'}},
   {ex:{title:'@ 拖腔（没词的音）', strict:true, syntax:'lyric: 我爱@你  （第3个音拖腔）', chord:'@ @ @ @', n:'1 2 3 4', lyric:'我爱@你', note:'@ 那个音下面空着（透明），字唱在前一个音上拖过来。'}},
-  {ex:{title:'标点自动粘字、悬挂不占位', strict:true, syntax:'lyric: 主啊，你真好！', chord:'@ @ @ @ @', n:'1 2 3 4 5', lyric:'主啊，你真好！', note:'逗号、叹号自动贴到前一个字上，永不占音位；渲染时挂在字右边、不撑宽、不推歪后字。'}},
+  {ex:{title:'标点自动粘字、悬挂不占位', strict:true, syntax:'lyric: 主啊，你真好！', chord:'@ @ @ @ @', n:'1 2 3 4 5', lyric:'主啊，你真好！', note:'逗号、叹号自动贴到前一个字上，永不占音位；渲染时挂在字右边悬挂，标点后自动留一点空间不撞后字。'}},
   {ex:{title:'英文 / 拼音按空格断音节', strict:true, syntax:'lyric: Je sus loves me', chord:'@ @ @ @', n:'1 2 3 4', lyric:'Je sus loves me', note:'英文一个音节对一个音，靠空格分。整词不分则占一个音（Jesus=1位）。'}},
   {ex:{title:'断梁 !（让梁断开）', strict:true, syntax:'n: 1_ 1_ ! 1_ 1_', chord:'@ @ @ @', n:'1_ 1_ ! 1_ 1_', lyric:'一二三四', note:'本来四个八分连成一梁，中间放 ! 就断成两梁。! 不占音位、不用写 @。'}},
   {ex:{title:'一个音位叠两个和弦（逗号）', strict:true, syntax:'chord: C,G @ @', n:'1 2 3', chord:'C,G @ @', lyric:'我爱你', note:'逗号分隔，第一个（C）在下、第二个（G）在上。'}},
