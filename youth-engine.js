@@ -537,12 +537,19 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em}
 .jp-plain-top{height:12px}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em}.jp-plain-sym.is-dash{position:relative;top:-0.12em}.jp-plain-bot{height:16px}
-.jp-dot-top,.jp-dot-bot{width:1em;font-size:16px;line-height:.563;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center}
-.jp-dot-top{height:8px;justify-content:flex-end}.jp-dot-bot{height:8px;justify-content:flex-start}
+.jp-dot-top,.jp-dot-bot{width:1em;font-size:16px;line-height:.563;color:var(--ym-ink);text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.jp-dot-top{height:8px;justify-content:flex-end;top:-2px}.jp-dot-bot{height:8px;justify-content:flex-start}
+/* 八度点画成 CSS 实心圆：比字形的 · 更粗更清楚，尺寸与水平对中都不受字体影响 */
+.jp-dot-top>span,.jp-dot-bot>span{display:block;width:4.5px;height:4.5px;border-radius:50%;background:currentColor;font-size:0;line-height:0;flex:0 0 auto}
+/* 低音点贴近数字；有减时线(8分/16分)时改为贴近下划线。只用 top 位移，盒高恒定 → 不影响整体排版 */
+.jp-wrap .jp-dot-bot{top:-10.5px}
+.jp-wrap:has(.jp-u1-line) .jp-dot-bot{top:-1px}
+.jp-wrap:has(.jp-u2-line) .jp-dot-bot{top:2px}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em}
-.jp-aug{position:absolute;right:-0.42em;top:-0.17em;font-size:16px;line-height:1;pointer-events:none}
+/* 附点/延音点：同款实心圆；上下对准数字墨迹中心，左右保持原来的间距 */
+.jp-aug{position:absolute;right:-4.92px;top:50%;transform:translateY(-50%) translateY(0.5px);width:4.5px;height:4.5px;border-radius:50%;background:currentColor;font-size:0;line-height:0;pointer-events:none}
 .jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ym-ink);pointer-events:none;z-index:1}
 .jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ym-ink);pointer-events:none;z-index:1}
 .jp-fermata{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;position:relative;padding-top:18px}
@@ -553,6 +560,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .jp-dual-top{margin-bottom:-5px}
 .jp-dual-top .jp-dot-bot{height:2px}
 .jp-dual-bot .jp-dot-top{height:2px}
+.jp-dual .jp-dual-top .jp-dot-bot,.jp-dual .jp-dual-bot .jp-dot-top{top:0}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:var(--slur-pad,12px)}
 .jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
 .jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:var(--slur-pad,12px)}
@@ -1434,12 +1442,18 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     });
     var augs=scope.querySelectorAll('.jp-aug');
     Array.prototype.forEach.call(augs,function(a){
-      a.style.position='absolute';
-      a.style.top='50%';
-      a.style.right='-0.42em';
-      a.style.transform='translateY(-50%)';
-      a.style.lineHeight='1';
-      a.style.display='inline-block';
+      styleJpAugEl(a);
+      a.style.display='block';
+    });
+    /* 导出时 .jp-lines-wrap 的 padding-bottom 由 4px 变 12px、下划线由 bottom:3/0 变 4/0，
+       低音点要跟着重算，否则导出图里点会比屏幕上低 5px */
+    var dotBots=scope.querySelectorAll('.jp-dot-bot');
+    Array.prototype.forEach.call(dotBots,function(b){
+      var wrap=b.parentElement;
+      if(!wrap||!wrap.classList.contains('jp-wrap'))return;
+      if(wrap.parentElement&&/jp-dual-(top|bot)/.test(wrap.parentElement.className||''))return;
+      b.style.position='relative';
+      b.style.top=wrap.querySelector('.jp-u2-line')?'2px':(wrap.querySelector('.jp-u1-line')?'-2px':'-15.5px');
     });
     var accs=scope.querySelectorAll('.jp-acc');
     Array.prototype.forEach.call(accs,function(a){
@@ -2048,9 +2062,15 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
   function styleJpAugEl(el){
     if(!el)return;
     el.style.position='absolute';
-    el.style.right='-0.42em';
+    el.style.right='-4.92px';
     el.style.top='50%';
-    el.style.transform='translateY(-50%)';
+    el.style.transform='translateY(-50%) translateY(0.5px)';
+    el.style.width='4.5px';
+    el.style.height='4.5px';
+    el.style.borderRadius='50%';
+    el.style.background='currentColor';
+    el.style.fontSize='0';
+    el.style.lineHeight='0';
     el.style.pointerEvents='none';
   }
   function styleJpAccEl(el){

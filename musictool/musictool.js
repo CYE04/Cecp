@@ -499,12 +499,19 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 .jp-plain{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
 .jp-plain-top{height:12px;}.jp-plain-sym{font-size:15px;line-height:1;text-align:center;display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;}.jp-plain-sym.is-dash{position:relative;top:-0.12em;}.jp-plain-bot{height:16px;}
-.jp-dot-top,.jp-dot-bot{width:1em;font-size:15px;line-height:.32;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;}
-.jp-dot-top{height:8px;justify-content:flex-end;}.jp-dot-bot{height:8px;justify-content:flex-start;}
+.jp-dot-top,.jp-dot-bot{width:1em;font-size:15px;line-height:.32;color:var(--ink);text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;}
+.jp-dot-top{height:8px;justify-content:flex-end;top:-2px;}.jp-dot-bot{height:8px;justify-content:flex-start;}
+/* 八度点画成 CSS 实心圆：比字形的 · 更粗更清楚，尺寸与水平对中都不受字体影响 */
+.jp-dot-top>span,.jp-dot-bot>span{display:block;width:4.5px;height:4.5px;border-radius:50%;background:currentColor;font-size:0;line-height:0;flex:0 0 auto;}
+/* 低音点贴近数字；有减时线(8分/16分)时改为贴近下划线。只用 top 位移，盒高恒定 → 不影响整体排版 */
+.jp-wrap .jp-dot-bot{top:-10.5px;}
+.jp-wrap:has(.jp-u1-line) .jp-dot-bot{top:-1px;}
+.jp-wrap:has(.jp-u2-line) .jp-dot-bot{top:2px;}
 .jp-lines-wrap{width:1em;display:inline-flex;flex-direction:column;align-items:stretch;padding-bottom:4px;position:relative;}
 .jp-num-row{width:1em;display:inline-flex;align-items:center;justify-content:center;position:relative;padding-bottom:3px;}
 .jp-num{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;width:1em;height:1em;position:relative;top:-0.12em;}
-.jp-aug{position:absolute;right:-0.46em;top:50%;transform:translateY(-50%);font-size:15px;line-height:1;pointer-events:none;}
+/* 附点/延音点：同款实心圆；上下对准数字墨迹中心，左右保持原来的间距 */
+.jp-aug{position:absolute;right:-5.5px;top:50%;transform:translateY(-50%) translateY(0.5px);width:4.5px;height:4.5px;border-radius:50%;background:currentColor;font-size:0;line-height:0;pointer-events:none;}
 .jp-u1-line{display:block;position:absolute;left:0;right:0;bottom:3px;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
 .jp-u2-line{display:block;position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ink);pointer-events:none;z-index:1;}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:var(--slur-pad,12px);}
@@ -546,6 +553,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .jp-dual-top{margin-bottom:-5px;}
 .jp-dual-top .jp-dot-bot{height:2px;}
 .jp-dual-bot .jp-dot-top{height:2px;}
+.jp-dual .jp-dual-top .jp-dot-bot,.jp-dual .jp-dual-bot .jp-dot-top{top:0;}
 
 /* ── 批量填歌词 modal ── */
 .lyfill-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;}
@@ -3062,9 +3070,15 @@ function styleJpNumEl(el){
 function styleJpAugEl(el){
   if(!el)return;
   el.style.position='absolute';
-  el.style.right='-0.46em';
+  el.style.right='-5.5px';
   el.style.top='50%';
-  el.style.transform='translateY(-50%)';
+  el.style.transform='translateY(-50%) translateY(0.5px)';
+  el.style.width='4.5px';
+  el.style.height='4.5px';
+  el.style.borderRadius='50%';
+  el.style.background='currentColor';
+  el.style.fontSize='0';
+  el.style.lineHeight='0';
   el.style.pointerEvents='none';
 }
 function styleJpDashLineEl(el){
