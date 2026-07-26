@@ -381,11 +381,8 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .jp-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:10px;line-height:1;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
 
 .kbd-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
-/* 小节线·反复 与 导航记号：容器够宽就并排两栏，不够就自动换成上下堆叠。
-   ⚠️ 不能用视口媒体查询判断——键盘面板是网格里的一格，实测在 1280px 视口下这一格也才 156px 宽。
-   用 flex-wrap + flex-basis 按「容器实际宽度」自适应才对。 */
-.kbd-split{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-start;}
-.kbd-split>.kbd-col{flex:1 1 170px;min-width:0;}
+/* 导航记号是独立一个 .kbd-group，靠 .kbd-func-grid 的两列网格自然落到右列
+   （即「临时记号」正下方、「小节线·反复」右边）。不要再在格子里套第二层分栏。 */
 .kbd-row{display:flex;gap:4px;flex-wrap:wrap;}
 .kbd-btn{font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;border-radius:5px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;transition:all .1s;min-width:30px;text-align:center;line-height:1;}
 .kbd-btn:hover{background:var(--panel);color:var(--ink);border-color:var(--accent);}
@@ -952,8 +949,6 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
             </div>
           </div>
           <div class="kbd-group">
-            <div class="kbd-split">
-            <div class="kbd-col">
             <div class="kbd-label">小节线 · 反复</div>
             <div class="kbd-row">
               <button class="kbd-btn" onclick="appendTok('|')" style="padding:6px 8px;">| 小节线<span class="shortcut">B</span></button>
@@ -964,8 +959,8 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
               <button class="kbd-btn" onclick="appendTok(':|')" style="padding:6px 8px;">:| 反复结</button>
               <button class="kbd-btn" onclick="appendTok('|:|')" style="padding:6px 8px;">|:| 反复段</button>
             </div>
-            </div>
-            <div class="kbd-col">
+          </div>
+          <div class="kbd-group">
             <div class="kbd-label">导航记号　<span style="opacity:.6;font-weight:400;">左＝挂小节线　右＝挂音符上</span></div>
             <div class="kbd-row">
               <button class="kbd-btn" onclick="appendNavTok('fine')" title="曲终：终止线 + Fine，挂在小节线处" style="padding:6px 8px;flex:1 1 0;">Fine 曲终</button>
@@ -987,9 +982,9 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
               <button class="kbd-btn" onclick="appendNavTok('segno')" title="Segno 记号（配合 D.S. 使用），挂在小节线处" style="padding:6px 8px;flex:1 1 0;">Segno 记号</button>
               <button class="kbd-btn" onclick="appendTok('*segno')" title="Segno 画在前一个音符正上方：不画小节线、不占音位（chord/歌词不用补 @）" style="padding:6px 8px;flex:1 1 0;">Segno 挂音</button>
             </div>
-            </div>
-            </div>
-            <div class="kbd-label" style="margin-top:10px;">连音 · 连音符 · 拍号</div>
+          </div>
+          <div class="kbd-group">
+            <div class="kbd-label">连音 · 连音符 · 拍号</div>
             <div class="kbd-row">
               <button class="kbd-btn" onclick="appendInlineTimeSignToken()" style="padding:6px 8px;">拍号记号</button>
               <button class="kbd-btn slur-btn" id="slur-btn" onclick="toggleSlur()" style="padding:6px 8px;">( ) 连音<span class="shortcut">[ / S</span></button>
