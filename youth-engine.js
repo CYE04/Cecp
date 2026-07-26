@@ -35,7 +35,7 @@
   }
 
   function isDualAtom(tk) {
-    if (!tk || tk === '/' || tk === '／' || tk === '!' || tk.charAt(0) === '~') return false;
+    if (!tk || tk === '/' || tk === '／' || tk === '!' || tk.charAt(0) === '~' || tk.charAt(0) === '*') return false;
     if (tk === '(' || tk === ')' || tk === '([' || tk === '])' || tk === '}' || tk === '[v1' || tk === '[v2' || tk === ']v') return false;
     if (isBarNavTok(tk)) return false;   // 小节线/导航记号/两者组合(如 ||coda) 都不是音位
     if (/^\{(3|5)$/.test(tk)) return false;
@@ -312,6 +312,8 @@ window.YouthEngine = {};
   --ym-brand:var(--ym-accent);--ym-brand2:var(--ym-accent-2);--ym-brand3:var(--ym-accent-2);--ym-on-brand:var(--ym-on-accent);
   --ym-accent2:var(--ym-accent-hover);
   --ym-capo:#0B6FE3;--ym-capo-bg:rgba(11,111,227,.08);--ym-capo-ln:rgba(11,111,227,.2);
+  /* 歌词分行配色：第 1 行纯黑，第 2/3/4 行深蓝/深绿/深紫 —— 都要够深，别用浅色/降透明度 */
+  --ym-ly2:#123C8F;--ym-ly3:#0E4F33;--ym-ly4:#5C2178;
   --yb:var(--ym-bg-elevated);--yt:var(--ym-text-primary);--ym:var(--ym-text-secondary);--ybr:var(--ym-separator);--ysh:rgba(20,30,55,.24);--ybk:rgba(15,20,35,.55);
 }
 @media(prefers-color-scheme:dark){
@@ -330,6 +332,8 @@ window.YouthEngine = {};
     --ym-elev:0 2px 6px rgba(0,0,0,.4),0 24px 70px rgba(0,0,0,.46),0 1px 0 rgba(255,255,255,.05) inset;
 
     --ym-bg:var(--ym-bg-base);--ym-card:rgba(255,255,255,.05);
+    /* 暗色下同样三种色相，提亮到深底上看得清 */
+    --ym-ly2:#7FB0FF;--ym-ly3:#52C994;--ym-ly4:#C88FEC;
     --ym-ink:var(--ym-text-primary);--ym-ink2:var(--ym-text-secondary);--ym-ink3:var(--ym-text-tertiary);
     --ym-border:var(--ym-separator);--ym-border-md:var(--ym-separator-strong);--ym-soft:rgba(255,255,255,.06);
     --ym-glow:var(--ym-accent-subtle);--ym-warm:rgba(99,179,242,.14);--ym-mint:rgba(63,196,214,.12);
@@ -525,9 +529,12 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--ym-capo);margin-bottom:2px;min-height:13px;white-space:pre}
 .p-chord.empty{visibility:hidden}
 .p-n{font-family:'Space Mono',monospace;color:var(--ym-ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;min-height:var(--row-note-height)}
-.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ym-ink2);white-space:pre-wrap}
-.p-lyric.bold{font-weight:700;color:var(--ym-ink)}
-.p-lyric2,.p-lyric3,.p-lyric4{opacity:0.65;margin-top:1px}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:600;color:var(--ym-ink);white-space:pre-wrap}
+/* 加粗＝真的更重一档。字体常只有 400/700 两个字重，700→800 可能一点变化都没有，
+   所以再叠一层极细的横向 text-shadow 兜底（html2canvas 也认 text-shadow）。 */
+.p-lyric.bold{font-weight:800;text-shadow:.32px 0 0 currentColor,-.32px 0 0 currentColor}
+.p-lyric2,.p-lyric3,.p-lyric4{margin-top:1px}
+.p-lyric2{color:var(--ym-ly2)}.p-lyric3{color:var(--ym-ly3)}.p-lyric4{color:var(--ym-ly4)}
 .chord-gap,
 .lyric-gap{display:inline-block;white-space:pre;visibility:hidden;pointer-events:none;font:inherit;line-height:inherit}
 .prev-volta{display:inline-flex;align-items:flex-end;position:relative}
@@ -2007,6 +2014,48 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
     }
     return o;
   }
+  /* ── 导航记号挂在音符正上方：写法 = `*` + 记号名，如 `1 *coda`、`3_ *segno` ──
+     与小节线写法(||coda/:|fine)并存；`*` 前缀这一档不画小节线、不占音位（isDualAtom 已判 false，
+     所以 chord/lyric 不用补 @）。记号用绝对定位挂在前一个音符上，不参与布局 → 不会把行撑高。 */
+  var JP_NOTE_NAVS={fine:'Fine',dc:'D.C.',ds:'D.S.',coda:1,segno:1};
+  function noteNavOf(tok){
+    var t=String(tok||'');
+    if(t.charAt(0)!=='*')return '';
+    var n=t.slice(1);
+    return JP_NOTE_NAVS[n]?n:'';
+  }
+  function makeNoteNavMark(nav){
+    var m=document.createElement('span');
+    m.className='jp-navmark';
+    m.style.cssText='display:flex;align-items:flex-end;justify-content:center;line-height:1;pointer-events:none;white-space:nowrap;margin-bottom:2px;flex:0 0 auto;';
+    if(nav==='coda'){
+      m.innerHTML='<svg viewBox="0 0 26 30" width="16" height="16" style="display:block;overflow:visible"><ellipse cx="13" cy="15" rx="6.4" ry="9.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="13" y1="2.6" x2="13" y2="27.4" stroke="currentColor" stroke-width="1.7"/><line x1="2.6" y1="15" x2="23.4" y2="15" stroke="currentColor" stroke-width="1.7"/></svg>';
+    }else if(nav==='segno'){
+      m.innerHTML='<svg viewBox="4 -759 546 786" width="9" height="13" style="display:block;overflow:visible"><path transform="scale(1,-1)" d="M135 665C141 665 148 663 151 652L153 645C160 618 175 559 226 559C267 559 295 583 295 626C295 641 292 657 287 673C271 719 204 736 153 736C83 736 4 650 4 551C4 527 9 502 20 477C52 404 197 315 205 312C209 310 211 308 211 304C211 300 209 295 205 288C198 274 54 15 54 15C52 11 51 6 51 2C51 -14 63 -27 79 -27C89 -27 99 -21 104 -12C104 -12 259 268 262 274C262 273 270 279 274 279C289 276 489 217 489 122C489 83 465 57 431 52L428 51C407 51 390 65 390 96V107C390 145 365 173 337 173C333 173 329 172 325 171C288 162 254 146 254 106C254 45 316 -8 375 -8C388 -8 402 -6 417 -1C497 26 550 91 550 174C550 183 549 193 548 203C533 313 375 402 363 408C351 415 346 419 346 424C346 426 347 428 348 430C353 438 508 717 508 717C511 722 512 726 512 731C512 747 499 759 484 759C474 759 464 754 459 745C459 745 300 458 294 449C291 444 289 441 285 441C282 441 279 442 275 444C266 447 115 505 89 550C83 561 75 582 75 603C75 630 87 658 129 665ZM415 466C415 435 441 409 472 409C504 409 529 435 529 466C529 498 504 523 472 523C441 523 415 498 415 466ZM140 264C140 295 115 321 83 321C52 321 26 295 26 264C26 232 52 207 83 207C115 207 140 232 140 264Z" fill="currentColor"/></svg>';
+    }else{
+      m.textContent=JP_NOTE_NAVS[nav];
+      m.style.fontFamily='"Noto Serif SC",Georgia,serif';m.style.fontStyle='italic';m.style.fontSize='10px';
+    }
+    return m;
+  }
+  /* host 可以是音符本体(.jp-wrap/.jp-plain)，也可以是严格模式的音位列(内含 .jp-wrap) */
+  function attachNoteNavMark(host,nav){
+    if(!host||!nav)return false;
+    var cn=String(host.className||'');
+    var anchor=(cn.indexOf('jp-wrap')>=0||cn.indexOf('jp-plain')>=0)?host
+              :(host.querySelector('.jp-wrap')||host.querySelector('.jp-plain')||host);
+    /* 作为普通 flex 子元素插在音符最上面，而不是绝对定位：
+       .jp-wrap 是 vertical-align:bottom、.p-n 是 align-items:flex-end，
+       所以音符本身不动，只是音符泳道往上长高 → 上面的和弦行被自动顶开，不会被挡。 */
+    var _m=makeNoteNavMark(nav);
+    /* 尽量贴近音符：音符上方那个八度点盒子(.jp-dot-top 8px / .jp-plain-top 12px)在没有高音点时
+       是空的，会白白撑出一段距离 —— 空的就用负 margin 收掉，只留 2px；有高音点则保持让位。 */
+    var _dt=anchor.querySelector('.jp-dot-top'), _pt=anchor.querySelector('.jp-plain-top');
+    if(_dt&&!_dt.firstElementChild)_m.style.marginBottom='-3.7px';
+    else if(_pt&&!_dt)_m.style.marginBottom='-7.7px';
+    anchor.insertBefore(_m, anchor.firstChild);
+    return true;
+  }
   function makeTimeSignature(sig){
     var norm=normalizeTimeSignValue(sig);
     if(!norm)return document.createDocumentFragment();
@@ -2291,7 +2340,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       parent.appendChild(inlineTs?makeTimeSignature(inlineTs):parseJpToken(tk));
     }
     function isDualAtom(tk){
-      if(!tk||tk==='/'||tk==='／'||tk==='!'||tk.charAt(0)==='~')return false;
+      if(!tk||tk==='/'||tk==='／'||tk==='!'||tk.charAt(0)==='~'||tk.charAt(0)==='*')return false;
       if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
       if(isBarlineTok(tk))return false;
       if(/^\{(3|5)$/.test(tk))return false;
@@ -2316,6 +2365,7 @@ hr.ym-hr{border:none;border-top:1px solid var(--ym-border);margin:2rem 0}
       if(inlineTs){d.appendChild(makeTimeSignature(inlineTs));i++;continue;}
       var tieSpan=jpTieSpan(t);
       if(tieSpan){d.appendChild(makeJpTie(tieSpan));hasTie=true;i++;continue;}
+      var _nnav=noteNavOf(t);if(_nnav){attachNoteNavMark(d.lastElementChild,_nnav);i++;continue;}   // *coda/*segno/… 挂在前一个音符上方
       if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')appendRenderedTok(sl,toks[i++]);d.appendChild(sl);i++;continue;}
       if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])')appendRenderedTok(so,toks[i++]);if(i<toks.length)i++;d.appendChild(so);continue;}
       if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)appendRenderedTok(sc,toks[i++]);d.appendChild(sc);continue;}
@@ -5113,6 +5163,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       var slot=0, pendingSlurOpen=0, pendingSlurClose=0, pendingTupletN=0, lastSlotCol=null;
       toks.forEach(function(tok){
         if(tok==='!'){var lc=container.lastElementChild;if(lc)lc.setAttribute('data-bb','1');return;}  // 断梁标记：让前一音位不与后邻连梁
+        var _nnav=noteNavOf(tok);if(_nnav){attachNoteNavMark(container.lastElementChild,_nnav);return;}   // *coda/*segno/… 挂在前一个音位的音符上方
         if(CecpStrictAlign.isDualAtom(tok)){
           var col=div('prev-seg p-slot');
           if(pendingSlurOpen){col.setAttribute('data-slur-open',pendingSlurOpen);pendingSlurOpen=0;}

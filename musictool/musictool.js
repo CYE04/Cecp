@@ -195,6 +195,8 @@ const jianpuHTML = `<!DOCTYPE html>
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
   --ink:rgba(255,255,255,0.88);--ink2:rgba(255,255,255,0.44);--ink3:rgba(255,255,255,0.18);
   --accent:#7c6af7;--accent2:#a89af9;--red:#f27c6a;--green:#6af2a8;--sel:#f0c040;
+  /* 歌词分行配色：第 1 行主色，第 2/3/4 行蓝/绿/紫区分（暗底用提亮版） */
+  --ly2:#7FB0FF;--ly3:#52C994;--ly4:#C88FEC;
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -379,6 +381,11 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .jp-volta::after{content:attr(data-v);position:absolute;top:4px;left:3px;font-size:10px;line-height:1;color:var(--accent2);pointer-events:none;font-family:'Space Mono',monospace;}
 
 .kbd-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
+/* 小节线·反复 与 导航记号：容器够宽就并排两栏，不够就自动换成上下堆叠。
+   ⚠️ 不能用视口媒体查询判断——键盘面板是网格里的一格，实测在 1280px 视口下这一格也才 156px 宽。
+   用 flex-wrap + flex-basis 按「容器实际宽度」自适应才对。 */
+.kbd-split{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-start;}
+.kbd-split>.kbd-col{flex:1 1 170px;min-width:0;}
 .kbd-row{display:flex;gap:4px;flex-wrap:wrap;}
 .kbd-btn{font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;border-radius:5px;border:1px solid var(--border2);background:var(--panel2);color:var(--ink2);cursor:pointer;transition:all .1s;min-width:30px;text-align:center;line-height:1;}
 .kbd-btn:hover{background:var(--panel);color:var(--ink);border-color:var(--accent);}
@@ -491,9 +498,10 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
 .p-chord.empty{visibility:hidden;}
 .p-n{font-family:'Space Mono',monospace;color:var(--ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;min-height:var(--row-note-height);}
-.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--ink2);}
-.p-lyric.bold{font-weight:700;color:var(--ink);}
-.p-lyric2{opacity:0.65;margin-top:1px;}.p-lyric3{opacity:0.65;margin-top:1px;}.p-lyric4{opacity:0.65;margin-top:1px;}
+.p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:600;color:var(--ink);}
+/* 加粗＝真的更重一档。字体常只有 400/700，700→800 可能毫无变化，再叠一层极细横向 text-shadow 兜底。 */
+.p-lyric.bold{font-weight:800;text-shadow:.32px 0 0 currentColor,-.32px 0 0 currentColor;}
+.p-lyric2{margin-top:1px;color:var(--ly2);}.p-lyric3{margin-top:1px;color:var(--ly3);}.p-lyric4{margin-top:1px;color:var(--ly4);}
 
 /* 音符结构 */
 .jp-wrap{display:inline-flex;flex-direction:column;align-items:center;vertical-align:bottom;min-width:1em;}
@@ -651,6 +659,8 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
     --border:rgba(17,24,39,0.10);--border2:rgba(17,24,39,0.18);
     --ink:rgba(17,24,39,0.92);--ink2:rgba(17,24,39,0.64);--ink3:rgba(17,24,39,0.40);
     --accent:#4a6cff;--accent2:#6d7dff;--red:#d95f5f;--green:#1f9f6c;--sel:#c08a10;
+    /* 亮底：三种都要够深 */
+    --ly2:#123C8F;--ly3:#0E4F33;--ly4:#5C2178;
     color-scheme:light;
   }
   body{
@@ -739,7 +749,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
     <button class="top-tab" data-top-tab="tools" type="button">工具</button>
     <button class="top-tab" data-top-tab="code" type="button">代码</button>
   </div>
-  <label id="strictToggleWrap" class="strict-toggle" title="严格对位：和弦/歌词按音位对齐、@占空位（规则建歌时定死，有音符后锁定，改模式请新建/重做）"><input type="checkbox" id="strictToggle" onchange="onStrictToggle(this)"> 严格对位</label>
+  <label id="strictToggleWrap" class="strict-toggle" title="严格对位：和弦/歌词按音位对齐、@占空位（规则建歌时定死，有音符后锁定，改模式请新建/重做）"><input type="checkbox" id="strictToggle" checked onchange="onStrictToggle(this)"> 严格对位</label>
   <button id="strictFillBtn" class="strict-toggle" type="button" onclick="strictAutoFillClick()" title="按音位数把每格和弦/歌词尾部不足的位自动补 @（内部跳过仍需手打 @）" style="display:none;cursor:pointer;">补 @ 对齐</button>
 </div>
 
@@ -942,6 +952,8 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
             </div>
           </div>
           <div class="kbd-group">
+            <div class="kbd-split">
+            <div class="kbd-col">
             <div class="kbd-label">小节线 · 反复</div>
             <div class="kbd-row">
               <button class="kbd-btn" onclick="appendTok('|')" style="padding:6px 8px;">| 小节线<span class="shortcut">B</span></button>
@@ -952,13 +964,30 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
               <button class="kbd-btn" onclick="appendTok(':|')" style="padding:6px 8px;">:| 反复结</button>
               <button class="kbd-btn" onclick="appendTok('|:|')" style="padding:6px 8px;">|:| 反复段</button>
             </div>
-            <div class="kbd-label" style="margin-top:10px;">导航记号</div>
+            </div>
+            <div class="kbd-col">
+            <div class="kbd-label">导航记号　<span style="opacity:.6;font-weight:400;">左＝挂小节线　右＝挂音符上</span></div>
             <div class="kbd-row">
-              <button class="kbd-btn" onclick="appendNavTok('fine')" title="曲终：终止线 + Fine（只放在小节线处）" style="padding:6px 8px;">Fine 曲终</button>
-              <button class="kbd-btn" onclick="appendNavTok('dc')" title="D.C. 从头反复（Da Capo）" style="padding:6px 8px;">D.C. 从头</button>
-              <button class="kbd-btn" onclick="appendNavTok('ds')" title="D.S. 回到记号（Dal Segno）" style="padding:6px 8px;">D.S. 大反复</button>
-              <button class="kbd-btn" onclick="appendNavTok('coda')" title="Coda 尾声记号（大跳跃）" style="padding:6px 8px;">Coda 尾声</button>
-              <button class="kbd-btn" onclick="appendNavTok('segno')" title="Segno 记号（配合 D.S. 使用）" style="padding:6px 8px;">Segno 记号</button>
+              <button class="kbd-btn" onclick="appendNavTok('fine')" title="曲终：终止线 + Fine，挂在小节线处" style="padding:6px 8px;flex:1 1 0;">Fine 曲终</button>
+              <button class="kbd-btn" onclick="appendTok('*fine')" title="Fine 画在前一个音符正上方：不画小节线、不占音位（chord/歌词不用补 @）" style="padding:6px 8px;flex:1 1 0;">Fine 挂音</button>
+            </div>
+            <div class="kbd-row">
+              <button class="kbd-btn" onclick="appendNavTok('dc')" title="D.C. 从头反复（Da Capo），挂在小节线处" style="padding:6px 8px;flex:1 1 0;">D.C. 从头</button>
+              <button class="kbd-btn" onclick="appendTok('*dc')" title="D.C. 画在前一个音符正上方：不画小节线、不占音位（chord/歌词不用补 @）" style="padding:6px 8px;flex:1 1 0;">D.C. 挂音</button>
+            </div>
+            <div class="kbd-row">
+              <button class="kbd-btn" onclick="appendNavTok('ds')" title="D.S. 回到记号（Dal Segno），挂在小节线处" style="padding:6px 8px;flex:1 1 0;">D.S. 大反复</button>
+              <button class="kbd-btn" onclick="appendTok('*ds')" title="D.S. 画在前一个音符正上方：不画小节线、不占音位（chord/歌词不用补 @）" style="padding:6px 8px;flex:1 1 0;">D.S. 挂音</button>
+            </div>
+            <div class="kbd-row">
+              <button class="kbd-btn" onclick="appendNavTok('coda')" title="Coda 尾声记号（大跳跃），挂在小节线处" style="padding:6px 8px;flex:1 1 0;">Coda 尾声</button>
+              <button class="kbd-btn" onclick="appendTok('*coda')" title="Coda 画在前一个音符正上方：不画小节线、不占音位（chord/歌词不用补 @）" style="padding:6px 8px;flex:1 1 0;">Coda 挂音</button>
+            </div>
+            <div class="kbd-row">
+              <button class="kbd-btn" onclick="appendNavTok('segno')" title="Segno 记号（配合 D.S. 使用），挂在小节线处" style="padding:6px 8px;flex:1 1 0;">Segno 记号</button>
+              <button class="kbd-btn" onclick="appendTok('*segno')" title="Segno 画在前一个音符正上方：不画小节线、不占音位（chord/歌词不用补 @）" style="padding:6px 8px;flex:1 1 0;">Segno 挂音</button>
+            </div>
+            </div>
             </div>
             <div class="kbd-label" style="margin-top:10px;">连音 · 连音符 · 拍号</div>
             <div class="kbd-row">
@@ -1149,7 +1178,7 @@ function extractInlineTimeSignToken(tok){
    srcdoc iframe 隔离，无法 import CecpStrictAlign，故内联于此；判定改动须四/五处同步。
    注意：本模板是字符串，正则里的反斜杠一律双写（\\s、\\{、\\[…）。 */
 function saIsDualAtom(tk){
-  if(!tk||tk==='/'||tk==='／'||tk==='!'||tk.charAt(0)==='~')return false;
+  if(!tk||tk==='/'||tk==='／'||tk==='!'||tk.charAt(0)==='~'||tk.charAt(0)==='*')return false;
   if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
   if(isBarlineTok(tk))return false;
   if(/^\\{(3|5)$/.test(tk))return false;
@@ -3015,6 +3044,49 @@ function makeBarline(tok){
   }
   return o;
 }
+/* ── 导航记号挂在音符正上方：写法 = 星号 + 记号名，如 1 *coda、3_ *segno ──
+   与小节线写法(||coda / :|fine)并存；星号前缀这一档不画小节线、不占音位（isDualAtom 已判 false，
+   所以 chord/lyric 不用补 @）。记号用绝对定位挂在前一个音符上，不参与布局 → 不会把行撑高。
+   注意：本文件这段在 srcdoc 模板字符串里，注释中绝对不能出现反引号，否则模板会提前终止。 */
+var JP_NOTE_NAVS={fine:'Fine',dc:'D.C.',ds:'D.S.',coda:1,segno:1};
+function noteNavOf(tok){
+  var t=String(tok||'');
+  if(t.charAt(0)!=='*')return '';
+  var n=t.slice(1);
+  return JP_NOTE_NAVS[n]?n:'';
+}
+function makeNoteNavMark(nav){
+  var m=document.createElement('span');
+  m.className='jp-navmark';
+  m.style.cssText='display:flex;align-items:flex-end;justify-content:center;line-height:1;pointer-events:none;white-space:nowrap;margin-bottom:2px;flex:0 0 auto;';
+  if(nav==='coda'){
+    m.innerHTML='<svg viewBox="0 0 26 30" width="16" height="16" style="display:block;overflow:visible"><ellipse cx="13" cy="15" rx="6.4" ry="9.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="13" y1="2.6" x2="13" y2="27.4" stroke="currentColor" stroke-width="1.7"/><line x1="2.6" y1="15" x2="23.4" y2="15" stroke="currentColor" stroke-width="1.7"/></svg>';
+  }else if(nav==='segno'){
+    m.innerHTML='<svg viewBox="4 -759 546 786" width="9" height="13" style="display:block;overflow:visible"><path transform="scale(1,-1)" d="M135 665C141 665 148 663 151 652L153 645C160 618 175 559 226 559C267 559 295 583 295 626C295 641 292 657 287 673C271 719 204 736 153 736C83 736 4 650 4 551C4 527 9 502 20 477C52 404 197 315 205 312C209 310 211 308 211 304C211 300 209 295 205 288C198 274 54 15 54 15C52 11 51 6 51 2C51 -14 63 -27 79 -27C89 -27 99 -21 104 -12C104 -12 259 268 262 274C262 273 270 279 274 279C289 276 489 217 489 122C489 83 465 57 431 52L428 51C407 51 390 65 390 96V107C390 145 365 173 337 173C333 173 329 172 325 171C288 162 254 146 254 106C254 45 316 -8 375 -8C388 -8 402 -6 417 -1C497 26 550 91 550 174C550 183 549 193 548 203C533 313 375 402 363 408C351 415 346 419 346 424C346 426 347 428 348 430C353 438 508 717 508 717C511 722 512 726 512 731C512 747 499 759 484 759C474 759 464 754 459 745C459 745 300 458 294 449C291 444 289 441 285 441C282 441 279 442 275 444C266 447 115 505 89 550C83 561 75 582 75 603C75 630 87 658 129 665ZM415 466C415 435 441 409 472 409C504 409 529 435 529 466C529 498 504 523 472 523C441 523 415 498 415 466ZM140 264C140 295 115 321 83 321C52 321 26 295 26 264C26 232 52 207 83 207C115 207 140 232 140 264Z" fill="currentColor"/></svg>';
+  }else{
+    m.textContent=JP_NOTE_NAVS[nav];
+    m.style.fontFamily='"Noto Serif SC",Georgia,serif';m.style.fontStyle='italic';m.style.fontSize='10px';
+  }
+  return m;
+}
+/* host 可以是音符本体(.jp-wrap/.jp-plain)，也可以是严格模式的音位列(内含 .jp-wrap) */
+function attachNoteNavMark(host,nav){
+  if(!host||!nav)return false;
+  var cn=String(host.className||'');
+  var anchor=(cn.indexOf('jp-wrap')>=0||cn.indexOf('jp-plain')>=0)?host
+            :(host.querySelector('.jp-wrap')||host.querySelector('.jp-plain')||host);
+  /* 作为普通 flex 子元素插在音符最上面，而不是绝对定位：
+     .jp-wrap 是 vertical-align:bottom、.p-n 是 align-items:flex-end，
+     所以音符本身不动，只是音符泳道往上长高 → 上面的和弦行被自动顶开，不会被挡。 */
+  var _m=makeNoteNavMark(nav);
+  /* 尽量贴近音符：音符上方那个八度点盒子(.jp-dot-top 8px / .jp-plain-top 12px)在没有高音点时
+     是空的，会白白撑出一段距离 —— 空的就用负 margin 收掉，只留 2px；有高音点则保持让位。 */
+  var _dt=anchor.querySelector('.jp-dot-top'), _pt=anchor.querySelector('.jp-plain-top');
+  if(_dt&&!_dt.firstElementChild)_m.style.marginBottom='-3.7px';
+  else if(_pt&&!_dt)_m.style.marginBottom='-7.7px';
+  anchor.insertBefore(_m, anchor.firstChild);
+  return true;
+}
 function makeTimeSignature(sig){
   var norm=normalizeTimeSignValue(sig);
   if(!norm)return document.createDocumentFragment();
@@ -3315,7 +3387,7 @@ function renderNStr(nStr,opts){
     parent.appendChild(inlineTs?makeTimeSignature(inlineTs):parseJpToken(tk));
   }
   function isDualAtom(tk){
-    if(!tk||tk==='/'||tk==='／'||tk==='!'||tk.charAt(0)==='~')return false;
+    if(!tk||tk==='/'||tk==='／'||tk==='!'||tk.charAt(0)==='~'||tk.charAt(0)==='*')return false;
     if(tk==='('||tk===')'||tk==='(['||tk==='])'||tk==='}'||tk==='[v1'||tk==='[v2'||tk===']v')return false;
     if(isBarlineTok(tk))return false;
     if(/^\\{(3|5)$/.test(tk))return false;
@@ -3340,6 +3412,7 @@ function renderNStr(nStr,opts){
     if(inlineTs){div.appendChild(makeTimeSignature(inlineTs));i++;continue;}
     var tieSpan=jpTieSpan(t);
     if(tieSpan){div.appendChild(makeJpTie(tieSpan));hasTie=true;i++;continue;}
+    var _nnav=noteNavOf(t);if(_nnav){attachNoteNavMark(div.lastElementChild,_nnav);i++;continue;}   // *coda/*segno/… 挂在前一个音符上方
     if(t==='('){var sl=document.createElement('span');sl.className='jp-slur';i++;while(i<toks.length&&toks[i]!==')')appendRenderedTok(sl,toks[i++]);div.appendChild(sl);i++;continue;}
     if(t==='(['){var so=document.createElement('span');so.className='jp-slur-open';i++;while(i<toks.length&&toks[i]!=='])') appendRenderedTok(so,toks[i++]);div.appendChild(so);i++;continue;}
     if(t==='])'){var sc=document.createElement('span');sc.className='jp-slur-close';i++;if(i<toks.length)appendRenderedTok(sc,toks[i++]);div.appendChild(sc);continue;}
@@ -3401,7 +3474,7 @@ function normalizePreviewRowHeights(scope){
     if(maxH)row.style.setProperty('--row-note-height',maxH+'px');
   });
 }
-var STRICT_MODE=false;  // 严格对位模式：新建时定死 / import 到 align:"strict" 自动开；存盘写 align
+var STRICT_MODE=true;   // 严格对位模式：**新建默认开**（用户 2026-07-26 要求）/ import 老歌会自动关；建歌时定死，存盘写 align
 /* 严格对位模式 UI：建歌时定死——一旦有音符即锁定，不能再切（改模式=新建/重做，符合§8不做切换开关）。 */
 function strictHasNotes(){
   return data.some(function(sec){return (sec.lines||[]).some(function(l){return (l.segs||[]).some(function(s){return s.n&&s.n.trim();});});});
@@ -3451,6 +3524,7 @@ function buildStrictSegColumnsMT(seg, container, psi, pli, pgi, bold){
   function lyRow(val,j){var l=document.createElement('div');l.className='p-lyric'+(j?' p-lyric'+(j+1):'')+(bold?' bold':'');if(val==null){setLyricContentEx(l,NB,mtSetPlainText);return l;}var lsp=saSplitTrailingPunct(String(val));if(lsp.punct){setLyricContentEx(l,lsp.base||NB,mtSetPlainText);var pun=document.createElement('span');pun.className='p-punct';pun.textContent=lsp.punct;l.appendChild(pun);}else{setLyricContentEx(l,String(val),mtSetPlainText);}return l;}
   toks.forEach(function(tok){
     if(tok==='!'){var lc=container.lastElementChild;if(lc)lc.setAttribute('data-bb','1');return;}  // 断梁标记
+    var _nnav=noteNavOf(tok);if(_nnav){attachNoteNavMark(container.lastElementChild,_nnav);return;}   // *coda/*segno/… 挂在前一个音位的音符上方
     if(saIsDualAtom(tok)){
       var col=document.createElement('div');col.className='prev-seg p-slot';col.setAttribute('data-loc',psi+'-'+pli+'-'+pgi);col.addEventListener('click',onClick);
       if(pendingSlurOpen){col.setAttribute('data-slur-open',pendingSlurOpen);pendingSlurOpen=0;}
@@ -4392,7 +4466,7 @@ function mtResetFresh(){
   saveUndo();
   data=[{name:'主歌',lines:[{bold:false,segs:[{chord:'',n:'',lyric:''}]}]}];
   curSi=-1;curLi=-1;curGi=-1;curTok=-1;clearSel();
-  STRICT_MODE=false;
+  STRICT_MODE=true;   // 新建一律回到严格模式（默认开）
   MT_META_IDS.forEach(function(k){if(k==='key'||k==='timesign'||k==='bpm')return;var el=document.getElementById('meta-'+k);if(el)el.value='';});
   mtDraftClear();
   renderEditor();renderPreview();if(typeof updateStrictUi==='function')updateStrictUi();
