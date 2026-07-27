@@ -565,7 +565,7 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
   align-items:center; justify-content:center;
   border:1px solid var(--fab-border);
   background:var(--fab-card); color:var(--fab-ink);
-  box-shadow:var(--fab-shadow); opacity:.62;
+  box-shadow:var(--fab-shadow); opacity:.5;
   cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
   transition:transform .45s cubic-bezier(.34,1.56,.64,1), color .2s ease,
              background .25s ease, border-color .25s ease, box-shadow .25s ease,
@@ -595,6 +595,8 @@ body.rt7-lock{ overflow:hidden !important; touch-action:none !important; }
    —— 工具导游在左下 → 左下角收紧；联系我们在右下 → 右下角收紧 */
 .rt7-fab{ border-radius:16px 16px 16px 6px; }
 .ccf-fab{ right:20px; bottom:20px; display:flex; border-radius:16px 16px 6px 16px; }
+/* 「联系我们」气泡钮已按用户要求隐藏（左上耳机 launcher 仍是聊天入口）。删掉此行即恢复。 */
+#cecp-contact-fab.ccf-fab{ display:none !important; }
 /* 把主题自带的"回到顶部"按钮也贴角圆角化 + 对齐，让右列（联系我们 / 回到顶部）整齐一致 */
 #btn-scroll-to-top{ border-radius:16px 16px 6px 16px !important; }
 /* 桌面端（Tailwind lg）主题按钮在 40px 边距，联系我们跟着对齐右边缘 */

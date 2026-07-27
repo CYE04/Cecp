@@ -354,7 +354,7 @@
     '.cf.is-floating{pointer-events:none}',
     '.cf.is-floating .cf-launcher,.cf.is-floating .cf-dock-pop{pointer-events:auto}',
     /* ── 悬浮球（贴角圆角语言 + 玻璃材质；不支持 backdrop-filter 时退回实色）── */
-    '.cf.is-floating .cf-launcher{position:fixed;z-index:2147483644;width:58px;height:58px;opacity:.62;',
+    '.cf.is-floating .cf-launcher{position:fixed;z-index:2147483644;width:58px;height:58px;opacity:.5;',
     '  background:var(--card);',
     '  border:1px solid var(--border);box-shadow:var(--shadow-soft),0 6px 18px rgba(0,0,0,.07);color:var(--text);',
     '  display:flex;align-items:center;justify-content:center;',
