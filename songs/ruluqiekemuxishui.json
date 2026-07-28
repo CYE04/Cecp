@@ -14,52 +14,51 @@
   "lrc": "",
   "youtube": "https://youtu.be/NHwHhEWEG_0?si=yGke5H-I2obpInVU",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/ruluqiekemuxishuiC.jpg",
- "sections": [
+ "align": "strict",
+  "sections": [
   {
     "name": "主歌",
     "lines": [
       [
-        {"chord":"C","n":"3 sp 5","lyric":"神{sp}啊！"},
-        {"chord":"G/B","n":"5 3_ 2_ sp |","lyric":"我的心"},
-        {"chord":"Am","n":"1· sp 2_","lyric":"切{sp}慕"},
-        {"chord":"C/G","n":"( 4_ 3_ )","lyric":"你，"},
-        {"chord":"","n":"( 2_ 1_ ) sp |","lyric":"如"},
-        {"chord":"F","n":"6· sp","lyric":"鹿{sp}"},
-        {"chord":"","n":"6_","lyric":"切"},
-        {"chord":"G","n":"5· sp 4_ sp |","lyric":"慕{sp}溪"},
-        {"chord":"C{sp}{sp}{sp}{sp}{sp}G","n":"5 - sp - sp - sp |","lyric":"水"}
+        {"chord":"C @","n":"3 5","lyric":"神啊！ @","lyric2":"惟有 @","lyric3":"你愿 @"},
+        {"chord":"G/B @ @","n":"5 3_ 2_ |","lyric":"我的心 @ @","lyric2":"你能满 @ @","lyric3":"成为我 @ @"},
+        {"chord":"Am @","n":"1· 2_ !","lyric":"切慕 @","lyric2":"足我 @","lyric3":"的朋 @"},
+        {"chord":"C/G @","n":"( 4_ 3_ ) !","lyric":"你， @","lyric2":"心， @","lyric3":"友， @"},
+        {"chord":"@ @ @","n":"( 2_ 1_ ) sp |","lyric":"如 @ @","lyric2":"你比 @ @","lyric3":"即使 @ @"},
+        {"chord":"F","n":"6·","lyric":"鹿","lyric2":"金","lyric3":"你"},
+        {"chord":"@","n":"6_","lyric":"切","lyric2":"银","lyric3":"是"},
+        {"chord":"G @","n":"5· 4_ |","lyric":"慕溪 @","lyric2":"更 宝","lyric3":"尊贵 @"},
+        {"chord":"C@G @ @ @","n":"5 - - - |","lyric":"水。 @ @ @","lyric2":"贵。 @ @ @","lyric3":"君。 @ @ @"}
       ],
       [
-        {"chord":"C","n":"3 sp 5","lyric":"惟ㅤ有ㅤ"},
-        {"chord":"G/B","n":"5 3_ 2_ sp |","lyric":"你是我"},
-        {"chord":"Am","n":"1· sp 2_","lyric":"心ㅤ所"},
-        {"chord":"F或C/G","n":"( 4_ 3_ )","lyric":"爱，"},
-        {"chord":"","n":"( 2_ 1_ ) sp |","lyric":"我渴"},
-        {"chord":"Dm7","n":"1· sp 3_","lyric":"慕ㅤ来"},
-        {"chord":"G","n":"2· sp 1_ sp |","lyric":"敬ㅤ拜"},
-        {"chord":"C","n":"1 - sp - sp - sp |","lyric":"你。"}
+        {"chord":"C @","n":"3 5","lyric":"惟有 @","lyric2":"惟有 @","lyric3":"我爱 @"},
+        {"chord":"G/B @ @","n":"5 3_ 2_ |","lyric":"你是我 @ @","lyric2":"你是我 @ @","lyric3":"你胜过 @ @"},
+        {"chord":"Am @","n":"1· 2_ !","lyric":"心所 @","lyric2":"心喜 @","lyric3":"世上 @"},
+        {"chord":"F或C/G @","n":"( 4_ 3_ ) !","lyric":"爱， @","lyric2":"乐， @","lyric3":"一切， @"},
+        {"chord":"@ @","n":"( 2_ 1_ ) |","lyric":"我渴 @","lyric2":"你是 @","lyric3":"无人 @"},
+        {"chord":"Dm7 @","n":"1· 3_","lyric":"慕来 @","lyric2":"我全 @","lyric3":"能与 @"},
+        {"chord":"G @","n":"2· 1_ |","lyric":"敬拜 @","lyric2":"心所 @","lyric3":"你相 @"},
+        {"chord":"C @ @ @","n":"1 - - - |","lyric":"你。 @ @ @","lyric2":"爱。 @ @ @","lyric3":"比。 @ @ @"}
       ],
       [
-        {"label":"Chorus"},
-        {"chord":"Am","n":"1' sp 1' sp","lyric":"你ㅤ是"},
-        {"chord":"Am/G","n":"1' sp 1'_ 7_ sp |","lyric":"我ㅤ的力"},
-        {"chord":"F","n":"6 sp 6","lyric":"量、盾"},
-        {"chord":"C/E","n":"5· sp 1_ sp |","lyric":"牌, 我"},
-        {"chord":"F","n":"6 sp 6","lyric":"灵ㅤ单"},
-        {"chord":"C/E","n":"6 sp ( 6_ 5_ ) sp |","lyric":"单ㅤ降"},
-        {"chord":"D","n":"4 4","lyric":"服于"},
-        {"chord":"Esus4","n":"3^","lyric":"你"},
-        {"chord":"E","n":"- sp |","lyric":"ㅤ"}
+        {"chord":"Am @","n":"|| 1' 1'","lyric":"你是 @"},
+        {"chord":"Am/G @ @","n":"1' 1'_ 7_ |","lyric":"我的力 @ @"},
+        {"chord":"F @","n":"6 6","lyric":"量、盾 @"},
+        {"chord":"C/E @","n":"5· 1_ |","lyric":"牌,我 @"},
+        {"chord":"F @","n":"6 6","lyric":"灵单 @"},
+        {"chord":"C/E @ @","n":"6 ( 6_ 5_ ) |","lyric":"单降 @ @"},
+        {"chord":"D @","n":"4 4","lyric":"服于 @"},
+        {"chord":"Esus4 E","n":"3^ - |","lyric":"你 @"}
       ],
       [
-        {"chord":"C","n":"3 sp 5 sp","lyric":"惟ㅤ有"},
-        {"chord":"G/B","n":"5 sp 3_ 2_ sp |","lyric":"你ㅤ是我"},
-        {"chord":"Am","n":"1· sp 2_","lyric":"心ㅤ所"},
-        {"chord":"C/G","n":"( 4_ 3_ )","lyric":"爱，"},
-        {"chord":"","n":"2_ sp_ 1_ sp |","lyric":"我ㅤ渴"},
-        {"chord":"Fmaj7","n":"1· sp 3_","lyric":"慕ㅤ来"},
-        {"chord":"G","n":"2· sp 1_ sp |","lyric":"敬ㅤ拜"},
-        {"chord":"C","n":"1 - sp - sp - ||/","lyric":"你。"}
+        {"chord":"C @","n":"3 5","lyric":"惟有 @"},
+        {"chord":"G/B @ @","n":"5 3_ 2_ |","lyric":"你是我 @ @"},
+        {"chord":"Am @","n":"1· 2_","lyric":"心所 @"},
+        {"chord":"C/G @","n":"( 4_ 3_ )","lyric":"爱， @"},
+        {"chord":"@ @","n":"2_ 1_ |","lyric":"我渴 @"},
+        {"chord":"Fmaj7 @","n":"1· 3_","lyric":"慕来 @"},
+        {"chord":"G @","n":"2· 1_ |","lyric":"敬拜 @"},
+        {"chord":"C @ @ @","n":"1 - - - ||/","lyric":"你。 @ @ @"}
       ]
     ]
   }
