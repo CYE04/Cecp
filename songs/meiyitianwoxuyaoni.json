@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/meiyitianwoxuyaoni.lrc",
   "youtube": "https://youtu.be/IBeDhW5uET0?si=AqrgSGpprEv5TUwS",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/meiyitianwoxuyaoniC.jpg",
-  "sections": [
+   "sections": [
   {
     "name": "每一天我需要你",
     "lines": [
@@ -54,7 +54,7 @@
       { "b": true, "line": [
         {"chord":"","lyric":""},
         {"chord":"C","n":"1 - - - sp || sp","lyric":"命。"},
-        {"label":"Pre-Chorus","dx":-10},
+        {"label":"Pre-Chorus","dx":-10,"dy":21},
         {"chord":"C{sp}{sp}{sp}G/B","n":"3 - 2 - sp | sp","lyric":"每 {sp}一"},
         {"chord":"Am","n":"1 -","lyric":"天，"},
         {"chord":"C/G","n":"1_ 2_","lyric":"我需"},
@@ -73,7 +73,7 @@
         {"chord":"","n":"3_","lyric":"圣"},
         {"chord":"G","n":"2_ 2__ ( 1__ sp 2_ ) 7,_ sp | sp","lyric":"灵如雨{sp}{sp}降"},
         {"chord":"C{sp}{sp}{sp}{sp}{sp}F/G","n":"1 - - - sp ||","lyric":"临。"},
-        {"label":"Chorus","dx":-5},
+        {"label":"Chorus","dx":-4,"dy":9},
         {"chord":"C{sp}{sp}{sp}G/B","n":"( 5 - 5_ ) 5_","lyric":"这{sp} {sp}是"},
         {"chord":"","n":"{3 5_ 6_ 7_ } sp |","lyric":"我的祷"}
       ]},
