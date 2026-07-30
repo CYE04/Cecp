@@ -1,0 +1,35 @@
+{
+  "week": "2026年8月 第一周",
+  "time": "每周日 12:00 – 13:30",
+  "sectionOrder": ["flow", "songs", "game", "ppt", "message", "replay", "action"],
+  "sheetName": "020826",
+  "gameText": "本周游戏活动叫 【诗歌知多少-4】 欢迎大家先来看看游戏规则哦 ",
+  "pptUrl": null,
+  "pptLabel": null,
+  "bibleRef": "gldqs 13 12",
+  "speaker": null,
+  "topic": null,
+  "replayUrl": null,
+  "schedule": [
+    {
+      "time": "12:00 – 12:30",
+      "event": "诗歌敬拜",
+      "emoji": "🎶"
+    },
+    {
+      "time": "12:30 – 13:30",
+      "event": "圣经分享",
+      "emoji": "📖"
+    },
+    {
+      "time": "13:30",
+      "event": "祷告 & 结束",
+      "emoji": "🙏"
+    }
+  ],
+  "songs": [
+    "manyounengli",
+    "woxinjiandingyuni",
+    "anjing-yueshuya"
+  ]
+}
