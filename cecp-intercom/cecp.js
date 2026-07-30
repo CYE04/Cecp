@@ -525,7 +525,7 @@
     /* ── 角色选择（menu 模式：一个链接选音控 / 敬拜）── */
     /* 外层滚动 + margin:auto 居中：内容超高时可滚（纯 justify-center 会顶部截断） */
     '.cf-menu{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}',
-    '.cf-menu-inner{margin:auto;width:100%;padding:clamp(20px,5cqi,40px) clamp(16px,5cqi,40px)}',
+    '.cf-menu-inner{margin:auto;width:100%;text-align:center;padding:clamp(20px,5cqi,40px) clamp(16px,5cqi,40px)}',
     '.cf-menu-kicker{font-size:clamp(11px,2.8cqi,13px);font-weight:600;color:var(--acc);text-align:center}',
     '.cf-menu h2{font-size:clamp(20px,5.5cqi,28px);font-weight:700;letter-spacing:-.02em;text-align:center;margin:3px 0 4px}',
     '.cf-menu-sub{color:var(--muted);font-size:clamp(12px,3cqi,14px);text-align:center;margin-bottom:clamp(12px,3.5cqi,20px)}',
@@ -1072,14 +1072,24 @@
        position:fixed 元素若留在文章 DOM 里会被变换祖先「困住」——
        坐标基准变成祖先、z-index 也被压进祖先的层叠上下文，
        表现为面板与站点顶栏重合、被标签弹层/灯箱盖住。 */
-    if (this.isFloating) {
+    if (this.isFloating || this.fullscreen) {
       if (!this.portal) {
         this.portal = document.createElement('cecp-intercom-layer');
-        /* 零干扰宿主：不占布局、不挡触摸——只有球/面板/toast 自身可交互 */
-        this.portal.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2147483644';
+        this.portal.style.cssText = this.isFloating
+          /* 悬浮：零干扰宿主，不占布局、不挡触摸——只有球/面板/toast 自身可交互 */
+          ? 'position:fixed;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2147483644'
+          /* 全屏页：铺满视口盖住站点（像 musictool 独占屏幕） */
+          : 'position:fixed;inset:0;z-index:2147483600';
         (document.body || document.documentElement).appendChild(this.portal);
       }
       this.shadow = this.portal.shadowRoot || this.portal.attachShadow({ mode: 'open' });
+      /* 全屏页：锁背景滚动，销毁时恢复 */
+      if (this.fullscreen && !this.isFloating && this._prevHtmlOverflow === undefined) {
+        this._prevHtmlOverflow = document.documentElement.style.overflow;
+        this._prevBodyOverflow = document.body ? document.body.style.overflow : '';
+        document.documentElement.style.overflow = 'hidden';
+        if (document.body) document.body.style.overflow = 'hidden';
+      }
     } else {
       this.shadow = this.host.shadowRoot || this.host.attachShadow({ mode: 'open' });
     }
@@ -2942,6 +2952,11 @@
     if (this.portal && this.portal.parentNode) {
       this.portal.parentNode.removeChild(this.portal);
       this.portal = null;
+    }
+    if (this._prevHtmlOverflow !== undefined) {
+      document.documentElement.style.overflow = this._prevHtmlOverflow;
+      if (document.body) document.body.style.overflow = this._prevBodyOverflow;
+      this._prevHtmlOverflow = undefined;
     }
     this.host.__cecpApp = null;
   };
