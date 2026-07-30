@@ -348,6 +348,9 @@
     '.cf-panel{display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--border);overflow:hidden;container-type:inline-size;overscroll-behavior:contain}',
     '.cf.is-page .cf-panel{position:relative;width:100%;height:100%;min-height:520px;border-radius:var(--r-lg)}',
     '.cf.is-page{height:100%}',
+    /* 单独页面全屏：铺满视口，内部自己滚 */
+    '.cf.is-page.is-fullscreen{position:fixed;inset:0;height:100vh;height:100dvh;z-index:2147483000}',
+    '.cf.is-page.is-fullscreen .cf-panel{width:100%;height:100%;min-height:0;border-radius:0;border:none}',
     '.cf-stage{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}',
 
     /* 悬浮根不拦任何触摸；可交互的只有球、面板、toast 本身 */
@@ -518,6 +521,39 @@
     '.cf-btn-primary:hover{filter:brightness(1.08)}',
     '.cf-btn-primary:active{transform:scale(.98)}',
     '.cf-btn-primary[disabled]{opacity:.4;cursor:default}',
+
+    /* ── 角色选择（menu 模式：一个链接选音控 / 敬拜）── */
+    /* 外层滚动 + margin:auto 居中：内容超高时可滚（纯 justify-center 会顶部截断） */
+    '.cf-menu{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}',
+    '.cf-menu-inner{margin:auto;width:100%;padding:clamp(20px,5cqi,40px) clamp(16px,5cqi,40px)}',
+    '.cf-menu-kicker{font-size:clamp(11px,2.8cqi,13px);font-weight:600;color:var(--acc);text-align:center}',
+    '.cf-menu h2{font-size:clamp(20px,5.5cqi,28px);font-weight:700;letter-spacing:-.02em;text-align:center;margin:3px 0 4px}',
+    '.cf-menu-sub{color:var(--muted);font-size:clamp(12px,3cqi,14px);text-align:center;margin-bottom:clamp(12px,3.5cqi,20px)}',
+    '.cf-role-grid{display:grid;grid-template-columns:1fr;gap:12px;max-width:520px;width:100%;margin:0 auto}',
+    '@container (min-width:520px){.cf-role-grid{grid-template-columns:1fr 1fr}}',
+    '.cf-role{display:flex;flex-direction:column;align-items:center;gap:8px;padding:clamp(18px,5cqi,30px) 16px;border-radius:var(--r-lg);',
+    '  border:1px solid var(--border);background:var(--card);box-shadow:var(--shadow-soft);text-align:center;',
+    '  transition:transform .15s cubic-bezier(.32,.72,0,1),box-shadow .15s}',
+    '.cf-role:hover{box-shadow:0 8px 28px rgba(0,0,0,.1)}',
+    '.cf-role:active{transform:scale(.97)}',
+    '.cf-role-icon{width:clamp(48px,14cqi,64px);height:clamp(48px,14cqi,64px);border-radius:50%;display:flex;align-items:center;justify-content:center;',
+    '  font-size:clamp(24px,7cqi,32px);background:var(--acc-soft);color:var(--acc)}',
+    '.cf-role.is-op .cf-role-icon{background:var(--orange-soft);color:var(--orange)}',
+    '.cf-role-title{font-size:clamp(15px,4cqi,18px);font-weight:600}',
+    '.cf-role-sub{font-size:clamp(11px,3cqi,12.5px);color:var(--muted)}',
+    '.cf-role-lock{color:var(--orange);font-weight:600}',
+    /* ── 音控密码 ── */
+    '.cf-pin{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(20px,6cqi,40px);gap:14px;text-align:center}',
+    '.cf-pin-icon{font-size:34px}',
+    '.cf-pin h2{font-size:clamp(18px,5cqi,22px);font-weight:700}',
+    '.cf-pin-sub{color:var(--muted);font-size:13px;max-width:300px}',
+    '.cf-pin-input{width:min(240px,80%);text-align:center;letter-spacing:.4em;font-size:22px;font-weight:700;padding:12px;',
+    '  border-radius:var(--r-md);border:1.5px solid var(--border-strong);background:var(--card);outline:none}',
+    '.cf-pin-input:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}',
+    '.cf-pin-error{color:var(--red);font-size:13px;font-weight:600;min-height:18px}',
+    '.cf-pin-actions{display:flex;gap:10px;width:min(300px,92%)}',
+    '.cf-pin-actions .cf-btn-primary{margin-top:0;flex:1;width:auto}',
+    '.cf-back-btn{flex:none;padding:12px 18px;border-radius:var(--r-md);background:var(--card3);font-size:15px;font-weight:600;color:var(--text)}',
 
     /* ── 敬拜端 ── */
     '.cf-client-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border)}',
@@ -782,7 +818,7 @@
     this.wsUrl = String(d.wsUrl || '').trim();
 
     var mode = String(d.mode || new URLSearchParams(location.search).get('mode') || 'client').trim().toLowerCase();
-    if (['operator', 'client', 'listener', 'auto'].indexOf(mode) < 0) mode = 'client';
+    if (['operator', 'client', 'listener', 'auto', 'menu'].indexOf(mode) < 0) mode = 'client';
     this.configMode = mode;
 
     var room = String(d.room || '').trim();
@@ -816,6 +852,10 @@
     this.cornerAttr = corner;
     /* data-launcher-icon 显式给了 emoji 就用 emoji，否则用内置声波耳机 SVG */
     this.launcherIconCustom = typeof d.launcherIcon === 'string' && d.launcherIcon.trim() !== '';
+    /* data-fullscreen：单独页面用，铺满整个视口 + 内部滚动（menu 模式默认开） */
+    this.fullscreen = ('fullscreen' in d)
+      ? (d.fullscreen !== '0' && d.fullscreen !== 'false')
+      : (this.configMode === 'menu');
   };
 
   CecpApp.prototype.initState = function () {
@@ -833,6 +873,8 @@
     this.suppressReconnect = false;
     this.wasEverOnline = false;
     this.pendingJoin = null;        // 加入中的身份（等 ack / name_taken）
+    this.pendingOp = false;         // menu 模式选了音控、等服务器验证密码后才显示看板
+    this.pendingOpPin = '';         // 用户输入的音控密码（只发给服务器校验，不留存）
 
     this.takenDevices = [];
     this.members = [];
@@ -1048,7 +1090,8 @@
     this.shadow.appendChild(style);
 
     var root = document.createElement('div');
-    root.className = 'cf ' + (this.isFloating ? 'is-floating' : 'is-page');
+    root.className = 'cf ' + (this.isFloating ? 'is-floating' : 'is-page')
+      + (!this.isFloating && this.fullscreen ? ' is-fullscreen' : '');
 
     var html = '';
     if (this.isFloating) {
@@ -1227,6 +1270,12 @@
       case 'pick-device': this.pickDevice(el.dataset.name || ''); break;
       case 'join': this.joinAsClient(); break;
       case 'reset-device': this.resetDevice(); break;
+      case 'pick-role':
+        if (el.dataset.role === 'operator') this.showOpPin();
+        else { this.role = null; this.showSetup(); }
+        break;
+      case 'op-pin-submit': this.enterOperator(); break;
+      case 'back-menu': this.backToMenu(); break;
       case 'tab': this.switchTab(el.dataset.tab || 'cues'); break;
       case 'cue': this.sendCue(el); break;
       case 'send-custom': this.sendCustom(el); break;
@@ -1283,6 +1332,12 @@
     this.syncViewport();
     this.startViewportWatch();
     if (this.isFloating) this.initDock();
+
+    if (this.configMode === 'menu') {
+      /* 合体入口：先选角色，不预连接 */
+      this.showMenu();
+      return;
+    }
 
     if (this.configMode === 'operator') {
       this.role = 'operator';
@@ -1380,7 +1435,9 @@
 
   CecpApp.prototype.sendRegister = function () {
     if (this.role === 'operator') {
-      this.wsSend({ type: 'register', name: '音控组', role: 'operator', identityType: 'operator' });
+      var reg = { type: 'register', name: '音控组', role: 'operator', identityType: 'operator' };
+      if (this.pendingOpPin) reg.pin = this.pendingOpPin;
+      this.wsSend(reg);
     } else if (this.role === 'client') {
       this.wsSend({
         type: 'register',
@@ -1431,6 +1488,16 @@
 
     if (type === 'ack') {
       if (this.pendingJoin && msg.role === 'client') this.pendingJoin = null;
+      /* menu 模式音控：密码通过、服务器确认后才显示看板 */
+      if (this.pendingOp && msg.role === 'operator') {
+        this.pendingOp = false;
+        this.showOperator();
+      }
+      return;
+    }
+
+    if (type === 'op_denied') {
+      this.onOpDenied(msg.reason);
       return;
     }
 
@@ -1816,6 +1883,80 @@
      Setup：选设备 + 名字
   ──────────────────────────────────────────── */
 
+  /* ── menu 模式：角色选择 + 音控密码 ── */
+
+  CecpApp.prototype.showMenu = function () {
+    var html = '<div class="cf-app is-menu" style="display:flex;flex-direction:column;flex:1;min-height:0">'
+      + '<div class="cf-menu"><div class="cf-menu-inner">'
+      + '  <span class="cf-menu-kicker">CECP 敬拜团内通</span>'
+      + '  <h2>你是哪一位？</h2>'
+      + '  <p class="cf-menu-sub">选择你今天的角色</p>'
+      + '  <div class="cf-role-grid">'
+      + '    <button class="cf-role" type="button" data-action="pick-role" data-role="client">'
+      + '      <span class="cf-role-icon">🎤</span>'
+      + '      <span class="cf-role-title">敬拜团</span>'
+      + '      <span class="cf-role-sub">发送快捷消息给音控组</span>'
+      + '    </button>'
+      + '    <button class="cf-role is-op" type="button" data-action="pick-role" data-role="operator">'
+      + '      <span class="cf-role-icon">🎚️</span>'
+      + '      <span class="cf-role-title">音控组</span>'
+      + '      <span class="cf-role-sub">接收消息 · 发全体通知<br><span class="cf-role-lock">🔒 需密码</span></span>'
+      + '    </button>'
+      + '  </div>'
+      + '</div></div>'
+      + '</div>';
+    this.$stage.innerHTML = html;
+    this.setStatus(this.online);
+  };
+
+  CecpApp.prototype.showOpPin = function (errorText) {
+    var html = '<div class="cf-app is-pin" style="display:flex;flex-direction:column;flex:1;min-height:0">'
+      + '<div class="cf-pin">'
+      + '  <div class="cf-pin-icon">🎛️</div>'
+      + '  <h2>音控台登录</h2>'
+      + '  <p class="cf-pin-sub">输入音控密码进入。只有负责音控的同工需要。</p>'
+      + '  <input class="cf-pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="••••" data-enter="op-pin-submit">'
+      + '  <div class="cf-pin-error">' + esc(errorText || '') + '</div>'
+      + '  <div class="cf-pin-actions">'
+      + '    <button class="cf-back-btn" type="button" data-action="back-menu">返回</button>'
+      + '    <button class="cf-btn-primary" type="button" data-action="op-pin-submit">进入</button>'
+      + '  </div>'
+      + '</div>'
+      + '</div>';
+    this.$stage.innerHTML = html;
+    var input = this.$stage.querySelector('.cf-pin-input');
+    if (input) setTimeout(function () { try { input.focus(); } catch (err) {} }, 60);
+  };
+
+  CecpApp.prototype.enterOperator = function () {
+    var input = this.$stage.querySelector('.cf-pin-input');
+    var pin = input && input.value ? input.value.trim() : '';
+    if (!pin) { this.showOpPin('请输入密码'); return; }
+    this.pendingOpPin = pin;
+    this.pendingOp = true;
+    this.role = 'operator';
+    var err = this.$stage.querySelector('.cf-pin-error');
+    if (err) { err.style.color = 'var(--muted)'; err.textContent = '验证中…'; }
+    if (this.wsReady()) this.sendRegister();
+    else this.connect();
+  };
+
+  CecpApp.prototype.onOpDenied = function (reason) {
+    this.pendingOp = false;
+    this.pendingOpPin = '';
+    this.role = null;
+    this.stopConnection(); // 密码错就别自动重连反复重试
+    this.showOpPin(reason === 'pin_required' ? '这个房间需要音控密码' : '密码不对，再试一次');
+  };
+
+  CecpApp.prototype.backToMenu = function () {
+    this.pendingOp = false;
+    this.pendingOpPin = '';
+    this.role = null;
+    this.stopConnection();
+    this.showMenu();
+  };
+
   CecpApp.prototype.showSetup = function (errorText) {
     var self = this;
     var remembered = lsGet(this.storeKey('name'));
@@ -1830,6 +1971,7 @@
       + '  <div class="cf-head-tools">' + this.statusHtml() + '</div>'
       + '</div>'
       + '<div class="cf-setup">'
+      + (this.configMode === 'menu' ? '  <button class="cf-ghost-btn" type="button" data-action="back-menu" style="margin-bottom:10px">← 返回角色选择</button><br>' : '')
       + '  <span class="cf-setup-kicker">STEP 1 · 选择身份</span>'
       + '  <h2>你今天用哪个设备？</h2>'
       + '  <p class="cf-setup-sub">先点你的话筒或乐器，再填名字。音控台会看到「设备｜名字」。</p>'

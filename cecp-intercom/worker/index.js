@@ -109,6 +109,23 @@ export class WorshipRoom {
           break;
         }
 
+        // 音控密码闸：房间配置了 OP_PIN 才校验（未配置 = 开放，向后兼容旧的
+        // data-mode="operator" 直连链接）。密码只存在 Worker 环境里，页面源码翻不到。
+        if (regRole === 'operator') {
+          const need = String((this.env && this.env.OP_PIN) || '').trim();
+          if (need) {
+            const got = String(msg.pin || '').trim();
+            if (got !== need) {
+              safeSend(ws, {
+                type: 'op_denied',
+                reason: got ? 'pin_wrong' : 'pin_required',
+                ts: Date.now(),
+              });
+              break;
+            }
+          }
+        }
+
         if (!regName) {
           safeSend(ws, {
             type: 'error',

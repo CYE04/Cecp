@@ -32,6 +32,15 @@ https://cecp-ws.cecp.workers.dev
 
 > v2 的 worker 对 v1 前端完全向后兼容，可先于前端上线。
 
+**设置音控密码（合体入口的音控组用）**：密码只存在服务器，不进代码仓库、不进网页源码。
+
+```bash
+cd cecp-intercom/worker
+npx wrangler secret put OP_PIN   # 按提示输入密码，例如 3234
+```
+
+设完就立即生效（不必重新 deploy）。不设的话音控组入口不设防。以后改密码重跑这条命令即可。
+
 ## 2. 前端地址（GitHub Pages）
 
 ```text
@@ -41,6 +50,25 @@ https://cye04.github.io/Cecp/cecp-intercom/cecp.js
 改完代码 `git push` 即发布，无需构建。**只需引入这一个 JS 文件，不需要再引 cecp.css。**
 
 ## 3. 三端嵌入
+
+### 3.0 合体入口（推荐对外只公开这一个链接）
+
+一个链接，进去先选「敬拜团 / 音控组」。敬拜团直接进；音控组要输密码（防止随便谁点进音控台踢人/发广播）。做成一个单独页面即可（自动全屏 + 内部滚动 + 跟随系统深浅色）：
+
+```html
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head>
+<body>
+<cecp-intercom
+  data-ws-url="wss://cecp-ws.cecp.workers.dev"
+  data-mode="menu"></cecp-intercom>
+<script src="https://cye04.github.io/Cecp/cecp-intercom/cecp.js"></script>
+</body></html>
+```
+
+- `data-mode="menu"` 默认全屏铺满页面、内容超高可内部滚动。
+- 音控密码**存在服务器上**（`OP_PIN`，见 §1），网页源码里翻不到——见下方部署步骤。**没设 `OP_PIN` 时音控组入口不设防**（向后兼容）。
+- 下面 3.1 / 3.2 的单独 `client` / `operator` 链接仍然可用，作为备用，不公开即可。
 
 ### 3.1 敬拜端（成员，手机）
 
@@ -99,7 +127,8 @@ https://cye04.github.io/Cecp/cecp-intercom/cecp.js
 | 属性 | 默认 | 说明 |
 |---|---|---|
 | `data-ws-url` | （必填） | Worker 的 wss 地址 |
-| `data-mode` | `client` | `operator` / `client` / `listener` / `auto`（auto=先被动收听，点开再升级） |
+| `data-mode` | `client` | `menu`（合体入口，选角色）/ `operator` / `client` / `listener` / `auto`（auto=先被动收听，点开再升级） |
+| `data-fullscreen` | menu 默认开 | `1` 铺满整个视口 + 内部滚动（单独页面用）；`0` 关闭。其它模式默认关 |
 | `data-room` | `cecp-main` | 房间名（字母/数字/`_`/`-`，≤64）；不同房间完全隔离 |
 | `data-layout` | 视 mode | `page`（填满容器）/ `floating`（悬浮球）；listener/auto 默认 floating |
 | `data-presets` | 内置 15 个 | JSON 数组，覆写设备身份列表 |
