@@ -2447,6 +2447,7 @@
       + '  <div class="cf-head-copy"><span class="cf-head-title">CECP 音控台</span><span class="cf-head-sub">' + esc(this.room) + ' 房间 · 请求与群聊实时汇总</span></div>'
       + '  <div class="cf-head-tools">'
       + '    <span class="cf-clock">🕒 <span data-clock>--:--:--</span></span>'
+      + (this.configMode === 'menu' ? '    <button class="cf-ghost-btn" type="button" data-action="back-menu">切换身份</button>' : '')
       + (this.isFloating ? '' : '    <button class="cf-ghost-btn" type="button" data-action="fullscreen">进入全屏</button>')
       + this.statusHtml()
       + '  </div>'
