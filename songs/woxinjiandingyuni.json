@@ -14,7 +14,7 @@
   "lrc": "https://cecpadua.github.io/resouces/lyrics/woxinjiandingyuni.lrc",
   "youtube": "https://youtu.be/MAorTjzpVw0?si=Nbub53drvPLLfqJz",
   "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/woxinjiandingyuniA.jpg",
- "sections": [
+  "sections": [
   {
     "name": "我心坚定于你",
     "lines": [
@@ -59,14 +59,13 @@
       ],
       [
         {"chord":"ㅤA","n":"( sp 1 ) sp - sp - sp","lyric":"ㅤ"},
-        {"chord":"","n":"0_ 6__ 7__ sp ||","lyric":"ㅤ你的"},
+        {"chord":"【Pre-Chorus】","n":"0_ 6__ 7__ sp ||","lyric":"ㅤ你的"},
         {"chord":"F#m","n":"1'·","lyric":"爱"},
         {"chord":"","n":"2'_","lyric":"使"},
         {"chord":"E","n":"7 - sp | sp","lyric":"我"},
         {"chord":"D","n":"6·_ ( 5__ sp 5_ )","lyric":"灵魂"},
         {"chord":"","n":"5_","lyric":"苏"},
         {"chord":"A","n":"5","lyric":"醒,"},
-        {"label":"Pre-Chorus","dx":-355,"dy":1},
         {"chord":"","n":"0_ 6__ 7__ sp | sp","lyric":"ㅤ患难"},
         {"chord":"F#m","n":"1'·","lyric":"中"},
         {"chord":"","n":"2'_","lyric":"我"},
@@ -93,8 +92,7 @@
         {"chord":"","n":"6·_ ( 7__ sp 7_ )","lyric":"再次"},
         {"chord":"","n":"1'_ sp | sp","lyric":"绚"},
         {"chord":"Esus4","n":"2' - - - sp | sp","lyric":"丽"},
-        {"label":"Chorus","dx":1,"dy":-1},
-        {"chord":"","n":"0 0 0","lyric":"ㅤ"},
+        {"chord":"【Chorus】","n":"0 0 0","lyric":"ㅤ"},
         {"chord":"","n":"5_ 1'_ sp || sp","lyric":"我心"},
         {"chord":"A","n":"1'_ 7_","lyric":"坚定"},
         {"chord":"ㅤㅤㅤE/G#","n":"3_ ( 5_ 5 )","lyric":"于你，"},
@@ -131,3 +129,4 @@
     ]
   }
 ]
+}
