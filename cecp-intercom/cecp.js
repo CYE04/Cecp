@@ -569,19 +569,54 @@
     '  font-size:15px;display:flex;align-items:center;justify-content:center;transition:transform .12s}',
     '.cf-live-ico:active{transform:scale(.93)}',
     '.cf-live-ico.on{background:var(--acc-soft);color:var(--acc)}',
-    /* 主体：默认（横屏/宽）= 谱左 + 内通右。内通面板只有一份 DOM，靠 grid 换位，切屏不断线 */
-    '.cf-live-body{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:minmax(0,1fr)}',
-    '.cf-live-score{display:flex;flex-direction:column;min-width:0;min-height:0}',
-    '.cf-live-comm{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;border-left:1px solid var(--border);background:var(--card)}',
+    /* 主体：谱占满，内通改成「点按钮才出来的小弹窗」（原来常驻侧栏在 iPad 上太占地方） */
+    '.cf-live-body{position:relative;flex:1;min-height:0;display:flex;overflow:hidden}',
+    '.cf-live-score{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}',
+    /* 内通弹窗：右下角浮出，不铺满 */
+    '.cf-live-comm{position:absolute;z-index:45;right:12px;top:10px;width:min(360px,calc(100% - 24px));',
+    '  max-height:min(72%,520px);display:flex;flex-direction:column;overflow:hidden;',
+    '  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow);',
+    '  opacity:0;transform:translateY(10px) scale(.97);pointer-events:none;',
+    '  transition:opacity .2s ease,transform .24s cubic-bezier(.32,.72,0,1)}',
+    '.cf-live.comm-open .cf-live-comm{opacity:1;transform:none;pointer-events:auto}',
     '.cf-live-comm .cf-pane{background:var(--bg)}',
-    '.cf-dock-grip{display:none}',
+    '.cf-live-comm .cf-cue-grid{grid-template-columns:repeat(2,minmax(0,1fr))}',
+    '.cf-live-comm .cf-cue{min-height:50px}',
+    '.cf-comm-mask{position:absolute;inset:0;z-index:44;background:transparent;display:none}',
+    '.cf-live.comm-open .cf-comm-mask{display:block}',
+    /* 唤出按钮在顶栏（底部被上一首/下一首占着，别挤在一起） */
+    '.cf-comm-btn{position:relative}',
+    '.cf-live.comm-open .cf-comm-btn{background:var(--acc-soft);color:var(--acc)}',
+    '.cf-comm-badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;',
+    '  background:var(--red);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center}',
+    '.cf-dock-grip{display:flex;flex:none;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid var(--border)}',
+    '.cf-dock-grip .gbar{width:30px;height:4px;border-radius:99px;background:var(--border-strong)}',
+    '.cf-dock-grip .glbl{font-size:12.5px;font-weight:600;color:var(--muted)}',
+    '.cf-dock-grip .grow{flex:1}',
+    /* ── 谱：音频 / 移调 / 原谱（自己渲染，不连 musiclib）── */
+    '.cf-audio{padding:8px 12px 0}',
+    '.cf-audio audio{width:100%;height:34px}',
+    '.cf-score-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px 4px}',
+    '.cf-seg2{display:inline-flex;gap:2px;padding:2px;border-radius:10px;background:var(--card3)}',
+    '.cf-seg2 button{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted)}',
+    '.cf-seg2 button.on{background:var(--card);color:var(--text);box-shadow:var(--shadow-soft)}',
+    '.cf-key-box{display:inline-flex;align-items:center;gap:4px}',
+    '.cf-key-now{min-width:62px;padding:6px 10px;border-radius:9px;background:var(--acc-soft);color:var(--acc);',
+    '  font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}',
+    '.cf-key-orig{font-size:11.5px;color:var(--muted)}',
+    '.cf-score-img-wrap{padding:0 12px 12px}',
+    /* 只留 .sw-score（sections 那部分谱）；引擎自带的播放器/标题/工具条都不要，
+       音频和移调用我自己那套（上面那条），免得两份控件打架 */
+    '.cf-jianpu{padding:0 4px 14px}',
+    '.cf-jianpu .ym-song-tabs,.cf-jianpu .ym-pl,.cf-jianpu .sw-hd,',
+    '.cf-jianpu .sw-tools,.cf-jianpu .sw-panel,.cf-jianpu .ym-song-head{display:none!important}',
+    '.cf-jianpu .ym-song-panel,.cf-jianpu .sw-wrap{margin:0!important;padding:0!important;background:none!important;border:none!important;box-shadow:none!important}',
+    '.cf-jianpu .sw-score{padding:0!important}',
     /* 谱区 */
     '.cf-score-stage{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;justify-content:center}',
     '.cf-score-stage img{max-width:100%;height:auto;align-self:flex-start;border-radius:10px;box-shadow:var(--shadow-soft)}',
     '.cf-score-stage>div{width:100%}',
-    /* 内嵌 musiclib：iframe 天然隔离样式，移调/音源/和弦全都能用 */
-    '.cf-score-stage.is-frame{padding:0;overflow:hidden}',
-    '.cf-score-frame{width:100%;height:100%;border:none;display:block;background:var(--bg)}',
+    '.cf-score-stage{display:block}',
     '.cf-score-bar{flex:none;display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 12px;border-top:1px solid var(--border);background:var(--card)}',
     '.cf-zbtn{width:31px;height:31px;border-radius:9px;background:var(--card3);font-size:16px;display:flex;align-items:center;justify-content:center}',
     '.cf-zlabel{font-size:12px;color:var(--muted);min-width:40px;text-align:center;font-variant-numeric:tabular-nums}',
@@ -641,27 +676,9 @@
     '.cf-live-banner.is-high .bn-from{color:var(--red)}',
     '@keyframes cf-bn-in{from{opacity:0;transform:translate(-50%,-14px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}',
     '@keyframes cf-bn-out{to{opacity:0;transform:translate(-50%,-14px) scale(.97)}}',
-    /* 竖屏 / 窄屏：谱在上、内通常驻底部 —— 两个同屏，不用切页签 */
-    '@container (max-width:900px){',
-    /* 行高由 grid 明确分配：谱 56% / 内通 44%。用 auto 会被内通内容撑满、把谱压成 0 */
-    '  .cf-live-body{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) var(--dock-h,44%)}',
-    '  .cf-live.dock-collapsed .cf-live-body{grid-template-rows:minmax(0,1fr) auto}',
-    '  .cf-live-comm{border-left:none;border-top:1px solid var(--border);height:100%;min-height:0}',
-    '  .cf-dock-grip{display:flex;flex:none;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid var(--border)}',
-    '  .cf-dock-grip .gbar{width:32px;height:4px;border-radius:99px;background:var(--border-strong)}',
-    '  .cf-dock-grip .glbl{font-size:12.5px;font-weight:600;color:var(--muted)}',
-    '  .cf-dock-grip .grow{flex:1}',
-    '  .cf-live.dock-collapsed .cf-live-comm .cf-pane,',
-    '  .cf-live.dock-collapsed .cf-live-comm .cf-tabs{display:none}',
-    '}',
-    /* 旧浏览器（无容器查询）按视口兜底 */
-    '@media (max-width:900px){',
-    '  .cf-live-body{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) var(--dock-h,44%)}',
-    '  .cf-live.dock-collapsed .cf-live-body{grid-template-rows:minmax(0,1fr) auto}',
-    '  .cf-live-comm{border-left:none;border-top:1px solid var(--border);height:100%;min-height:0}',
-    '  .cf-dock-grip{display:flex;flex:none;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid var(--border)}',
-    '  .cf-live.dock-collapsed .cf-live-comm .cf-pane,',
-    '  .cf-live.dock-collapsed .cf-live-comm .cf-tabs{display:none}',
+    /* 窄屏：弹窗改成贴底的 sheet，宽度占满好点 */
+    '@media (max-width:640px){',
+    '  .cf-live-comm{right:8px;left:8px;width:auto;top:8px;max-height:74%}',
     '}',
 
     /* ── 敬拜端 ── */
@@ -889,6 +906,28 @@
     + '<path fill="currentColor" d="M2 12.124C2 6.533 6.477 2 12 2s10 4.533 10 10.124v5.243c0 .817 0 1.378-.143 1.87a3.52 3.52 0 0 1-1.847 2.188c-.458.22-1.004.307-1.801.434l-.13.02a13 13 0 0 1-.727.105c-.209.02-.422.027-.64-.016a2.1 2.1 0 0 1-1.561-1.35a2.2 2.2 0 0 1-.116-.639c-.012-.204-.012-.452-.012-.742v-4.173c0-.425 0-.791.097-1.105a2.1 2.1 0 0 1 1.528-1.43c.316-.073.677-.044 1.096-.01l.093.007l.11.01c.783.062 1.32.104 1.775.275q.481.181.883.487v-1.174c0-4.811-3.853-8.711-8.605-8.711s-8.605 3.9-8.605 8.711v1.174c.267-.203.563-.368.883-.487c.455-.17.992-.213 1.775-.276l.11-.009l.093-.007c.42-.034.78-.063 1.096.01a2.1 2.1 0 0 1 1.528 1.43c.098.314.097.68.097 1.105v4.172c0 .291 0 .54-.012.743c-.012.213-.04.427-.116.638a2.1 2.1 0 0 1-1.56 1.35a2.2 2.2 0 0 1-.641.017c-.201-.02-.444-.059-.727-.104l-.13-.02c-.797-.128-1.344-.215-1.801-.436a3.52 3.52 0 0 1-1.847-2.188c-.118-.405-.139-.857-.142-1.461L2 17.58z"/>'
     + '<path class="cf-ic-bars" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12 5.75a.75.75 0 0 1 .75.75v5a.75.75 0 1 1-1.5 0v-5a.75.75 0 0 1 .75-.75m3 1.5a.75.75 0 0 1 .75.75v2a.75.75 0 1 1-1.5 0V8a.75.75 0 0 1 .75-.75m-6 0a.75.75 0 0 1 .75.75v2a.75.75 0 0 1-1.5 0V8A.75.75 0 0 1 9 7.25"/>'
     + '</svg>';
+
+  /* ── 和弦移调（简谱数字不变，只有和弦符号跟着调走）── */
+  var SHARP_KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  var FLAT_KEYS  = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+  var KEY_INDEX = { 'C':0,'B#':0,'C#':1,'DB':1,'D':2,'D#':3,'EB':3,'E':4,'FB':4,'F':5,'E#':5,
+                    'F#':6,'GB':6,'G':7,'G#':8,'AB':8,'A':9,'A#':10,'BB':10,'B':11,'CB':11 };
+
+  function keyToIndex(name) {
+    var k = String(name || '').trim().replace(/^([A-Ga-g])([#b]?).*$/, '$1$2').toUpperCase();
+    return KEY_INDEX[k] === undefined ? -1 : KEY_INDEX[k];
+  }
+
+  /* 把一个和弦符号移调 steps 个半音，例如 F → G、Bbmaj7/F → Cmaj7/G */
+  function transposeChord(chord, steps, useFlat) {
+    if (!chord || !steps) return chord || '';
+    var table = useFlat ? FLAT_KEYS : SHARP_KEYS;
+    return String(chord).replace(/([A-G][#b]?)/g, function (m) {
+      var i = keyToIndex(m);
+      if (i < 0) return m;
+      return table[((i + steps) % 12 + 12) % 12];
+    });
+  }
 
   /* 话筒图形（着 --tone 色，选身份卡片用） */
   var MIC_SVG = '<svg class="cf-mic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'
@@ -1458,14 +1497,19 @@
         if (liveRoot) liveRoot.classList.toggle('setlist-open');
         break;
       }
-      case 'live-dock': {
-        var dockRoot = this.$stage.querySelector('.cf-live');
-        if (dockRoot) {
-          dockRoot.classList.toggle('dock-collapsed');
-          var collapsed = dockRoot.classList.contains('dock-collapsed');
-          var hint = this.$stage.querySelector('[data-dock-hint]');
-          if (hint) hint.textContent = collapsed ? '展开' : '收起';
-          lsSet(this.storeKey('dock'), collapsed ? '0' : '1');
+      case 'live-key': {
+        var d = +el.dataset.d;
+        this.live.steps = d === 0 ? 0 : (this.live.steps || 0) + d;
+        if (this.live.steps > 11 || this.live.steps < -11) this.live.steps = 0;
+        this.selectLiveSong(this.live.i);
+        break;
+      }
+      case 'live-comm': {
+        var lr = this.$stage.querySelector('.cf-live');
+        if (lr) {
+          var nowOpen = lr.classList.toggle('comm-open');
+          if (nowOpen && this.activeTab === 'chat') this.chatSeenTs = Date.now();
+          this.syncBadge();
         }
         break;
       }
@@ -1884,10 +1928,30 @@
       if (!this.live) this.live = { songs: [], i: 0, zoom: 100, loaded: false, mode: 'img' };
       var sameCount = this.live.songs.length === incoming.length;
       var sameIds = sameCount && incoming.every(function (s, i) { return s.id === this.live.songs[i].id; }, this);
+      /* 服务器只存 {id,title,key}，谱/音频要用本地缓存补齐，没有就去抓 */
+      var selfSL = this;
+      this.songCache = this.songCache || {};
+      var needFetch = [];
       this.live.songs = incoming.map(function (s) {
-        return { id: s.id || '', title: s.title || s.id || '未命名', key: s.key || '', img: '', note: '' };
+        var cached = s.id && selfSL.songCache[s.id];
+        if (cached) return cached;
+        if (s.id) needFetch.push(s.id);
+        return { id: s.id || '', title: s.title || s.id || '未命名', key: s.key || '',
+                 img: '', mp3: '', sections: [], note: '' };
       });
       this.live.loaded = true;
+      if (needFetch.length) {
+        Promise.all(needFetch.map(function (id) { return selfSL.fetchLiveSong(id); })).then(function () {
+          if (selfSL.destroyed || !selfSL.live) return;
+          selfSL.live.songs = selfSL.live.songs.map(function (s) {
+            return (s.id && selfSL.songCache[s.id]) || s;
+          });
+          if (selfSL.useLiveUI && selfSL.$stage.querySelector('.cf-live')) {
+            selfSL.renderSetlist();
+            selfSL.selectLiveSong(selfSL.live.i);
+          }
+        });
+      }
       if (this.live.i >= this.live.songs.length) this.live.i = 0;
       if (this.useLiveUI && this.$stage.querySelector('.cf-live')) {
         this.renderSetlist();
@@ -2027,6 +2091,18 @@
     this.$badge.textContent = count > 99 ? '99+' : String(count || 0);
     /* 未读：悬浮球声波扩散动效 */
     if (this.$launcher) this.$launcher.classList.toggle('has-unread', count > 0 && !this.open);
+    this.syncCommBadge(count);
+  };
+
+  /* 现场模式：💬 按钮上的未读角标 */
+  CecpApp.prototype.syncCommBadge = function (count) {
+    if (!this.$stage) return;
+    var b = this.$stage.querySelector('[data-comm-badge]');
+    if (!b) return;
+    var open = this.$stage.querySelector('.cf-live.comm-open');
+    var n = open ? 0 : (count || 0);
+    b.hidden = !n;
+    b.textContent = n > 99 ? '99+' : String(n || 0);
   };
 
   /* ── Toast ── */
@@ -2452,13 +2528,14 @@
       return '<button class="cf-cue-chip" type="button" data-action="live-cue" data-text="' + esc(name) + '">' + esc(name) + '</button>';
     }).join('');
 
-    /* 窄屏默认把内通收起，谱先占满——消息靠顶部横幅推给你，要发言再展开 */
-    var dockOpen = lsGet(this.storeKey('dock')) === '1';
-    this.$stage.innerHTML = '<div class="cf-app cf-live' + (dockOpen ? '' : ' dock-collapsed') + '" style="display:flex;flex-direction:column;flex:1;min-height:0">'
+    /* 内通默认收着（谱占满），消息靠顶部横幅推给你，要发言点右下角 💬 */
+    this.$stage.innerHTML = '<div class="cf-app cf-live" style="display:flex;flex-direction:column;flex:1;min-height:0">'
       + '<div class="cf-live-top">'
       + '  <button class="cf-live-ico" type="button" data-action="live-setlist" title="歌单" aria-label="歌单">☰</button>'
       + '  <div class="cf-live-title">' + esc(this.liveTitle) + '<span class="sub" data-live-now></span></div>'
       + '  ' + this.statusHtml()
+      + '  <button class="cf-live-ico cf-comm-btn" type="button" data-action="live-comm" title="团队内通" aria-label="团队内通">'
+      + '    💬<span class="cf-comm-badge" data-comm-badge hidden></span></button>'
       + '  <button class="cf-live-ico" type="button" data-action="reset-device" title="换设备" aria-label="换设备">👤</button>'
       + '</div>'
       + '<div class="cf-live-body">'
@@ -2479,10 +2556,11 @@
       + '      <button class="cf-ghost-btn" type="button" data-action="live-lib" data-lib-btn hidden>曲库 ↗</button>'
       + '    </div>'
       + '  </main>'
+      + '  <div class="cf-comm-mask" data-action="live-comm"></div>'
       + '  <section class="cf-live-comm">'
-      + '    <div class="cf-dock-grip" data-action="live-dock">'
+      + '    <div class="cf-dock-grip" data-action="live-comm">'
       + '      <span class="gbar"></span><span class="glbl">团队内通</span><span class="grow"></span>'
-      + '      <span class="glbl" data-dock-hint>' + (dockOpen ? '收起' : '展开') + '</span>'
+      + '      <span class="glbl">关闭</span>'
       + '    </div>'
       + this.paneStackHtml()
       + '  </section>'
@@ -2575,7 +2653,9 @@
 
   CecpApp.prototype.fetchLiveSong = function (ref) {
     var self = this;
-    var out = { id: ref, title: ref, key: '', img: '', note: '' };
+    this.songCache = this.songCache || {};
+    if (this.songCache[ref]) return Promise.resolve(this.songCache[ref]);
+    var out = { id: ref, title: ref, key: '', img: '', mp3: '', sections: [], note: '' };
     if (/^https?:\/\//i.test(ref)) {
       out.img = ref; out.title = '谱图'; out.id = '';
       return Promise.resolve(out);
@@ -2584,8 +2664,12 @@
       .then(function (r) { if (!r.ok) throw new Error('404'); return r.json(); })
       .then(function (song) {
         out.title = song.title || ref;
+        out.artist = song.artist || '';
         out.key = song.origKey || '';
-        out.img = song.scoreImg || '';   /* 备用；曲库歌优先内嵌 musiclib */
+        out.img = song.scoreImg || '';
+        out.mp3 = song.mp3 || '';
+        out.sections = Array.isArray(song.sections) ? song.sections : [];
+        out.raw = song;          /* 原始 JSON 交给真引擎渲染（老格式/严格模式都认 align 字段） */
         return out;
       })
       .catch(function () {
@@ -2593,7 +2677,7 @@
         out.note = '曲库里找不到「' + ref + '」';
         return out;
       })
-      .then(function (x) { void self; return x; });
+      .then(function (x) { if (x.id) self.songCache[x.id] = x; return x; });
   };
 
   CecpApp.prototype.renderSetlist = function () {
@@ -2682,37 +2766,7 @@
     var libBtn = this.$stage.querySelector('[data-lib-btn]');
     if (now) now.textContent = '· ' + x.title;
     if (libBtn) libBtn.hidden = !x.id;
-    var zoomBox = this.$stage.querySelector('[data-zoom-box]');
-    if (stage) {
-      if (x.id && !x.frameFailed) {
-        /* 曲库里的歌 → 直接内嵌 musiclib：移调、音源、和弦、放大全都在里面 */
-        stage.className = 'cf-score-stage is-frame';
-        stage.innerHTML = '<iframe class="cf-score-frame" data-score-frame'
-          + ' src="' + esc(this.musiclibUrl(x.id)) + '"'
-          + ' title="' + esc(x.title) + ' · 曲库"'
-          + ' allow="autoplay; fullscreen"></iframe>';
-        if (zoomBox) zoomBox.hidden = true;      /* musiclib 自己有缩放 */
-        /* 保险：iframe 起不来（被 CSP / 网络挡住）就退回谱图，别给一片空白 */
-        if (x.img) {
-          var self2 = this, idx = this.live.i, frame = stage.querySelector('[data-score-frame]');
-          var fallback = setTimeout(function () {
-            if (self2.destroyed || !self2.live || self2.live.i !== idx) return;
-            if (!frame.dataset.ok) { x.frameFailed = true; self2.selectLiveSong(idx); }
-          }, 6000);
-          frame.addEventListener('load', function () { frame.dataset.ok = '1'; clearTimeout(fallback); });
-          frame.addEventListener('error', function () { clearTimeout(fallback); x.frameFailed = true; self2.selectLiveSong(idx); });
-        }
-      } else if (x.img) {
-        stage.className = 'cf-score-stage';
-        stage.innerHTML = '<img alt="' + esc(x.title) + ' 乐谱" data-score-img>';
-        stage.querySelector('[data-score-img]').src = x.img;
-        if (zoomBox) zoomBox.hidden = false;
-      } else {
-        stage.className = 'cf-score-stage';
-        stage.innerHTML = '<div class="cf-empty">' + esc(x.note || '这首没有谱') + '</div>';
-        if (zoomBox) zoomBox.hidden = true;
-      }
-    }
+    if (stage) this.renderScore(stage, x);
     var items = this.$stage.querySelectorAll('[data-action="live-song"]');
     for (var k = 0; k < items.length; k++) items[k].classList.toggle('on', +items[k].dataset.i === this.live.i);
     this.applyLiveZoom();
@@ -2729,6 +2783,147 @@
     if (songId) qs.push('song=' + encodeURIComponent(songId));
     if (!full) qs.push('embed=1');
     return this.musiclibBase + '/' + (qs.length ? '?' + qs.join('&') : '');
+  };
+
+  /* 真·简谱渲染器（youth-engine，跟 musiclib 同一套记谱规范：彩色和弦标、
+     连音线、段落标记、可移调）。它把 CSS 注进 document.head，而我们在
+     Shadow DOM 里 —— 所以加载后要把「新增的那几个 style」克隆进来才有样式。 */
+  CecpApp.prototype.ensureScoreEngine = function () {
+    if (this._ymPromise) return this._ymPromise;
+    var self = this;
+    if (!this.scoreEngine) return Promise.reject(new Error('no engine'));
+    this._ymPromise = new Promise(function (res, rej) {
+      if (window.YouthEngine && window.YouthEngine.renderSongObjects) return res(window.YouthEngine);
+      var before = [];
+      try { before = Array.prototype.slice.call(document.head.querySelectorAll('style,link[rel=stylesheet]')); } catch (err) {}
+      self._ymStylesBefore = before;
+      var s = document.createElement('script');
+      s.src = self.scoreEngine;
+      s.onload = function () {
+        if (window.YouthEngine && window.YouthEngine.renderSongObjects) res(window.YouthEngine);
+        else rej(new Error('engine bad'));
+      };
+      s.onerror = function () { rej(new Error('engine load failed')); };
+      document.head.appendChild(s);
+    }).then(function (eng) {
+      self.adoptEngineStyles();
+      return eng;
+    });
+    return this._ymPromise;
+  };
+
+  /* youth-engine 的样式是分批注入的（渲染时还会再加），所以这里要能重复调用，
+     每次只搬「还没搬过的那些」。用 Map 记住来源节点，别重复克隆。 */
+  CecpApp.prototype.adoptEngineStyles = function () {
+    if (!this.shadow) return;
+    var before = this._ymStylesBefore || [];
+    if (!this._ymAdopted) this._ymAdopted = [];
+    var now = [];
+    try { now = Array.prototype.slice.call(document.head.querySelectorAll('style,link[rel=stylesheet]')); } catch (err) { return; }
+    var self = this, added = 0;
+    now.forEach(function (node) {
+      if (before.indexOf(node) >= 0) return;            /* 宿主页面原有的，不要 */
+      if (self._ymAdopted.indexOf(node) >= 0) return;   /* 搬过了 */
+      self._ymAdopted.push(node);
+      try {
+        var copy = node.cloneNode(true);
+        copy.setAttribute('data-ym-style', '1');
+        self.shadow.insertBefore(copy, self.shadow.firstChild);  /* 放最前，别盖住我自己的样式 */
+        added++;
+      } catch (err) {}
+    });
+    return added;
+  };
+
+  /* ── 谱面板：自己渲染，不连 musiclib ──
+     只三样：音频 / 移调（和弦跟着走，简谱数字不变）/ 原谱图。 */
+  CecpApp.prototype.renderScore = function (stage, x) {
+    if (!x.sections) x.sections = [];
+    if (!x.img && !x.sections.length && !x.mp3) {
+      stage.innerHTML = '<div class="cf-empty">' + esc(x.note || '这首没有谱') + '</div>';
+      return;
+    }
+    var steps = this.live.steps || 0;
+    var origIdx = keyToIndex(x.key);
+    var useFlat = /b/i.test(x.key || '');
+    var nowKey = origIdx >= 0
+      ? (useFlat ? FLAT_KEYS : SHARP_KEYS)[((origIdx + steps) % 12 + 12) % 12]
+      : (x.key || '');
+    var showChords = !!x.sections.length;   /* 有谱数据就渲染简谱，不再给原谱图开关 */
+
+    var html = '';
+    /* 音频：一条细的，不抢地方 */
+    if (x.mp3) {
+      html += '<div class="cf-audio"><audio controls preload="none" data-audio src="'
+        + esc(/^https?:/i.test(x.mp3) ? x.mp3 : 'https://cecp.it' + (x.mp3.charAt(0) === '/' ? '' : '/') + x.mp3)
+        + '"></audio></div>';
+    }
+    /* 视图切换 + 移调 */
+    html += '<div class="cf-score-tools">';
+    if (x.sections.length && origIdx >= 0) {
+      html += '<span class="cf-key-box">'
+        + '<button class="cf-zbtn" type="button" data-action="live-key" data-d="-1" title="降半音">−</button>'
+        + '<button class="cf-key-now" type="button" data-action="live-key" data-d="0" title="回原调">1=' + esc(nowKey) + '</button>'
+        + '<button class="cf-zbtn" type="button" data-action="live-key" data-d="1" title="升半音">+</button>'
+        + '</span>';
+      if (steps) html += '<span class="cf-key-orig">原调 ' + esc(x.key) + '</span>';
+    }
+    html += '</div>';
+
+    if (showChords) {
+      html += '<div class="cf-jianpu" data-jianpu><div class="cf-empty">简谱渲染中…</div></div>';
+    } else if (x.img) {
+      html += '<div class="cf-score-img-wrap"><img alt="' + esc(x.title) + ' 乐谱" data-score-img></div>';
+    } else {
+      html += '<div class="cf-empty">这首只有音频，没有谱</div>';
+    }
+
+    stage.innerHTML = html;
+    var img = stage.querySelector('[data-score-img]');
+    if (img) img.src = x.img;
+    if (showChords) this.renderJianpu(stage, x, steps);
+    this.applyLiveZoom();
+  };
+
+  /* 用真引擎渲染简谱（老格式 / align:strict 严格模式都由引擎自己认） */
+  CecpApp.prototype.renderJianpu = function (stage, x, steps) {
+    var self = this;
+    var slot = stage.querySelector('[data-jianpu]');
+    if (!slot || !x.raw) return;
+    this.ensureScoreEngine().then(function (eng) {
+      if (self.destroyed) return;
+      var live = self.$stage.querySelector('[data-jianpu]');
+      if (!live) return;                        /* 已经切走了 */
+      var song = x.raw;
+      if (steps) {
+        /* 只把和弦移调，简谱数字本来就不随调变 */
+        song = JSON.parse(JSON.stringify(x.raw));
+        var flat = /b/i.test(x.key || '');
+        (song.sections || []).forEach(function (sec) {
+          (sec.lines || []).forEach(function (line) {
+            (Array.isArray(line) ? line : []).forEach(function (cell) {
+              if (cell && cell.chord) cell.chord = transposeChord(cell.chord, steps, flat);
+            });
+          });
+        });
+        var oi = keyToIndex(x.key);
+        if (oi >= 0) song.origKey = (flat ? FLAT_KEYS : SHARP_KEYS)[((oi + steps) % 12 + 12) % 12];
+      }
+      try {
+        var node = eng.renderSongObjects([song]);
+        live.replaceChildren(node);
+        /* 样式是渲染过程中分批注入的，渲完再采几次才齐 */
+        self.adoptEngineStyles();
+        [120, 600, 1500].forEach(function (ms) {
+          setTimeout(function () { if (!self.destroyed) self.adoptEngineStyles(); }, ms);
+        });
+      } catch (err) {
+        live.innerHTML = '<div class="cf-empty">简谱渲染失败<br><span style="font-size:12px">先看原谱</span></div>';
+      }
+    }).catch(function () {
+      var live = self.$stage.querySelector('[data-jianpu]');
+      if (live) live.innerHTML = '<div class="cf-empty">简谱引擎没加载上<br><span style="font-size:12px">切「原谱」看图</span></div>';
+    });
   };
 
   CecpApp.prototype.applyLiveZoom = function () {
