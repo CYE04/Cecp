@@ -2893,12 +2893,9 @@
     var showChords = canTrans && (this.live.view === 'trans' || !x.img);
 
     var html = '';
-    /* 音频：一条细的，不抢地方 */
-    if (x.mp3) {
-      html += '<div class="cf-audio"><audio controls preload="none" data-audio src="'
-        + esc(/^https?:/i.test(x.mp3) ? x.mp3 : 'https://cecp.it' + (x.mp3.charAt(0) === '/' ? '' : '/') + x.mp3)
-        + '"></audio></div>';
-    }
+    /* 音频：一条细的，不抢地方。占位符先放着，渲染完把「同一个 audio 节点」搬回来，
+       这样切原图/移调不会打断正在放的音源。 */
+    if (x.mp3) html += '<div class="cf-audio" data-audio-slot></div>';
     /* 视图切换 + 移调 */
     html += '<div class="cf-score-tools">';
     if (x.img && canTrans) {
@@ -2919,7 +2916,30 @@
       html += '<div class="cf-empty">这首只有音频，没有谱</div>';
     }
 
+    /* 重建前先把音频节点摘出来保住（innerHTML 一改它就没了，正在放的会断） */
+    var keptAudio = this._audioEl;
+    if (keptAudio && keptAudio.parentNode) keptAudio.parentNode.removeChild(keptAudio);
+
     stage.innerHTML = html;
+
+    var slot = stage.querySelector('[data-audio-slot]');
+    if (slot && x.mp3) {
+      var src = /^https?:/i.test(x.mp3) ? x.mp3
+        : 'https://cecp.it' + (x.mp3.charAt(0) === '/' ? '' : '/') + x.mp3;
+      /* 换歌了才新建；同一首切视图就复用，播放进度不丢 */
+      if (!keptAudio || keptAudio.dataset.src !== src) {
+        keptAudio = document.createElement('audio');
+        keptAudio.controls = true;
+        keptAudio.preload = 'none';
+        keptAudio.dataset.src = src;
+        keptAudio.src = src;
+      }
+      slot.appendChild(keptAudio);
+      this._audioEl = keptAudio;
+    } else if (!x.mp3) {
+      this._audioEl = null;
+    }
+
     var img = stage.querySelector('[data-score-img]');
     if (img) img.src = x.img;
     stage.classList.remove('is-frame');
@@ -2943,6 +2963,32 @@
       try {
         var node = eng.renderSongObjects([song]);
         live.replaceChildren(node);
+        /* 和弦点击弹指法：引擎把委托挂在 document 上，但我们的和弦在 Shadow DOM 里，
+           事件重定向后它匹配不到 .p-chord，所以自己在 shadow 里挂一次，
+           命中就调它暴露的 ChordEngine.open(符号)。 */
+        if (!live.dataset.chordWired) {
+          live.dataset.chordWired = '1';
+          live.addEventListener('click', function (ev) {
+            var t = ev.target && ev.target.closest
+              ? ev.target.closest('.p-chord, .sw-chord, [class*="chord"]') : null;
+            if (!t || t.classList.contains('empty')) return;
+            var sym = (t.textContent || '').trim();
+            if (!sym) return;
+            try {
+              if (window.ChordEngine && window.ChordEngine.open) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                window.ChordEngine.open(sym);
+                /* 弹窗挂在 document.body 上，而现场页 portal 的 z-index 很高，
+                   不提上来就会被盖住看不见 */
+                setTimeout(function () {
+                  var exp = document.querySelector('chord-explorer');
+                  if (exp) exp.style.zIndex = '2147483647';
+                }, 30);
+              }
+            } catch (err) {}
+          });
+        }
         /* 引擎默认先显示「简谱原稿」（就是原图），要再点它自带的「移调」才展开真谱。
            用户已经点过我这边的「移调」了，所以这里替他点一次，直接进可改调的谱。 */
         setTimeout(function () {
