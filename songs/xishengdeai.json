@@ -1,0 +1,40 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-07-31 20:53:45",
+  "id": "xishengdeai",
+  "title": "牺牲的爱",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉【耶和华祝福满满】(1997) 卢恩惠词/张证恩曲",
+  "origKey": "C",
+  "timeSign": "4/4",
+  "bpm": 72,
+  "mp3": "/upload/xishengdeai.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/yehehuazhufumanman.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/xishengdeai.lrc",
+  "youtube": "https://youtu.be/wh1JIRoJ8wA?si=_9zq__kzQSypLTe5",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/xishengdeaiC.jpg",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "牺牲的爱",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"@C@@G/B@Am7@@Em@F@C/E@Dm@@@G7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"3_ | 4_ 3 2_ 5· 7_ | 1'_ 7 3_ 5 - | 6· 5_ 1 - | 4_ 3_ ! 2_ 1_ 2 0_ 3_ |","lyric":"在十字架上，你为我舍命，@受鞭伤，@使我得医治。@所 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"C@@G@Am7@@Em@F@C/E@G7@@@C@C@F/G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"4_ 3 2_ 5· 7_ | 1'_ 7 3_ 5 - | 6· 5_ 1 - | 4_ 3_ ! 2_ 1_ ( 1 - | 1 ) - - 0 ||","lyric":"有的罪恶，你为我担当，@受刑罚，@使我得平安。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"C@@@@Em@@@@@F@@@@@G7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"|| 1'· 1'_ ! 1'_ 7 3_ | 5 - - 0_ 4__ 5__ | 6_ 6· 6_ 5_ ! 5_ 3_ | 2 - - 0_ 3__ 4__ |","lyric":"何 等牺牲的爱，@@@圣洁圣子 成为赎罪祭;@@@何等 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Em@@@@@F@C/E@@@Dm@G7@@@C @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5_ 5· 5_ 3_ ! 3_ 5_ | 6 - - 0_ 6__ 7__ | 1'_ 1'· 1'_ 7_ ! 6_ 7_ | 1' - - 0_ ||/","lyric":"能力胜死亡权 势，@@@今我属你永活的真神。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"@C@@G@Am7@@Em@F@C/E@G7@@@C @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"3_ *coda | 4_ 3 2_ 5· 7_ | 1'_ 7 3_ 5 - | 6· 5_ 1 - | 4_ 3_ ! 2_ 1_ 1· ||/","lyric":"在这个时刻，我心只有你，@我的主，@我唯一的爱。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]}
+    ]
+  }
+]
+}
