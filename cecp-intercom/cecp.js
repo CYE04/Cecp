@@ -608,15 +608,24 @@
     /* 只留 .sw-score（sections 那部分谱）；引擎自带的播放器/标题/工具条都不要，
        音频和移调用我自己那套（上面那条），免得两份控件打架 */
     '.cf-jianpu{padding:0 4px 14px}',
-    '.cf-jianpu .ym-song-tabs,.cf-jianpu .ym-pl,.cf-jianpu .sw-hd,',
-    '.cf-jianpu .sw-tools,.cf-jianpu .sw-panel,.cf-jianpu .ym-song-head{display:none!important}',
-    '.cf-jianpu .ym-song-panel,.cf-jianpu .sw-wrap{margin:0!important;padding:0!important;background:none!important;border:none!important;box-shadow:none!important}',
-    '.cf-jianpu .sw-score{padding:0!important}',
+    /* .sw-tools 留着——引擎自带的「移调」在里面，和弦会跟着真的变 */
+    /* .sw-hd 留着——「移调」按钮在里面（藏了就没法移调了） */
+    '.cf-jianpu .ym-song-tabs,.cf-jianpu .ym-pl,.cf-jianpu .ym-song-head{display:none!important}',
+    '.cf-jianpu .sw-tools{display:flex!important;flex-wrap:wrap;gap:6px;padding:6px 4px 10px}',
+    /* 注意：这里绝不能改 .sw-score / .sw-wrap 的 padding·margin·width——
+       弧线和符杠是按真实容器宽度算坐标的，动了基准弧线就会塌（踩过）。
+       只去背景和外框，尺寸一律不碰。 */
+    '.cf-jianpu .ym-song-panel,.cf-jianpu .sw-wrap{background:none!important;border:none!important;box-shadow:none!important}',
+    /* 移调视图只要「移调后的谱」——引擎里的「简谱原稿」那张图不要（原图在另一个按钮里） */
+    '.cf-jianpu .sw-score img,.cf-jianpu .sw-orig,.cf-jianpu [class*="orig"]{display:none!important}',
     /* 谱区 */
     '.cf-score-stage{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;justify-content:center}',
     '.cf-score-stage img{max-width:100%;height:auto;align-self:flex-start;border-radius:10px;box-shadow:var(--shadow-soft)}',
     '.cf-score-stage>div{width:100%}',
     '.cf-score-stage{display:block}',
+    /* 移调视图：iframe 跑 musiclib 本体，撑满谱区 */
+    '.cf-score-stage.is-frame{padding:0;overflow:hidden;display:flex}',
+    '.cf-score-frame{flex:1;width:100%;min-height:420px;border:none;display:block;background:var(--bg)}',
     '.cf-score-bar{flex:none;display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 12px;border-top:1px solid var(--border);background:var(--card)}',
     '.cf-zbtn{width:31px;height:31px;border-radius:9px;background:var(--card3);font-size:16px;display:flex;align-items:center;justify-content:center}',
     '.cf-zlabel{font-size:12px;color:var(--muted);min-width:40px;text-align:center;font-variant-numeric:tabular-nums}',
@@ -1453,6 +1462,10 @@
       /* ── 现场模式 ── */
       case 'live-cue': this.sendLiveCue(el); break;
       case 'live-song': this.selectLiveSong(+el.dataset.i || 0); break;
+      case 'live-view':
+        this.live.view = el.dataset.v === 'trans' ? 'trans' : 'img';
+        this.selectLiveSong(this.live.i);
+        break;
       case 'live-edit-set':
         this.live.editing = !this.live.editing;
         this.renderSetlist();
@@ -1925,7 +1938,7 @@
     if (type === 'setlist') {
       var incoming = Array.isArray(msg.songs) ? msg.songs : [];
       if (this.liveTitleFromServer !== undefined || msg.title) this.liveTitleFromServer = msg.title || '';
-      if (!this.live) this.live = { songs: [], i: 0, zoom: 100, loaded: false, mode: 'img' };
+      if (!this.live) this.live = { songs: [], i: 0, zoom: 100, loaded: false, mode: 'img', view: 'img' };
       var sameCount = this.live.songs.length === incoming.length;
       var sameIds = sameCount && incoming.every(function (s, i) { return s.id === this.live.songs[i].id; }, this);
       /* 服务器只存 {id,title,key}，谱/音频要用本地缓存补齐，没有就去抓 */
@@ -2519,7 +2532,8 @@
   CecpApp.prototype.showLive = function () {
     var self = this;
     this.activeTab = 'cues';
-    if (!this.live) this.live = { songs: [], i: 0, zoom: 100, loaded: false, mode: 'img' };
+    if (!this.live) this.live = { songs: [], i: 0, zoom: 100, loaded: false, mode: 'img', view: 'img' };
+    this.live.view = 'img';   /* 每次进现场页都从「原图」起步，点「移调」才渲简谱 */
 
     var secCues = this.sectionCues.map(function (name) {
       return '<button class="cf-cue-chip is-sec" type="button" data-action="live-cue" data-sec="1" data-text="' + esc(name) + '">' + esc(name) + '</button>';
@@ -2721,23 +2735,28 @@
         if (!kw) return true;
         return s.title.toLowerCase().indexOf(kw) >= 0 || s.id.toLowerCase().indexOf(kw) >= 0;
       }).slice(0, 60);
-      box.innerHTML = '<div class="cf-lib-search"><input type="text" placeholder="搜歌名或拼音…" data-lib-kw value="' + esc(self.live.libKw || '') + '"></div>'
-        + '<div class="cf-lib-list">'
-        + (hits.length ? hits.map(function (s) {
-            var on = chosen.indexOf(s.id) >= 0;
-            return '<button class="cf-lib-item' + (on ? ' on' : '') + '" type="button" data-action="live-set-add" data-id="' + esc(s.id) + '">'
-              + '<span class="grow"><span class="cf-song-t">' + esc(s.title) + '</span>'
-              + '<span class="cf-song-s">' + (s.key ? esc(s.key) + ' 调 · ' : '') + esc(s.id) + '</span></span>'
-              + '<span class="cf-lib-plus">' + (on ? '✓' : '+') + '</span></button>';
-          }).join('') : '<div class="cf-empty" style="padding:16px">没找到</div>')
-        + '</div>';
+      var listHtml = hits.length ? hits.map(function (s) {
+        var on = chosen.indexOf(s.id) >= 0;
+        return '<button class="cf-lib-item' + (on ? ' on' : '') + '" type="button" data-action="live-set-add" data-id="' + esc(s.id) + '">'
+          + '<span class="grow"><span class="cf-song-t">' + esc(s.title) + '</span>'
+          + '<span class="cf-song-s">' + (s.key ? esc(s.key) + ' 调 · ' : '') + esc(s.id) + '</span></span>'
+          + '<span class="cf-lib-plus">' + (on ? '✓' : '+') + '</span></button>';
+      }).join('') : '<div class="cf-empty" style="padding:16px">没找到</div>';
+
+      /* 只在第一次建输入框；之后只换列表 —— 每次重建输入框会丢焦点，打不了字 */
       var input = box.querySelector('[data-lib-kw]');
-      if (input) {
+      if (!input) {
+        box.innerHTML = '<div class="cf-lib-search"><input type="text" placeholder="搜歌名或拼音…" data-lib-kw></div>'
+          + '<div class="cf-lib-list" data-lib-list></div>';
+        input = box.querySelector('[data-lib-kw]');
+        input.value = self.live.libKw || '';
         input.addEventListener('input', function () {
           self.live.libKw = input.value;
-          self.renderLibraryPicker(input.value);
+          self.renderLibraryPicker(input.value);   /* 只会走到下面那行换列表 */
         });
       }
+      var listBox = box.querySelector('[data-lib-list]');
+      if (listBox) listBox.innerHTML = listHtml;
     };
     if (this.library) draw(this.library);
     else this.loadLibraryIndex().then(function (lib) {
@@ -2821,6 +2840,26 @@
     var now = [];
     try { now = Array.prototype.slice.call(document.head.querySelectorAll('style,link[rel=stylesheet]')); } catch (err) { return; }
     var self = this, added = 0;
+    /* 字体单独处理：@font-face 可能在宿主页面原有的样式表里（不在 before 之后新增的
+       那批），漏了它 segno/coda 这些记号就变豆腐块。字体规则不影响布局，全搬进来是安全的。 */
+    if (!this._ymFonts) {
+      this._ymFonts = true;
+      var css = '';
+      try {
+        Array.prototype.forEach.call(document.styleSheets, function (sheet) {
+          var rules; try { rules = sheet.cssRules; } catch (err) { return; }   /* 跨域表跳过 */
+          Array.prototype.forEach.call(rules || [], function (r) {
+            if (r.type === 5 /* CSSFontFaceRule */) css += r.cssText + '\n';
+          });
+        });
+      } catch (err) {}
+      if (css) {
+        var fs = document.createElement('style');
+        fs.setAttribute('data-ym-fonts', '1');
+        fs.textContent = css;
+        try { this.shadow.insertBefore(fs, this.shadow.firstChild); } catch (err) {}
+      }
+    }
     now.forEach(function (node) {
       if (before.indexOf(node) >= 0) return;            /* 宿主页面原有的，不要 */
       if (self._ymAdopted.indexOf(node) >= 0) return;   /* 搬过了 */
@@ -2849,7 +2888,9 @@
     var nowKey = origIdx >= 0
       ? (useFlat ? FLAT_KEYS : SHARP_KEYS)[((origIdx + steps) % 12 + 12) % 12]
       : (x.key || '');
-    var showChords = !!x.sections.length;   /* 有谱数据就渲染简谱，不再给原谱图开关 */
+    /* 两个视图：原图（谱图，默认）/ 移调（引擎渲染的简谱，可改调） */
+    var canTrans = !!x.sections.length;
+    var showChords = canTrans && (this.live.view === 'trans' || !x.img);
 
     var html = '';
     /* 音频：一条细的，不抢地方 */
@@ -2860,17 +2901,17 @@
     }
     /* 视图切换 + 移调 */
     html += '<div class="cf-score-tools">';
-    if (x.sections.length && origIdx >= 0) {
-      html += '<span class="cf-key-box">'
-        + '<button class="cf-zbtn" type="button" data-action="live-key" data-d="-1" title="降半音">−</button>'
-        + '<button class="cf-key-now" type="button" data-action="live-key" data-d="0" title="回原调">1=' + esc(nowKey) + '</button>'
-        + '<button class="cf-zbtn" type="button" data-action="live-key" data-d="1" title="升半音">+</button>'
+    if (x.img && canTrans) {
+      html += '<span class="cf-seg2">'
+        + '<button type="button" class="' + (showChords ? '' : 'on') + '" data-action="live-view" data-v="img">原图</button>'
+        + '<button type="button" class="' + (showChords ? 'on' : '') + '" data-action="live-view" data-v="trans">移调</button>'
         + '</span>';
-      if (steps) html += '<span class="cf-key-orig">原调 ' + esc(x.key) + '</span>';
     }
+    void nowKey; void origIdx; void steps;
     html += '</div>';
 
     if (showChords) {
+      /* 移调视图：自己渲染那一块谱（不连 musiclib、不开 iframe） */
       html += '<div class="cf-jianpu" data-jianpu><div class="cf-empty">简谱渲染中…</div></div>';
     } else if (x.img) {
       html += '<div class="cf-score-img-wrap"><img alt="' + esc(x.title) + ' 乐谱" data-score-img></div>';
@@ -2881,6 +2922,7 @@
     stage.innerHTML = html;
     var img = stage.querySelector('[data-score-img]');
     if (img) img.src = x.img;
+    stage.classList.remove('is-frame');
     if (showChords) this.renderJianpu(stage, x, steps);
     this.applyLiveZoom();
   };
@@ -2894,24 +2936,23 @@
       if (self.destroyed) return;
       var live = self.$stage.querySelector('[data-jianpu]');
       if (!live) return;                        /* 已经切走了 */
+      /* 原样交给引擎——移调由引擎自己的「移调」按钮做，和弦才会真的跟着变。
+         之前在这里预先改 chord + origKey，等于跟引擎抢活，结果调号变了和弦没变。 */
       var song = x.raw;
-      if (steps) {
-        /* 只把和弦移调，简谱数字本来就不随调变 */
-        song = JSON.parse(JSON.stringify(x.raw));
-        var flat = /b/i.test(x.key || '');
-        (song.sections || []).forEach(function (sec) {
-          (sec.lines || []).forEach(function (line) {
-            (Array.isArray(line) ? line : []).forEach(function (cell) {
-              if (cell && cell.chord) cell.chord = transposeChord(cell.chord, steps, flat);
-            });
-          });
-        });
-        var oi = keyToIndex(x.key);
-        if (oi >= 0) song.origKey = (flat ? FLAT_KEYS : SHARP_KEYS)[((oi + steps) % 12 + 12) % 12];
-      }
+      void steps;
       try {
         var node = eng.renderSongObjects([song]);
         live.replaceChildren(node);
+        /* 引擎默认先显示「简谱原稿」（就是原图），要再点它自带的「移调」才展开真谱。
+           用户已经点过我这边的「移调」了，所以这里替他点一次，直接进可改调的谱。 */
+        setTimeout(function () {
+          if (self.destroyed) return;
+          var box = self.$stage.querySelector('[data-jianpu]');
+          if (!box || box.dataset.opened) return;
+          var t = Array.prototype.slice.call(box.querySelectorAll('button,[role="button"]'))
+            .filter(function (b) { return /移调/.test(b.textContent || ''); })[0];
+          if (t) { box.dataset.opened = '1'; t.click(); }
+        }, 260);
         /* 样式是渲染过程中分批注入的，渲完再采几次才齐 */
         self.adoptEngineStyles();
         [120, 600, 1500].forEach(function (ms) {
