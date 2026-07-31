@@ -2342,6 +2342,17 @@
     this.$stage.innerHTML = html;
     this.syncSetupPreview();
     this.syncSetupTaken();
+    this.ensureTakenFeed();
+  };
+
+  /* 选设备这一屏必须先连上，否则收不到 taken_devices，谁都显示「可选」，
+     结果同一支话筒被多个人选走。menu / live 模式进来时还没有任何连接，
+     所以这里先以 listener 挂上（服务端会给 listener 发占用列表），
+     选好设备点「进入」时再在同一条连接上重注册成 client。 */
+  CecpApp.prototype.ensureTakenFeed = function () {
+    if (this.destroyed || this.wsReady() || this.role) return;
+    this.role = 'listener';
+    this.connect();
   };
 
   /* 占用列表里存的是完整名「设备｜人名」，比对时只看设备段；自己占用的设备不算 */
