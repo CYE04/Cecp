@@ -789,9 +789,22 @@
     /* 三栏按面板自身宽度断点（容器查询），嵌进窄容器也不挤扁 */
     '.cf-op-grid{flex:1;display:grid;grid-template-columns:240px minmax(0,1fr) 280px;gap:12px;padding:12px 16px 16px;min-height:0}',
     '@container (max-width:1020px){.cf-op-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.cf-op-panel.p-members{grid-column:1 / -1;max-height:220px}}',
-    '@container (max-width:640px){.cf-op-grid{grid-template-columns:minmax(0,1fr)}.cf-op-panel{max-height:none;min-height:220px}}',
-    /* 旧 iOS（<16，无容器查询）兜底：按视口宽度堆叠 */
-    '@media (max-width:640px){.cf-op-grid{grid-template-columns:minmax(0,1fr)}.cf-op-panel{max-height:none;min-height:220px}}',
+    /* 窄屏：整个音控台当一页滚，别再「锁一屏高 + 每块各自内滚」——
+       那样外层滑不动、每块还被挤扁。改成外层滚、内层放开自然高度。 */
+    '@container (max-width:640px){',
+    '  .cf-op{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}',
+    '  .cf-op-grid{grid-template-columns:minmax(0,1fr);min-height:auto;padding:10px 12px 16px;gap:10px}',
+    '  .cf-op-panel{max-height:none;min-height:0}',
+    '  .cf-op-scroll{overflow-y:visible!important;max-height:none;flex:none}',
+    '  .cf-op-stats{grid-template-columns:repeat(3,minmax(0,1fr));padding:10px 12px 0}',
+    '}',
+    /* 旧 iOS（<16，无容器查询）兜底：按视口宽度 */
+    '@media (max-width:640px){',
+    '  .cf-op{overflow-y:auto;-webkit-overflow-scrolling:touch}',
+    '  .cf-op-grid{grid-template-columns:minmax(0,1fr);min-height:auto;padding:10px 12px 16px;gap:10px}',
+    '  .cf-op-panel{max-height:none;min-height:0}',
+    '  .cf-op-scroll{overflow-y:visible!important;max-height:none;flex:none}',
+    '}',
     '.cf-op-panel{display:flex;flex-direction:column;min-height:0;border-radius:var(--r-md);background:var(--card);box-shadow:var(--shadow-soft);overflow:hidden;border:1px solid transparent}',
     '.cf-op-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px;border-bottom:1px solid var(--border)}',
     '.cf-op-panel-title{font-size:13px;font-weight:600;letter-spacing:-.01em}',
