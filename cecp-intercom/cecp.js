@@ -984,6 +984,9 @@
     try { liveTitle = new URLSearchParams(location.search).get('title') || ''; } catch (err) {}
     this.liveTitle = String(d.liveTitle || liveTitle || '敬拜现场');
     this.sectionCues = readPresetList(d.sectionCues, DEFAULT_SECTION_CUES);
+    /* 合体入口选「敬拜团」后进现场界面（谱+内通）。data-menu-live="0" 可退回老的纯内通界面 */
+    this.menuLive = d.menuLive !== '0' && d.menuLive !== 'false';
+    this.useLiveUI = (this.configMode === 'live');
   };
 
   CecpApp.prototype.initState = function () {
@@ -1474,8 +1477,13 @@
         break;
       }
       case 'pick-role':
-        if (el.dataset.role === 'operator') this.showOpPin();
-        else { this.role = null; this.showSetup(); }
+        if (el.dataset.role === 'operator') { this.useLiveUI = false; this.showOpPin(); }
+        else {
+          /* 合体入口选「敬拜团」→ 直接进现场界面（谱 + 内通 + 段落 cue） */
+          this.useLiveUI = this.menuLive;
+          this.role = null;
+          this.showSetup();
+        }
         break;
       case 'op-pin-submit': this.enterOperator(); break;
       case 'back-menu': this.backToMenu(); break;
@@ -1565,7 +1573,7 @@
       this.whoAmI = remembered;
       this.role = 'client';
       this.loadHistory();
-      if (this.configMode === 'live') this.showLive(); else this.showClient();
+      if (this.useLiveUI) this.showLive(); else this.showClient();
       this.connect();
       return;
     }
@@ -1804,7 +1812,7 @@
       if (!entry.text) return;
       this.appendChat(entry);
       this.syncBanner();
-      if (this.configMode === 'live') this.liveBanner('音控组', entry.text, 'high');
+      if (this.useLiveUI) this.liveBanner('音控组', entry.text, 'high');
       if (this.role === 'listener' || (this.isFloating && !this.open)) {
         this.toast('📢', '音控组消息', entry.text, entry.ts);
       }
@@ -1827,7 +1835,7 @@
       if (!reply.text) return;
       this.appendChat(reply);
       this.syncBanner();
-      if (this.configMode === 'live') this.liveBanner('音控回复', reply.text, 'high');
+      if (this.useLiveUI) this.liveBanner('音控回复', reply.text, 'high');
       if (this.isFloating && !this.open) this.toast('🎧', '音控回复', reply.text, reply.ts);
       vibrate([20, 40, 20]);
       this.syncBadge();
@@ -1856,7 +1864,7 @@
       } else if (this.role === 'client') {
         this.appendChat(chatEntry);
         /* 现场模式：别人的段落 cue / 群聊都从顶部弹一条 */
-        if (this.configMode === 'live') {
+        if (this.useLiveUI) {
           var isSecCue = chatEntry.text.indexOf(SECTION_CUE_PREFIX) === 0;
           this.liveBanner(
             identityMeta(chatEntry.from).title,
@@ -1881,7 +1889,7 @@
       });
       this.live.loaded = true;
       if (this.live.i >= this.live.songs.length) this.live.i = 0;
-      if (this.configMode === 'live' && this.$stage.querySelector('.cf-live')) {
+      if (this.useLiveUI && this.$stage.querySelector('.cf-live')) {
         this.renderSetlist();
         if (!sameIds) this.selectLiveSong(this.live.i);
         if (msg.by && msg.by !== this.whoAmI) {
@@ -2347,7 +2355,7 @@
     this.pendingJoin = { name: this.whoAmI };
     this.role = 'client';
     this.loadHistory();
-    if (this.configMode === 'live') this.showLive(); else this.showClient();
+    if (this.useLiveUI) this.showLive(); else this.showClient();
 
     if (this.wsReady()) this.sendRegister();
     else this.connect();
