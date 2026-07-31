@@ -1472,7 +1472,7 @@
       case 'live-lib': {
         var song = this.live && this.live.songs[this.live.i];
         if (song && song.id) {
-          try { window.open(this.musiclibUrl(song.id), '_blank', 'noopener'); } catch (err) {}
+          try { window.open(this.musiclibUrl(song.id, true), '_blank', 'noopener'); } catch (err) {}
         }
         break;
       }
@@ -2721,10 +2721,13 @@
     if (root) root.classList.remove('setlist-open');
   };
 
-  CecpApp.prototype.musiclibUrl = function (songId) {
+  /* embed=1 → musiclib 只渲染这一首（曲库外壳全藏，移调/MP3/节拍器/原图都在）；
+     新窗口打开时不加 embed，给完整曲库 */
+  CecpApp.prototype.musiclibUrl = function (songId, full) {
     var qs = [];
     if (this.musiclibKey) qs.push('key=' + encodeURIComponent(this.musiclibKey));
     if (songId) qs.push('song=' + encodeURIComponent(songId));
+    if (!full) qs.push('embed=1');
     return this.musiclibBase + '/' + (qs.length ? '?' + qs.join('&') : '');
   };
 
