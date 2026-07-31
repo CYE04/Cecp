@@ -28,12 +28,18 @@ const DEFAULT_DAILY_RESET_TZ = 'Europe/Rome';
 const HISTORY_KEY = 'msg_history_v1';
 const HISTORY_MAX = 120;
 
+// 共享歌单：谁都能改，改完广播给房间里所有人。持久化在 DO storage，
+// 跨天不清（本周诗歌要留着），只有明确改动才覆盖。
+const SETLIST_KEY = 'setlist_v1';
+const SETLIST_MAX = 30;
+
 export class WorshipRoom {
   constructor(state, env) {
     this.state = state;
     this.env = env;
     this.resetTimeZone = String((env && env.DAILY_RESET_TZ) || DEFAULT_DAILY_RESET_TZ).trim() || DEFAULT_DAILY_RESET_TZ;
-    this._history = null; // 懒加载缓存
+    this._history = null;    // 懒加载缓存
+    this._setlist = undefined; // undefined = 还没读过；null = 读过但没有
   }
 
   async fetch(request) {
@@ -184,6 +190,33 @@ export class WorshipRoom {
           await this._replayHistoryTo(ws);
         }
 
+        // 谁进来都先拿一份当前的共享歌单
+        await this._sendSetlistTo(ws);
+
+        break;
+      }
+
+      case 'setlist_set': {
+        // 共享歌单：任何已注册的人都能改（现场随手选歌），改完广播给全房间
+        const meta = safeMeta(ws);
+        if (!meta || !meta.role) break;
+
+        const songs = Array.isArray(msg.songs) ? msg.songs.slice(0, SETLIST_MAX).map((s) => ({
+          id: cleanText(s && s.id, 120),
+          title: cleanText(s && s.title, 120),
+          key: cleanText(s && s.key, 20),
+        })).filter((s) => s.id || s.title) : [];
+
+        const payload = {
+          type: 'setlist',
+          songs,
+          title: cleanText(msg.title, 80),
+          by: meta.name || '',
+          ts: Date.now(),
+        };
+        await this.state.storage.put(SETLIST_KEY, payload);
+        this._setlist = payload;
+        this._broadcast(payload);   // 房间里所有人（含 listener）都更新
         break;
       }
 
@@ -485,6 +518,14 @@ export class WorshipRoom {
     for (const entry of hist) {
       safeSend(ws, { ...entry, replay: true });
     }
+  }
+
+  // ── 共享歌单 ────────────────────────────────────────────────
+  async _sendSetlistTo(ws) {
+    if (this._setlist === undefined) {
+      this._setlist = (await this.state.storage.get(SETLIST_KEY)) || null;
+    }
+    if (this._setlist) safeSend(ws, this._setlist);
   }
 
   async _ensureDailyResetAlarm(force) {

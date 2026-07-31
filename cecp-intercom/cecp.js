@@ -579,6 +579,9 @@
     '.cf-score-stage{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;justify-content:center}',
     '.cf-score-stage img{max-width:100%;height:auto;align-self:flex-start;border-radius:10px;box-shadow:var(--shadow-soft)}',
     '.cf-score-stage>div{width:100%}',
+    /* 内嵌 musiclib：iframe 天然隔离样式，移调/音源/和弦全都能用 */
+    '.cf-score-stage.is-frame{padding:0;overflow:hidden}',
+    '.cf-score-frame{width:100%;height:100%;border:none;display:block;background:var(--bg)}',
     '.cf-score-bar{flex:none;display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 12px;border-top:1px solid var(--border);background:var(--card)}',
     '.cf-zbtn{width:31px;height:31px;border-radius:9px;background:var(--card3);font-size:16px;display:flex;align-items:center;justify-content:center}',
     '.cf-zlabel{font-size:12px;color:var(--muted);min-width:40px;text-align:center;font-variant-numeric:tabular-nums}',
@@ -604,6 +607,24 @@
     '.cf-song-t{display:block;font-size:14px;font-weight:600}',
     '.cf-song-s{display:block;font-size:11px;color:var(--muted)}',
     '.cf-song .grow{flex:1;min-width:0}',
+    /* 选歌器 */
+    '.cf-setlist-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}',
+    '.cf-song-row{display:flex;align-items:center;gap:2px}',
+    '.cf-song-row .cf-song{flex:1;min-width:0}',
+    '.cf-song-x{flex:none;width:26px;height:26px;border-radius:8px;background:var(--card3);color:var(--muted);font-size:12px;',
+    '  display:flex;align-items:center;justify-content:center}',
+    '.cf-song-x.is-del{color:var(--red)}',
+    '.cf-lib-box{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}',
+    '.cf-lib-search input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border-strong);',
+    '  background:var(--bg);outline:none;font-size:16px;margin-bottom:8px}',
+    '.cf-lib-search input:focus{border-color:var(--acc)}',
+    '.cf-lib-list{max-height:46vh;overflow-y:auto;overscroll-behavior:contain}',
+    '.cf-lib-item{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:9px 10px;border-radius:10px;margin-bottom:3px}',
+    '.cf-lib-item.on{background:var(--green-soft)}',
+    '.cf-lib-item .grow{flex:1;min-width:0}',
+    '.cf-lib-plus{flex:none;width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;font-size:14px;',
+    '  display:flex;align-items:center;justify-content:center}',
+    '.cf-lib-item.on .cf-lib-plus{background:var(--green)}',
     /* 顶部消息横幅：谁发消息都从上面滑下来，盖在谱上 */
     '.cf-live-banner{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:60;width:min(520px,calc(100% - 20px));',
     '  display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:15px;background:var(--card);',
@@ -951,7 +972,12 @@
     try { setParam = new URLSearchParams(location.search).get('set') || ''; } catch (err) {}
     this.liveSongs = String(d.songs || setParam || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean);
     this.songsBase = String(d.songsBase || 'https://cye04.github.io/Cecp').replace(/\/+$/, '');
-    this.musiclibBase = String(d.musiclibBase || 'https://musiclib.cecp.workers.dev').replace(/\/+$/, '');
+    this.musiclibBase = String(d.musiclibBase || 'https://musiclib.cecp.it').replace(/\/+$/, '');
+    /* musiclib 的访问 key（在页面源码里可见，只是轻量门槛，不是密码） */
+    this.musiclibKey = ('musiclibKey' in d) ? String(d.musiclibKey || '').trim() : 'cecp2026';
+    /* 曲库文件清单（实时枚举 GitHub，新加的诗歌才选得到） */
+    this.libApi = String(d.libApi || 'https://api.github.com/repos/CYE04/Cecp/contents/songs');
+    this.library = null;
     /* 可移调真谱渲染器（youth-engine），不给就只显示谱图 */
     this.scoreEngine = ('scoreEngine' in d) ? String(d.scoreEngine || '').trim() : (this.songsBase + '/youth-engine.js');
     var liveTitle = '';
@@ -1385,6 +1411,39 @@
       /* ── 现场模式 ── */
       case 'live-cue': this.sendLiveCue(el); break;
       case 'live-song': this.selectLiveSong(+el.dataset.i || 0); break;
+      case 'live-edit-set':
+        this.live.editing = !this.live.editing;
+        this.renderSetlist();
+        break;
+      case 'live-set-add': {
+        var addId = el.dataset.id || '';
+        var already = this.live.songs.findIndex(function (s) { return s.id === addId; });
+        if (already >= 0) {
+          this.live.songs.splice(already, 1);
+        } else {
+          var found = (this.library || []).filter(function (s) { return s.id === addId; })[0];
+          if (found) this.live.songs.push({ id: found.id, title: found.title, key: found.key, img: '', note: '' });
+        }
+        this.renderSetlist();
+        this.pushSetlist();
+        break;
+      }
+      case 'live-set-del':
+        this.live.songs.splice(+el.dataset.i, 1);
+        if (this.live.i >= this.live.songs.length) this.live.i = Math.max(0, this.live.songs.length - 1);
+        this.renderSetlist();
+        this.pushSetlist();
+        break;
+      case 'live-set-move': {
+        var from = +el.dataset.i, to = from + (+el.dataset.d);
+        if (to >= 0 && to < this.live.songs.length) {
+          var moved = this.live.songs.splice(from, 1)[0];
+          this.live.songs.splice(to, 0, moved);
+          this.renderSetlist();
+          this.pushSetlist();
+        }
+        break;
+      }
       case 'live-prev': this.selectLiveSong(this.live.i - 1); break;
       case 'live-next': this.selectLiveSong(this.live.i + 1); break;
       case 'live-zoom':
@@ -1400,15 +1459,17 @@
         var dockRoot = this.$stage.querySelector('.cf-live');
         if (dockRoot) {
           dockRoot.classList.toggle('dock-collapsed');
+          var collapsed = dockRoot.classList.contains('dock-collapsed');
           var hint = this.$stage.querySelector('[data-dock-hint]');
-          if (hint) hint.textContent = dockRoot.classList.contains('dock-collapsed') ? '展开' : '收起';
+          if (hint) hint.textContent = collapsed ? '展开' : '收起';
+          lsSet(this.storeKey('dock'), collapsed ? '0' : '1');
         }
         break;
       }
       case 'live-lib': {
         var song = this.live && this.live.songs[this.live.i];
         if (song && song.id) {
-          try { window.open(this.musiclibBase + '/?song=' + encodeURIComponent(song.id), '_blank', 'noopener'); } catch (err) {}
+          try { window.open(this.musiclibUrl(song.id), '_blank', 'noopener'); } catch (err) {}
         }
         break;
       }
@@ -1804,6 +1865,28 @@
           );
         }
         this.syncBadge();
+      }
+      return;
+    }
+
+    /* 共享歌单：谁改了全房间同步 */
+    if (type === 'setlist') {
+      var incoming = Array.isArray(msg.songs) ? msg.songs : [];
+      if (this.liveTitleFromServer !== undefined || msg.title) this.liveTitleFromServer = msg.title || '';
+      if (!this.live) this.live = { songs: [], i: 0, zoom: 100, loaded: false, mode: 'img' };
+      var sameCount = this.live.songs.length === incoming.length;
+      var sameIds = sameCount && incoming.every(function (s, i) { return s.id === this.live.songs[i].id; }, this);
+      this.live.songs = incoming.map(function (s) {
+        return { id: s.id || '', title: s.title || s.id || '未命名', key: s.key || '', img: '', note: '' };
+      });
+      this.live.loaded = true;
+      if (this.live.i >= this.live.songs.length) this.live.i = 0;
+      if (this.configMode === 'live' && this.$stage.querySelector('.cf-live')) {
+        this.renderSetlist();
+        if (!sameIds) this.selectLiveSong(this.live.i);
+        if (msg.by && msg.by !== this.whoAmI) {
+          this.liveBanner(identityMeta(msg.by).title, '更新了歌单', 'msg');
+        }
       }
       return;
     }
@@ -2361,7 +2444,9 @@
       return '<button class="cf-cue-chip" type="button" data-action="live-cue" data-text="' + esc(name) + '">' + esc(name) + '</button>';
     }).join('');
 
-    this.$stage.innerHTML = '<div class="cf-app cf-live" style="display:flex;flex-direction:column;flex:1;min-height:0">'
+    /* 窄屏默认把内通收起，谱先占满——消息靠顶部横幅推给你，要发言再展开 */
+    var dockOpen = lsGet(this.storeKey('dock')) === '1';
+    this.$stage.innerHTML = '<div class="cf-app cf-live' + (dockOpen ? '' : ' dock-collapsed') + '" style="display:flex;flex-direction:column;flex:1;min-height:0">'
       + '<div class="cf-live-top">'
       + '  <button class="cf-live-ico" type="button" data-action="live-setlist" title="歌单" aria-label="歌单">☰</button>'
       + '  <div class="cf-live-title">' + esc(this.liveTitle) + '<span class="sub" data-live-now></span></div>'
@@ -2375,9 +2460,11 @@
       + '    <div class="cf-score-stage" data-score-stage><div class="cf-empty">正在取谱…</div></div>'
       + '    <div class="cf-cue-bar">' + secCues + flowCues + '</div>'
       + '    <div class="cf-score-bar">'
-      + '      <button class="cf-zbtn" type="button" data-action="live-zoom" data-d="-10">−</button>'
-      + '      <span class="cf-zlabel" data-zoom-label>100%</span>'
-      + '      <button class="cf-zbtn" type="button" data-action="live-zoom" data-d="10">+</button>'
+      + '      <span data-zoom-box style="display:contents">'
+      + '        <button class="cf-zbtn" type="button" data-action="live-zoom" data-d="-10">−</button>'
+      + '        <span class="cf-zlabel" data-zoom-label>100%</span>'
+      + '        <button class="cf-zbtn" type="button" data-action="live-zoom" data-d="10">+</button>'
+      + '      </span>'
       + '      <span class="cf-zsep"></span>'
       + '      <button class="cf-ghost-btn" type="button" data-action="live-prev">上一首</button>'
       + '      <button class="cf-ghost-btn" type="button" data-action="live-next">下一首</button>'
@@ -2387,7 +2474,7 @@
       + '  <section class="cf-live-comm">'
       + '    <div class="cf-dock-grip" data-action="live-dock">'
       + '      <span class="gbar"></span><span class="glbl">团队内通</span><span class="grow"></span>'
-      + '      <span class="glbl" data-dock-hint>收起</span>'
+      + '      <span class="glbl" data-dock-hint>' + (dockOpen ? '收起' : '展开') + '</span>'
       + '    </div>'
       + this.paneStackHtml()
       + '  </section>'
@@ -2405,24 +2492,76 @@
   };
 
   /* 取歌：id → cecp 曲库 JSON；直接给 http 地址就当谱图 */
+  /* ── 曲库索引：实时从 GitHub 取（你随时会加新歌），歌名缓存在本地 ──
+     文件清单走 GitHub API（有 60 次/小时限额，所以缓存 1 小时）；
+     歌名只在遇到没见过的 id 时才去 Pages 拉，拉过就长期留着。 */
+  CecpApp.prototype.loadLibraryIndex = function () {
+    var self = this;
+    if (this._libPromise) return this._libPromise;
+
+    var LIST_TTL = 60 * 60 * 1000;
+    var titleCache = parseJsonMaybe(lsGet('cecp2:libtitles')) || {};
+    var listCache = parseJsonMaybe(lsGet('cecp2:liblist'));
+    var fresh = listCache && listCache.ts && (Date.now() - listCache.ts < LIST_TTL) && Array.isArray(listCache.ids);
+
+    var idsPromise = fresh
+      ? Promise.resolve(listCache.ids)
+      : fetch(this.libApi)
+          .then(function (r) { if (!r.ok) throw new Error('list'); return r.json(); })
+          .then(function (files) {
+            var ids = (files || [])
+              .filter(function (f) { return f && f.type === 'file' && /\.json$/i.test(f.name); })
+              .map(function (f) { return f.name.replace(/\.json$/i, ''); });
+            lsSet('cecp2:liblist', JSON.stringify({ ts: Date.now(), ids: ids }));
+            return ids;
+          })
+          .catch(function () { return (listCache && listCache.ids) || []; });   /* 取不到就用旧的 */
+
+    this._libPromise = idsPromise.then(function (ids) {
+      var missing = ids.filter(function (id) { return !titleCache[id]; });
+      if (!missing.length) return ids.map(function (id) { return titleCache[id]; });
+      /* 只拉没见过的歌名，分批避免一次性太多请求 */
+      return Promise.all(missing.map(function (id) {
+        return fetch(self.songsBase + '/songs/' + encodeURIComponent(id) + '.json')
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (s) {
+            titleCache[id] = { id: id, title: (s && s.title) || id, key: (s && s.origKey) || '' };
+          })
+          .catch(function () { titleCache[id] = { id: id, title: id, key: '' }; });
+      })).then(function () {
+        lsSet('cecp2:libtitles', JSON.stringify(titleCache));
+        return ids.map(function (id) { return titleCache[id]; });
+      });
+    }).then(function (list) {
+      self.library = list.filter(Boolean);
+      return self.library;
+    });
+    return this._libPromise;
+  };
+
   CecpApp.prototype.loadLiveSongs = function () {
     var self = this;
     var ids = this.liveSongs;
     if (!ids.length) {
+      /* 没有 ?set= 也不是死胡同：歌单是共享的，点「☰ → 选歌」谁都能加 */
+      this.live.loaded = true;
       var stage = this.$stage.querySelector('[data-score-stage]');
-      if (stage) {
-        stage.innerHTML = '<div class="cf-empty">这个链接没带歌单<br><span style="font-size:12px">在网址后面加 <code>?set=歌名id,歌名id</code></span></div>';
+      if (stage && !this.live.songs.length) {
+        stage.className = 'cf-score-stage';
+        stage.innerHTML = '<div class="cf-empty">还没选歌<br><span style="font-size:12px">点左上角 ☰ →「选歌」，选了大家都能看到</span></div>';
       }
-      var list = this.$stage.querySelector('[data-setlist]');
-      if (list) list.innerHTML = '<div class="cf-empty">没有歌单</div>';
+      this.renderSetlist();
       return;
     }
     Promise.all(ids.map(function (ref) { return self.fetchLiveSong(ref); })).then(function (songs) {
       if (self.destroyed || !self.live) return;
+      /* 服务器已经有共享歌单了就别覆盖它——链接里的 ?set= 只当初始种子 */
+      if (self.live.loaded && self.live.songs.length) return;
       self.live.songs = songs;
       self.live.loaded = true;
       self.renderSetlist();
       self.selectLiveSong(0);
+      if (self.wsReady()) self.pushSetlist();   /* 让其他人也拿到 */
     });
   };
 
@@ -2438,11 +2577,14 @@
       .then(function (song) {
         out.title = song.title || ref;
         out.key = song.origKey || '';
-        out.img = song.scoreImg || '';
-        if (!out.img) out.note = '这首曲库里没有谱图，点「曲库 ↗」在 musiclib 里看';
+        out.img = song.scoreImg || '';   /* 备用；曲库歌优先内嵌 musiclib */
         return out;
       })
-      .catch(function () { out.note = '曲库里找不到「' + ref + '」'; return out; })
+      .catch(function () {
+        out.id = '';                     /* 找不到就别去 iframe 一个 404 */
+        out.note = '曲库里找不到「' + ref + '」';
+        return out;
+      })
       .then(function (x) { void self; return x; });
   };
 
@@ -2450,14 +2592,77 @@
     var list = this.$stage.querySelector('[data-setlist]');
     if (!list) return;
     var cur = this.live.i;
-    list.innerHTML = '<div class="cf-cue-group-label" style="margin-bottom:8px">今天的歌单</div>'
-      + this.live.songs.map(function (x, i) {
-          return '<button class="cf-song' + (i === cur ? ' on' : '') + '" type="button" data-action="live-song" data-i="' + i + '">'
-            + '<span class="cf-song-no">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span>'
-            + '<span class="grow"><span class="cf-song-t">' + esc(x.title) + '</span>'
-            + '<span class="cf-song-s">' + (x.key ? esc(x.key) + ' 调' : (x.img ? '有谱' : '无谱')) + '</span></span>'
-            + '</button>';
-        }).join('');
+    var editing = this.live.editing;
+    list.innerHTML = '<div class="cf-setlist-head">'
+      + '<span class="cf-cue-group-label" style="margin:0">本周诗歌</span>'
+      + '<button class="cf-ghost-btn" type="button" data-action="live-edit-set">' + (editing ? '完成' : '选歌') + '</button>'
+      + '</div>'
+      + (this.live.songs.length
+          ? this.live.songs.map(function (x, i) {
+              return '<div class="cf-song-row">'
+                + '<button class="cf-song' + (i === cur ? ' on' : '') + '" type="button" data-action="live-song" data-i="' + i + '">'
+                + '<span class="cf-song-no">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span>'
+                + '<span class="grow"><span class="cf-song-t">' + esc(x.title) + '</span>'
+                + '<span class="cf-song-s">' + (x.key ? esc(x.key) + ' 调' : '') + '</span></span>'
+                + '</button>'
+                + (editing
+                    ? '<button class="cf-song-x" type="button" data-action="live-set-move" data-i="' + i + '" data-d="-1" title="上移">↑</button>'
+                      + '<button class="cf-song-x" type="button" data-action="live-set-move" data-i="' + i + '" data-d="1" title="下移">↓</button>'
+                      + '<button class="cf-song-x is-del" type="button" data-action="live-set-del" data-i="' + i + '" title="移除">✕</button>'
+                    : '')
+                + '</div>';
+            }).join('')
+          : '<div class="cf-empty" style="padding:18px 8px">还没有选歌<br><span style="font-size:12px">点上面「选歌」加</span></div>')
+      + (editing ? '<div class="cf-lib-box" data-lib-box><div class="cf-empty" style="padding:14px">曲库加载中…</div></div>' : '');
+    if (editing) this.renderLibraryPicker();
+  };
+
+  /* 选歌器：搜曲库（实时枚举 GitHub，你新加的歌也在），点一下加进歌单，全房间同步 */
+  CecpApp.prototype.renderLibraryPicker = function (keyword) {
+    var self = this;
+    var box = this.$stage.querySelector('[data-lib-box]');
+    if (!box) return;
+    var draw = function (lib) {
+      var kw = String(keyword || self.live.libKw || '').trim().toLowerCase();
+      var chosen = self.live.songs.map(function (s) { return s.id; });
+      var hits = lib.filter(function (s) {
+        if (!kw) return true;
+        return s.title.toLowerCase().indexOf(kw) >= 0 || s.id.toLowerCase().indexOf(kw) >= 0;
+      }).slice(0, 60);
+      box.innerHTML = '<div class="cf-lib-search"><input type="text" placeholder="搜歌名或拼音…" data-lib-kw value="' + esc(self.live.libKw || '') + '"></div>'
+        + '<div class="cf-lib-list">'
+        + (hits.length ? hits.map(function (s) {
+            var on = chosen.indexOf(s.id) >= 0;
+            return '<button class="cf-lib-item' + (on ? ' on' : '') + '" type="button" data-action="live-set-add" data-id="' + esc(s.id) + '">'
+              + '<span class="grow"><span class="cf-song-t">' + esc(s.title) + '</span>'
+              + '<span class="cf-song-s">' + (s.key ? esc(s.key) + ' 调 · ' : '') + esc(s.id) + '</span></span>'
+              + '<span class="cf-lib-plus">' + (on ? '✓' : '+') + '</span></button>';
+          }).join('') : '<div class="cf-empty" style="padding:16px">没找到</div>')
+        + '</div>';
+      var input = box.querySelector('[data-lib-kw]');
+      if (input) {
+        input.addEventListener('input', function () {
+          self.live.libKw = input.value;
+          self.renderLibraryPicker(input.value);
+        });
+      }
+    };
+    if (this.library) draw(this.library);
+    else this.loadLibraryIndex().then(function (lib) {
+      if (!self.destroyed && self.$stage.querySelector('[data-lib-box]')) draw(lib);
+    }).catch(function () {
+      box.innerHTML = '<div class="cf-empty" style="padding:14px">曲库取不到<br><span style="font-size:12px">检查网络后重开「选歌」</span></div>';
+    });
+  };
+
+  /* 改完就广播出去，全房间实时同步 */
+  CecpApp.prototype.pushSetlist = function () {
+    if (!this.wsReady()) { this.flash('当前离线，改动没同步出去', true); return; }
+    this.wsSend({
+      type: 'setlist_set',
+      songs: this.live.songs.map(function (s) { return { id: s.id, title: s.title, key: s.key }; }),
+      title: this.liveTitleFromServer || '',
+    });
   };
 
   CecpApp.prototype.selectLiveSong = function (i) {
@@ -2469,12 +2674,35 @@
     var libBtn = this.$stage.querySelector('[data-lib-btn]');
     if (now) now.textContent = '· ' + x.title;
     if (libBtn) libBtn.hidden = !x.id;
+    var zoomBox = this.$stage.querySelector('[data-zoom-box]');
     if (stage) {
-      if (x.img) {
+      if (x.id && !x.frameFailed) {
+        /* 曲库里的歌 → 直接内嵌 musiclib：移调、音源、和弦、放大全都在里面 */
+        stage.className = 'cf-score-stage is-frame';
+        stage.innerHTML = '<iframe class="cf-score-frame" data-score-frame'
+          + ' src="' + esc(this.musiclibUrl(x.id)) + '"'
+          + ' title="' + esc(x.title) + ' · 曲库"'
+          + ' allow="autoplay; fullscreen"></iframe>';
+        if (zoomBox) zoomBox.hidden = true;      /* musiclib 自己有缩放 */
+        /* 保险：iframe 起不来（被 CSP / 网络挡住）就退回谱图，别给一片空白 */
+        if (x.img) {
+          var self2 = this, idx = this.live.i, frame = stage.querySelector('[data-score-frame]');
+          var fallback = setTimeout(function () {
+            if (self2.destroyed || !self2.live || self2.live.i !== idx) return;
+            if (!frame.dataset.ok) { x.frameFailed = true; self2.selectLiveSong(idx); }
+          }, 6000);
+          frame.addEventListener('load', function () { frame.dataset.ok = '1'; clearTimeout(fallback); });
+          frame.addEventListener('error', function () { clearTimeout(fallback); x.frameFailed = true; self2.selectLiveSong(idx); });
+        }
+      } else if (x.img) {
+        stage.className = 'cf-score-stage';
         stage.innerHTML = '<img alt="' + esc(x.title) + ' 乐谱" data-score-img>';
         stage.querySelector('[data-score-img]').src = x.img;
+        if (zoomBox) zoomBox.hidden = false;
       } else {
+        stage.className = 'cf-score-stage';
         stage.innerHTML = '<div class="cf-empty">' + esc(x.note || '这首没有谱') + '</div>';
+        if (zoomBox) zoomBox.hidden = true;
       }
     }
     var items = this.$stage.querySelectorAll('[data-action="live-song"]');
@@ -2483,6 +2711,13 @@
     /* 关掉歌单抽屉 */
     var root = this.$stage.querySelector('.cf-live');
     if (root) root.classList.remove('setlist-open');
+  };
+
+  CecpApp.prototype.musiclibUrl = function (songId) {
+    var qs = [];
+    if (this.musiclibKey) qs.push('key=' + encodeURIComponent(this.musiclibKey));
+    if (songId) qs.push('song=' + encodeURIComponent(songId));
+    return this.musiclibBase + '/' + (qs.length ? '?' + qs.join('&') : '');
   };
 
   CecpApp.prototype.applyLiveZoom = function () {
