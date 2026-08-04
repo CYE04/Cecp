@@ -33,6 +33,12 @@ const HISTORY_MAX = 120;
 const SETLIST_KEY = 'setlist_v1';
 const SETLIST_MAX = 30;
 
+// 同步标注（像 GoodNotes 在谱上做记号）：按歌分组持久化，谁画全房间都看见。
+// 激光笔是即时的，只转发不存。
+const INK_KEY = 'ink_v1';
+const INK_MAX_PER_SONG = 400;   // 每首歌最多存这么多笔，超了丢最早的
+const INK_MAX_PTS = 600;        // 单笔最多点数，防止有人画一条巨长的线撑爆存储
+
 export class WorshipRoom {
   constructor(state, env) {
     this.state = state;
@@ -40,6 +46,7 @@ export class WorshipRoom {
     this.resetTimeZone = String((env && env.DAILY_RESET_TZ) || DEFAULT_DAILY_RESET_TZ).trim() || DEFAULT_DAILY_RESET_TZ;
     this._history = null;    // 懒加载缓存
     this._setlist = undefined; // undefined = 还没读过；null = 读过但没有
+    this._ink = undefined;     // 同上：标注按歌分组 { songId: [stroke,...] }
   }
 
   async fetch(request) {
@@ -193,6 +200,87 @@ export class WorshipRoom {
         // 谁进来都先拿一份当前的共享歌单
         await this._sendSetlistTo(ws);
 
+        break;
+      }
+
+      // ── 同步标注：笔 / 荧光笔 / 形状 / 橡皮，按歌存，谁画全房间都看见 ──
+      case 'ink': {
+        const meta = safeMeta(ws);
+        if (!meta || !meta.role) break;
+
+        const song = cleanText(msg.song, 120);
+        const op = ['stroke', 'undo', 'clear'].indexOf(msg.op) >= 0 ? msg.op : '';
+        if (!song || !op) break;
+
+        const ink = await this._loadInk();
+        if (!ink[song]) ink[song] = [];
+
+        let payload = null;
+        if (op === 'stroke') {
+          const s = msg.stroke || {};
+          const pts = Array.isArray(s.pts) ? s.pts.slice(0, INK_MAX_PTS)
+            .filter((p) => Array.isArray(p) && p.length >= 2)
+            .map((p) => [round3(p[0]), round3(p[1])]) : [];
+          if (!pts.length) break;
+          const stroke = {
+            id: cleanId(s.id, 'ink'),
+            tool: ['pen', 'hl', 'shape', 'text'].indexOf(s.tool) >= 0 ? s.tool : 'pen',
+            text: s.tool === 'text' ? cleanText(s.text, 120) : undefined,
+            shape: ['free', 'line', 'rect', 'ellipse', 'arrow'].indexOf(s.shape) >= 0 ? s.shape : 'free',
+            color: cleanText(s.color, 24) || '#ff3b30',
+            width: Math.max(1, Math.min(40, Number(s.width) || 3)),
+            pts,
+            by: meta.name || '',
+            ts: Date.now(),
+          };
+          ink[song].push(stroke);
+          if (ink[song].length > INK_MAX_PER_SONG) ink[song].splice(0, ink[song].length - INK_MAX_PER_SONG);
+          payload = { type: 'ink', op: 'stroke', song, stroke, ts: stroke.ts };
+        } else if (op === 'undo') {
+          // 只撤自己最后一笔，别把别人的记号也撤掉
+          const mine = meta.name || '';
+          for (let i = ink[song].length - 1; i >= 0; i--) {
+            if (ink[song][i].by === mine) {
+              const removed = ink[song].splice(i, 1)[0];
+              payload = { type: 'ink', op: 'undo', song, id: removed.id, ts: Date.now() };
+              break;
+            }
+          }
+          if (!payload) break;
+        } else {
+          ink[song] = [];
+          payload = { type: 'ink', op: 'clear', song, by: meta.name || '', ts: Date.now() };
+        }
+
+        await this.state.storage.put(INK_KEY, ink);
+        this._ink = ink;
+        this._broadcast(payload);
+        break;
+      }
+
+      // 拉某首歌已有的标注（换歌 / 刚进来时）
+      case 'ink_get': {
+        const song = cleanText(msg.song, 120);
+        if (!song) break;
+        const ink = await this._loadInk();
+        safeSend(ws, { type: 'ink', op: 'all', song, strokes: ink[song] || [], ts: Date.now() });
+        break;
+      }
+
+      // ── 激光笔：即时指示，不存盘，只转发给别人 ──
+      case 'laser': {
+        const meta = safeMeta(ws);
+        if (!meta || !meta.role) break;
+        const mode = msg.mode === 'line' ? 'line' : 'dot';
+        const pts = Array.isArray(msg.pts) ? msg.pts.slice(0, 120)
+          .filter((p) => Array.isArray(p) && p.length >= 2)
+          .map((p) => [round3(p[0]), round3(p[1])]) : [];
+        this._broadcast({
+          type: 'laser', mode, pts,
+          done: !!msg.done,
+          color: cleanText(msg.color, 24) || '#ff3b30',
+          by: meta.name || '', ts: Date.now(),
+        }, ws);
         break;
       }
 
@@ -520,6 +608,14 @@ export class WorshipRoom {
     }
   }
 
+  // ── 同步标注 ────────────────────────────────────────────────
+  async _loadInk() {
+    if (this._ink === undefined) {
+      this._ink = (await this.state.storage.get(INK_KEY)) || {};
+    }
+    return this._ink;
+  }
+
   // ── 共享歌单 ────────────────────────────────────────────────
   async _sendSetlistTo(ws) {
     if (this._setlist === undefined) {
@@ -541,6 +637,9 @@ export class WorshipRoom {
 
     await this.state.storage.put(DAILY_RESET_STAMP_KEY, stamp);
     await this._clearHistory();
+    /* 标注跟当天的谱走，隔天清掉（歌单是「本周诗歌」所以保留） */
+    this._ink = {};
+    await this.state.storage.delete(INK_KEY);
 
     this._broadcast({
       type: 'daily_reset',
@@ -779,6 +878,13 @@ function cleanIdentityType(value) {
 
 function cleanText(value, maxLen = 500) {
   return String(value || '').trim().slice(0, maxLen);
+}
+
+/* 标注坐标是 0~1 归一化的，留三位小数足够精确，也能把存储压小一半 */
+function round3(n) {
+  const v = Number(n);
+  if (!isFinite(v)) return 0;
+  return Math.round(Math.max(-0.5, Math.min(1.5, v)) * 1000) / 1000;
 }
 
 function cleanId(value, prefix) {
