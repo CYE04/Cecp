@@ -849,7 +849,16 @@
     '.cf-song .grow{flex:1;min-width:0}',
     /* 选歌器 */
     '.cf-setlist-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}',
-    '.cf-song-row{display:flex;align-items:center;gap:2px}',
+    '.cf-song-row{display:flex;align-items:center;gap:2px;transition:transform .17s cubic-bezier(.3,.9,.4,1)}',
+    /* 拖动把手：只有它吃手势，行别处照常能点、抽屉照常能滚 */
+    '.cf-song-grip{flex:none;width:28px;height:34px;display:inline-flex;align-items:center;justify-content:center;',
+    '  cursor:grab;touch-action:none;color:var(--muted);border-radius:8px}',
+    '.cf-song-grip:active{cursor:grabbing;color:var(--text)}',
+    '.cf-song-grip i{display:block;width:14px;height:1.8px;border-radius:2px;background:currentColor;',
+    '  box-shadow:0 -4.5px 0 currentColor,0 4.5px 0 currentColor}',
+    '.cf-song-row.drag{transition:none;position:relative;z-index:5}',
+    '.cf-song-row.drag .cf-song{box-shadow:0 8px 22px rgba(0,0,0,.22)}',
+    '[data-setlist].reordering{-webkit-user-select:none;user-select:none}',
     '.cf-song-row .cf-song{flex:1;min-width:0}',
     '.cf-song-x{flex:none;width:26px;height:26px;border-radius:8px;background:var(--card3);color:var(--muted);font-size:12px;',
     '  display:flex;align-items:center;justify-content:center}',
@@ -1857,16 +1866,6 @@
         this.renderSetlist();
         this.pushSetlist();
         break;
-      case 'live-set-move': {
-        var from = +el.dataset.i, to = from + (+el.dataset.d);
-        if (to >= 0 && to < this.live.songs.length) {
-          var moved = this.live.songs.splice(from, 1)[0];
-          this.live.songs.splice(to, 0, moved);
-          this.renderSetlist();
-          this.pushSetlist();
-        }
-        break;
-      }
       case 'live-prev': this.selectLiveSong(this.live.i - 1); break;
       case 'live-next': this.selectLiveSong(this.live.i + 1); break;
       case 'live-zoom':
@@ -3147,21 +3146,23 @@
       + (this.live.songs.length
           ? this.live.songs.map(function (x, i) {
               return '<div class="cf-song-row">'
+                + (editing
+                    ? '<span class="cf-song-grip" data-set-grip title="按住上下拖，可以调顺序"><i></i></span>'
+                    : '')
                 + '<button class="cf-song' + (i === cur ? ' on' : '') + '" type="button" data-action="live-song" data-i="' + i + '">'
                 + '<span class="cf-song-no">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span>'
                 + '<span class="grow"><span class="cf-song-t">' + esc(x.title) + '</span>'
                 + '<span class="cf-song-s">' + (x.key ? esc(x.key) + ' 调' : '') + '</span></span>'
                 + '</button>'
                 + (editing
-                    ? '<button class="cf-song-x" type="button" data-action="live-set-move" data-i="' + i + '" data-d="-1" title="上移">↑</button>'
-                      + '<button class="cf-song-x" type="button" data-action="live-set-move" data-i="' + i + '" data-d="1" title="下移">↓</button>'
-                      + '<button class="cf-song-x is-del" type="button" data-action="live-set-del" data-i="' + i + '" title="移除">✕</button>'
+                    ? '<button class="cf-song-x is-del" type="button" data-action="live-set-del" data-i="' + i + '" title="移除">✕</button>'
                     : '')
                 + '</div>';
             }).join('')
           : '<div class="cf-empty" style="padding:18px 8px">还没有选歌<br><span style="font-size:12px">点上面「选歌」加</span></div>')
       + (editing ? '<div class="cf-lib-box" data-lib-box><div class="cf-empty" style="padding:14px">曲库加载中…</div></div>' : '');
     if (editing) this.renderLibraryPicker();
+    this.bindSetlistDrag();
   };
 
   /* 选歌器：搜曲库（实时枚举 GitHub，你新加的歌也在），点一下加进歌单，全房间同步 */
@@ -3205,6 +3206,93 @@
     }).catch(function () {
       box.innerHTML = '<div class="cf-empty" style="padding:14px">曲库取不到<br><span style="font-size:12px">检查网络后重开「选歌」</span></div>';
     });
+  };
+
+  /* 歌单按住上下拖着排序（原来要一下一下点 ↑↓，太慢）。
+     只有把手 [data-set-grip] 吃手势，行别的地方照常能点、抽屉照常能滚。 */
+  CecpApp.prototype.bindSetlistDrag = function () {
+    var list = this.$stage && this.$stage.querySelector('[data-setlist]');
+    if (!list || list.dataset.dragbound) return;
+    list.dataset.dragbound = '1';
+    var self = this, S = null;
+
+    var scrollerOf = function (el) {
+      var p = el.parentElement;
+      while (p) {
+        var o = getComputedStyle(p).overflowY;
+        if (o === 'auto' || o === 'scroll') return p;
+        p = p.parentElement;
+      }
+      return null;
+    };
+
+    list.addEventListener('pointerdown', function (ev) {
+      var grip = ev.target.closest && ev.target.closest('[data-set-grip]');
+      if (!grip) return;
+      var row = grip.closest('.cf-song-row');
+      if (!row) return;
+      ev.preventDefault();
+      try { grip.setPointerCapture(ev.pointerId); } catch (err) {}
+      var rows = [].slice.call(list.querySelectorAll('.cf-song-row'));
+      var rects = rows.map(function (r) { return r.getBoundingClientRect(); });
+      var idx = rows.indexOf(row);
+      /* 步距用相邻两行的间距量，别写死行高 */
+      var step = rows.length > 1
+        ? Math.abs((rects[1] || rects[0]).top - rects[0].top)
+        : rects[idx].height;
+      S = { rows: rows, rects: rects, from: idx, to: idx, row: row,
+            y0: ev.clientY, step: step || rects[idx].height,
+            scroller: scrollerOf(list) };
+      row.classList.add('drag');
+      list.classList.add('reordering');
+    });
+
+    list.addEventListener('pointermove', function (ev) {
+      if (!S) return;
+      ev.preventDefault();
+      /* 拖到上下边缘时自动滚一点，长歌单才够得着 */
+      if (S.scroller) {
+        var sb = S.scroller.getBoundingClientRect();
+        if (ev.clientY < sb.top + 46) S.scroller.scrollTop -= 9;
+        else if (ev.clientY > sb.bottom - 46) S.scroller.scrollTop += 9;
+      }
+      var dy = ev.clientY - S.y0;
+      S.row.style.transform = 'translateY(' + dy + 'px)';
+      var to = Math.max(0, Math.min(S.rows.length - 1, S.from + Math.round(dy / S.step)));
+      if (to === S.to) return;
+      S.to = to;
+      /* 其余行让开一格，先把结果演出来 */
+      S.rows.forEach(function (r, i) {
+        if (i === S.from) return;
+        var shift = 0;
+        if (S.from < to && i > S.from && i <= to) shift = -S.step;
+        else if (S.from > to && i >= to && i < S.from) shift = S.step;
+        r.style.transform = shift ? 'translateY(' + shift + 'px)' : '';
+      });
+    });
+
+    var end = function () {
+      if (!S) return;
+      var s = S; S = null;
+      s.rows.forEach(function (r) { r.style.transform = ''; });
+      s.row.classList.remove('drag');
+      list.classList.remove('reordering');
+      if (s.to !== s.from) self.moveSong(s.from, s.to);
+    };
+    list.addEventListener('pointerup', end);
+    list.addEventListener('pointercancel', end);
+  };
+
+  /* 挪一首歌的位置。当前在放的那首要跟着走，别because 序号变了就跳歌 */
+  CecpApp.prototype.moveSong = function (from, to) {
+    var songs = this.live.songs;
+    if (from === to || from < 0 || to < 0 || from >= songs.length || to >= songs.length) return;
+    var playing = songs[this.live.i];
+    songs.splice(to, 0, songs.splice(from, 1)[0]);
+    var ni = songs.indexOf(playing);
+    this.live.i = ni < 0 ? 0 : ni;
+    this.renderSetlist();
+    this.pushSetlist();
   };
 
   /* 改完就广播出去，全房间实时同步 */
