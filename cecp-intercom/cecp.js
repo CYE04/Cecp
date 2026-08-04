@@ -640,6 +640,28 @@
     '  transition:opacity .14s ease,transform .14s ease}',
     '.cf-ink-tipbox.on{opacity:1;transform:translateX(-50%) translateY(0)}',
     '.cf-ink-tipbox.above{top:auto;bottom:calc(100% + 8px)}',
+    /* ── 手机上整条要收小：11 个按钮按平板尺寸排会挤出屏幕 ── */
+    '@media (max-width:560px){',
+    '  .cf-ink-bar{padding:4px 5px;border-radius:14px}',
+    '  .cf-ink-btn{width:31px;height:32px;border-radius:9px}',
+    '  .cf-ic-tool{width:18px;height:18px}',
+    '  .cf-ink-slot{border-radius:10px}',
+    '  .cf-ink-slot.on .cf-ink-btn{width:28px}',
+    '  .cf-ink-chev{width:14px;height:32px;padding-right:3px;border-radius:0 10px 10px 0}',
+    '  .cf-ink-grip{width:11px;height:22px;margin-right:0}',
+    '  .cf-ink-sep{margin:0 2px;height:17px}',
+    '  .cf-ink-tip{right:3px;bottom:3px;width:6px;height:6px}',
+    '  .cf-ink-opts{width:min(268px,92vw);padding:12px 12px 10px;border-radius:15px}',
+    '  .cf-gn-prev{height:62px}',
+    '  .cf-gn-sw-c,.cf-gn-addcolor{width:23px;height:23px}',
+    '  .cf-gn-prow{gap:7px}',
+    '}',
+    '@media (max-width:400px){',
+    '  .cf-ink-btn{width:27px;height:30px}',
+    '  .cf-ic-tool{width:17px;height:17px}',
+    '  .cf-ink-slot.on .cf-ink-btn{width:25px}',
+    '  .cf-ink-chev{width:12px;height:30px}',
+    '}',
     /* GoodNotes 式：工具槽 = 图标 + 选中后挂的小箭头；图标右下角一点当前颜色 */
     /* 选中的工具 = 图标和 ⌄ 并排装在同一个高亮圆角块里（GoodNotes 就是这样） */
     '.cf-ink-slot{position:relative;display:inline-flex;flex-direction:row;align-items:center;',
@@ -772,8 +794,9 @@
     '.cf-ink-color:active,.cf-ink-w:active,.cf-opt-shape:active,',
     '.cf-opt-mode:active,.cf-gn-card:active{transform:scale(.94)}',
     /* 工具条落位用弹簧曲线；拖动中关掉过渡免得跟手发飘 */
-    '.cf-ink-bar{transition:top .2s ease-out,left .2s ease-out,box-shadow .2s}',
-    '.cf-ink-bar.dragging{transform:translateX(-50%) scale(1.04)}',
+    /* 位置不做过渡：每次重绘都从中间滑过去很飘，GoodNotes 的工具条也是直接落位 */
+    '.cf-ink-bar{transition:box-shadow .2s}',
+
     '@media (prefers-reduced-motion:reduce){',
     '  .cf-ink-opts.just-open{animation:none}',
     '  .cf-ink-bar,.cf-ink-textbox{transition:none}}',
@@ -1141,6 +1164,11 @@
       + ' aria-hidden="true" focusable="false">' + inner + '</svg>';
   }
   var ICON = {
+    /* 手：选它就退出画笔，谱恢复正常滚动、和弦也能点 */
+    pan: svg('<path d="M8.5 11V5.6a1.6 1.6 0 0 1 3.2 0V11"/>'
+      + '<path d="M11.7 10.6V4.7a1.6 1.6 0 0 1 3.2 0V11"/>'
+      + '<path d="M14.9 11V6.6a1.6 1.6 0 0 1 3.2 0V14a6.5 6.5 0 0 1-6.5 6.5h-.7a5.6 5.6 0 0 1-4.2-1.9l-3-3.4a1.6 1.6 0 0 1 2.3-2.2l2.2 2"/>'
+      + '<path d="M8.5 11v3.6"/>'),
     /* 钢笔：斜握的笔身 + 笔尖 */
     pen: svg('<path d="M16.8 3.6a2 2 0 0 1 2.8 2.8L9.2 16.8l-3.7.9.9-3.7z"/><path d="M14.6 5.8l3.6 3.6"/>'),
     /* 荧光笔：粗斜马克笔 + 宽笔迹 */
@@ -1162,6 +1190,7 @@
       + '<path d="M6.6 6.5l.9 12a1.6 1.6 0 0 0 1.6 1.5h5.8a1.6 1.6 0 0 0 1.6-1.5l.9-12"/>'),
   };
   var INK_TOOLS = [
+    { id: 'pan',   icon: ICON.pan,   title: '滑动' },
     { id: 'pen',   icon: ICON.pen,   title: '笔' },
     { id: 'hl',    icon: ICON.hl,    title: '荧光笔' },
     { id: 'shape', icon: ICON.shape, title: '形状' },
@@ -1178,6 +1207,14 @@
     { id: 'brush', name: '画笔',
       icon: svg('<path d="M15.8 4.4a1.7 1.7 0 0 1 2.4 0l1.4 1.4a1.7 1.7 0 0 1 0 2.4l-8.2 8.2-3.8-3.8z"/><path d="M7.6 12.6c-1.9 1-2.4 3.1-3.1 5.4 2.4-.6 4.5-1.1 5.5-3"/>') }
   ];
+  /* 谱盒的参考宽度。坐标早就归一化了，但粗细/字号/光点这些还是绝对像素——
+     结果同一条笔画在窄屏（谱盒小）上相对谱面就显得特别粗。所有像素量一律
+     乘 box.w/800，这样手机、平板、电脑看到的比例才一样。 */
+  var SCORE_REF_W = 800;
+  function inkScale(box) {
+    if (box && box.k != null) return box.k;          /* 预览画布自己指定 */
+    return Math.max(0.35, Math.min(2.2, ((box && box.w) || SCORE_REF_W) / SCORE_REF_W));
+  }
   var ERASE_SIZES = [1.4, 2.6, 5];      /* 橡皮半径，单位是谱宽的 % */
   var SHAPE_CYCLE = ['line', 'rect', 'ellipse', 'arrow'];
   var SHAPE_ICON = {
@@ -2925,7 +2962,7 @@
     if (!this.live) this.live = { songs: [], i: 0, zoom: 100, loaded: false, mode: 'img', view: 'img' };
     this.live.view = 'img';   /* 每次进现场页都从「原图」起步，点「移调」才渲简谱 */
     if (!this.ink) {
-      this.ink = { on: false, tool: 'pen', shape: 'line', color: INK_COLORS[0], width: 4,
+      this.ink = { on: true, tool: 'pan', shape: 'line', color: INK_COLORS[0], width: 4,
                    laserMode: 'dot', eraseSize: 1, eraseWhole: false, opts: false,
                    /* 笔（GoodNotes 那套）：笔型 + 笔尖 + 压感 + 扁平度 + 稳定性 */
                    pen: 'fountain', press: 0.5, flat: 0, stab: 0.2,
@@ -3223,21 +3260,21 @@
       var on = ink.on && ink.tool === t.id;
       var icon = t.icon;
       if (t.id === 'shape' && on) icon = SHAPE_ICON[ink.shape] || t.icon;
-      var swatch = (on && t.id !== 'erase')
+      var swatch = (on && t.id !== 'erase' && t.id !== 'pan')
         ? '<i class="cf-ink-tip" style="background:' + esc(ink.color) + '"></i>' : '';
       return '<span class="cf-ink-slot' + (on ? ' on' : '') + (t.id === 'laser' ? ' laser' : '') + '">'
         + '<button class="cf-ink-btn' + (on ? ' on' : '')
         + '" type="button" data-action="ink-tool" data-t="' + t.id + '"'
         + ' data-tip="' + esc(t.title) + '" aria-label="' + esc(t.title) + '">'
         + icon + swatch + '</button>'
-        + (on
+        + (on && t.id !== 'pan'
             ? '<button class="cf-ink-chev' + (ink.opts ? ' open' : '') + '" type="button"'
               + ' data-action="ink-opts" aria-label="' + esc(t.title) + '选项">⌄</button>'
             : '')
         + '</span>';
     }).join('');
 
-    var actions = (canDraw && ink.on && ink.tool !== 'laser')
+    var actions = (canDraw && ink.on && ink.tool !== 'laser' && ink.tool !== 'pan')
       ? '<span class="cf-ink-sep"></span>'
         + '<button class="cf-ink-btn" type="button" data-action="ink-undo" data-tip="撤销 ⌘Z">' + ICON.undo + '</button>'
         + '<button class="cf-ink-btn" type="button" data-action="ink-redo" data-tip="重做 ⌘⇧Z">' + ICON.redo + '</button>'
@@ -3447,7 +3484,8 @@
       var host = bar.offsetParent || bar.parentElement;
       var hb = host.getBoundingClientRect(), bb = bar.getBoundingClientRect();
       start = { x: ev.clientX, y: ev.clientY, left: bb.left - hb.left, top: bb.top - hb.top,
-                maxX: hb.width - bb.width, maxY: hb.height - bb.height };
+                maxX: (host.clientWidth || hb.width) - bb.width,
+                maxY: (host.clientHeight || hb.height) - bb.height };
       bar.classList.add('dragging');
     });
 
@@ -3484,14 +3522,21 @@
     if (!p) return;                       /* 没拖过就用 CSS 默认的顶部居中 */
     var host = bar.offsetParent || bar.parentElement;
     if (!host) return;
-    var hb = host.getBoundingClientRect(), bb = bar.getBoundingClientRect();
+    var bb = bar.getBoundingClientRect();
+    /* 用 clientWidth/Height（可视区），不用 rect —— 容器本身是可滚动的，
+       rect 拿到的是内容盒，横向滚出去之后夹不住工具条 */
+    var hw = host.clientWidth || host.getBoundingClientRect().width;
+    var hh = host.clientHeight || host.getBoundingClientRect().height;
     /* 容器变窄时别把工具条留在屏幕外 */
-    var x = Math.max(6, Math.min(Math.max(6, hb.width - bb.width - 6), p.x));
-    var y = Math.max(6, Math.min(Math.max(6, hb.height - bb.height - 6), p.y));
-    bar.style.left = x + 'px';
-    bar.style.top = y + 'px';
-    /* 拖动中稍微放大一点点，跟手感更明显（内联要盖掉 CSS 的 translateX(-50%)） */
-    bar.style.transform = bar.classList.contains('dragging') ? 'scale(1.04)' : 'none';
+    var x = Math.max(6, Math.min(Math.max(6, hw - bb.width - 6), p.x));
+    var y = Math.max(6, Math.min(Math.max(6, hh - bb.height - 6), p.y));
+    /* 定位一律走 transform：CSS 里 .cf-ink-bar 有 left:50%，内联 left 在某些
+       布局下推不动它；translate 直接作用在合成层上，既稳又不触发重排。
+       拖动中稍微放大一点点，跟手感更明显。 */
+    bar.style.left = '0';
+    bar.style.top = '0';
+    bar.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)'
+      + (bar.classList.contains('dragging') ? ' scale(1.04)' : '');
   };
 
   /* ────────────────────────────────────────────
@@ -3509,7 +3554,7 @@
 
   CecpApp.prototype.inkOptsHtml = function () {
     var ink = this.ink;
-    if (!ink.on || !ink.opts) return '';
+    if (!ink.on || !ink.opts || ink.tool === 'pan') return '';
 
     /* —— 小积木 —— */
     function sec(label) { return '<div class="cf-gn-sec">' + esc(label) + '</div>'; }
@@ -3675,6 +3720,19 @@
     return Math.round((ink[k] || 0) * 100) + '%';
   };
 
+  /* 点在哪个文字上（从最上面那层往下找） */
+  CecpApp.prototype.findTextAt = function (p) {
+    var box = this._inkBox;
+    if (!box) return null;
+    var ar = box.w / (box.h || 1);
+    for (var i = this.ink.strokes.length - 1; i >= 0; i--) {
+      var st = this.ink.strokes[i];
+      if (st.tool !== 'text') continue;
+      if (this.strokeHit(st, p, 0.012, ar)) return st;
+    }
+    return null;
+  };
+
   /* 「+」自定义颜色：借系统取色器，选完存进自定义那一排 */
   CecpApp.prototype.pickCustomInkColor = function () {
     var self = this;
@@ -3735,7 +3793,7 @@
       var speed = 0.35 + Math.sin(t * Math.PI) * 0.65;      /* 中段快 */
       pts.push([x, y, 1.35 - speed * 0.8]);
     }
-    this.drawStroke(ctx, this.strokeMeta({ pts: pts }), { w: w, h: h });
+    this.drawStroke(ctx, this.strokeMeta({ pts: pts }), { w: w, h: h, k: 0.62 });
   };
   CecpApp.prototype.mountInkLayer = function () {
     var stage = this.$stage && this.$stage.querySelector('[data-score-stage]');
@@ -3760,7 +3818,26 @@
       laser: wrap.querySelector('[data-laser-canvas]')
     };
     this.bindInkPointer();
+    this.observeInkSize();
     this.resizeInkCanvas();
+  };
+
+  /* 谱盒不只在窗口 resize 时会变：切原图/移调、改缩放、开合歌单抽屉、
+     图片加载完成……都会变。盯住盒子本身最省心。 */
+  CecpApp.prototype.observeInkSize = function () {
+    var e = this.inkEls, self = this;
+    if (!e || !window.ResizeObserver) return;
+    if (this._inkRO) this._inkRO.disconnect();
+    this._inkRO = new ResizeObserver(function () {
+      if (self.destroyed || !self.inkEls) return;
+      /* 一帧一次就够，观察者可能连着报好几次 */
+      if (self._inkROraf) return;
+      self._inkROraf = requestAnimationFrame(function () {
+        self._inkROraf = 0;
+        if (!self.destroyed && self.inkEls) self.resizeInkCanvas();
+      });
+    });
+    this._inkRO.observe(e.host);
   };
 
   CecpApp.prototype.resizeInkCanvas = function () {
@@ -3823,15 +3900,16 @@
     var pts = s.pts || [];
     if (!pts.length) return;
     var P = pts.map(function (p) { return [p[0] * box.w, p[1] * box.h, p[2] == null ? 1 : p[2]]; });
+    var k = inkScale(box);            /* 粗细/字号跟着谱盒缩放，各设备看着一样粗 */
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = s.color;
-    ctx.lineWidth = s.width;
+    ctx.lineWidth = s.width * k;
 
     /* 文字：一个锚点 + 内容，字号跟着笔画粗细走 */
     if (s.tool === 'text') {
-      var fs = Math.max(13, s.width * 4.5);
+      var fs = Math.max(13, s.width * 4.5) * k;
       ctx.font = '600 ' + fs + 'px -apple-system,BlinkMacSystemFont,"PingFang SC",system-ui,sans-serif';
       ctx.fillStyle = s.color;
       ctx.textBaseline = 'top';
@@ -3844,9 +3922,9 @@
 
     /* 笔型：圆珠笔恒定、钢笔跟压感/速度变、画笔更粗更软 */
     var pen = s.pen || 'fountain';
-    var base = s.width;
+    var base = s.width * k;
     if (s.tool === 'hl') { ctx.globalAlpha = s.alpha || 0.35; }
-    else if (pen === 'brush') { ctx.globalAlpha = 0.86; base = s.width * 1.45; }
+    else if (pen === 'brush') { ctx.globalAlpha = 0.86; base = s.width * 1.45 * k; }
     else if (pen === 'ball') { ctx.globalAlpha = 0.97; }
     var varying = (s.tool === 'pen' && pen !== 'ball');
     var flat = s.flat || 0, NIB = -Math.PI / 4;      /* 凿头笔尖的朝向 */
@@ -3863,7 +3941,7 @@
           Math.abs(b[0] - a[0]) / 2, Math.abs(b[1] - a[1]) / 2, 0, 0, Math.PI * 2);
       } else if (s.shape === 'arrow') {
         ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
-        var ang = Math.atan2(b[1] - a[1], b[0] - a[0]), h = Math.max(9, s.width * 3);
+        var ang = Math.atan2(b[1] - a[1], b[0] - a[0]), h = Math.max(9, s.width * 3) * k;
         ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - h * Math.cos(ang - 0.42), b[1] - h * Math.sin(ang - 0.42));
         ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] + 0, b[1] + 0);
         ctx.lineTo(b[0] - h * Math.cos(ang + 0.42), b[1] - h * Math.sin(ang + 0.42));
@@ -3969,8 +4047,22 @@
         return;
       }
       if (self.ink.tool === 'erase') { self.eraseAt(p); return; }
-      /* 文字：就地弹输入框（window.prompt 在 iOS/WebView 里常被拦，用不了） */
-      if (self.ink.tool === 'text') { self.openTextBox(p); return; }
+      /* 文字：点到已有的字就是拖它，点空白才是新起一个框 */
+      if (self.ink.tool === 'text') {
+        var hitT = self.findTextAt(p);
+        if (hitT) {
+          self.closeTextBox();
+          self._movingText = {
+            st: hitT,
+            before: JSON.parse(JSON.stringify(hitT)),
+            grab: p,
+            from: [hitT.pts[0][0], hitT.pts[0][1]]
+          };
+          return;
+        }
+        self.openTextBox(p);
+        return;
+      }
       self._drawing = self.strokeMeta({ pts: [[p[0], p[1], 1]] });
       self._penPrev = null;
     });
@@ -3996,6 +4088,15 @@
         return;
       }
       if (self.ink.tool === 'erase') { if (ev.buttons) self.eraseAt(p); return; }
+      if (self._movingText) {
+        ev.preventDefault();
+        var mv = self._movingText;
+        mv.st.pts[0][0] = mv.from[0] + (p[0] - mv.grab[0]);
+        mv.st.pts[0][1] = mv.from[1] + (p[1] - mv.grab[1]);
+        mv.moved = true;
+        self.scheduleInkRedraw();
+        return;
+      }
       if (!self._drawing) return;
       ev.preventDefault();
       var d = self._drawing;
@@ -4030,6 +4131,19 @@
         }
         return;
       }
+      if (self._movingText) {
+        var mt = self._movingText;
+        self._movingText = null;
+        if (mt.moved) {
+          var key2 = self.currentSongKey();
+          /* 位置变了：先撤掉旧的，再按同一个 id 重新广播 */
+          self.wsSend({ type: 'ink', op: 'undo', song: key2, id: mt.st.id });
+          self.wsSend({ type: 'ink', op: 'stroke', song: key2, stroke: mt.st });
+          self.pushInkOp({ del: [mt.before], add: [JSON.parse(JSON.stringify(mt.st))] });
+          self.redrawInk();
+        }
+        return;
+      }
       var d = self._drawing;
       self._drawing = null;
       if (!d || d.pts.length < 1) return;
@@ -4048,7 +4162,8 @@
   /* 没开工具时画布不能拦触摸，否则谱都滑不动了 */
   CecpApp.prototype.syncInkInteractive = function () {
     if (!this.inkEls) return;
-    this.inkEls.ink.classList.toggle('idle', !this.ink.on);
+    /* 「滑动」= 画布不吃事件，谱照常滚动、和弦照常能点 */
+    this.inkEls.ink.classList.toggle('idle', !this.ink.on || this.ink.tool === 'pan');
   };
 
   /* 标注的归属键 = 这首歌 + 当前视图。
@@ -4078,7 +4193,7 @@
     box.style.left = (hb.left - wb.left + p[0] * hb.width) + 'px';
     box.style.top = (hb.top - wb.top + p[1] * hb.height) + 'px';
     box.style.color = this.ink.color;
-    box.style.fontSize = Math.max(13, this.ink.width * 4.5) + 'px';
+    box.style.fontSize = Math.max(13, this.ink.width * 4.5) * inkScale(this._inkBox) + 'px';
     e.wrap.appendChild(box);
     this._textBox = box;
 
@@ -4131,7 +4246,7 @@
     var box = this._textBox;
     if (!box) return;
     box.style.color = this.ink.color;
-    box.style.fontSize = Math.max(13, this.ink.width * 4.5) + 'px';
+    box.style.fontSize = Math.max(13, this.ink.width * 4.5) * inkScale(this._inkBox) + 'px';
   };
 
   CecpApp.prototype.closeTextBox = function () {
@@ -4217,7 +4332,7 @@
     /* 文字：按渲染出来的文字盒子算（字号由 width 决定） */
     if (st.tool === 'text') {
       var box = this._inkBox || { w: 900, h: 900 };
-      var fs = Math.max(13, st.width * 4.5);
+      var fs = Math.max(13, st.width * 4.5) * inkScale(box);
       var lines = String(st.text || '').split('\n');
       var wpx = Math.max.apply(null, lines.map(function (L) { return L.length * fs * 0.62; }));
       var hpx = lines.length * fs * 1.25;
@@ -4343,6 +4458,7 @@
     ctx.clearRect(0, 0, box.w, box.h);
     var a = alpha === undefined ? 1 : Math.max(0, Math.min(1, alpha));
     if (a <= 0) return;
+    var k = inkScale(box);                    /* 光点大小也得跟着谱盒走 */
     var rgb = laserRgb(color);
     var rgba = function (al) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + al + ')'; };
     var P = pts.map(function (p) { return [p[0] * box.w, p[1] * box.h]; });
@@ -4350,61 +4466,61 @@
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    ctx.shadowBlur = 0;                        /* 绝对不能开：每段一次高斯模糊会掉帧 */
 
-    /* 线模式：越靠尾部越淡越细。
-       性能：绝对不能用 shadowBlur —— 每段一次高斯模糊，几十段就掉帧（之前卡就是这个）。
-       改成「宽而淡 → 中 → 白亮芯」三层描边叠出辉光，纯 stroke 便宜得多。 */
-    if (mode === 'line' && P.length > 1) {
+    /* 拖尾：一条从尾到头逐渐变粗变亮的锥形光带。
+       逐段画，节点取相邻两点的中点、原始点当控制点，这样是圆滑曲线不是折线。 */
+    if (mode === 'line' && P.length > 2) {
       var n = P.length;
-      ctx.shadowBlur = 0;
-      var pass = [
-        { w: 11, al: 0.16, col: rgba(1) },              /* 外层弥散 */
-        { w: 5,  al: 0.55, col: rgba(1) },              /* 主体 */
-        { w: 1.6, al: 0.75, col: 'rgba(255,255,255,1)' } /* 白亮芯 */
-      ];
-      for (var pi = 0; pi < pass.length; pi++) {
-        var ps = pass[pi];
-        /* 白芯只画靠头的一小段 */
-        var start = pi === 2 ? Math.max(1, n - 14) : 1;
-        for (var i = start; i < n; i++) {
-          var t = i / (n - 1);
-          var ease = t * t;
-          ctx.globalAlpha = a * ps.al * (0.08 + 0.92 * ease);
-          ctx.strokeStyle = ps.col;
-          ctx.lineWidth = ps.w * (0.45 + 0.55 * ease);
-          ctx.beginPath();
-          ctx.moveTo(P[i - 1][0], P[i - 1][1]);
-          ctx.lineTo(P[i][0], P[i][1]);
-          ctx.stroke();
-        }
+      /* 尾巴不要太长，短促才像激光笔（也省画） */
+      var from = Math.max(1, n - 30);
+      var seg = function (i, w, col, al) {
+        var m0 = [(P[i - 1][0] + P[i][0]) / 2, (P[i - 1][1] + P[i][1]) / 2];
+        var m1 = [(P[i][0] + P[i + 1][0]) / 2, (P[i][1] + P[i + 1][1]) / 2];
+        ctx.globalAlpha = al;
+        ctx.strokeStyle = col;
+        ctx.lineWidth = w;
+        ctx.beginPath();
+        ctx.moveTo(m0[0], m0[1]);
+        ctx.quadraticCurveTo(P[i][0], P[i][1], m1[0], m1[1]);
+        ctx.stroke();
+      };
+      for (var i = from; i < n - 1; i++) {
+        var t = (i - from) / Math.max(1, n - 1 - from);   /* 0 尾 → 1 头 */
+        var ease = t * t;
+        /* 外辉光：宽、淡 */
+        seg(i, (7.5 * (0.3 + 0.7 * ease)) * k, rgba(1), a * 0.18 * (0.05 + 0.95 * ease));
+        /* 主体：饱和 */
+        seg(i, (3.2 * (0.35 + 0.65 * ease)) * k, rgba(1), a * 0.7 * (0.06 + 0.94 * ease));
+        /* 白芯只在靠头的三分之一 */
+        if (t > 0.62) seg(i, 1.15 * k, 'rgba(255,255,255,1)', a * 0.8 * (t - 0.62) / 0.38);
       }
     }
 
-    /* 两种模式都在当前位置画光点（点模式只有这个） */
+    /* 光点本体：紧一点、更饱和，才像 GoodNotes 那颗；散得太开会发灰 */
     var last = P[P.length - 1];
-    ctx.shadowBlur = 0;
-    /* 外层弥散光晕 */
-    var halo = ctx.createRadialGradient(last[0], last[1], 0, last[0], last[1], 26);
-    halo.addColorStop(0, rgba(0.55));
-    halo.addColorStop(0.45, rgba(0.22));
-    halo.addColorStop(1, rgba(0));
     ctx.globalAlpha = a;
+    var R = 15 * k;
+    var halo = ctx.createRadialGradient(last[0], last[1], 0, last[0], last[1], R);
+    halo.addColorStop(0, rgba(0.85));
+    halo.addColorStop(0.35, rgba(0.34));
+    halo.addColorStop(1, rgba(0));
     ctx.fillStyle = halo;
-    ctx.beginPath(); ctx.arc(last[0], last[1], 26, 0, Math.PI * 2); ctx.fill();
-    /* 中层饱和色核 */
-    var core = ctx.createRadialGradient(last[0], last[1], 0, last[0], last[1], 9);
-    core.addColorStop(0, 'rgba(255,255,255,0.98)');
-    core.addColorStop(0.28, rgba(0.98));
-    core.addColorStop(1, rgba(0));
+    ctx.beginPath(); ctx.arc(last[0], last[1], R, 0, Math.PI * 2); ctx.fill();
+
+    var r2 = 5.4 * k;
+    var core = ctx.createRadialGradient(last[0], last[1], 0, last[0], last[1], r2);
+    core.addColorStop(0, 'rgba(255,255,255,1)');
+    core.addColorStop(0.42, rgba(1));
+    core.addColorStop(1, rgba(0.1));
     ctx.fillStyle = core;
-    ctx.beginPath(); ctx.arc(last[0], last[1], 9, 0, Math.PI * 2); ctx.fill();
-    /* 炽白点 */
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.beginPath(); ctx.arc(last[0], last[1], 2.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(last[0], last[1], r2, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.98)';
+    ctx.beginPath(); ctx.arc(last[0], last[1], 1.6 * k, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   };
 
-  /* 松手后渐隐（不是「等一会儿突然消失」），逐帧降 alpha */
   CecpApp.prototype.fadeLaser = function (pts, color, mode) {
     var self = this;
     var last = (pts && pts.length) ? pts.slice() : (this._laserLast || null);
@@ -5504,6 +5620,8 @@
       document.removeEventListener('keydown', this.docKeyHandler);
       this.docKeyHandler = null;
     }
+    if (this._inkRO) { try { this._inkRO.disconnect(); } catch (err) {} this._inkRO = null; }
+    if (this._inkROraf) { try { cancelAnimationFrame(this._inkROraf); } catch (err) {} this._inkROraf = 0; }
     if (this._inkKeyHandler) {
       document.removeEventListener('keydown', this._inkKeyHandler);
       this._inkKeyHandler = null;
