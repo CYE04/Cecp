@@ -632,6 +632,16 @@
     '.cf-ink-btn.on{color:#fff}',
     '.cf-ink-sep{width:1px;height:20px;background:rgba(255,255,255,.16);margin:0 4px}',
     '.cf-ink-btn.dim{opacity:.32}',
+    /* 页脚：跟官网底部那条版权一个意思，淡淡一行就好 */
+    '.cf-foot{flex:none;text-align:center;font-size:10.5px;letter-spacing:.4px;',
+    '  color:var(--muted);opacity:.62;padding:4px 10px 7px;user-select:none;-webkit-user-select:none}',
+    '.cf-foot b{font-weight:600}',
+    /* 收起态：一个小圆钮 */
+    '.cf-ink-bar.mini{padding:0;border-radius:50%}',
+    '.cf-ink-mini{flex:none;width:46px;height:46px;border-radius:50%;color:rgba(255,255,255,.92);',
+    '  display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none}',
+    '.cf-ink-mini:active{cursor:grabbing}',
+    '.cf-ink-mini .cf-ic-tool{width:22px;height:22px}',
     /* 悬停/长按说明气泡 */
     '.cf-ink-tipbox{position:absolute;top:calc(100% + 8px);transform:translateX(-50%) translateY(-3px);',
     '  padding:4px 9px;border-radius:7px;white-space:nowrap;pointer-events:none;',
@@ -655,6 +665,7 @@
     '  .cf-gn-prev{height:62px}',
     '  .cf-gn-sw-c,.cf-gn-addcolor{width:23px;height:23px}',
     '  .cf-gn-prow{gap:7px}',
+    '  .cf-ink-mini{width:42px;height:42px}',
     '}',
     '@media (max-width:400px){',
     '  .cf-ink-btn{width:27px;height:30px}',
@@ -1195,6 +1206,8 @@
     /* 撤销 / 清空 */
     undo: svg('<path d="M4 9h11a4.5 4.5 0 0 1 0 9H9"/><path d="M7.5 5.5L4 9l3.5 3.5"/>'),
     redo: svg('<path d="M20 9H9a4.5 4.5 0 0 0 0 9h6"/><path d="M16.5 5.5L20 9l-3.5 3.5"/>'),
+    /* 收起成小圆钮（Apple Notes 那种） */
+    fold: svg('<circle cx="12" cy="12" r="8.2"/><path d="M15.2 10.4l-3.2 3.2-3.2-3.2"/>', { w: 1.5 }),
     trash: svg('<path d="M4.5 6.5h15"/><path d="M9.5 6.5V5a1.2 1.2 0 0 1 1.2-1.2h2.6A1.2 1.2 0 0 1 14.5 5v1.5"/>'
       + '<path d="M6.6 6.5l.9 12a1.6 1.6 0 0 0 1.6 1.5h5.8a1.6 1.6 0 0 0 1.6-1.5l.9-12"/>'),
   };
@@ -1830,6 +1843,16 @@
         this.ink.width = +el.dataset.w || 4;
         this.syncTextBoxStyle();
         this.refreshInkOpts();
+        break;
+      case 'ink-collapse':
+        if (this.ink.tool && this.ink.tool !== 'pan') this.ink.lastTool = this.ink.tool;
+        this.ink.collapsed = true;
+        this.ink.tool = 'pan';
+        this.ink.opts = false;
+        this.closeTextBox();
+        this.saveInkPrefs();
+        this.renderInkBar();
+        this.syncInkInteractive();
         break;
       case 'ink-undo': this.inkUndo(); break;
       case 'ink-redo': this.inkRedo(); break;
@@ -2738,6 +2761,7 @@
       + '  </div>'
       + '  <div class="cf-setup-error' + (errorText ? ' show' : '') + '">' + esc(errorText || '') + '</div>'
       + '  <button class="cf-btn-primary" type="button" data-action="join">进入成员端</button>'
+      + '  <div class="cf-foot">© 帕多瓦华人教会 · Powered by <b>YuEn</b></div>'
       + '</div>'
       + '</div>';
 
@@ -2961,7 +2985,8 @@
     if (!this.live) this.live = { songs: [], i: 0, zoom: 100, loaded: false, mode: 'img', view: 'img' };
     this.live.view = 'img';   /* 每次进现场页都从「原图」起步，点「移调」才渲简谱 */
     if (!this.ink) {
-      this.ink = { on: true, tool: 'pan', shape: 'line', color: INK_COLORS[0], width: 4,
+      this.ink = { on: true, tool: 'pan', collapsed: true, lastTool: 'pen',
+                   shape: 'line', color: INK_COLORS[0], width: 4,
                    laserMode: 'dot', eraseSize: 1, eraseWhole: false, opts: false,
                    /* 笔（GoodNotes 那套）：笔型 + 笔尖 + 压感 + 扁平度 + 稳定性 */
                    pen: 'fountain', press: 0.5, flat: 0, stab: 0.2,
@@ -3009,6 +3034,7 @@
       + '      <button class="cf-ghost-btn" type="button" data-action="live-next">下一首</button>'
       + '      <button class="cf-ghost-btn" type="button" data-action="live-lib" data-lib-btn hidden>曲库 ↗</button>'
       + '    </div>'
+      + '    <div class="cf-foot">© 帕多瓦华人教会 · Powered by <b>YuEn</b></div>'
       + '  </main>'
       + '  <div class="cf-comm-mask" data-action="live-comm"></div>'
       + '  <section class="cf-live-comm">'
@@ -3336,6 +3362,21 @@
     var bar = this.$stage && this.$stage.querySelector('[data-ink-bar]');
     if (!bar) return;
     var ink = this.ink, self = this;
+
+    /* 收起：整条变成一个小圆钮（Apple Notes 的记号笔那种），点一下展开。
+       收起时一定回到「滑动」，谱照常能滚。 */
+    if (ink.collapsed) {
+      bar.classList.add('mini');
+      bar.innerHTML = '<button class="cf-ink-mini" type="button" data-tip="标注工具"'
+        + ' aria-label="展开标注工具条">' + ICON.pen + '</button>';
+      this._optsWasOpen = false;
+      this.bindInkTips(bar);
+      this.bindInkMiniDrag();
+      this.applyInkBarPos();
+      return;
+    }
+    bar.classList.remove('mini');
+
     /* 原图和移调都能画：标注按「歌 + 视图」分开存（currentSongKey 带 @view），
        坐标归一化到当前谱盒，各画各的互不串。 */
     var canDraw = true;
@@ -3370,7 +3411,10 @@
       : '';
 
     bar.innerHTML = '<span class="cf-ink-grip" data-ink-grip title="拖动可移动工具条"></span>'
-      + tools + actions + this.inkOptsHtml();
+      + tools + actions
+      + '<span class="cf-ink-sep"></span>'
+      + '<button class="cf-ink-btn" type="button" data-action="ink-collapse" data-tip="收起工具条">' + ICON.fold + '</button>'
+      + this.inkOptsHtml();
     /* 入场动画只在浮层「从无到有」那一次播。否则任何重建都会重播一遍，看起来就是一闪一闪 */
     var optsEl = bar.querySelector('[data-ink-opts]');
     if (optsEl && !this._optsWasOpen) optsEl.classList.add('just-open');
@@ -3393,6 +3437,63 @@
     void self;
   };
 
+  CecpApp.prototype.expandInkBar = function () {
+    this.ink.collapsed = false;
+    this.ink.on = true;
+    /* 展开顺手回到上次用的笔，Apple Notes 也是点开直接能画 */
+    if (this.ink.tool === 'pan') this.ink.tool = this.ink.lastTool || 'pen';
+    this.saveInkPrefs();
+    this.renderInkBar();
+    this.syncInkInteractive();
+  };
+
+  /* 小圆钮：拖 = 挪位置，点 = 展开。不能走全局 click 委托——
+     pointerdown 里 preventDefault 之后有的 WebView 不派发 click。 */
+  CecpApp.prototype.bindInkMiniDrag = function () {
+    var bar = this.$stage && this.$stage.querySelector('[data-ink-bar]');
+    var btn = bar && bar.querySelector('.cf-ink-mini');
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    var self = this, st = null;
+
+    btn.addEventListener('pointerdown', function (ev) {
+      ev.preventDefault();
+      try { btn.setPointerCapture(ev.pointerId); } catch (err) {}
+      var host = bar.offsetParent || bar.parentElement;
+      if (!host) return;
+      var hb = host.getBoundingClientRect(), bb = bar.getBoundingClientRect();
+      st = { x: ev.clientX, y: ev.clientY, left: bb.left - hb.left, top: bb.top - hb.top,
+             maxX: (host.clientWidth || hb.width) - bb.width,
+             maxY: (host.clientHeight || hb.height) - bb.height, moved: false };
+    });
+    btn.addEventListener('pointermove', function (ev) {
+      if (!st) return;
+      var dx = ev.clientX - st.x, dy = ev.clientY - st.y;
+      if (!st.moved && dx * dx + dy * dy < 49) return;   /* 7px 内算点按，不算拖 */
+      st.moved = true;
+      bar.classList.add('dragging');
+      self.inkBarPos = {
+        x: Math.max(6, Math.min(st.maxX - 6, st.left + dx)),
+        y: Math.max(6, Math.min(st.maxY - 6, st.top + dy))
+      };
+      self.applyInkBarPos();
+    });
+    var end = function () {
+      if (!st) return;
+      var moved = st.moved;
+      st = null;
+      bar.classList.remove('dragging');
+      self.applyInkBarPos();
+      if (moved) {
+        if (self.inkBarPos) { try { lsSet(self.storeKey('inkbar'), JSON.stringify(self.inkBarPos)); } catch (err) {} }
+      } else {
+        self.expandInkBar();
+      }
+    };
+    btn.addEventListener('pointerup', end);
+    btn.addEventListener('pointercancel', end);
+  };
+
   /* 悬停（桌面）/ 按一下（平板）都弹一小会儿说明。
      平板没有 hover，光靠 title 属性是看不到的。 */
   CecpApp.prototype.bindInkTips = function (bar) {
@@ -3407,7 +3508,7 @@
     var show = function (el) {
       var text = el && el.dataset.tip;
       if (!text) return kill();
-      if (!tip) {
+      if (!tip || !tip.isConnected) {
         tip = document.createElement('span');
         tip.className = 'cf-ink-tipbox';
         bar.appendChild(tip);
@@ -3855,7 +3956,7 @@
         hlWidth: i.hlWidth, hlAlpha: i.hlAlpha, hlStraight: i.hlStraight,
         lowLag: i.lowLag, shapeFill: i.shapeFill,
         eraseType: i.eraseType, eraseSize: i.eraseSize, eraseHlOnly: i.eraseHlOnly,
-        color: i.color, custom: i.custom
+        color: i.color, custom: i.custom, collapsed: i.collapsed, lastTool: i.lastTool
       }));
     } catch (err) {}
   };
