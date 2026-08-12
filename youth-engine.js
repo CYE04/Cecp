@@ -1210,6 +1210,8 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
     var host=document.createElement('div');
     host.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
     var clone=panelInner.cloneNode(true);
+    // CECP-A4-PAGE: 屏幕上为填满 A4 撑开的行距(paddingBottom)不进导出图——导出仍按自然行距排
+    clone.querySelectorAll('.sw-lline').forEach(function(l){l.style.paddingBottom='';});
     if(opt.tight){
       clone.style.display='inline-block';
       clone.style.width='max-content';
@@ -4838,8 +4840,19 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     var root=(src.closest&&src.closest('#music-library,#ym-root'))||document.body;
     if(overlay.parentNode!==root)root.appendChild(overlay);
     mode='node';imgList=[];
-    content.className=('czoom-content '+src.className).replace('sw-lb-zoomable','').replace(/\s+/g,' ');
-    content.innerHTML=src.innerHTML;
+    var pg=src.closest&&src.closest('.sw-page');
+    if(pg){
+      /* CECP-A4-PAGE: 谱套在 A4 纸里时连纸一起放大——克隆整个 .sw-page
+         (内联宽高 + 谱的内联 transform 都带着, 所见即所得的那张纸)。
+         去掉克隆里的 sw-lb-zoomable, 免得在放大层里点谱又触发一次 open。 */
+      content.className='czoom-content czoom-paper';
+      content.innerHTML=pg.outerHTML;
+      var zl=content.querySelector('.sw-lb-zoomable');
+      if(zl)zl.classList.remove('sw-lb-zoomable');
+    }else{
+      content.className=('czoom-content '+src.className).replace('sw-lb-zoomable','').replace(/\s+/g,' ');
+      content.innerHTML=src.innerHTML;
+    }
     overlay.classList.add('open');document.documentElement.style.overflow='hidden';
     updateNav();fitAndCenter();
   }
@@ -5026,6 +5039,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     /* toggle button */
     var togBtn = hd.querySelector('.sw-tog');
     var fitRaf=0;
+    /* getViewportBox 原是屏高适配(scaleY 压扁)用的,CECP-A4-PAGE 后已无消费者,保留防外部引用 */
     function getViewportBox(){
       var vv=window.visualViewport;
       return vv ? {
@@ -5038,17 +5052,90 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
         offsetTop:0
       };
     }
-    function shouldUseScreenHeightFit(){
-      var coarse=window.matchMedia?window.matchMedia('(pointer: coarse)').matches:false;
-      var noHover=window.matchMedia?window.matchMedia('(hover: none)').matches:false;
-      var touchPoints=navigator.maxTouchPoints||0;
-      return coarse||(noHover&&touchPoints>0);
+    /* ═══════════ CECP-A4-PAGE v1 BEGIN ═══════════
+       屏幕上的移调谱按一张 A4 纸呈现，**规范 = musiclib 详情页那张「原图谱卡片」**
+       （用户原话：「跟下面那个原图一样的大小的显示」）：
+       ① 纸撑满所在容器的宽度(吃掉 .sw-wrap 左右 padding)，不留额外边距；
+       ② 纸是 A4 比例(210:297)，整首歌完整装在这一张上；纸比屏幕高就上下滚，
+          字小就点谱放大(CECP-SCORE-ZOOM 连纸一起放大)；
+       ③ 内容在纸内**等比**缩放(scale 单参数)，绝不出现 scale(x,y) 压扁；
+       ④ 内容不够高时把行与行的间距均匀撑开填满整页(只动行距，字号/对位一律不变)。
+       ⚠️ 「纸」是 lbDiv **外面**新套的 .sw-page —— 导出(buildExportClone)只克隆
+          lbDiv 本身(克隆里已清撑行距的 paddingBottom)，故导出不受影响。
+       ⚠️ 与 [[strict-arc-fit-order]] 的顺序约束不冲突：撑开行距只加纵向 padding，
+          在梁/弧布局**之后**做，不改任何行内水平坐标(弧线挂在各自 .sw-lrow 里随行走)。
+       与 musiclib 逐条同款(仅 CSS 前缀/变量名按各自宿主)。 */
+    var A4_RATIO=297/210;        // 1.41428…
+    var PAGE_MX=12,PAGE_MY=12;   // 纸内页边距(lbDiv 自己还有 8/18/16/8 的 padding,叠加后=页边距)
+    var SPREAD_MAX=0.9;          // 每个行间隙最多再撑开 0.9×平均行高(防两行歌被拉散)
+    function ensureScorePageCss(){
+      if(document.getElementById('ye-a4-page-css'))return;
+      var st=document.createElement('style');
+      st.id='ye-a4-page-css';
+      /* 纸永远是浅色 → 纸内把取色变量钉回浅色值(youth 谱面用 --ym-ink/--ym-ink3/
+         --ym-border/--ym-capo)，并把和弦芯片强制用浅色配色(否则深色模式下深底芯片戳在浅纸上)。 */
+      var chip='',i,h;
+      for(i=0;i<12;i++){
+        h=chordStyleHue(i);
+        chip+='.sw-page .chord-chip.chord-pc'+i+'{background:hsl('+h+',34%,94%);outline-color:hsl('+h+',38%,74%);color:hsl('+h+',90%,20%);}';
+      }
+      st.textContent=[
+        '.sw-page{position:relative;box-sizing:border-box;margin:0 0 14px;overflow:hidden;',
+        'background:#f7f4ee;color:#241C17;border:1px solid #E9E0D8;border-radius:8px;',
+        '--ym-ink:#241C17;--ym-ink2:#6F655D;--ym-ink3:#9A8F85;--ym-border:#E1D8CE;--ym-capo:#1C5AA6;}',
+        'html[data-resolved-theme="dark"] .sw-page{background:#f4efe7;',
+        'box-shadow:0 12px 32px rgba(0,0,0,.24);}',
+        '@media (prefers-color-scheme:dark){html:not([data-resolved-theme="light"]) .sw-page{',
+        'background:#f4efe7;box-shadow:0 12px 32px rgba(0,0,0,.24);}}',
+        '.sw-page>.sw-lb{background:transparent !important;}'
+      ].join('')+chip;
+      document.head.appendChild(st);
     }
-    function getAvailableScoreHeight(){
-      var viewport=getViewportBox();
-      var chromeHeight=Math.max(0,panelInner.scrollHeight-lbDiv.scrollHeight);
-      return Math.max(0,viewport.height-chromeHeight);
+    function ensureScorePage(){
+      ensureScorePageCss();
+      var pg=lbDiv.parentElement;
+      if(pg&&pg.classList&&pg.classList.contains('sw-page'))return pg;
+      /* 纸挂在 panel 下(panelInner 的弟弟)而不是 panelInner 里：panelInner 是
+         overflow:hidden 的卡片，纸要比它宽会被裁。 */
+      pg=document.createElement('div');
+      pg.className='sw-page';
+      panel.appendChild(pg);
+      pg.appendChild(lbDiv);
+      return pg;
     }
+    /* 把 slack 像素均匀分到行与行之间(用 paddingBottom,不覆盖 CSS 的 margin 规则)。
+       幂等：每次先清空再重设，所以可以反复调用来逼近目标高度。 */
+    function spreadScoreLines(slack){
+      var lines=lbDiv.querySelectorAll('.sw-lline');
+      var n=lines.length,i;
+      for(i=0;i<n;i++)lines[i].style.paddingBottom='';
+      if(n<2||!(slack>1))return 0;
+      var sum=0;
+      for(i=0;i<n;i++)sum+=lines[i].offsetHeight||0;
+      var avg=sum/n;
+      if(!(avg>0))return 0;
+      var gaps=n-1;
+      var per=Math.min(slack/gaps,avg*SPREAD_MAX);
+      if(!(per>0.5))return 0;
+      for(i=0;i<gaps;i++)lines[i].style.paddingBottom=per.toFixed(2)+'px';
+      return per*gaps;
+    }
+    /* 把内容高度撑到 target(未缩放坐标)。
+       ⚠️ 不能靠「加了多少 padding 就长多少」来预测：给「段落里最后一行」加 padding 会
+          解开它与 .sw-lsec 之间的外边距合并，scrollHeight 会多涨一截(实测 4 段歌多 60px)。
+          所以撑一次 → 实测 → 按差额回收一次，第二次就精确落在 target。 */
+    function fillScoreHeight(base,target){
+      if(!(target-base>1))return base;
+      spreadScoreLines(target-base);
+      var got=lbDiv.scrollHeight||base;
+      var over=got-target;
+      if(over>0.5){
+        spreadScoreLines(target-base-over);
+        got=lbDiv.scrollHeight||base;
+      }
+      return got;
+    }
+    /* ═══════════ CECP-A4-PAGE v1 END ═══════════ */
     function resetScoreFit(){
       lbDiv.style.transform='';
       lbDiv.style.transformOrigin='';
@@ -5056,6 +5143,10 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       lbDiv.style.marginBottom='';
       lbDiv.style.padding='8px 18px 16px 8px';
       lbDiv.style.boxSizing='border-box';
+      var _ll=lbDiv.querySelectorAll('.sw-lline');
+      for(var i=0;i<_ll.length;i++)_ll[i].style.paddingBottom='';
+      var pg=lbDiv.parentElement;
+      if(pg&&pg.classList&&pg.classList.contains('sw-page')){pg.style.width='';pg.style.height='';}
       justifyScoreRowsClear(lbDiv);
       if(lbDiv.parentElement)lbDiv.parentElement.style.overflow='hidden';
     }
@@ -5363,10 +5454,20 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       scheduleFitRows();
     }
     function fitRows(){
+      if(!lbDiv.isConnected||!lbDiv.parentNode)return;
+      var pageEl=ensureScorePage();       // 幂等：把 lbDiv 套进 .sw-page（A4 纸）
+      /* 纸要撑满卡片全宽：把 .sw-wrap 的左右 padding 吃掉(panel 负 margin)，
+         panelInner 补回同样的正 margin 保持原宽。数值实测取自 computed style，各断点自动跟。 */
+      var wrapEl=panel.parentElement;
+      if(wrapEl){
+        var wcs=getComputedStyle(wrapEl);
+        var padL=parseFloat(wcs.paddingLeft)||0,padR=parseFloat(wcs.paddingRight)||0;
+        panel.style.marginLeft=(-padL)+'px';panel.style.marginRight=(-padR)+'px';
+        panelInner.style.marginLeft=padL+'px';panelInner.style.marginRight=padR+'px';
+      }
+      var host=panel;                     // 纸的宽度基准 = 撑到 wrap 全宽的 panel
       resetScoreFit();
       normalizePreviewRowHeights();
-      var parent=lbDiv.parentElement;
-      if(!parent||!lbDiv.isConnected)return;
 
       if(YE_JUSTIFY_ROWS)justifyScoreRows(lbDiv.querySelectorAll('.sw-lrow'));
       var natural=measureNaturalScore();
@@ -5388,32 +5489,28 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
         }
       }
 
-      // 版面居中：内容最大宽度 SCORE_MAXW，窄屏两侧留 SCORE_PAD；曲谱缩放到此宽度并水平居中。
-      // 不锁 A4、不额外整页 transform（沿用既有 fit 缩放）。导出克隆已 transform:none，故不受影响。
-      var SCORE_MAXW=1000,SCORE_PAD=16;   // ← 平板实测后可调这个数
-      var rawAvail=parent.clientWidth||natural.width;
-      if(!rawAvail)return;
-      var availableWidth=Math.max(1,Math.min(rawAvail-SCORE_PAD*2,SCORE_MAXW));
-      var centerX=Math.max(0,(rawAvail-availableWidth)/2);
+      /* ── CECP-A4-PAGE：纸撑满容器宽(同原图卡片)，正好一张 A4，整首歌装在这一张上 ── */
+      var pageW=Math.max(1,host.clientWidth||natural.width);
+      var pageH=pageW*A4_RATIO;
+      var cw=Math.max(1,pageW-PAGE_MX*2);
+      var ch=Math.max(1,pageH-PAGE_MY*2);
 
-      var scaleX=availableWidth/natural.width;
-      if(!isFinite(scaleX)||scaleX<=0)scaleX=1;
-      var scaleY=scaleX;
-      if(shouldUseScreenHeightFit()){
-        var availableHeight=getAvailableScoreHeight();
-        if(availableHeight>0){
-          var fittedHeight=natural.height*scaleX;
-          if(fittedHeight>availableHeight){
-            scaleY=scaleX*(availableHeight/fittedHeight);
-          }
-        }
-      }
-      if(!isFinite(scaleY)||scaleY<=0)scaleY=scaleX;
+      /* 单参数 scale = 等比：横竖同一个比例，简谱/和弦/歌词的形状与对位一律不变。
+         min(宽比,高比) → 整首歌完整落在这一张 A4 里，跟 musiclib 原图谱一样的看法：
+         纸比屏幕高就上下滚，字小就点谱放大(CECP-SCORE-ZOOM)。 */
+      var scale=Math.min(cw/natural.width,ch/natural.height);
+      if(!isFinite(scale)||scale<=0)scale=1;
 
-      lbDiv.style.transform='translateX('+centerX.toFixed(1)+'px) scale('+scaleX+','+scaleY+')';
+      // 内容不够高：把剩下的高度均匀撑到行与行之间（字号不动），把整页填满
+      natural.height=fillScoreHeight(natural.height,ch/scale);
+
+      pageEl.style.width=pageW.toFixed(1)+'px';
+      pageEl.style.height=pageH.toFixed(1)+'px';
+      var offX=PAGE_MX+Math.max(0,(cw-natural.width*scale)/2);
+      var offY=PAGE_MY+Math.max(0,(ch-natural.height*scale)/2);
       lbDiv.style.transformOrigin='left top';
+      lbDiv.style.transform='translate('+offX.toFixed(1)+'px,'+offY.toFixed(1)+'px) scale('+scale+')';
       lbDiv.style.width=natural.width+'px';
-      lbDiv.style.marginBottom=(natural.height*(scaleY-1)+18)+'px';
     }
 
     exportBtn.addEventListener('click',function(){

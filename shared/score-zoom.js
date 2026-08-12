@@ -73,8 +73,19 @@
     var root=(src.closest&&src.closest('#music-library,#ym-root'))||document.body;
     if(overlay.parentNode!==root)root.appendChild(overlay);
     mode='node';imgList=[];
-    content.className=('czoom-content '+src.className).replace('sw-lb-zoomable','').replace(/\s+/g,' ');
-    content.innerHTML=src.innerHTML;
+    var pg=src.closest&&src.closest('.sw-page');
+    if(pg){
+      /* CECP-A4-PAGE: 谱套在 A4 纸里时连纸一起放大——克隆整个 .sw-page
+         (内联宽高 + 谱的内联 transform 都带着, 所见即所得的那张纸)。
+         去掉克隆里的 sw-lb-zoomable, 免得在放大层里点谱又触发一次 open。 */
+      content.className='czoom-content czoom-paper';
+      content.innerHTML=pg.outerHTML;
+      var zl=content.querySelector('.sw-lb-zoomable');
+      if(zl)zl.classList.remove('sw-lb-zoomable');
+    }else{
+      content.className=('czoom-content '+src.className).replace('sw-lb-zoomable','').replace(/\s+/g,' ');
+      content.innerHTML=src.innerHTML;
+    }
     overlay.classList.add('open');document.documentElement.style.overflow='hidden';
     updateNav();fitAndCenter();
   }
