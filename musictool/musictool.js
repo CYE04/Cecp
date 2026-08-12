@@ -1161,6 +1161,9 @@ function getSelRange(){
 }
 function clearSel(){selA=-1;selB=-1;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+/* ==== SA-CONFORMANCE-REGION-A-BEGIN ====
+   shared/strict-align.conformance.js reads between these ASCII markers to run the shared
+   test cases against this copy. Markers only, no logic change. Move them with the code. */
 function normalizeTimeSignValue(sig){
   var m=String(sig||'').trim().replace(/\\s+/g,'').replace(/\uFF0F/g,'/').match(/^(\\d{1,2})\\/(\\d{1,2})$/);
   return m?(m[1]+'/'+m[2]):'';
@@ -1256,11 +1259,14 @@ function saAlignRow(nStr,chord,lyrics){
   var lys=lyrics==null?[]:(Array.isArray(lyrics)?lyrics:[lyrics]);
   var slots=saSplitSlots(nStr),n=slots.length,warnings=[];
   var cf=saAlignField(chord,n);
-  if(cf.count!==n)warnings.push({field:'chord',need:n,got:cf.count,slot:Math.min(cf.count,n)+1});
+  /* kind 字段与 shared/strict-align.js 对齐（over/under）：一致性测试抓到这里原先漏了它。
+     musictool 自己的校对面板不读 kind，但少一个字段就是行为分家，补上保持四份一致。 */
+  if(cf.count!==n)warnings.push({field:'chord',kind:cf.count>n?'over':'under',need:n,got:cf.count,slot:Math.min(cf.count,n)+1});
   var outLy=[];
-  for(var k=0;k<lys.length;k++){var lf=saAlignField(lys[k],n,true);outLy.push(lf.vals);if(lf.count!==n)warnings.push({field:k===0?'lyric':'lyric'+(k+1),need:n,got:lf.count,slot:Math.min(lf.count,n)+1});}
+  for(var k=0;k<lys.length;k++){var lf=saAlignField(lys[k],n,true);outLy.push(lf.vals);if(lf.count!==n)warnings.push({field:k===0?'lyric':'lyric'+(k+1),kind:lf.count>n?'over':'under',need:n,got:lf.count,slot:Math.min(lf.count,n)+1});}
   return {slotCount:n,slots:slots,chords:cf.vals,lyrics:outLy,warnings:warnings};
 }
+/* ==== SA-CONFORMANCE-REGION-A-END ==== */
 function getSegInlineTimeSign(seg){
   if(!seg)return'';
   return normalizeTimeSignValue(seg.timeSign||seg.ts||seg.meter||'');
@@ -3006,6 +3012,7 @@ function initSegSearch(){
 ════════════════════════════════════════ */
 /* 导航记号可与任意小节线组合：写法 = 小节线token + 记号名 连写，如 ||coda、:|fine、|:|segno。
    单写 coda/dc/... 时用各自的默认小节线（向后兼容）。不用正则(musictool 模板内禁反斜杠)。 */
+/* ==== SA-CONFORMANCE-REGION-B-BEGIN ==== see region A note ==== */
 function barNavOf(tok){
   var NAVS={fine:'||/',dc:'||',ds:'||',coda:'|',segno:'|'};
   var t=String(tok||'');
@@ -3022,6 +3029,7 @@ function isBarlineTok(tok){
   var b=barNavOf(tok).bar;
   return b==='|'||b==='||'||b==='||/'||b==='|]'||b==='|:'||b===':|'||b==='|:|';
 }
+/* ==== SA-CONFORMANCE-REGION-B-END ==== */
 function makeBarline(tok){
   var _bn=barNavOf(tok),bar=_bn.bar,nav=_bn.nav;
   var o=document.createElement('span');o.className='jp-bar';
