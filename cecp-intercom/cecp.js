@@ -4322,9 +4322,16 @@
       if (self.ink.tool === 'laser') {
         if (!self._laserPts) return;
         ev.preventDefault();
-        self._laserPts.push(p);
         if (self.ink.laserMode === 'dot') self._laserPts = [p];
-        else if (self._laserPts.length > 48) self._laserPts.shift();   /* 拖尾够长就行，越多越慢 */
+        else {
+          /* 线模式：画什么留什么（GoodNotes 不丢尾巴）。太密的点扔掉，
+             一整条也就一两百个点；400 封顶防极端 */
+          var lp0 = self._laserPts[self._laserPts.length - 1];
+          var ldx = p[0] - lp0[0], ldy = p[1] - lp0[1];
+          if (ldx * ldx + ldy * ldy < 0.000009) return;
+          self._laserPts.push([Math.round(p[0] * 1e4) / 1e4, Math.round(p[1] * 1e4) / 1e4]);
+          if (self._laserPts.length > 400) self._laserPts.shift();
+        }
         /* 一帧最多画一次：指针事件 120Hz，逐个画必卡 */
         if (!self._laserRafDraw) {
           self._laserRafDraw = requestAnimationFrame(function () {
@@ -4705,9 +4712,10 @@
     if (!e || !box || !pts || !pts.length) return;
     var ctx = e.laser.getContext('2d');
     ctx.clearRect(0, 0, box.w, box.h);
-    var a = alpha === undefined ? 1 : Math.max(0, Math.min(1, alpha));
+    var live = alpha === undefined;            /* 还按着 = 亮头点；抬手淡出时不画点 */
+    var a = live ? 1 : Math.max(0, Math.min(1, alpha));
     if (a <= 0) return;
-    var k = inkScale(box);                    /* 光点大小也得跟着谱盒走 */
+    var k = inkScale(box);
     var rgb = laserRgb(color);
     var rgba = function (al) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + al + ')'; };
     var P = pts.map(function (p) { return [p[0] * box.w, p[1] * box.h]; });
@@ -4717,56 +4725,56 @@
     ctx.lineJoin = 'round';
     ctx.shadowBlur = 0;                        /* 绝对不能开：每段一次高斯模糊会掉帧 */
 
-    /* 拖尾：一条从尾到头逐渐变粗变亮的锥形光带。
-       逐段画，节点取相邻两点的中点、原始点当控制点，这样是圆滑曲线不是折线。 */
-    if (mode === 'line' && P.length > 2) {
-      var n = P.length;
-      /* 尾巴不要太长，短促才像激光笔（也省画） */
-      var from = Math.max(1, n - 30);
-      var seg = function (i, w, col, al) {
-        var m0 = [(P[i - 1][0] + P[i][0]) / 2, (P[i - 1][1] + P[i][1]) / 2];
-        var m1 = [(P[i][0] + P[i + 1][0]) / 2, (P[i][1] + P[i + 1][1]) / 2];
-        ctx.globalAlpha = al;
-        ctx.strokeStyle = col;
-        ctx.lineWidth = w;
-        ctx.beginPath();
-        ctx.moveTo(m0[0], m0[1]);
-        ctx.quadraticCurveTo(P[i][0], P[i][1], m1[0], m1[1]);
+    /* 线模式（GoodNotes 的「线」）：画什么线亮什么线——整条均匀粗细、均匀亮度，
+       不做彗星式的尾部渐隐。一条平滑 path 描三层（辉光/主体/亮芯），
+       比逐段画快得多，也保证均匀。 */
+    if (mode === 'line' && P.length > 1) {
+      ctx.beginPath();
+      ctx.moveTo(P[0][0], P[0][1]);
+      if (P.length === 2) {
+        ctx.lineTo(P[1][0], P[1][1]);
+      } else {
+        for (var i = 1; i < P.length - 1; i++) {
+          ctx.quadraticCurveTo(P[i][0], P[i][1],
+            (P[i][0] + P[i + 1][0]) / 2, (P[i][1] + P[i + 1][1]) / 2);
+        }
+        ctx.lineTo(P[P.length - 1][0], P[P.length - 1][1]);
+      }
+      var pass = [
+        { w: 9,   al: 0.22, col: rgba(1) },                 /* 外辉光 */
+        { w: 4,   al: 0.95, col: rgba(1) },                 /* 饱和主体 */
+        { w: 1.6, al: 0.5,  col: 'rgba(255,240,240,1)' }    /* 整条淡淡的亮芯 */
+      ];
+      for (var pi = 0; pi < pass.length; pi++) {
+        ctx.globalAlpha = a * pass[pi].al;
+        ctx.strokeStyle = pass[pi].col;
+        ctx.lineWidth = pass[pi].w * k;
         ctx.stroke();
-      };
-      for (var i = from; i < n - 1; i++) {
-        var t = (i - from) / Math.max(1, n - 1 - from);   /* 0 尾 → 1 头 */
-        var ease = t * t;
-        /* 外辉光：宽、淡 */
-        seg(i, (7.5 * (0.3 + 0.7 * ease)) * k, rgba(1), a * 0.18 * (0.05 + 0.95 * ease));
-        /* 主体：饱和 */
-        seg(i, (3.2 * (0.35 + 0.65 * ease)) * k, rgba(1), a * 0.7 * (0.06 + 0.94 * ease));
-        /* 白芯只在靠头的三分之一 */
-        if (t > 0.62) seg(i, 1.15 * k, 'rgba(255,255,255,1)', a * 0.8 * (t - 0.62) / 0.38);
       }
     }
 
-    /* 光点本体：紧一点、更饱和，才像 GoodNotes 那颗；散得太开会发灰 */
-    var last = P[P.length - 1];
-    ctx.globalAlpha = a;
-    var R = 15 * k;
-    var halo = ctx.createRadialGradient(last[0], last[1], 0, last[0], last[1], R);
-    halo.addColorStop(0, rgba(0.85));
-    halo.addColorStop(0.35, rgba(0.34));
-    halo.addColorStop(1, rgba(0));
-    ctx.fillStyle = halo;
-    ctx.beginPath(); ctx.arc(last[0], last[1], R, 0, Math.PI * 2); ctx.fill();
-
-    var r2 = 5.4 * k;
-    var core = ctx.createRadialGradient(last[0], last[1], 0, last[0], last[1], r2);
-    core.addColorStop(0, 'rgba(255,255,255,1)');
-    core.addColorStop(0.42, rgba(1));
-    core.addColorStop(1, rgba(0.1));
-    ctx.fillStyle = core;
-    ctx.beginPath(); ctx.arc(last[0], last[1], r2, 0, Math.PI * 2); ctx.fill();
-
-    ctx.fillStyle = 'rgba(255,255,255,0.98)';
-    ctx.beginPath(); ctx.arc(last[0], last[1], 1.6 * k, 0, Math.PI * 2); ctx.fill();
+    /* 光点：点模式永远有；线模式只在还按着的时候当「笔尖」亮着 */
+    if (mode !== 'line' || live) {
+      var last = P[P.length - 1];
+      var sc = (mode === 'line' ? 0.72 : 1) * k;   /* 线模式的笔尖点小一号 */
+      ctx.globalAlpha = a;
+      var R = 15 * sc;
+      var halo = ctx.createRadialGradient(last[0], last[1], 0, last[0], last[1], R);
+      halo.addColorStop(0, rgba(0.85));
+      halo.addColorStop(0.35, rgba(0.34));
+      halo.addColorStop(1, rgba(0));
+      ctx.fillStyle = halo;
+      ctx.beginPath(); ctx.arc(last[0], last[1], R, 0, Math.PI * 2); ctx.fill();
+      var r2 = 5.4 * sc;
+      var core = ctx.createRadialGradient(last[0], last[1], 0, last[0], last[1], r2);
+      core.addColorStop(0, 'rgba(255,255,255,1)');
+      core.addColorStop(0.42, rgba(1));
+      core.addColorStop(1, rgba(0.1));
+      ctx.fillStyle = core;
+      ctx.beginPath(); ctx.arc(last[0], last[1], r2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.98)';
+      ctx.beginPath(); ctx.arc(last[0], last[1], 1.6 * sc, 0, Math.PI * 2); ctx.fill();
+    }
     ctx.restore();
   };
 
@@ -4778,8 +4786,8 @@
     clearTimeout(this._laserFade);
     if (this._laserRaf) { cancelAnimationFrame(this._laserRaf); this._laserRaf = 0; }
     if (!last) return;
-    var hold = md === 'dot' ? 280 : 420;   /* 先停留一下，再化开 */
-    var dur = md === 'dot' ? 420 : 700;
+    var hold = md === 'dot' ? 220 : 500;   /* 抬手后整条先亮一下，再一起化开 */
+    var dur = md === 'dot' ? 350 : 450;
     this._laserFade = setTimeout(function () {
       var t0 = 0;
       var step = function (ts) {
@@ -4805,7 +4813,7 @@
     if (!done && this._laserSentAt && now - this._laserSentAt < 50) return;
     this._laserSentAt = now;
     this.wsSend({ type: 'laser', mode: this.ink.laserMode, color: this.ink.color,
-                  pts: this._laserPts.slice(-60), done: !!done });
+                  pts: this._laserPts.slice(-400), done: !!done });
   };
 
   CecpApp.prototype.musiclibUrl = function (songId, full) {
