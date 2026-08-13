@@ -951,6 +951,15 @@
     '  border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,0,0,.2);animation:cf-bn-in .3s cubic-bezier(.32,.72,0,1)}',
     '.cf-live-banner[hidden]{display:none}',
     '.cf-live-banner.leaving{animation:cf-bn-out .24s ease forwards}',
+    '.cf-live-banner{cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}',
+    /* 换脸：内容糊一下再换，整块重建会重播入场动画，看着像闪 */
+    '.cf-live-banner.swap{opacity:.35;filter:blur(3px)}',
+    '.cf-live-banner:not(.drag){transition:opacity .11s ease,filter .11s ease,transform .2s cubic-bezier(.23,1,.32,1)}',
+    '.cf-live-banner.drag{transition:none}',
+    '.cf-live-banner:active{transform:translate(-50%,0) scale(.985)}',
+    '.cf-live-banner .bn-x{flex:none;width:22px;height:22px;border-radius:50%;background:var(--card3);',
+    '  color:var(--muted);font-size:11px;display:flex;align-items:center;justify-content:center;opacity:.75}',
+    '@media (hover:hover){.cf-live-banner:hover .bn-x{opacity:1;background:var(--border-strong);color:var(--text)}}',
     '.cf-live-banner .bn-ico{flex:none;font-size:20px}',
     '.cf-live-banner .bn-body{flex:1;min-width:0}',
     '.cf-live-banner .bn-from{font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.02em}',
@@ -2319,11 +2328,14 @@
       if (!entry.text) return;
       this.appendChat(entry);
       this.syncBanner();
-      if (this.useLiveUI) this.liveBanner('音控组', entry.text, 'high');
-      if (this.role === 'listener' || (this.isFloating && !this.open)) {
-        this.toast('📢', '音控组消息', entry.text, entry.ts);
+      /* 历史回放只进列表，别把旧广播重新全响一遍 */
+      if (!msg.replay) {
+        if (this.useLiveUI) this.liveBanner('音控组', entry.text, 'high');
+        if (this.role === 'listener' || (this.isFloating && !this.open)) {
+          this.toast('📢', '音控组消息', entry.text, entry.ts);
+        }
+        vibrate([20, 40, 20]);
       }
-      vibrate([20, 40, 20]);
       this.syncBadge();
       return;
     }
@@ -2342,9 +2354,11 @@
       if (!reply.text) return;
       this.appendChat(reply);
       this.syncBanner();
-      if (this.useLiveUI) this.liveBanner('音控回复', reply.text, 'high');
-      if (this.isFloating && !this.open) this.toast('🎧', '音控回复', reply.text, reply.ts);
-      vibrate([20, 40, 20]);
+      if (!msg.replay) {
+        if (this.useLiveUI) this.liveBanner('音控回复', reply.text, 'high');
+        if (this.isFloating && !this.open) this.toast('🎧', '音控回复', reply.text, reply.ts);
+        vibrate([20, 40, 20]);
+      }
       this.syncBadge();
       return;
     }
@@ -2371,7 +2385,7 @@
       } else if (this.role === 'client') {
         this.appendChat(chatEntry);
         /* 现场模式：别人的段落 cue / 群聊都从顶部弹一条 */
-        if (this.useLiveUI) {
+        if (this.useLiveUI && !msg.replay) {
           var isSecCue = chatEntry.text.indexOf(SECTION_CUE_PREFIX) === 0;
           this.liveBanner(
             identityMeta(chatEntry.from).title,
@@ -2467,10 +2481,13 @@
       if (this.useLiveUI && this.$stage.querySelector('.cf-live')) {
         this.renderSetlist();
         if (!sameIds) this.selectLiveSong(this.live.i);
-        if (msg.by && msg.by !== this.whoAmI) {
+        /* 只有「真的变了 + 不是刚进来的首轮同步 + 不是历史回放」才播报——
+           不然每次进现场页都弹一条上次谁改的歌单 */
+        if (!sameIds && this._setlistSynced && !msg.replay && msg.by && msg.by !== this.whoAmI) {
           this.liveBanner(identityMeta(msg.by).title, '更新了歌单', 'msg');
         }
       }
+      this._setlistSynced = true;
       return;
     }
 
@@ -5084,25 +5101,102 @@
     vibrate(15);
   };
 
-  /* 顶部横幅：音控组广播 / 别人的段落 cue / 定向回复都从上面滑下来 */
+  /* 顶部横幅：音控组广播 / 别人的段落 cue / 定向回复都从上面滑下来。
+     点一下 = 已读立即收起；往上一甩也行；正在显示时来了新的一条，
+     内容糊一下换脸（整块重建会重播入场动画，看着像闪）。 */
   CecpApp.prototype.liveBanner = function (from, text, kind) {
     var el = this.$stage && this.$stage.querySelector('[data-live-banner]');
     if (!el) return;
     var self = this;
-    el.className = 'cf-live-banner' + (kind === 'sec' ? ' is-sec' : '') + (kind === 'high' ? ' is-high' : '');
-    el.innerHTML = '<span class="bn-ico">' + (kind === 'sec' ? '🎵' : kind === 'high' ? '📢' : '💬') + '</span>'
-      + '<div class="bn-body"><div class="bn-from">' + esc(from) + '</div>'
-      + '<div class="bn-txt">' + esc(text) + '</div></div>';
-    el.hidden = false;
+    var apply = function () {
+      el.className = 'cf-live-banner' + (kind === 'sec' ? ' is-sec' : '') + (kind === 'high' ? ' is-high' : '');
+      el.innerHTML = '<span class="bn-ico">' + (kind === 'sec' ? '🎵' : kind === 'high' ? '📢' : '💬') + '</span>'
+        + '<div class="bn-body"><div class="bn-from">' + esc(from) + '</div>'
+        + '<div class="bn-txt">' + esc(text) + '</div></div>'
+        + '<span class="bn-x" aria-hidden="true">✕</span>';
+    };
+    clearTimeout(this._bnSwapT);
+    clearTimeout(this._bnClearT);
+    el.style.transition = ''; el.style.transform = ''; el.style.opacity = '';
+    if (!el.hidden) {
+      el.classList.add('swap');
+      this._bnSwapT = setTimeout(function () {
+        apply();
+        el.classList.add('swap');
+        /* 用定时器解糊，不用 rAF——后台标签页里 rAF 是冻的，会一直糊着 */
+        self._bnClearT = setTimeout(function () { el.classList.remove('swap'); }, 20);
+      }, 110);
+    } else {
+      apply();
+      el.hidden = false;
+    }
+    this.bindBannerGestures(el);
     clearTimeout(this.liveBannerTimer);
-    this.liveBannerTimer = setTimeout(function () {
+    this.liveBannerTimer = setTimeout(function () { self.dismissBanner(); }, kind === 'sec' ? 3600 : 5000);
+  };
+
+  CecpApp.prototype.dismissBanner = function (mode) {
+    var el = this.$stage && this.$stage.querySelector('[data-live-banner]');
+    if (!el || el.hidden) return;
+    clearTimeout(this.liveBannerTimer);
+    clearTimeout(this._bnSwapT);
+    clearTimeout(this._bnClearT);
+    var self = this;
+    var done = function () {
+      if (self.destroyed) return;
+      el.hidden = true;
+      el.classList.remove('leaving');
+      el.classList.remove('swap');
+      el.style.transition = ''; el.style.transform = ''; el.style.opacity = '';
+    };
+    if (mode === 'fly') {
+      /* 顺着甩的方向飞出去 */
+      el.style.transition = 'transform .18s cubic-bezier(.4,0,.7,1),opacity .16s ease';
+      el.style.transform = 'translate(-50%,-130%)';
+      el.style.opacity = '0';
+      setTimeout(done, 190);
+    } else {
       el.classList.add('leaving');
-      setTimeout(function () {
-        if (self.destroyed) return;
-        el.hidden = true;
-        el.classList.remove('leaving');
-      }, 250);
-    }, kind === 'sec' ? 3600 : 5000);
+      setTimeout(done, 250);
+    }
+  };
+
+  /* 点 = 已读；按住上滑 = 甩掉（跟手，带阻尼）；按着不放就不自动消失 */
+  CecpApp.prototype.bindBannerGestures = function (el) {
+    if (el.dataset.bound) return;
+    el.dataset.bound = '1';
+    var self = this, st = null;
+    el.addEventListener('pointerdown', function (ev) {
+      if (el.hidden) return;
+      st = { y: ev.clientY, t: Date.now(), dy: 0 };
+      try { el.setPointerCapture(ev.pointerId); } catch (err) {}
+      clearTimeout(self.liveBannerTimer);
+    });
+    el.addEventListener('pointermove', function (ev) {
+      if (!st) return;
+      ev.preventDefault();
+      st.dy = ev.clientY - st.y;
+      var dy = st.dy < 0 ? st.dy : st.dy * 0.12;   /* 往下拉给阻尼，世界里没有硬墙 */
+      el.classList.add('drag');
+      el.style.transform = 'translate(-50%,' + dy + 'px)';
+    });
+    var end = function () {
+      if (!st) return;
+      var s2 = st; st = null;
+      el.classList.remove('drag');
+      var dt = Math.max(1, Date.now() - s2.t);
+      var vel = -s2.dy / dt;
+      /* 快甩不看距离，慢拖过 26px 也算 */
+      if (s2.dy < -26 || vel > 0.35) { self.dismissBanner('fly'); vibrate(10); return; }
+      if (Math.abs(s2.dy) < 6) { self.dismissBanner(); vibrate(10); return; }   /* 点一下 = 已读 */
+      /* 没甩到位：弹回去，稍后再自动收 */
+      el.style.transition = 'transform .22s cubic-bezier(.23,1,.32,1)';
+      el.style.transform = 'translate(-50%,0)';
+      setTimeout(function () { el.style.transition = ''; }, 240);
+      self.liveBannerTimer = setTimeout(function () { self.dismissBanner(); }, 2600);
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
   };
 
   /* ────────────────────────────────────────────
@@ -5869,6 +5963,8 @@
     clearTimeout(this.midnightTimer);
     clearTimeout(this.flashTimer);
     clearTimeout(this.liveBannerTimer);
+    clearTimeout(this._bnSwapT);
+    clearTimeout(this._bnClearT);
     clearTimeout(this._laserFade);
     clearTimeout(this._laserRemoteFade);
     if (this._laserRaf) { try { cancelAnimationFrame(this._laserRaf); } catch (err) {} this._laserRaf = 0; }
