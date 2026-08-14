@@ -86,6 +86,12 @@
       content.className=('czoom-content '+src.className).replace('sw-lb-zoomable','').replace(/\s+/g,' ');
       content.innerHTML=src.innerHTML;
     }
+    /* CECP-SCORE-INK: 墨迹是画在 <canvas> 上的，而 canvas 的位图不随 innerHTML 克隆走——
+       克隆出来是一张空白画布，既盖在谱上吃掉指针事件(橡皮/点击退出都会失灵)，
+       又让页面同时存在两个 .cecp-ink-layer(宿主按类名取节点时会取错)。
+       放大器本来就是只读的图片式查看器，不需要墨迹层，直接摘掉。 */
+    var inks=content.querySelectorAll('.cecp-ink-layer');
+    for(var ii=0;ii<inks.length;ii++)inks[ii].parentNode.removeChild(inks[ii]);
     overlay.classList.add('open');document.documentElement.style.overflow='hidden';
     updateNav();fitAndCenter();
   }
@@ -154,7 +160,16 @@
     if(Date.now()-lastClose<450)return;                 // 刚点掉那次的 ghost click 穿透到下层谱, 别又打开
     var t=e.target;if(!t||!t.closest)return;
     if(t.closest('.p-chord:not(.empty)'))return;
+    /* CECP-SCORE-INK: 正在用笔/荧光笔/橡皮时，点谱是「画」不是「放大」。
+       两道判断都要：① target 就是画布(真实点击时画布在最上层，命中的就是它)；
+       ② 谱里存在一个正在吃事件的画布(pointer-events!=='none')——
+       合成事件或从子节点冒上来的 click 到不了画布，只靠 ① 会漏。 */
+    if(t.classList&&t.classList.contains('cecp-ink-layer'))return;
     var box=t.closest('.sw-lb-zoomable');
+    if(box){
+      var ink=box.querySelector('.cecp-ink-layer');
+      if(ink&&getComputedStyle(ink).pointerEvents!=='none')return;
+    }
     if(box&&box.textContent.trim())open(box);
   },false);
   document.addEventListener('keydown',function(e){if(!isOpen())return;if(e.key==='Escape')close();else if(mode==='image'&&e.key==='ArrowLeft')nav(-1);else if(mode==='image'&&e.key==='ArrowRight')nav(1);});

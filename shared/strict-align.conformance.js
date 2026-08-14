@@ -37,11 +37,15 @@ var MT_REGIONS = [
   ['SA-CONFORMANCE-REGION-B-BEGIN', 'SA-CONFORMANCE-REGION-B-END']
 ];
 
+/* 名单里每一份都是"必须存在"的 —— 没有 optional。
+   一份副本从名单里消失得是有人主动删掉这一行，而不是文件不在就静默跳过：
+   真正上线的那份要是被跳过了，这个测试就等于没跑。
+   （musiclib/musiclib.js 已于 2026-08 迁往独立仓库 CYE04/musiclib，
+     它的接班人是下面的 musiclib-react-migration/public/musiclib.js。） */
 var HOSTS = [
   { name: 'shared/strict-align.js（权威）', file: 'shared/strict-align.js', kind: 'module' },
-  { name: 'musiclib/musiclib.js', file: 'musiclib/musiclib.js', kind: 'block' },
   { name: 'youth-engine.js', file: 'youth-engine.js', kind: 'block' },
-  { name: 'musiclib-react-migration/public/musiclib.js', file: 'musiclib-react-migration/public/musiclib.js', kind: 'block', optional: true },
+  { name: 'musiclib-react-migration/public/musiclib.js（线上跑的就是这份）', file: 'musiclib-react-migration/public/musiclib.js', kind: 'block' },
   { name: 'musictool/musictool.js', file: 'musictool/musictool.js', kind: 'musictool' }
 ];
 

@@ -1,5 +1,5 @@
 /* ═══════════ CECP-CHORD-STYLE v1 BEGIN ═══════════
-   共享模块：和弦文字视觉样式（按根音固定配色的填充 + 描边小片）。
+   共享模块：和弦文字视觉样式（按根音固定配色的纯文字，不加任何底色/边框）。
    本块在以下三个文件中逐字节相同（权威版本 = shared/chord-style.js）：
      musiclib/musiclib.js / youth-engine.js / musictool/musictool.js
    修改流程：先改 shared/chord-style.js，再同步三处，diff 校验一致。
@@ -7,14 +7,19 @@
    （musictool.js 经 CMS 部署会丢失一层反斜杠），
    转义字符一律用 String.fromCharCode 构造。
    硬性约束：只做视觉，不改布局——和弦按等宽字体与歌词逐字对齐，
-   因此不用 padding/border/margin，描边用 outline（不占布局空间），
+   因此不用 padding/border/margin/outline，只改 color。
    字号、行高、margin、min-height 全部继承宿主 .p-chord 原样。
+   2026-08 起去掉了底色与描边小片（用户反馈更占地方）：
+   和弦回到纯文字，仅靠颜色区分根音。这条约束原本就写在这里，
+   后来 padding 被加了进来，现在改回来了。
    配色规则：同根音共用一色（G/G7/Gsus4/Gm 同色），12 音名 12 色，
    色相按半音序直接展开（pc*30°）：常见进行（I-IV-V、关系小调）
    的根音相距纯四/五度或小三度，映射后色差足够大，
    同一首歌里的常用和弦颜色能明显区分；
-   填充色醒目但文字对比度优先：浅色主题浅底深字、深色主题深底浅字
-   （同色相配对，保证和弦文字一眼可辨）；
+   文字对比度优先：浅色主题深字(L20%)、深色主题浅字(L84%)，
+   直接压在宿主背景上（不再有自己的底色）。这两个亮度值是去底色后实测过的：
+   压在 #F4EFE7 / #101613 上最差对比度 5.71 / 9.85，均过 WCAG AA(4.5)。
+   ⚠️ 别把浅色调到 28%，G/A/B 那几个黄绿色相会掉到 3.3~4.1，投影上发虚；
    深浅主题分别取色：优先 html[data-resolved-theme]，
    无该属性的宿主回退 prefers-color-scheme。 */
 var CHORD_STYLE_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
@@ -57,13 +62,12 @@ function chordStyleEnsureCss(){
   var light='',dark='',i,h;
   for(i=0;i<12;i++){
     h=chordStyleHue(i);
-    light+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',34%,94%);outline-color:hsl('+h+',38%,74%);color:hsl('+h+',90%,20%);}';
-    dark+='.chord-chip.chord-pc'+i+'{background:hsl('+h+',42%,26%);outline-color:hsl('+h+',45%,48%);color:hsl('+h+',72%,84%);}';
+    light+='.chord-chip.chord-pc'+i+'{color:hsl('+h+',90%,20%);}';
+    dark+='.chord-chip.chord-pc'+i+'{color:hsl('+h+',72%,84%);}';
   }
   var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"] .chord-chip.');
   var darkAuto=dark.split('.chord-chip.').join('html:not([data-resolved-theme="light"]) .chord-chip.');
   st.textContent=
-    '.chord-chip{border-radius:4px;outline:1px solid transparent;outline-offset:0;padding-left:.2em;padding-right:.2em;}'+
     light+darkAttr+
     '@media (prefers-color-scheme: dark){'+darkAuto+'}';
   document.head.appendChild(st);
