@@ -1,0 +1,46 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-08-16 09:03:46",
+  "id": "yesuwoaini-yueshuya",
+  "title": "耶稣我爱你",
+  "artist": "约书亚乐团",
+  "sub": "Jesus, I Love You (GMS Live |约书亚乐团Joshua Band) GMSLive作词 GMSLive作曲",
+  "origKey": "E",
+  "timeSign": "4/4",
+  "bpm": 78,
+  "mp3": "/upload/yesuwoaini-yueshuya.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/yesuwoaini-yueshuya.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/yesuwoaini-yueshuya.lrc",
+  "youtube": "https://youtu.be/DmdOCeZjH8k?si=AXfH-EVoWnb588hh",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/yesuwoaini-yueshuyaE.jpg",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "耶稣我爱祢-约书亚乐团",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"E@@@@E/G#@@@@@A@@@@@E/G#@F#m @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0 5,_ ( 5,_ 5,· ) 5,_ | 2 1_ ( 7,_ 7, ) 5,_ ( 6,_ | 6, ) - - - | 0 sp 0 sp 0 sp 0 |","lyric":"@祢爱@对我坚定@不移， @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"@Thanks for@Your stub -born love @for me, @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"E@@@@D#dim@@G#7@@C#m@@@@@@@B@C#7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0 5,_ ( 5,_ 5,· ) 5,_ | 2, 3_ ( 2_ 2 ) 1_ ( 3_ | 3 ) - - - | 0 sp 0 sp 2 sp 3 |","lyric":"@感谢@祢恩典和@怜悯。@@@@@@@@有@首 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"@Just grace@and mer -cy that@I see.@@@@@@@@From@my @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"F#m@@@@E/G#@@@@@A@@@@@Bsus4 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"4· ( 4_ 4 ) 3_ ( 2_ | 2 ) 1_ ( 1_ 1· ) 2__ 3__ | 4 3_ ( 2_ 2 ) 1_ ( 2_ | 2 ) - - - |","lyric":"歌从@我心@升起，@只想单单敬@拜祢。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"heart comes@a sim - ple son,@With de -si -re I@will sing. @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"B@@@@@@E@@@@D#dim@@G#7@@C#m@@@@Bm7@@@E@E/G# @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0 sp 0 sp 0 sp 0 | 0 3_ 2_ 3 4 | 2 - sp - sp - | 0 3_ 2_ 3 6 | 5 sp - sp - sp - |","lyric":"@@@@@@@@耶稣我爱称，@@@@@@耶稣我爱祢。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"@@@@@@@@Je -sus, I Love You.@@@@ @@Je -sus, I Love You. @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"A@@@@@@@G#m@@@C#m@@@F#m @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0 6_ 6__ ( 6__ ! 6_ ) 5_ ! 4_ ( 5_ | 5 ) 5_ 5__ ( 5__ ! 5_ ) 4_ ! 3_ ( 4_ | 4 ) 4_ 3_ 4 ( 3·_ 2__ ) |","lyric":"@走过人@生四季，@祢爱永@不止息，@耶稣我爱 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"@Though the sea - sons may change, @Still Your love @will re -main,@ Je -sus, I Love @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"B@@C#m B/D# E@@@@D#dim@G#7@C#m@@@@Bm7@E E/G# @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"( 3__ ( 2·_ 2 ) ) - - | 0 3_ 2_ 3 4 | 2 - - - | 0 3_ 2_ 3 6 | 5 - - - |","lyric":"祢。@@@@@耶稣我爱祢，@@@@耶稣我爱祢。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"You.@@@@@Je -sus, I Love You,@@@@le -sus I Love You. @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"A@@@@@@@G#m@@@C#m@@@F#m7@@B@@E @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0 6_ 6__ ( 6__ ! 6_ ) 5_ ! 4_ ( 5_ | 5 ) 5_ 5__ ( 5__ ! 5_ ) 4_ ! 3_ ( 4_ | 4 ) 4_ 3_ 2 ( 3·_ 1__ ) | 1 - - - ||/","lyric":"@听我全@心呼求，@ 祢应许@都坚定，@耶稣我爱@祢。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"@Hear the cry @of my heart, @Know e- very @word is true,@ Je -sus, I Love @You. @ @ @ @ @ @ @ @ @"}
+      ]}
+    ]
+  }
+]
+}
