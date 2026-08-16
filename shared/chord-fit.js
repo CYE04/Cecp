@@ -274,7 +274,7 @@ function layoutStrictChordsAll(scope){
   .prev-seg.p-slot .p-chord .p-chord-head{white-space:pre;}
   .prev-seg.p-slot .p-chord .p-chord-tail{display:inline-block;width:0;min-width:0;overflow:visible;white-space:pre;}
   .prev-seg.p-slot .p-chord.p-chord-mid .p-chord-tail{width:auto;}
-  .prev-seg.p-slot.cf-tight{margin-left:0;margin-right:0;min-width:0.9em;}
+  .prev-seg.p-slot.cf-tight{margin-left:0;margin-right:0;min-width:14.4px;}
   .prev-seg.p-slot:has(.jp-aug){margin-right:11px;}
   .prev-seg.p-slot.cf-tight[data-bb]{margin-right:8px;}
     -- 断梁的「断口」就是两列之间的空隙（connectStrictBeams 遇到 data-bb 不连梁）。

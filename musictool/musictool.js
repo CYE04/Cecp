@@ -482,7 +482,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .prev-row.has-volta{--volta-rail:18px;}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
 /* 严格对位（align:"strict"）预览：每音位一列、三层居中共轴，与 youth/musiclib 成品一致 */
-.prev-seg.p-slot{align-items:center !important;min-width:1.2em;margin:0 2px;}
+.prev-seg.p-slot{align-items:center !important;font-size:16px;min-width:19.2px;margin:0 2px;}
 /* CECP-CHORD-FIT：和弦零宽，完全不参与列宽（长和弦不再撑开数字间距）。
    前两个字对中(=老版位置)，第三个字起零宽悬挂向右延伸；字号一律不变。 */
 .prev-seg.p-slot .p-chord{min-width:0;width:0;overflow:visible;white-space:pre;display:flex;flex-direction:row;justify-content:center;align-items:flex-end;font-size:16px;min-height:17px;}
@@ -490,7 +490,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .prev-seg.p-slot .p-chord .p-chord-head{white-space:pre;}
 .prev-seg.p-slot .p-chord .p-chord-tail{display:inline-block;width:0;min-width:0;overflow:visible;white-space:pre;}
 .prev-seg.p-slot .p-chord.p-chord-mid .p-chord-tail{width:auto;}
-.prev-seg.p-slot.cf-tight{margin-left:0;margin-right:0;min-width:0.9em;}
+.prev-seg.p-slot.cf-tight{margin-left:0;margin-right:0;min-width:14.4px;}
 .prev-seg.p-slot:has(.jp-aug){margin-right:11px;}
 .prev-seg.p-slot.cf-tight[data-bb]{margin-right:8px;}
 /* 断梁 ! 的编辑器提示：虚线小竖杠，零宽不影响布局，仅 musictool 预览可见 */
@@ -501,7 +501,7 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .prev-seg.p-slot .p-chord-multi .chord-chip{font-size:.85em;}
 .prev-seg.p-slot .p-lyric{text-align:center;padding:0 1px;}
 .prev-seg.p-slot .p-lyric .p-punct{display:inline-block;width:0;overflow:visible;white-space:pre;pointer-events:none;}
-.prev-seg.p-slot.p-punct-gap{margin-right:0.5em;}
+.prev-seg.p-slot.p-punct-gap{margin-right:8px;}
 .prev-seg.p-barslot{min-width:0;margin:0 3px;}
 .strict-label-row{display:block;margin:0 0 2px;line-height:1;}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:2px;min-height:13px;white-space:nowrap;}
@@ -2032,7 +2032,7 @@ function layoutStrictChordsAll(scope){
   .prev-seg.p-slot .p-chord .p-chord-head{white-space:pre;}
   .prev-seg.p-slot .p-chord .p-chord-tail{display:inline-block;width:0;min-width:0;overflow:visible;white-space:pre;}
   .prev-seg.p-slot .p-chord.p-chord-mid .p-chord-tail{width:auto;}
-  .prev-seg.p-slot.cf-tight{margin-left:0;margin-right:0;min-width:0.9em;}
+  .prev-seg.p-slot.cf-tight{margin-left:0;margin-right:0;min-width:14.4px;}
   .prev-seg.p-slot:has(.jp-aug){margin-right:11px;}
   .prev-seg.p-slot.cf-tight[data-bb]{margin-right:8px;}
     -- 断梁的「断口」就是两列之间的空隙（connectStrictBeams 遇到 data-bb 不连梁）。
