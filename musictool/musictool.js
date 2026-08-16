@@ -485,12 +485,17 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .prev-seg.p-slot{align-items:center !important;min-width:1.2em;margin:0 2px;}
 /* CECP-CHORD-FIT：和弦零宽，完全不参与列宽（长和弦不再撑开数字间距）。
    前两个字对中(=老版位置)，第三个字起零宽悬挂向右延伸；字号一律不变。 */
-.prev-seg.p-slot .p-chord{min-width:0;width:0;overflow:visible;white-space:pre;display:flex;flex-direction:row;justify-content:center;align-items:flex-end;}
+.prev-seg.p-slot .p-chord{min-width:0;width:0;overflow:visible;white-space:pre;display:flex;flex-direction:row;justify-content:center;align-items:flex-end;font-size:16px;min-height:17px;}
 .prev-seg.p-slot .p-chord > *{flex:0 0 auto;}
 .prev-seg.p-slot .p-chord .p-chord-head{white-space:pre;}
 .prev-seg.p-slot .p-chord .p-chord-tail{display:inline-block;width:0;min-width:0;overflow:visible;white-space:pre;}
 .prev-seg.p-slot .p-chord.p-chord-mid .p-chord-tail{width:auto;}
 .prev-seg.p-slot.cf-tight{margin-left:0;margin-right:0;min-width:0.9em;}
+.prev-seg.p-slot:has(.jp-aug){margin-right:11px;}
+.prev-seg.p-slot.cf-tight[data-bb]{margin-right:8px;}
+/* 断梁 ! 的编辑器提示：虚线小竖杠，零宽不影响布局，仅 musictool 预览可见 */
+.prev-seg.p-slot .p-n{position:relative;}
+.mt-bb-mark{position:absolute;right:-4px;top:0;bottom:2px;width:0;border-left:2px dashed var(--accent2);opacity:.55;pointer-events:none;}
 .prev-seg.p-slot .p-chord.p-chord-multi{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;line-height:1.1;}
 .prev-seg.p-slot .p-chord-multi .p-chord-stk{display:block;line-height:1.2;}
 .prev-seg.p-slot .p-chord-multi .chord-chip{font-size:.85em;}
@@ -1773,7 +1778,9 @@ function justifyScoreRows(rowList,opts){
       第 3 个字起是「尾巴」，零宽悬挂、只向右延伸，不影响任何人的位置。
    3. 紧邻的下一个音位马上也有和弦时，这个和弦退回老版「整段整体对中」
       （左右都伸），否则右延伸会把后面的音位推开，反而比老版更宽。
-   4. 字号一律不变 —— 尾巴与头一样大，短和弦更是一个像素都不改。
+   4. 头和尾一样大，绝不为了省地方缩小尾巴（用户明确否过）。
+      严格模式的和弦基准字号 16px（老格式仍是 12px，不受影响）——
+      零宽之后放大不撑列宽，所以敢放大。
    5. 只有两个和弦真的会撞上时，才在那一处局部加最小间距（写 padding，
       不碰 margin-right —— 那是 justifyScoreRows 的地盘）。
    6. 歌词空位（@）连续 4 个以上的那一段（前奏/间奏/拖腔），把这几列的横向占位收紧约三成；
@@ -1991,7 +1998,11 @@ function layoutStrictChordsAll(scope){
 /* 本块要求的 CSS（三个宿主各自带前缀注入，规则文字保持一致）：
 
   .prev-seg.p-slot .p-chord{min-width:0;width:0;overflow:visible;white-space:pre;
-    display:flex;flex-direction:row;justify-content:center;align-items:flex-end;}
+    display:flex;flex-direction:row;justify-content:center;align-items:flex-end;
+    font-size:16px;min-height:17px;}
+    -- 字号 16px 是严格模式专属（基础 .p-chord 仍是 12px，老格式歌不受影响）。
+       和弦零宽之后放大不再撑开列宽，实测 12/14/15/16px 行自然宽恒为同一值，
+       代价只是碰撞避让多一两处。用户 2026-08-15 选的 +4。
   .prev-seg.p-slot .p-chord > *{flex:0 0 auto;}
     -- 这条必须有：musiclib 有全局 reset #music-library *{min-width:0}，
        零宽 flex 容器里的 .chord-chip 会被 flex-shrink 压成 0 宽，
@@ -2001,6 +2012,14 @@ function layoutStrictChordsAll(scope){
   .prev-seg.p-slot .p-chord .p-chord-tail{display:inline-block;width:0;min-width:0;overflow:visible;white-space:pre;}
   .prev-seg.p-slot .p-chord.p-chord-mid .p-chord-tail{width:auto;}
   .prev-seg.p-slot.cf-tight{margin-left:0;margin-right:0;min-width:0.9em;}
+  .prev-seg.p-slot:has(.jp-aug){margin-right:11px;}
+  .prev-seg.p-slot.cf-tight[data-bb]{margin-right:8px;}
+    -- 断梁的「断口」就是两列之间的空隙（connectStrictBeams 遇到 data-bb 不连梁）。
+       cf-tight 把 margin 归零之后断口跟着变 0，断梁等于白写 —— 前奏/间奏这种
+       没歌词的行首当其冲。实测有歌词 8px、收紧后 0px。这条把断口捞回来。
+    -- 附点 .jp-aug 是零宽绝对定位(right:-5px)，会贴到下一个音符上（实测间隙
+       只剩 3.6px，而正常音符之间是 16.5px），分不清点属于哪个音；给带附点的
+       音位补出间距。特异度 (0,4,0) 高于 cf-tight，所以收紧段里也保得住。
     -- 连续 >=4 个空歌词音位的那一段：横向占位收紧约三成（外边距 2px->0、最小列宽 1.2em->0.9em）。
 */
 /* ═══════════ CECP-CHORD-FIT v1 END ═══════════ */
@@ -3808,7 +3827,15 @@ function buildStrictSegColumnsMT(seg, container, psi, pli, pgi, bold){
   function onClick(){previewSegClick(psi,pli,pgi);}
   function lyRow(val,j){var l=document.createElement('div');l.className='p-lyric'+(j?' p-lyric'+(j+1):'')+(bold?' bold':'');if(val==null){setLyricContentEx(l,NB,mtSetPlainText);return l;}var lsp=saSplitTrailingPunct(String(val));if(lsp.punct){setLyricContentEx(l,lsp.base||NB,mtSetPlainText);var pun=document.createElement('span');pun.className='p-punct';pun.textContent=lsp.punct;l.appendChild(pun);}else{setLyricContentEx(l,String(val),mtSetPlainText);}return l;}
   toks.forEach(function(tok){
-    if(tok==='!'){var lc=container.lastElementChild;if(lc)lc.setAttribute('data-bb','1');return;}  // 断梁标记
+    if(tok==='!'){var lc=container.lastElementChild;
+      if(lc){lc.setAttribute('data-bb','1');
+        /* 编辑器可见提示：断梁本身不占音位、不画任何东西，写的时候看不见容易写错，
+           所以在前一个音的右侧挂一条虚线小竖杠。零宽绝对定位，不影响任何布局；
+           只有 musictool 有这段，musiclib/youth 的成品谱不会出现。 */
+        var _bn=lc.querySelector('.p-n');
+        if(_bn&&!_bn.querySelector('.mt-bb-mark')){var _bm=document.createElement('span');_bm.className='mt-bb-mark';_bm.title='断梁 !';_bn.appendChild(_bm);}
+      }
+      return;}  // 断梁标记
     var _nnav=noteNavOf(tok);if(_nnav){attachNoteNavMark(container.lastElementChild,_nnav);return;}   // *coda/*segno/… 挂在前一个音位的音符上方
     if(saIsDualAtom(tok)){
       var col=document.createElement('div');col.className='prev-seg p-slot';col.setAttribute('data-loc',psi+'-'+pli+'-'+pgi);col.addEventListener('click',onClick);
