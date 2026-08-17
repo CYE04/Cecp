@@ -5608,7 +5608,9 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
         '.prev-seg.p-slot.cf-tight[data-bb]{margin-right:8px;}',   /* 收紧不能把断梁的断口也压没了 —— 没写歌词时梁缝会变 0，断梁等于白写 */
         '.prev-seg.p-slot .p-chord.p-chord-multi{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;line-height:1.1;}',
         '.prev-seg.p-slot .p-chord-multi .p-chord-stk{display:block;line-height:1.2;}',
-        '.prev-seg.p-slot .p-chord-multi .chord-chip{font-size:.85em;}',
+        /* 叠和弦(上下两个)跟单和弦一样大：以前压到 .85em 是为了塞下两行，
+           零宽之后宽度不成问题，小一号反而像写错了 */
+        '.prev-seg.p-slot .p-chord-multi .chord-chip{font-size:1em;}',
         '.prev-seg.p-slot .p-lyric{text-align:center;padding:0 1px;}',
         '.prev-seg.p-slot .p-lyric .p-punct{display:inline-block;width:0;overflow:visible;white-space:pre;pointer-events:none;}',
         '.prev-seg.p-slot.p-punct-gap{margin-right:8px;}',
