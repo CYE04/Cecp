@@ -1,0 +1,50 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-08-18 17:49:08",
+  "id": "haoxihuanyunizaiyiqi",
+  "title": "好喜欢与你在一起",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉【我能给你什么】 (2024) (诗133:1-3，约13:34-35，太7:1-2) 曾祥怡词曲",
+  "origKey": "C",
+  "timeSign": "4/4",
+  "bpm": 132,
+  "mp3": "/upload/haoxihuanyunizaiyiqi.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/wonenggeinishenme.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/haoxihuanyunizaiyiqi.lrc",
+  "youtube": "https://youtu.be/mVqSmWIjoZU?si=ATN8zF80MxmMvIeN",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/haoxihuanyunizaiyiqiC.lrc",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "好喜欢与你在一起",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"F@@G/F@@@@C/E@@@A7@@@Dm C/E F @F#dim@@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"6·_ #5__ ! 6_ ( 2'_ ! 2'·_ ) 1'__ ! 7·_ 6__ | 5·_ 1'__ ! 3'_ ( 5'_ ! 5'·_ ) 3'__ ! #1·_ 6__ | 4' 3' 2'_ sp 1' sp ( 2'_ | 2' ) - 1' 2' |","lyric":"@@@@@@@@@@@@@@@@@@@@@@@谢谢 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"C@@@@C7@@@F@@@@F F#dim @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"|: 3 3_ ( 3_ 3 ) 4 | 5 0 3 1 | 6 6_ ( 6_ 6 ) 7 | 1' 0 7 6 |","lyric":"祢牵着@我手，@高山低谷陪@我走，@从不 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"做梦，一@起笑，@一起敬拜和@祷告，@一起 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"C/E@@@Am@@@Dm@@@@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"[v1 5 - 1' - | 1 0 2 3 | 4 4_ ( 4_ 4 ) 3 | 2 0 1 2 :| ]v","lyric":"放@弃@我，@真诚爱我，接@纳我。@一起 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"C/G @ @ @ @","n":"5 1' - 1'_ 1'_ [v2 ]v |","lyric":"庆贺，@每个 @ @ @ @"},
+        {"chord":"G@@@@C @ @ @ @ @ @ @ @ @ @ @","n":"7 1'_ ( 2'_ 2' ) 7 | 1' sp - sp - sp - ||","lyric":"生命的@奇迹。 @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"@@@@F@@@@G/F@@@Em@@@@Am @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"|| 0 1' 1' 7 | 6 6_ ( 4_ 4 ) 3 | 2 0 7 6 | 5 5_ ( 3_ 3 ) 2 | 1 0 6 5 |","lyric":"@好喜欢与你在@一起，@分享生活、分@享爱，@没有 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Dm@@@@G@@@C@@@C7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"4 4_ ( 4_ 4 ) 3 | 2 0 3 4 | 3 - 4 - | 5 1' 1' 7 |","lyric":"批判和@论断，@心完全@敞@开。好喜欢 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"F@@@@G/F@@@Em@@E/G#@@Am @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"6 6_ ( 4_ 4 ) 3 | 2 0 7 6 | 5 5_ ( 2'_ 2' ) 7_ ( 1'_ | 1' ) 0 3 5 |","lyric":"与你在@一起，@像耶稣一样@地爱，@@你我 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Dm@@@@F/G@G@C @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5 4_ ( 1'_ 1' ) 1' | 6 - 7 - | 1' sp - sp - sp - ||/","lyric":"不孤单，@这里@有@爱。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]}
+    ]
+  }
+]
+}
