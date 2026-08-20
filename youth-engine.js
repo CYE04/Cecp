@@ -1617,11 +1617,28 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
           layoutStrictArcsAll(snap.node);
           var r1=snap.node.getBoundingClientRect();
           var cw=Math.max(1,r1.width),ch=Math.max(1,r1.height);
-          var lyricPx=exportMeasureLyricFont(snap.node);
           var P=EXPORT_FIT.portrait;
+          var targetW = P.W-EXPORT_FIT.sideM*2;
+          var targetH = P.H-EXPORT_FIT.headerH-EXPORT_FIT.bottomH;
+          if (cw / ch < (targetW / targetH) * 0.85) {
+             var st = document.createElement('style');
+             st.textContent = '.sw-lline{margin-bottom:6px !important;} .sw-seg{margin-bottom:2px !important;}';
+             snap.node.insertBefore(st, snap.node.firstChild);
+             var idealRatio = targetW / targetH;
+             var ch_new = ch * 0.8; // estimate new height after margin reduction
+             var stretchW = Math.min(ch_new * idealRatio, cw * 1.5);
+             if(YE_JUSTIFY_ROWS) justifyScoreRows(snap.node.querySelectorAll('.sw-lrow'), {targetWidth: stretchW, ratio: 0.5});
+             layoutStrictChordsAll(snap.node);
+             snap.node.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);
+             layoutStrictArcsAll(snap.node);
+             r1=snap.node.getBoundingClientRect();
+             cw=Math.max(1,r1.width);
+             ch=Math.max(1,r1.height);
+          }
+          var lyricPx=exportMeasureLyricFont(snap.node);
           var sPort=Math.min(
-            (P.W-EXPORT_FIT.sideM*2)/cw,
-            (P.H-EXPORT_FIT.headerH-EXPORT_FIT.bottomH)/ch,
+            targetW/cw,
+            targetH/ch,
             EXPORT_FIT.maxScale
           );
           if(sPort*lyricPx>=EXPORT_FIT.minLyricPx){
@@ -3100,6 +3117,7 @@ function justifyScoreRows(rowList,opts){
   });
   var maxW=0;
   widths.forEach(function(w){if(w>maxW)maxW=w;});
+  if(opts.targetWidth && opts.targetWidth > maxW) maxW = opts.targetWidth;
   if(!maxW)return 0;
   /* 3. 先集中读（offsetWidth / computed margin），后集中写，避免逐格回流 */
   var plans=[];
