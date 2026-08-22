@@ -1408,7 +1408,7 @@
        不带 ?v= 浏览器会一直用缓存里的旧引擎 —— 表现成「youth 的谱跟 musiclib 不一样」
        （musiclib 那边有完整的版本链，改了就更新；youth 这边没有，就一直是旧的）。
        改了 youth-engine.js 就把这个日期串往上抬一位。 */
-    this.scoreEngine = ('scoreEngine' in d) ? String(d.scoreEngine || '').trim() : (this.songsBase + '/youth-engine.js?v=20260816-chordfit');
+    this.scoreEngine = ('scoreEngine' in d) ? String(d.scoreEngine || '').trim() : (this.songsBase + '/youth-engine.js?v=20260822-a4wide');
     var liveTitle = '';
     try { liveTitle = new URLSearchParams(location.search).get('title') || ''; } catch (err) {}
     this.liveTitle = String(d.liveTitle || liveTitle || '敬拜现场');

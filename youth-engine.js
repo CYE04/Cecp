@@ -1224,6 +1224,18 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
     clone.style.transform='none';
     host.appendChild(clone);
     mount.appendChild(host);
+    /* CECP-A4-PAGE v2: 屏幕上为填满纸宽做的「压紧+拉宽」不进导出图 ——
+       压紧类的 CSS 挂在 .sw-page 下,克隆搬出纸外本来就失效;真正会跟过来的是
+       justify 写在 .prev-seg 上的 inline margin 和段落标记被挪过的 left/top。
+       这里把两者都退回「按最宽的自然行对齐 + 作者拖的原始 dx/dy」=
+       v2 之前导出拿到的样子,导出自己的排版从这里起步。 */
+    clone.classList.remove('sw-a4-tight');
+    Array.prototype.forEach.call(clone.querySelectorAll('.sec-label[data-a4-l0]'),function(t){
+      t.style.left=t.getAttribute('data-a4-l0')+'px';
+      t.style.top=t.getAttribute('data-a4-t0')+'px';
+    });
+    justifyScoreRowsClear(clone);
+    if(YE_JUSTIFY_ROWS)justifyScoreRows(clone.querySelectorAll('.sw-lrow'));
     if(opt.tight){
       var tightW=Math.max(1,Math.ceil(clone.scrollWidth||rect.width||0));
       clone.style.width=tightW+'px';
@@ -1620,20 +1632,30 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
           var P=EXPORT_FIT.portrait;
           var targetW = P.W-EXPORT_FIT.sideM*2;
           var targetH = P.H-EXPORT_FIT.headerH-EXPORT_FIT.bottomH;
-          if (cw / ch < (targetW / targetH) * 0.85) {
+          var aspectRatio = cw / ch;
+          var idealAspect = targetW / targetH;
+          var stretched = false;
+          console.log('[FittedExport] cw='+cw+' ch='+ch+' aspect='+aspectRatio.toFixed(3)+' ideal='+idealAspect.toFixed(3));
+          if (aspectRatio < idealAspect) {
+             console.log('[FittedExport] Song is too tall/narrow, stretching wide...');
+             stretched = true;
+             var expLabels = secLabelsSnapshot(snap.node);   // 拉宽会把音符挪走，段落标记得跟着走(同屏幕那套锚点)
              var st = document.createElement('style');
              st.textContent = '.sw-lline{margin-bottom:6px !important;} .sw-seg{margin-bottom:2px !important;}';
              snap.node.insertBefore(st, snap.node.firstChild);
-             var idealRatio = targetW / targetH;
-             var ch_new = ch * 0.8; // estimate new height after margin reduction
-             var stretchW = Math.min(ch_new * idealRatio, cw * 1.5);
-             if(YE_JUSTIFY_ROWS) justifyScoreRows(snap.node.querySelectorAll('.sw-lrow'), {targetWidth: stretchW, ratio: 0.5});
+             var stretchW = Math.min(ch * idealAspect * 0.9, cw * 1.6);
+             console.log('[FittedExport] stretchW='+stretchW.toFixed(0)+' (natural cw='+cw+')');
+             /* 关键：把 clone 容器宽度撑开，否则 flex 行会被旧宽度压缩 */
+             snap.node.style.width = Math.ceil(stretchW) + 'px';
+             if(YE_JUSTIFY_ROWS) justifyScoreRows(snap.node.querySelectorAll('.sw-lrow'), {targetWidth: stretchW, ratio: 0.4});
              layoutStrictChordsAll(snap.node);
              snap.node.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);
              layoutStrictArcsAll(snap.node);
              r1=snap.node.getBoundingClientRect();
              cw=Math.max(1,r1.width);
              ch=Math.max(1,r1.height);
+             secLabelsRestore(expLabels);                    // 徽章放回原来那一拍
+             console.log('[FittedExport] after stretch: cw='+cw+' ch='+ch+' newAspect='+(cw/ch).toFixed(3));
           }
           var lyricPx=exportMeasureLyricFont(snap.node);
           var sPort=Math.min(
@@ -1641,7 +1663,10 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
             targetH/ch,
             EXPORT_FIT.maxScale
           );
-          if(sPort*lyricPx>=EXPORT_FIT.minLyricPx){
+          /* 拉宽优化后，歌词仍然清晰可读，放宽 minLyricPx 门槛让竖版通过 */
+          var effectiveMinLyric = stretched ? Math.min(EXPORT_FIT.minLyricPx, 16) : EXPORT_FIT.minLyricPx;
+          console.log('[FittedExport] sPort='+sPort.toFixed(3)+' lyricPx='+lyricPx+' rendered='+(sPort*lyricPx).toFixed(1)+' min='+effectiveMinLyric);
+          if(sPort*lyricPx>=effectiveMinLyric){
             return nodeToPngBlobRobust(snap.node,EXPORT_PAPER_BG,{scale:sPort*EXPORT_FIT.ss}).then(function(blob){return {blob:blob,page:P};});
           }
           exportApplyTwoColumns(snap.node,cw);
@@ -2861,6 +2886,63 @@ function secLabelColor(text){
   return SEC_LABEL_FALLBACK[h%SEC_LABEL_FALLBACK.length];
 }
 var SEC_LABEL_TOP_GAP_PX=3;
+/* ── 段落标记(严格模式)的锚点 ──
+   严格模式的段落标记单独占一行 .strict-label-row，徽章用的是 left:dx / top:dy 的
+   **绝对像素** —— 作者在自然排版下一格一格拖出来的(song JSON 的 dx/dy)。
+   v2 一压紧行高、一拉宽行，音符就走了、行高也变了，徽章会指错拍子、掉到音符上。
+   所以每次重排前先记下「它指着哪一列、列内哪个位置、离这行音符行多高」，
+   重排完按新坐标放回去：徽章还是压在原来那一拍、离音符一样高。
+   left/top 都是 relative 定位，改了不影响任何布局，放回去之后不必重新测量。
+   老格式的标记是 inline 挂在行里跟着音符走的(placeSecLabel 每次重排都会重新定位)，不用管。
+   data-a4-l0/t0 = 第一次见到时的原始 dx/dy，resetScoreFit 每次先归位 —— 否则反复 fit 会把
+   补偿量一次次叠上去(跟 justify 的 data-ml-just 幂等是同一个道理)。 */
+function secLabelTags(scope){
+  return (scope&&scope.querySelectorAll)?scope.querySelectorAll('.strict-label-row .sec-label'):[];
+}
+function secLabelsReset(scope){
+  Array.prototype.forEach.call(secLabelTags(scope),function(tag){
+    if(!tag.hasAttribute('data-a4-l0'))return;
+    tag.style.left=tag.getAttribute('data-a4-l0')+'px';
+    tag.style.top=tag.getAttribute('data-a4-t0')+'px';
+  });
+}
+function secLabelsSnapshot(scope){
+  var marks=[];
+  Array.prototype.forEach.call(secLabelTags(scope),function(tag){
+    var line=tag.closest?tag.closest('.sw-lline'):null;
+    var row=line?line.querySelector('.sw-lrow'):null;
+    if(!row)return;
+    if(!tag.hasAttribute('data-a4-l0')){
+      tag.setAttribute('data-a4-l0',(parseFloat(tag.style.left)||0));
+      tag.setAttribute('data-a4-t0',(parseFloat(tag.style.top)||0));
+    }
+    var rr=row.getBoundingClientRect(),tr=tag.getBoundingClientRect();
+    var x=tr.left-rr.left;
+    var cols=row.querySelectorAll('.prev-seg'),col=null,frac=0,i,cr;
+    for(i=0;i<cols.length;i++){
+      cr=cols[i].getBoundingClientRect();
+      if(cr.left-rr.left<=x||i===0)col=cols[i];else break;
+    }
+    if(col){cr=col.getBoundingClientRect();frac=cr.width?((x-(cr.left-rr.left))/cr.width):0;}
+    var note=row.querySelector('.p-n');
+    marks.push({tag:tag,row:row,col:col,frac:frac,x:x,rowW:row.offsetWidth||1,
+                note:note,gap:note?(tr.top-note.getBoundingClientRect().top):null});
+  });
+  return marks;
+}
+function secLabelsRestore(marks){
+  if(!marks||!marks.length)return;
+  marks.forEach(function(m){
+    var rr=m.row.getBoundingClientRect(),x=m.x;
+    if(m.col){var cr=m.col.getBoundingClientRect();x=(cr.left-rr.left)+m.frac*cr.width;}
+    else x=m.x*(m.row.offsetWidth||1)/m.rowW;      // 没有音位列可锚(纯记号行)：按行宽等比挪
+    m.tag.style.left=x.toFixed(1)+'px';
+    if(m.note&&m.gap!=null){
+      var now=m.tag.getBoundingClientRect().top-m.note.getBoundingClientRect().top;
+      m.tag.style.top=((parseFloat(m.tag.style.top)||0)+(m.gap-now)).toFixed(1)+'px';
+    }
+  });
+}
 function segRenderLabelBlock(seg,row){
   var holder=document.createElement('span');
   holder.className='sec-label-holder';
@@ -5424,6 +5506,9 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     var A4_RATIO=297/210;        // 1.41428…
     var PAGE_MX=12,PAGE_MY=12;   // 纸内页边距(lbDiv 自己还有 8/18/16/8 的 padding,叠加后=页边距)
     var SPREAD_MAX=0.9;          // 每个行间隙最多再撑开 0.9×平均行高(防两行歌被拉散)
+    /* v2「压紧+拉宽」用的两个上限，见下面 fitRows 里的注释 */
+    var STRETCH_MAX=1.6;         // 行最多拉到自然宽的 1.6 倍(再宽音符就散成一盘沙)
+    var STRETCH_RATIO=0.45;      // 拉宽时的短行门槛：不到目标宽 45% 的行保持左对齐(尾句不跟着拉)
     function ensureScorePageCss(){
       if(document.getElementById('ye-a4-page-css'))return;
       var st=document.createElement('style');
@@ -5444,7 +5529,18 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
         'box-shadow:0 12px 32px rgba(0,0,0,.24);}',
         '@media (prefers-color-scheme:dark){html:not([data-resolved-theme="light"]) .sw-page{',
         'background:#f4efe7;box-shadow:0 12px 32px rgba(0,0,0,.24);}}',
-        '.sw-page>.sw-lb{background:transparent !important;}'
+        '.sw-page>.sw-lb{background:transparent !important;}',
+        /* CECP-A4-PAGE v2：长歌压紧纵向留白(只在纸里、只在高瘦歌上加 .sw-a4-tight)。
+           一律 (0,4,0) 特异度 —— 要压得过严格模式那套 .prev-seg.p-slot .p-lyric (0,3,0)。
+           只动留白不动字号：字号在这里改是白改，fitRows 随后会按比例缩放，改了等于没改。
+           ⚠️ 规则挂在 .sw-page 下 → 导出克隆(搬到纸外面)天然不受影响，跟撑行距那条一样。 */
+        '.sw-page .sw-lb.sw-a4-tight .p-lyric{line-height:1.12;}',
+        '.sw-page .sw-lb.sw-a4-tight .p-lyric2,.sw-page .sw-lb.sw-a4-tight .p-lyric3,.sw-page .sw-lb.sw-a4-tight .p-lyric4{margin-top:0;}',
+        '.sw-page .sw-lb.sw-a4-tight .p-chord{line-height:1.05;}',
+        '.sw-page .sw-lb.sw-a4-tight .sw-lline{margin-bottom:4px;}',
+        '.sw-page .sw-lb.sw-a4-tight .sw-lsec{margin-bottom:10px;}',
+        '.sw-page .sw-lb.sw-a4-tight .sw-lsec-name{margin-bottom:4px;}',
+        '.sw-page .sw-lb.sw-a4-tight .prev-row.has-volta{--volta-rail:12px;}'
       ].join('')+chip;
       document.head.appendChild(st);
     }
@@ -5492,6 +5588,21 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       }
       return got;
     }
+    /* 行内附加物重排：严格模式的梁/弧、老格式的段落标记。
+       行宽或行高一变(justify 拉宽、压紧留白、移调重渲染)就得重来一遍，
+       ⚠️ 且必须排在 measureNaturalScore() 之后 —— 那时 lbDiv 才被撑到自然宽，
+          在那之前行还被容器挤着，量到的音位坐标是压扁的([[strict-arc-fit-order]])。
+       返回重排后的内容高度(弧线会给和弦加 marginBottom，行会变高)。 */
+    function relayoutRowExtras(){
+      if(song.align==='strict'){
+        lbDiv.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);
+        layoutStrictArcsAll(lbDiv);
+      }else{
+        var _sl=lbDiv.querySelectorAll('.sec-label-holder');
+        Array.prototype.forEach.call(_sl,function(h){ if(h.cecpPlaceSecLabel)h.cecpPlaceSecLabel(); });
+      }
+      return lbDiv.scrollHeight||0;
+    }
     /* ═══════════ CECP-A4-PAGE v1 END ═══════════ */
     function resetScoreFit(){
       lbDiv.style.transform='';
@@ -5500,6 +5611,8 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       lbDiv.style.marginBottom='';
       lbDiv.style.padding='8px 18px 16px 8px';
       lbDiv.style.boxSizing='border-box';
+      lbDiv.classList.remove('sw-a4-tight');   // v2 压紧幂等：每次 fit 都从松的基线重新判断
+      secLabelsReset(lbDiv);                   // 段落标记回到作者拖的原始 dx/dy(同上，防补偿量叠加)
       var _ll=lbDiv.querySelectorAll('.sw-lline');
       for(var i=0;i<_ll.length;i++)_ll[i].style.paddingBottom='';
       var pg=lbDiv.parentElement;
@@ -5851,28 +5964,40 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       if(YE_JUSTIFY_ROWS)justifyScoreRows(lbDiv.querySelectorAll('.sw-lrow'));
       var natural=measureNaturalScore();
       if(!natural)return;
-      /* ⚠️ 梁/弧必须排在 measureNaturalScore() 之后：它才把 lbDiv 撑到自然宽度。
-         在那之前行还被容器挤着(.sw-lrow 是 flex，窄屏上音位列会被 flex-shrink 压扁)，
-         此时量到的音位坐标是压缩过的，撑开后弧线就整体左移——屏幕越窄偏得越多，
-         桌面宽屏因为容器≈自然宽所以看不出来。 */
-      if(song.align==='strict'){
-        lbDiv.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);
-        layoutStrictArcsAll(lbDiv);
-        natural.height=lbDiv.scrollHeight||natural.height;   // 弧线给和弦加了 marginBottom，行会变高
-      }else{
-        // 老格式：段落标记的让位/定位在这里重排一次（严格模式由 layoutStrictArcsAll 负责，不碰）
-        var _sl=lbDiv.querySelectorAll('.sec-label-holder');
-        if(_sl.length){
-          Array.prototype.forEach.call(_sl,function(h){ if(h.cecpPlaceSecLabel)h.cecpPlaceSecLabel(); });
-          natural.height=lbDiv.scrollHeight||natural.height;
-        }
-      }
+      natural.height=relayoutRowExtras()||natural.height;   // 梁/弧(或段落标记)——见函数上的顺序警告
 
       /* ── CECP-A4-PAGE：纸撑满容器宽(同原图卡片)，正好一张 A4，整首歌装在这一张上 ── */
       var pageW=Math.max(1,host.clientWidth||natural.width);
       var pageH=pageW*A4_RATIO;
       var cw=Math.max(1,pageW-PAGE_MX*2);
       var ch=Math.max(1,pageH-PAGE_MY*2);
+
+      /* ── CECP-A4-PAGE v2：长歌「先压紧、再拉宽」 ──
+         高瘦的歌(行数多、每行还叠着和弦和三四段歌词)是**以高定缩放**：纸的高度用满了，
+         宽度却剩一大截白边，整首谱被缩得很小(怜悯的爱实测只占纸宽 71%，两边各留 15%)。
+         把这截白边换成谱面，两步：
+         ① 压紧纵向留白(.sw-a4-tight：歌词行距/和弦行高/行间距/段落间距/反复记号轨)——
+            只动留白不动字号，同一张纸于是能装下更大的谱；
+         ② 还剩白边就把每行拉宽到刚好填满纸宽(justify 的 targetWidth，音位间距均匀变大)，
+            跟原图谱一样满幅；最多拉到自然宽的 STRETCH_MAX 倍，再宽音符就散了。
+         矮胖的歌(以宽定缩放)一步都不走，仍旧是原来的「行距撑开填页」；
+         压紧之后若反过来变成以宽定缩放，剩下的高度也照旧由 fillScoreHeight 撑回行距里
+         —— 留白从行内挪到行与行之间，正是它该待的地方。 */
+      if(natural.width*ch<natural.height*cw){
+        var labelMarks=secLabelsSnapshot(lbDiv);  // 压紧/拉宽前记下段落标记指着哪一拍、离音符多高
+        lbDiv.classList.add('sw-a4-tight');
+        var tightNat=measureNaturalScore();
+        if(tightNat)natural=tightNat;
+        natural.height=relayoutRowExtras()||natural.height;
+        var targetW=Math.min(natural.height*cw/ch,natural.width*STRETCH_MAX);
+        if(YE_JUSTIFY_ROWS&&targetW>natural.width+1){
+          justifyScoreRows(lbDiv.querySelectorAll('.sw-lrow'),{targetWidth:targetW,ratio:STRETCH_RATIO});
+          var wideNat=measureNaturalScore();
+          if(wideNat)natural=wideNat;
+          natural.height=relayoutRowExtras()||natural.height;
+        }
+        secLabelsRestore(labelMarks);          // 段落标记放回原来那一拍(只动 relative 定位，不影响排版)
+      }
 
       /* 单参数 scale = 等比：横竖同一个比例，简谱/和弦/歌词的形状与对位一律不变。
          min(宽比,高比) → 整首歌完整落在这一张 A4 里，跟 musiclib 原图谱一样的看法：
