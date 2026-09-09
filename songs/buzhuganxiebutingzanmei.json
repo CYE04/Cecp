@@ -1,0 +1,42 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-09-09 20:08:31",
+  "id": "buzhuganxiebutingzanmei",
+  "title": "不住感谢，不听赞美",
+  "artist": "黄国伦",
+  "sub": "黄国伦【带领我】(2000) 黄国伦词曲",
+  "origKey": "G",
+  "timeSign": "4/4",
+  "bpm": 99,
+  "mp3": "/upload/buzhuganxiebutingzanmei.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/dailingwo.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/buzhuganxiebutingzanmei.lrc",
+  "youtube": "https://youtu.be/GBKuU-E9rmI?si=9w6rfmGvOxJ4pKHA",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/buzhuganxiebutingzanmeiG.jpg",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "不住感谢，不停赞美",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"@@G,F@@@@D/F#,C/E@@@@@Em,D@@@@Bm/D,Am/C@@@@@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0_ 5,_ |: 3 3 3 1_ 1_ | 2_ 2_ ! 3_ ( 2_ 2 ) - | 1 1 1 6,_ 1_ | 7,_ 7,_ ! 6,_ ( 5,_ 5, ) - |","lyric":"@喔主的恩典是何等宝贵，@@主的慈爱是何等甘甜， @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"@@世界充满@许多谎言，@@求主吸引@我的视线， @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"C,Bb@@@@G/B,F/A @ @ @ @ @ @ @ @ @ @","n":"6, 6, 6, ( 5,_ 4,_ ) | 5,_ 5,_ ! 5,_ ( 1_ 1 ) - |","lyric":"我愿尝尝@这种滋味， @ @ @ @ @ @ @ @ @ @","lyric2":"淡淡爱慕@祢的一切， @ @ @ @ @ @ @ @ @ @"},
+        {"chord":"Am7,Gm7@@@@@D,C @ @ @ @ @ @ @ @ @ @","n":"3 2 2_ 1_ ! 6,_ 5,_ | 0 0 0 0_ 5,_ :| [v1 ]v","lyric":"便知他的善美。@@@@这 @ @ @ @ @ @ @ @ @ @","lyric2":"@@@@@@@@@@@@@@@@ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Am7,Gm7@Dsus4,Csus4@@@G,F@Dsus4,Csus4 @ @ @ @ @ @ @ @ @ @ @","n":"3 2 1_ 1_ ! 7,_ ( 1_ | 1 ) 0_ 0_ 0 0_ 5,_ || [v2 ]v","lyric":"常住祢的里面@@@@@喔 @ @ @ @ @ @ @ @ @ @ @"},
+        {"chord":"G,F@@@@Am7,Gm7 @ @ @ @ @ @ @ @ @","n":"3· ( 3_ 3 ) 0_ 3_ | 4· ( 4_ 4 ) 3_ 4_ |","lyric":"耶稣，@@喔耶稣，@祢是 @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G/B,F/A@@@C,Bb Dsus4,Csus4@@@G,F@@@@Am7,Gm7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5· ( 5_ 5 ) 7, | 1· ~ 2_ ~ 2 0_ 5,_ | 3· ( 3_ 3 ) 0_ 3_ | 4· ( 4_ 4 ) 3_ 4_ |","lyric":"何等@宝贵。@@@喔耶稣，@@喔耶稣，@我要 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G/B,F/A@@@C,Bb@@@D,C@@@@@G,F @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5· ( 5_ 5 ) 6/7, | ( 1 - - - | 2 ) 0 3_ 2_ ! 2_ ( 1_ | 1 ) 0 0 ||/","lyric":"不住@感谢，@@@@@不停赞美。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]}
+    ]
+  }
+]
+}
