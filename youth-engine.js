@@ -391,15 +391,15 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .ym-mast-lede{font-size:15px;line-height:1.65;color:var(--ym-ink2);margin:0;max-width:36ch}
 .ym-mast-meta{margin-top:16px;font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:12.5px;letter-spacing:.02em;color:var(--ym-ink3)}
 .ym-mast-nav{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:18px}
-.ym-mast-link{--nav-color:#7896AD;position:relative;font-size:14.5px;color:var(--ym-ink2);text-decoration:none;padding:4px 0 6px;cursor:pointer;background:none;border:0;font-family:inherit;transition:color var(--ym-dur) var(--ym-ease)}
+.ym-mast-link{--nav-color:#4F79B8;position:relative;font-size:14.5px;color:var(--ym-ink2);text-decoration:none;padding:4px 0 6px;cursor:pointer;background:none;border:0;font-family:inherit;transition:color var(--ym-dur) var(--ym-ease)}
 .ym-mast-link::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--nav-color);opacity:.6;transition:opacity var(--ym-dur) var(--ym-ease)}
-.ym-mast-link[data-section="songs"]{--nav-color:#739D91}
-.ym-mast-link[data-section="score"]{--nav-color:#A19A72}
-.ym-mast-link[data-section="message"]{--nav-color:#9A85AD}
-.ym-mast-link[data-section="ppt"]{--nav-color:#B49076}
-.ym-mast-link[data-section="replay"]{--nav-color:#759FA5}
-.ym-mast-link[data-section="tutorial"]{--nav-color:#9695B8}
-.ym-mast-link[data-section="game"]{--nav-color:#B68794}
+.ym-mast-link[data-section="songs"]{--nav-color:#B78335}
+.ym-mast-link[data-section="score"]{--nav-color:#4D8A72}
+.ym-mast-link[data-section="message"]{--nav-color:#8166A5}
+.ym-mast-link[data-section="ppt"]{--nav-color:#A36F45}
+.ym-mast-link[data-section="replay"]{--nav-color:#64738B}
+.ym-mast-link[data-section="tutorial"]{--nav-color:#367E89}
+.ym-mast-link[data-section="game"]{--nav-color:#A36363}
 .ym-mast-link:hover,.ym-mast-link.active{color:var(--ym-ink)}
 .ym-mast-link:hover::after,.ym-mast-link.active::after{opacity:1}
 
@@ -437,6 +437,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .ym-ord-row:last-child{border-bottom:0}
 .ym-ord-num{font-family:var(--ym-serif);font-size:15px;color:var(--ym-ink3);line-height:1}
 .ym-ord-time{font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--ym-ink);min-width:0}
+.ym-ord-time,.ym-ord-dur,.ym-mast-meta{font-variant-numeric:tabular-nums}
 .ym-ord-time small{display:block;font-size:12px;font-weight:400;color:var(--ym-ink3);margin-top:3px;letter-spacing:0}
 .ym-ord-name{font-family:var(--ym-serif);font-size:clamp(18px,4.8vw,22px);line-height:1.26;color:var(--ym-ink);min-width:0;word-break:break-word}
 .ym-ord-name .sub{display:block;font-family:-apple-system,system-ui,"PingFang SC",sans-serif;font-size:12.5px;color:var(--ym-ink2);margin-top:4px;letter-spacing:0}
@@ -470,7 +471,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .wr-group-ct{font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:11.5px;color:var(--ym-ink3);margin-left:auto}
 .wr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 @media(min-width:640px){.wr-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}}
-.wr-section{position:relative;background:var(--ym-bg-elevated);border-radius:10px;padding:12px 13px 13px;border:1px solid var(--ym-line);box-sizing:border-box;min-width:0}
+.wr-section{position:relative;background:var(--ym-bg-elevated-2);border-radius:12px;padding:12px 13px 13px;border:1px solid var(--ym-line);box-sizing:border-box;min-width:0}
 .wr-section-title{display:flex;align-items:center;gap:7px;font-weight:600;font-size:12.5px;margin-bottom:10px;color:var(--ym-ink2)}
 .wr-section-title .ym-ic{font-size:14px;color:var(--ym-ink3)}
 .wr-people{display:flex;flex-direction:column;gap:7px}
@@ -598,7 +599,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-tools{display:flex;justify-content:center;margin:14px 0}
 .sw-tools-row{display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;padding:0;border-radius:0;background:none;border:0;box-shadow:none}
 .sw-export-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:8px 14px;border-radius:8px;border:1px solid var(--ym-line);background:none;color:var(--ym-ink);font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.02em;line-height:1;cursor:pointer;text-decoration:none;box-shadow:none;transition:border-color .15s,background .15s,opacity .15s}
-.sw-export-btn:hover{transform:translateY(-1px);box-shadow:var(--ym-sh-lg);background:var(--ym-chip-hover)}
+.sw-export-btn:hover,.sw-export-btn:focus-visible{border-color:var(--ym-border-md);background:var(--ym-accent-subtle)}
 .sw-export-btn:disabled{cursor:default;transform:none}
 .sw-export-btn svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .yt-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:var(--ym-youtube);color:#fff;text-decoration:none;transition:transform .15s,box-shadow .15s,background .15s;box-shadow:0 3px 10px rgba(255,0,51,.28)}
@@ -658,15 +659,16 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
 .ym-meta-label{font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:none;color:var(--ym-ink3);flex:0 0 auto}
 .ym-meta-value{font-family:var(--ym-serif);font-size:clamp(17px,4.4vw,20px);font-weight:400;color:var(--ym-ink);line-height:1.4}
 .ppt-card{display:flex;align-items:center;gap:14px;width:100%;box-sizing:border-box;padding:16px 18px;margin:6px 0;border:1px solid var(--ym-line);border-radius:10px;background:var(--ym-bg-elevated);color:var(--ym-ink);text-decoration:none;transition:border-color var(--ym-dur) var(--ym-ease),background var(--ym-dur) var(--ym-ease),box-shadow var(--ym-dur) var(--ym-ease)}
-.ppt-card:hover{border-color:var(--ym-border-md);box-shadow:var(--ym-sh)}
+.ppt-card:hover,.ppt-card:focus-visible{border-color:var(--ym-border-md);background:var(--ym-accent-subtle)}
+.ppt-card:hover .ppt-card-s,.ppt-card:focus-visible .ppt-card-s{color:var(--ym-ink2)}
 .ppt-card-ic{display:grid;place-items:center;width:40px;height:40px;flex:0 0 auto;border-radius:9px;color:var(--ym-accent);background:var(--ym-accent-subtle);font-size:19px}
 .ppt-card-main{display:block;flex:1 1 auto;min-width:0}
 .ppt-card-t{display:block;font-family:var(--ym-serif);font-size:16.5px;color:var(--ym-ink);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ppt-card-s{display:block;font-size:12px;color:var(--ym-ink3);margin-top:3px}
 .ppt-card-arrow{flex:0 0 auto;color:var(--ym-ink3);font-size:15px;transition:transform var(--ym-dur) var(--ym-ease),color var(--ym-dur) var(--ym-ease)}
-.ppt-card:hover .ppt-card-arrow{transform:translateX(3px);color:var(--ym-accent)}
+.ppt-card:hover .ppt-card-arrow,.ppt-card:focus-visible .ppt-card-arrow{transform:translateX(3px);color:var(--ym-accent)}
 .ppt-download-link{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;background:none;border:1px solid var(--ym-line);color:var(--ym-ink);text-decoration:none;font-size:14px;font-weight:500;transition:border-color .15s,background .15s}
-.ppt-download-link:hover{border-color:var(--ym-border-md);background:var(--ym-soft)}
+.ppt-download-link:hover,.ppt-download-link:focus-visible{border-color:var(--ym-border-md);background:var(--ym-accent-subtle)}
 .ppt-empty,.replay-tip{color:var(--ym-ink2);font-size:14px;padding:20px 0}
 .ym-iframe-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px}
 .ym-iframe-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:14px}
@@ -1804,7 +1806,7 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
         navDiv.querySelectorAll('.ym-mast-link').forEach(function(b){b.classList.remove('active')});
         a.classList.add('active');
         var t = document.querySelector(item.href);
-        if(t) t.scrollIntoView({behavior:'smooth', block:'start'});
+        if(t) t.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
       });
       navDiv.appendChild(a);
     });
