@@ -494,11 +494,11 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-sub{font-size:11px;color:var(--ym-ink2)}
 .sw-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
 .sw-pill{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.5px;padding:3px 9px;border-radius:5px;border:1px solid var(--ym-border);background:var(--ym-soft);color:var(--ym-ink2)}
-.sw-tog{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--ym-line);background:none;font-size:13px;font-weight:500;color:var(--ym-ink);cursor:pointer;box-shadow:none;transition:all .2s;white-space:nowrap;margin-top:2px}
+.sw-tog{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;padding:7px 13px;border-radius:10px;border:1px solid var(--ym-line);background:none;font-size:13px;font-weight:600;color:var(--ym-ink);cursor:pointer;box-shadow:none;transition:all .2s;white-space:nowrap;margin-top:2px}
 .sw-tog:hover{background:var(--ym-soft);border-color:var(--ym-border-md)}
 .sw-tog.on{background:var(--ym-accent);color:var(--ym-on-accent);border-color:transparent}
-.sw-tog svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.4,0,.2,1)}
-.sw-tog.on svg{transform:rotate(180deg)}
+.sw-tog .sw-tog-arrow{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .24s cubic-bezier(.4,0,.2,1);margin-left:2px}
+.sw-tog.on .sw-tog-arrow{transform:rotate(180deg)}
 .sw-panel{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1)}
 .sw-panel.open{max-height:9999px}
 .sw-panel-inner{border-radius:0;border:0;border-top:1px solid var(--ym-line);border-bottom:1px solid var(--ym-line);background:none;box-shadow:none;overflow:hidden;margin-bottom:14px}
@@ -677,22 +677,23 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
 
 /* ── Song selector tabs ── */
 .ym-songs-wrap{width:100%}
-.ym-song-tabs{display:flex;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:2px 28px;margin-bottom:1.4rem;padding:2px 0 10px;border-radius:0;background:none;border:0;border-bottom:1px solid var(--ym-line-soft);box-shadow:none}
-.ym-song-tab{position:relative;display:inline-flex;align-items:baseline;gap:9px;padding:7px 0;border-radius:0;border:0;background:none;color:var(--ym-ink);font-size:15px;cursor:pointer;transition:color var(--ym-dur) var(--ym-ease);text-align:left;max-width:100%;box-shadow:none}
+.ym-song-tabs{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 24px;margin-bottom:1.2rem;padding:0 0 2px;border-radius:0;background:none;border:0;border-bottom:1px solid var(--ym-line-soft);box-shadow:none}
+.ym-song-tab{position:relative;display:inline-flex;align-items:center;gap:8px;padding:5px 0 7px;border-radius:0;border:0;background:none;color:var(--ym-ink);font-size:15px;cursor:pointer;transition:color var(--ym-dur) var(--ym-ease);text-align:left;max-width:100%;box-shadow:none}
 .ym-song-tab:hover .ym-song-tab-title{color:var(--ym-accent)}
 .ym-song-tab.active{background:none;color:var(--ym-ink);box-shadow:none}
 .ym-song-tab.active .ym-song-tab-num,.ym-song-tab.active .ym-song-tab-title{color:var(--ym-accent)}
-.ym-song-tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-11px;height:1.5px;background:var(--ym-accent)}
-.ym-song-tab-num{display:inline-flex;align-items:baseline;justify-content:center;width:auto;min-width:0;height:auto;border-radius:0;background:none;font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:13px;font-weight:500;color:var(--ym-ink3);flex-shrink:0}
+.ym-song-tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;border-radius:1px;background:var(--ym-accent)}
+.ym-song-tab-num{display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:0;height:auto;border-radius:0;background:none;font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:13px;font-weight:500;color:var(--ym-ink3);flex-shrink:0}
 .ym-song-tab-title{font-family:var(--ym-serif);font-size:17.5px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(56vw,280px);flex:0 1 auto;min-width:0}
-.ym-song-tab-copy{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;flex-shrink:0;opacity:.5;transition:opacity .15s,background .15s}
+.ym-song-tab-copy{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;flex-shrink:0;opacity:.5;transition:opacity .15s,background .15s}
 .ym-song-tab-copy:hover{opacity:1;background:var(--ym-soft)}
 .ym-song-panel{display:none}
 .ym-song-panel.active{display:block;min-width:0}
 @media(max-width:640px){
   .ym-mast{padding:22px 0 16px}
-  .ym-song-tabs{padding:10px;border-radius:16px}
-  .ym-song-tab{max-width:100%;padding:8px 12px}
+  .ym-song-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:center;gap:18px;padding:0 0 4px;border-radius:0;border-bottom:1px solid var(--ym-line-soft)}
+  .ym-song-tabs::-webkit-scrollbar{display:none}
+  .ym-song-tab{flex-shrink:0;max-width:none;padding:5px 0 7px}
   .sw-hd{flex-direction:column;align-items:stretch;gap:10px}
   .sw-tog{align-self:flex-start;max-width:100%}
   .sw-tools-row{max-width:100%}
@@ -5477,10 +5478,24 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
           el('span',{class:'sw-pill',text:'♩ = '+(song.bpm||80)}),
         ]),
       ]),
-      el('button',{class:'sw-tog'},[
-        el('svg',{viewBox:'0 0 24 24',html:'<polyline points="6 9 12 15 18 9"></polyline>'}),
-        document.createTextNode(' 移调'),
-      ]),
+      (function(){
+        var togArrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        togArrow.setAttribute('viewBox', '0 0 24 24');
+        togArrow.setAttribute('class', 'sw-tog-arrow');
+        togArrow.setAttribute('aria-hidden', 'true');
+        var togPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        togPath.setAttribute('d', 'M6 9l6 6l6 -6');
+        togPath.setAttribute('fill', 'none');
+        togPath.setAttribute('stroke', 'currentColor');
+        togPath.setAttribute('stroke-width', '2');
+        togPath.setAttribute('stroke-linecap', 'round');
+        togPath.setAttribute('stroke-linejoin', 'round');
+        togArrow.appendChild(togPath);
+        return el('button',{class:'sw-tog',type:'button'},[
+          document.createTextNode('移调'),
+          togArrow
+        ]);
+      })(),
     ]);
     wrap.appendChild(hd);
 
