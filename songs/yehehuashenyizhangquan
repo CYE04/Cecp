@@ -1,0 +1,43 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-09-25 17:50:55",
+  "id": "yehehuashenyizhangquan",
+  "title": "耶和华神已掌权",
+  "artist": "有情天音乐",
+  "sub": "有情天音乐【千山万水，恩惠相随】 (2004) 李育群词曲",
+  "origKey": "D",
+  "timeSign": "4/4",
+  "bpm": 70,
+  "mp3": "/upload/yehehuashenyizhangquan.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/qianshanwanshuienhuixiangsui.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/yehehuashenyizhangquan.lrc",
+  "youtube": "https://youtu.be/ICOl71doJb4?si=k4WbyjwFPcq7RXnt",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/yehehuashenyizhangquanD.jpg",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "耶和华神已掌权",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"Bm@@@@@Em@@G@A@@@@@Dmaj7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"6 6_ 5_ 3 2_ 1_ | 2 2_ 1_ 6, 0 | 2·_ 2__ ! 2_ 1_ 2 5 | 3 - - - |","lyric":"主耶和华我的神我的王，@我的心要倚靠 你。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Bm@@@@@Em@@G@A@@@@@@Bm @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"6 6_ 5_ 3 2_ 1_ | 2 ( 2_ 1_ ) 6, 0 | 2·_ 2__ ! 2_ 3_ 2 5,_ 1_ | 6, - - - |","lyric":"凡投靠你的必不惧@怕，@等候你的必不羞愧。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Bm@@@@Em@@@@A@@@@@@Dmaj7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"6, 6,_ 7,_ 1 3 | 4 2_ 3_ 4 - | 5_ 5_ ! 5_ 5_ 4 5_ 4_ | 3 - - - |","lyric":"愿你的崇高 过于诸天，@你的荣耀高过全 地。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Em@@@@@Bm@@@@G@@@Gdim@@F#7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"2 2_ 3_ 4 ( 3_ 2_ ) | 1 1_ 2_ 3 1 | 6_ 6_ ! 6_ 6_ #5 5_ 6_ | 7 - - - |","lyric":"你统管万有，@你治理列邦，万国万民都敬拜 你。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      [
+        {"chord":"Bm@@@@Em@@@@A@@@@@@Dmaj7 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"1' 1'_ 7_ 1' 3 | 5 5_ 4_ 4 0 | 7_ 7_ ! 7_ 6_ 5 5_ 4_ | 3 - - - |","lyric":"你是那独行 奇事的神，@在你没有难 成的 事。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ],
+      [
+        {"chord":"Em@@@@Bm@@@D/A G@@F#m@@Bm @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"4 4_ 3_ 2 4 | 3 3_ 3_ 6 7 | 1' 6_ 1'_ 7 6_ 5_ | 6 - - - ||/","lyric":"我心要坚定，我口要歌颂，耶和华神已掌权。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]
+    ]
+  }
+]
+}
