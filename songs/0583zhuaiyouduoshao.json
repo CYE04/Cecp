@@ -1,0 +1,40 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-09-25 17:21:50",
+  "id": "0583zhuaiyouduoshao",
+  "title": "0583主爱有多少",
+  "artist": "",
+  "sub": "",
+  "origKey": "C",
+  "timeSign": "4/4",
+  "bpm": 70,
+  "mp3": "/upload/0583zhuaiyouduoshao.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/hongbenben.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/0583zhuaiyouduoshao.lrc",
+  "youtube": "https://youtu.be/SLnz3WWVAOA?si=m9hNp3diOuq9fWmy",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/0583zhuaiyouduoshaoC.jpg",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "0583主爱有多少",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"C@@@C@@@Am@@@Em@@@@F@@Em @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0 3 3· 2_ | 1 - 1 - | 0 3 1· 3_ | 5 - 5 - | 0 6 7 6 | 5 - 3 - |","lyric":"@主爱有多@少？@@主恩有多@深？@@祂甘愿舍@命， @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"D@@@G@@@C@@@C@@@Am@@@Em@@@Am @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0 6, 7, 1 | 2 - 2 - | 0 3 3· 2_ | 1 - 1 - | 0 3 1· 3_ | 5 - 5 - | 0 1 2 3 |","lyric":"@为救人灵@魂。@@主爱有多@少，@@主恩有多@深？@@每当我 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Dm@G@@@@@C@@@C@@@@F@@Em @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"4 - 2 - | 0 7, 3· 2_ | 1 - - - | 0 1' 7 6 | 1'· 6_ 4 - | 0 7 6 5 | 7· 5_ 3 - |","lyric":"思@想，@@我心感恩。@@@@天离地多么高，@@两极有多少远， @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"F@@@F@@@D@@@G@@@C@@@F@@@Em @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"0 6 5 4 | 6 - 1' - | 0 1' 7 1' | 2' - - - | 0 1' 7 6 | 1'· 6_ 4 - | 0 7 6 5 |","lyric":"@救主的慈@爱@@也有多大。@@@@永恒有多么长@@无限有 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"@@@@@F@@F@@@G7@@@C @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"7· 5_ 3 - | 0 6 5 4 | 6 - 1' - | 0 1' 2'· 1'_ | 1' - - - :|","lyric":"@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]}
+    ]
+  }
+]
+}
