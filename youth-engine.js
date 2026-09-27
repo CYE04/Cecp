@@ -528,8 +528,9 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-jianpu{font-family:'DM Mono',monospace;color:var(--ym-ink);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1}
 .sw-lyric{font-size:22px;color:var(--ym-ink2);white-space:pre;letter-spacing:.5px}
 .sw-lyric2{display:block;font-size:22px;opacity:0.6;margin-top:1px}.sw-lyric3{display:block;font-size:22px;opacity:0.6;margin-top:1px}.sw-lyric4{display:block;font-size:22px;opacity:0.6;margin-top:1px}
-.prev-row{--volta-rail:0px;--volta-top:2px;--row-note-height:0px;display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow:visible;padding-top:var(--volta-rail);padding-bottom:2px}
+.prev-row{--volta-rail:0px;--volta-top:2px;--row-note-height:0px;display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow:visible;padding-top:0;padding-bottom:2px}
 .prev-row.has-volta{--volta-rail:18px}
+.prev-row.has-volta .p-n{margin-top:var(--volta-rail)}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0}
 .p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--ym-capo);margin-bottom:2px;min-height:13px;white-space:pre}
 .p-chord.empty{visibility:hidden}
@@ -5626,6 +5627,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
         var _sl=lbDiv.querySelectorAll('.sec-label-holder');
         Array.prototype.forEach.call(_sl,function(h){ if(h.cecpPlaceSecLabel)h.cecpPlaceSecLabel(); });
       }
+      positionVoltaRails(lbDiv);
       return lbDiv.scrollHeight||0;
     }
     /* ═══════════ CECP-A4-PAGE v1 END ═══════════ */
@@ -5645,6 +5647,28 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       justifyScoreRowsClear(lbDiv);
       if(lbDiv.parentElement)lbDiv.parentElement.style.overflow='hidden';
     }
+  /* Keep the ending rail between chords and notes, in unscaled layout coordinates. */
+  function positionVoltaRails(scope){
+    scope.querySelectorAll('.prev-volta').forEach(function(volta){
+      var top=Infinity;
+      volta.querySelectorAll('.p-n').forEach(function(note){
+        var y=0, node=note;
+        while(node && node!==volta){y+=node.offsetTop;node=node.offsetParent;}
+        if(node===volta)top=Math.min(top,y);
+      });
+      var chordBottom=-Infinity;
+      volta.querySelectorAll('.p-chord').forEach(function(chord){
+        if(!chord.textContent.trim() || !chord.offsetHeight)return;
+        var y=chord.offsetHeight, node=chord;
+        while(node && node!==volta){y+=node.offsetTop;node=node.offsetParent;}
+        if(node===volta)chordBottom=Math.max(chordBottom,y);
+      });
+      // Chord line-height can be smaller than its ink; leave six pixels below it.
+      // Anchor above the slur reservation, so ending numbers do not cross arcs.
+      if(isFinite(chordBottom))top=chordBottom+6+(parseFloat(getComputedStyle(volta).getPropertyValue('--volta-rail'))||0);
+      if(isFinite(top))volta.style.setProperty('--volta-top',top+'px');
+    });
+  }
     function normalizePreviewRowHeights(){
       lbDiv.querySelectorAll('.prev-row').forEach(function(row){
         row.style.setProperty('--row-note-height','0px');

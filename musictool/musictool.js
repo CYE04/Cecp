@@ -478,8 +478,9 @@ body.mt-resizing,body.mt-resizing *{user-select:none !important;}
 .prev-sec{margin-bottom:20px;}
 .prev-sec-name{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .prev-sec-name::after{content:'';flex:1;height:1px;background:var(--border);}
-.prev-row{--volta-rail:0px;--volta-top:2px;--row-note-height:0px;display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-top:var(--volta-rail);padding-bottom:2px;}
+.prev-row{--volta-rail:0px;--volta-top:2px;--row-note-height:0px;display:flex;flex-wrap:nowrap;align-items:flex-end;margin-bottom:10px;overflow-x:auto;padding-top:0;padding-bottom:2px;}
 .prev-row.has-volta{--volta-rail:18px;}
+.prev-row.has-volta .p-n{margin-top:var(--volta-rail)}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0;}
 /* 严格对位（align:"strict"）预览：每音位一列、三层居中共轴，与 youth/musiclib 成品一致 */
 .prev-seg.p-slot{align-items:center !important;font-size:16px;min-width:19.2px;margin:0 2px;}
@@ -3810,6 +3811,7 @@ function fitPreview(){
       inner.querySelectorAll('.prev-row').forEach(connectStrictBeams);
       layoutStrictArcsAll(inner);
     }
+    positionVoltaRails(inner);
     var scale=maxW>avail?avail/maxW:1;
     var visualW=maxW*scale;
     var centerX=Math.max(0,(rawAvail-visualW)/2);
@@ -3825,6 +3827,28 @@ if(document.fonts&&document.fonts.ready){
   document.fonts.ready.then(function(){ try{fitPreview();}catch(e){} });
 }
 
+  /* Keep the ending rail between chords and notes, in unscaled layout coordinates. */
+  function positionVoltaRails(scope){
+    scope.querySelectorAll('.prev-volta').forEach(function(volta){
+      var top=Infinity;
+      volta.querySelectorAll('.p-n').forEach(function(note){
+        var y=0, node=note;
+        while(node && node!==volta){y+=node.offsetTop;node=node.offsetParent;}
+        if(node===volta)top=Math.min(top,y);
+      });
+      var chordBottom=-Infinity;
+      volta.querySelectorAll('.p-chord').forEach(function(chord){
+        if(!chord.textContent.trim() || !chord.offsetHeight)return;
+        var y=chord.offsetHeight, node=chord;
+        while(node && node!==volta){y+=node.offsetTop;node=node.offsetParent;}
+        if(node===volta)chordBottom=Math.max(chordBottom,y);
+      });
+      // Chord line-height can be smaller than its ink; leave six pixels below it.
+      // Anchor above the slur reservation, so ending numbers do not cross arcs.
+      if(isFinite(chordBottom))top=chordBottom+6+(parseFloat(getComputedStyle(volta).getPropertyValue('--volta-rail'))||0);
+      if(isFinite(top))volta.style.setProperty('--volta-top',top+'px');
+    });
+  }
 function normalizePreviewRowHeights(scope){
   if(!scope)return;
   scope.querySelectorAll('.prev-row').forEach(function(row){
