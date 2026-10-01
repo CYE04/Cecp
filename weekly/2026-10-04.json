@@ -1,0 +1,37 @@
+{
+  "week": "2026年十月 第一周",
+  "time": "每周日 12:00 – 13:30",
+  "sectionOrder": ["flow", "songs", "game", "tutorial", "ppt", "message", "replay", "action"],
+  "sheetName": "041026",
+  "gameText": "",
+  "tutorialTitle": null,
+  "tutorialUrl": null,
+  "pptUrl": "",
+  "pptLabel": "",
+  "bibleRef": "",
+  "speaker": null,
+  "topic": null,
+  "replayUrl": "",
+  "schedule": [
+    {
+      "time": "12:00 – 12:30",
+      "event": "诗歌敬拜",
+      "emoji": "🎶"
+    },
+    {
+      "time": "12:30 – 13:30",
+      "event": "圣经分享",
+      "emoji": "📖"
+    },
+    {
+      "time": "13:30",
+      "event": "祷告 & 结束",
+      "emoji": "🙏"
+    }
+  ],
+  "songs": [
+    "zhudexileshiwoliliang",
+    "runi",
+    "jiandanhuxi"
+  ]
+}
