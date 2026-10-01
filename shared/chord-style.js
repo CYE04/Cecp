@@ -65,11 +65,10 @@ function chordStyleEnsureCss(){
     light+='.chord-chip.chord-pc'+i+'{color:hsl('+h+',90%,20%);}';
     dark+='.chord-chip.chord-pc'+i+'{color:hsl('+h+',72%,84%);}';
   }
-  var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"] .chord-chip.');
-  var darkAuto=dark.split('.chord-chip.').join('html:not([data-resolved-theme="light"]) .chord-chip.');
+  var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"]:not([data-sheet-theme="light"]) .chord-chip.');
   st.textContent=
     light+darkAttr+
-    '@media (prefers-color-scheme: dark){'+darkAuto+'}';
+    '.sw-score .chord-chip, .sw-page .chord-chip, .cf-jianpu .chord-chip { font-weight:700; }';
   document.head.appendChild(st);
 }
 /* 把一个文本节点按 gap 字符切成若干节点，返回 [{gap,node}...]；

@@ -315,6 +315,7 @@ window.YouthEngine = {};
   --ym-brand:var(--ym-accent);--ym-brand2:var(--ym-accent-2);--ym-brand3:var(--ym-accent-2);--ym-on-brand:var(--ym-on-accent);
   --ym-accent2:var(--ym-accent-hover);
   --ym-capo:#0B6FE3;--ym-capo-bg:rgba(11,111,227,.08);--ym-capo-ln:rgba(11,111,227,.2);
+  --ym-chord-ink:#0B6FE3;
   /* 歌词分行配色：第 1 行纯黑，第 2/3/4 行深蓝/深绿/深紫 —— 都要够深，别用浅色/降透明度 */
   --ym-ly2:#123C8F;--ym-ly3:#0E4F33;--ym-ly4:#5C2178;
   --yb:var(--ym-bg-elevated);--yt:var(--ym-text-primary);--ym:var(--ym-text-secondary);--ybr:var(--ym-separator);--ysh:rgba(20,30,55,.24);--ybk:rgba(15,20,35,.55);
@@ -346,6 +347,7 @@ window.YouthEngine = {};
     --ym-brand:var(--ym-accent);--ym-brand2:var(--ym-accent-2);--ym-brand3:var(--ym-accent-2);--ym-on-brand:var(--ym-on-accent);
     --ym-accent2:var(--ym-accent-hover);
     --ym-capo:#4C9BFF;--ym-capo-bg:rgba(76,155,255,.14);--ym-capo-ln:rgba(76,155,255,.26);
+    --ym-chord-ink:#4C9BFF;
     --yb:var(--ym-bg-elevated);--yt:var(--ym-text-primary);--ym:var(--ym-text-secondary);--ybr:var(--ym-separator);--ysh:rgba(0,0,0,.65);--ybk:rgba(0,0,0,.8);
   }
 }
@@ -523,7 +525,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .sw-lline{margin-bottom:12px}.sw-lline:last-child{margin-bottom:0}
 .sw-lrow{display:flex;flex-wrap:nowrap;align-items:flex-end;overflow:visible}
 .sw-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;margin-bottom:5px}
-.sw-chord{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--ym-capo);margin-bottom:3px;min-height:15px;white-space:pre}
+.sw-chord{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--ym-chord-ink, var(--ym-capo));margin-bottom:3px;min-height:15px;white-space:pre}
 .sw-chord.empty{visibility:hidden}
 .sw-jianpu{font-family:'DM Mono',monospace;color:var(--ym-ink);margin-bottom:2px;display:flex;align-items:flex-end;line-height:1}
 .sw-lyric{font-size:22px;color:var(--ym-ink2);white-space:pre;letter-spacing:.5px}
@@ -532,7 +534,7 @@ html.ym-open,html.ym-open body{overflow:hidden!important}
 .prev-row.has-volta{--volta-rail:18px}
 .prev-row.has-volta .p-n{margin-top:var(--volta-rail)}
 .prev-seg{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:4px;flex-shrink:0}
-.p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--ym-capo);margin-bottom:2px;min-height:13px;white-space:pre}
+.p-chord{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--ym-chord-ink, var(--ym-capo));margin-bottom:2px;min-height:13px;white-space:pre}
 .p-chord.empty{visibility:hidden}
 .p-n{font-family:'Space Mono',monospace;color:var(--ym-ink);margin-bottom:1px;line-height:1.2;display:flex;align-items:flex-end;min-height:var(--row-note-height)}
 .p-lyric{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:600;color:var(--ym-ink);white-space:pre-wrap}
@@ -3086,11 +3088,10 @@ function chordStyleEnsureCss(){
     light+='.chord-chip.chord-pc'+i+'{color:hsl('+h+',90%,20%);}';
     dark+='.chord-chip.chord-pc'+i+'{color:hsl('+h+',72%,84%);}';
   }
-  var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"] .chord-chip.');
-  var darkAuto=dark.split('.chord-chip.').join('html:not([data-resolved-theme="light"]) .chord-chip.');
+  var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"]:not([data-sheet-theme="light"]) .chord-chip.');
   st.textContent=
     light+darkAttr+
-    '@media (prefers-color-scheme: dark){'+darkAuto+'}';
+    '.sw-score .chord-chip, .sw-page .chord-chip, .cf-jianpu .chord-chip { font-weight:700; }';
   document.head.appendChild(st);
 }
 /* 把一个文本节点按 gap 字符切成若干节点，返回 [{gap,node}...]；
@@ -5545,7 +5546,8 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       var chip='',i,h;
       for(i=0;i<12;i++){
         h=chordStyleHue(i);
-        chip+='.sw-page .chord-chip.chord-pc'+i+'{color:hsl('+h+',90%,20%);}';
+        // The paper stays light even when the host/system is dark; outrank the shared dark selector.
+        chip+='.sw-page .p-chord .chord-chip.chord-pc'+i+'{color:hsl('+h+',90%,20%);}';
       }
       st.textContent=[
         '.sw-page{position:relative;box-sizing:border-box;margin:0 0 14px;overflow:hidden;',
