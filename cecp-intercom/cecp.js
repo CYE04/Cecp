@@ -856,6 +856,7 @@
     '  background:var(--acc)!important;color:#fff!important}',
     /* 简谱本身也放在「纸」上，跟原图一个待遇 */
     '.cf-jianpu .sw-score{background:#fff;border-radius:12px;padding:14px 10px;',
+    '  --ym-chord-ink:#0B6FE3!important;--ym-capo:#0B6FE3!important;color:#241C17!important;',
     '  box-shadow:0 1px 2px rgba(0,0,0,.18),0 12px 34px rgba(0,0,0,.16)}',
     /* 注意：这里绝不能改 .sw-score / .sw-wrap 的 padding·margin·width——
        弧线和符杠是按真实容器宽度算坐标的，动了基准弧线就会塌（踩过）。
@@ -1408,7 +1409,7 @@
        不带 ?v= 浏览器会一直用缓存里的旧引擎 —— 表现成「youth 的谱跟 musiclib 不一样」
        （musiclib 那边有完整的版本链，改了就更新；youth 这边没有，就一直是旧的）。
        改了 youth-engine.js 就把这个日期串往上抬一位。 */
-    this.scoreEngine = ('scoreEngine' in d) ? String(d.scoreEngine || '').trim() : (this.songsBase + '/youth-engine.js?v=20260925-tabfix');
+    this.scoreEngine = ('scoreEngine' in d) ? String(d.scoreEngine || '').trim() : (this.songsBase + '/youth-engine.js?v=20261001-chord-contrast');
     var liveTitle = '';
     try { liveTitle = new URLSearchParams(location.search).get('title') || ''; } catch (err) {}
     this.liveTitle = String(d.liveTitle || liveTitle || '敬拜现场');
