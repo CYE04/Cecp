@@ -3088,9 +3088,12 @@ function chordStyleEnsureCss(){
     light+='.chord-chip.chord-pc'+i+'{color:hsl('+h+',90%,20%);}';
     dark+='.chord-chip.chord-pc'+i+'{color:hsl('+h+',72%,84%);}';
   }
-  var darkAttr=dark.split('.chord-chip.').join('html[data-resolved-theme="dark"]:not([data-sheet-theme="light"]) .chord-chip.');
+  // Theme context must not outrank the light paper's local chord palette.
+  var darkAttr=dark.split('.chord-chip.').join(':where(html[data-resolved-theme="dark"]:not([data-sheet-theme="light"])) .chord-chip.');
+  var darkAuto=dark.split('.chord-chip.').join(':where(html:not([data-resolved-theme="light"]):not([data-sheet-theme="light"])) .chord-chip.');
   st.textContent=
     light+darkAttr+
+    '@media (prefers-color-scheme: dark){'+darkAuto+'}'+
     '.sw-score .chord-chip, .sw-page .chord-chip, .cf-jianpu .chord-chip { font-weight:700; }';
   document.head.appendChild(st);
 }
@@ -5552,7 +5555,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       st.textContent=[
         '.sw-page{position:relative;box-sizing:border-box;margin:0 0 14px;overflow:hidden;',
         'background:#f7f4ee;color:#241C17;border:1px solid #E9E0D8;border-radius:8px;',
-        '--ym-ink:#241C17;--ym-ink2:#6F655D;--ym-ink3:#9A8F85;--ym-border:#E1D8CE;--ym-capo:#1C5AA6;}',
+        '--ym-ink:#241C17;--ym-ink2:#6F655D;--ym-ink3:#9A8F85;--ym-border:#E1D8CE;--ym-capo:#1C5AA6;--ym-chord-ink:#1C5AA6;}',
         'html[data-resolved-theme="dark"] .sw-page{background:#f4efe7;',
         'box-shadow:0 12px 32px rgba(0,0,0,.24);}',
         '@media (prefers-color-scheme:dark){html:not([data-resolved-theme="light"]) .sw-page{',
