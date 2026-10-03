@@ -1,0 +1,46 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-10-03 11:08:50",
+  "id": "0013rongyaoguishen",
+  "title": "0013荣耀归神",
+  "artist": "诗歌本",
+  "sub": "诗歌本【赞美诗歌 1608】William B.Bradbury (1816-1868)曲 ",
+  "origKey": "G",
+  "timeSign": "4/4",
+  "bpm": 60,
+  "mp3": "/upload/0013rongyaoguishen.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/hongbenben.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/0013rongyaoguishen.lrc",
+  "youtube": "https://youtu.be/Ie7slbI64zM?si=IE8K1xSMHoNhlnbd",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/0013rongyaoguishenG.jpg",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "0013荣耀归神",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"G@@@@@G@@@D@@@@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"1 1·_ 1__ 1 ( 3_ 4_ ) | 5 - 3 0 | 2 2·_ 2__ 2 0 | 3 3·_ 3__ 3 |","lyric":"荣耀归至高@真@神!@荣 耀归神!@荣 耀归神! @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G@@@@@G/B@G@D@@@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"1 1·_ 1__ 1 ( 3_ 4_ ) | 5 - 3 1 | 2 2 3· 2_ | 1 - - 5, |","lyric":"荣耀归至高@真@神!赞美赞美不尽。@@赞 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G@@@G@@@@D7@@@@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5, 1 1 2 | 3 3 3 ( 4_ 3_ ) | 2 2 2 ( 1_ 2_ ) | 3 1 6, 5, |","lyric":"美真神慈爱最深，赞@美真神恩@及万人，赞 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G@@@G@@@@D7@@@@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5, 1 1 2 | 3 3 3 ( 4_ 3_ ) | 2 2 2 ( 1_ 2_ ) | 3 2 1 - |","lyric":"美真神声达天庭，赞@美圣父圣@子、圣灵。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"C@@@@C@@@G@@@@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"4 4·_ 4__ 4 4 | 4 - 4 0 | 3 3·_ 3__ 3 3 | 3 - 5 0 |","lyric":"荣耀归至高真@神！@荣耀归至高真@神！ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G/D@G/B@G@G/D@G/B@G@G/D@D@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5 5 3 3 | 1 1 5, 5, | 1 2 3 4 | 3 - 2 - | 3 - - 0 |","lyric":"荣耀，荣耀，荣耀，荣耀，荣耀归至高@真@神! @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G/D@G/B@G@G/D@G/B@G@G/D@D@G@@@C@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5 5 3 3 | 1 1 5, 5, | 1 2 3 4 | 3 - 2 - | 1 - - 0 ||/ 1 - 1 - ||/","lyric":"荣耀，荣耀，荣耀，荣耀，荣耀归至高@真@神!@@@阿@们 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]}
+    ]
+  }
+]
+}
