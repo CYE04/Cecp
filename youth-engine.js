@@ -362,29 +362,6 @@ window.YouthEngine = {};
 @media(hover:none),(pointer:coarse){.ym-tilt:hover{box-shadow:var(--ym-sh-lg);transform:none!important}.ym-tilt::after{display:none}}
 @media(prefers-reduced-motion:reduce){.ym-tilt,.ym-tilt::after,.ym-reveal{transition:none!important;transform:none!important}.ym-reveal{opacity:1!important}}
 
-/* ── Welcome Modal ── */
-html.ym-open,html.ym-open body{overflow:hidden!important}
-#ymOverlay{position:fixed;inset:0;background:var(--ybk);backdrop-filter:blur(6px);z-index:var(--ym-z-overlay);display:none}
-#ymModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,calc(100vw - 32px));max-height:min(85vh,760px);background:var(--yb);color:var(--yt);border:1px solid var(--ybr);border-radius:22px;box-shadow:0 40px 120px var(--ysh);overflow:hidden;z-index:var(--ym-z-modal);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:clamp(14px,.35vw + 12px,17px)}
-#ymModal .yLayout{display:flex;flex-direction:column;height:100%;max-height:inherit}
-#ymModal .yBody{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px}
-#ymModal .yGrid{display:grid;grid-template-columns:1.2fr .9fr;gap:12px}
-@media(max-width:640px){#ymModal .yGrid{grid-template-columns:1fr}}
-#ymModal .yCard{border:1px solid var(--ybr);border-radius:16px;padding:14px}
-#ymModal .yTitle{font-family:var(--ym-serif);font-size:1.5em;font-weight:400;margin:0 0 .5em}
-#ymModal .ySub{color:var(--ym);margin:0 0 .8em;line-height:1.7}
-#ymModal .yText{margin:0;line-height:1.9;white-space:pre-line;word-break:break-word}
-#ymModal .yPanelTitle{font-weight:700;color:var(--ym);margin:0 0 .8em;font-size:.85em}
-#ymModal .yChipList{display:flex;flex-direction:column;gap:10px}
-#ymModal .yChip{border:1px solid var(--ybr);border-radius:14px;padding:10px 12px}
-#ymModal .yChip .k{font-size:.8em;color:var(--ym);margin:0 0 3px}
-#ymModal .yChip .v{font-weight:750;margin:0}
-#ymModal .yFooter{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--ybr);background:var(--yb)}
-#ymModal .yCheck{display:flex;gap:8px;align-items:center;color:var(--ym);font-size:.88em;user-select:none;cursor:pointer}
-#ymModal .yBtns{display:flex;gap:8px}
-#ymModal button{border-radius:999px;padding:8px 16px;font-size:.92em;cursor:pointer;border:1px solid var(--ybr);background:transparent;color:var(--ym)}
-#ymModal button.primary{background:var(--yt);color:var(--yb);border-color:transparent}
-
 /* ── Masthead (editorial) ── */
 .ym-mast{width:100%;min-width:0;margin:0 auto;padding:30px 0 20px;border-bottom:1px solid var(--ym-line)}
 .ym-eyebrow{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--ym-ink2)}
@@ -1705,69 +1682,6 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
     }).then(function(png){
       saveBlobAs(png,stem+'.png');
     });
-  }
-
-  /* ══════════════ Welcome Modal ══════════════ */
-  function buildModal() {
-    var key = 'ym_hide__' + (location.pathname || '');
-    try { if (localStorage.getItem(key) === '1') return; } catch(e){}
-
-    var overlay = el('div', {id:'ymOverlay'});
-    var modal   = el('div', {id:'ymModal'});
-
-    modal.innerHTML = `
-      <div class="yLayout">
-        <div class="yBody">
-          <div class="yGrid">
-            <div class="yCard">
-              <h3 class="yTitle">欢迎来到青年聚会页面 👋</h3>
-              <p class="ySub">这里是本周聚会安排与预备工具。</p>
-              <p class="yText">🕛 时间：${C.time}
-🎵 内容：敬拜 · 分享 · 活动 · 祷告
-
-🎶 页面功能：
-• ▶️ 诗歌可以直接播放
-• ⏱ 可使用节拍器练习节奏
-• 📋 歌单与流程已整理好
-• 🎸 移调计算器
-
-欢迎邀请朋友一起来参加 ✨
-有建议或发现问题，也欢迎联系 YuEn 🙌</p>
-            </div>
-            <div class="yCard">
-              <div class="yPanelTitle">本页快速信息</div>
-              <div class="yChipList">
-                <div class="yChip"><div class="k">时间</div><div class="v">${C.time}</div></div>
-                <div class="yChip"><div class="k">本周</div><div class="v">${C.week || ''}</div></div>
-                <div class="yChip"><div class="k">内容</div><div class="v">敬拜 · 分享 · 活动 · 祷告</div></div>
-                <div class="yChip"><div class="k">任何问题联系</div><div class="v">YuEn</div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="yFooter">
-          <label class="yCheck"><input type="checkbox" id="ymDontShow"> 以后不再显示</label>
-          <div class="yBtns">
-            <button id="ymClose">关闭</button>
-            <button class="primary" id="ymOk">确定</button>
-          </div>
-        </div>
-      </div>`;
-
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-    overlay.style.display = 'block';
-    document.documentElement.classList.add('ym-open');
-
-    function close() {
-      try { if (document.getElementById('ymDontShow').checked) localStorage.setItem(key,'1'); } catch(e){}
-      overlay.style.display = 'none';
-      document.documentElement.classList.remove('ym-open');
-    }
-    document.getElementById('ymClose').onclick = close;
-    document.getElementById('ymOk').onclick    = close;
-    overlay.addEventListener('click', function(e){ if(e.target===overlay) close(); });
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && overlay.style.display==='block') close(); });
   }
 
   /* ══════════════ Hero ══════════════ */
@@ -5221,6 +5135,11 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
   var mode='node',imgList=[],imgIdx=0,lastClose=0;
   var s=1,tx=0,ty=0,minS=1,maxS=4,natW=1,natH=1;
   var pts={},pinch=null,pan=null,down=null,dragged=false;
+  function notifyHost(open){
+    if(window.parent&&window.parent!==window){
+      window.parent.postMessage({type:'cecp-pm-score-zoom',open:!!open},'*');
+    }
+  }
   function injectCss(){
     if(document.getElementById('cecp-scorezoom-css'))return;
     var st=document.createElement('style');st.id='cecp-scorezoom-css';
@@ -5230,17 +5149,31 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       '#cecp-scorezoom .czoom-content{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;width:max-content;padding:16px;box-sizing:border-box;}',
       '#cecp-scorezoom .czoom-content.czoom-img{padding:0;}',
       '#cecp-scorezoom .czoom-content.czoom-img img{display:block;max-width:none;}',
-      '#cecp-scorezoom .czoom-nav{position:fixed;top:50%;transform:translateY(-50%);width:44px;height:66px;border:none;border-radius:12px;background:rgba(0,0,0,.34);color:#fff;font-size:30px;line-height:1;cursor:pointer;z-index:3;display:none;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}',
+      '#cecp-scorezoom .czoom-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:66px;border:none;border-radius:12px;background:rgba(0,0,0,.34);color:#fff;font-size:30px;line-height:1;cursor:pointer;z-index:3;display:none;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}',
       '#cecp-scorezoom .czoom-prev{left:10px;}#cecp-scorezoom .czoom-next{right:10px;}',
-      '#cecp-scorezoom .czoom-count{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;font-size:13px;letter-spacing:1px;color:rgba(255,255,255,.62);font-family:"Noto Sans SC",sans-serif;pointer-events:none;display:none;z-index:3;}',
-      '#cecp-scorezoom .czoom-hint{position:fixed;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;letter-spacing:1px;color:var(--text3,rgba(140,140,150,.72));font-family:"Noto Sans SC",sans-serif;pointer-events:none;}',
+      '#cecp-scorezoom .czoom-count{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;font-size:13px;letter-spacing:1px;color:rgba(255,255,255,.62);font-family:"Noto Sans SC",sans-serif;pointer-events:none;display:none;z-index:3;}',
+      '#cecp-scorezoom .czoom-hint{position:absolute;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;letter-spacing:1px;color:var(--text3,rgba(140,140,150,.72));font-family:"Noto Sans SC",sans-serif;pointer-events:none;}',
       '.sw-lb-zoomable{cursor:zoom-in;}'
     ].join('');
     (document.head||document.documentElement).appendChild(st);
   }
+  function embedViewport(){
+    var css=getComputedStyle(document.documentElement);
+    var top=parseFloat(css.getPropertyValue('--cecp-embed-visible-top'));
+    var height=parseFloat(css.getPropertyValue('--cecp-embed-visible-height'));
+    return isFinite(top)&&isFinite(height)&&height>0?{top:Math.max(0,top),height:height}:null;
+  }
+  function placeOverlay(){
+    var box=embedViewport();
+    if(box){overlay.style.inset='auto 0 auto 0';overlay.style.top=box.top+'px';overlay.style.height=box.height+'px';}
+    else{overlay.style.inset='0';overlay.style.top='';overlay.style.height='';}
+  }
+  function viewportSize(){
+    return {w:(overlay&&overlay.clientWidth)||window.innerWidth,h:(overlay&&overlay.clientHeight)||window.innerHeight};
+  }
   function apply(){content.style.transform='translate('+tx+'px,'+ty+'px) scale('+s+')';}
   function clampPan(){
-    var vw=window.innerWidth,vh=window.innerHeight,w=natW*s,h=natH*s;
+    var size=viewportSize(),vw=size.w,vh=size.h,w=natW*s,h=natH*s;
     if(w<=vw)tx=(vw-w)/2; else tx=Math.min(0,Math.max(vw-w,tx));
     if(h<=vh)ty=(vh-h)/2; else ty=Math.min(12,Math.max(vh-h-12,ty));
   }
@@ -5263,7 +5196,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     content.style.transform='none';
     natW=content.offsetWidth||content.scrollWidth||1;
     natH=content.offsetHeight||content.scrollHeight||1;
-    var vw=window.innerWidth,vh=window.innerHeight;
+    var size=viewportSize(),vw=size.w,vh=size.h;
     if(mode==='image'){var f=Math.min((vw-16)/natW,(vh-64)/natH);if(!(f>0))f=1;f=Math.min(3,f);minS=f;s=f;maxS=f*4;}
     else{minS=Math.min(1,(vw-8)/natW);s=Math.max(minS,Math.min(2.4,(vw-8)/natW));maxS=Math.max(minS*4,s*4);}
     tx=0;ty=(mode==='image'?0:12);clampPan();apply();
@@ -5298,7 +5231,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
        放大器本来就是只读的图片式查看器，不需要墨迹层，直接摘掉。 */
     var inks=content.querySelectorAll('.cecp-ink-layer');
     for(var ii=0;ii<inks.length;ii++)inks[ii].parentNode.removeChild(inks[ii]);
-    overlay.classList.add('open');document.documentElement.style.overflow='hidden';
+    placeOverlay();overlay.classList.add('open');document.documentElement.style.overflow='hidden';notifyHost(true);
     updateNav();fitAndCenter();
   }
   function openImage(list,idx){                          // 图片模式(宿主调用)
@@ -5307,7 +5240,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     if(overlay.parentNode!==document.body)document.body.appendChild(overlay);
     imgList=(list||[]).filter(Boolean);if(!imgList.length)return;
     mode='image';imgIdx=Math.max(0,Math.min(imgList.length-1,idx||0));
-    overlay.classList.add('open');document.documentElement.style.overflow='hidden';
+    placeOverlay();overlay.classList.add('open');document.documentElement.style.overflow='hidden';notifyHost(true);
     showImg();
   }
   function showImg(){
@@ -5320,7 +5253,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     updateNav();
   }
   function nav(d){if(mode!=='image'||imgList.length<2)return;imgIdx=(imgIdx+d+imgList.length)%imgList.length;showImg();}
-  function close(){if(overlay){overlay.classList.remove('open');document.documentElement.style.overflow='';pts={};pinch=pan=down=null;lastClose=Date.now();}}
+  function close(){if(overlay){overlay.classList.remove('open');document.documentElement.style.overflow='';pts={};pinch=pan=down=null;lastClose=Date.now();notifyHost(false);}}
   function d2(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
   function mid(a,b){return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};}
   function zoomAt(ns,cx,cy){ns=Math.max(minS,Math.min(maxS,ns));var k=ns/s;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;s=ns;clampPan();apply();}
@@ -5336,7 +5269,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
       if(!pts[e.pointerId])return;
       pts[e.pointerId]={x:e.clientX,y:e.clientY};
       var ids=Object.keys(pts);
-      if(ids.length>=2&&pinch){e.preventDefault();var p=ids.map(function(i){return pts[i];});var m=mid(p[0],p[1]);zoomAt(pinch.s*(d2(p[0],p[1])/pinch.d),m.x,m.y);}
+      if(ids.length>=2&&pinch){e.preventDefault();var p=ids.map(function(i){return pts[i];});var m=mid(p[0],p[1]),r=overlay.getBoundingClientRect();zoomAt(pinch.s*(d2(p[0],p[1])/pinch.d),m.x-r.left,m.y-r.top);}
       else if(ids.length===1&&pan){var dx=e.clientX-pan.x,dy=e.clientY-pan.y;if(dragged||Math.abs(dx)>6||Math.abs(dy)>6){dragged=true;e.preventDefault();tx=pan.tx+dx;ty=pan.ty+dy;clampPan();apply();}}
     });
     function up(e){
@@ -5357,8 +5290,8 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     overlay.addEventListener('pointercancel',up);
     overlay.addEventListener('dblclick',function(e){
       if(e.target.closest('.p-chord:not(.empty)')||e.target.closest('.czoom-nav'))return;e.preventDefault();
-      var fit=(mode==='image')?minS:Math.max(minS,Math.min(2.4,(window.innerWidth-8)/natW));
-      if(s>fit*1.05){s=fit;tx=0;ty=(mode==='image'?0:12);clampPan();apply();}else zoomAt(fit*2.2,e.clientX,e.clientY);
+      var size=viewportSize(),fit=(mode==='image')?minS:Math.max(minS,Math.min(2.4,(size.w-8)/natW));
+      if(s>fit*1.05){s=fit;tx=0;ty=(mode==='image'?0:12);clampPan();apply();}else{var r=overlay.getBoundingClientRect();zoomAt(fit*2.2,e.clientX-r.left,e.clientY-r.top);}
     });
   }
   document.addEventListener('click',function(e){       // 未放大时点谱 -> 打开(图片由宿主 openImage 触发)
@@ -5379,6 +5312,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     if(box&&box.textContent.trim())open(box);
   },false);
   document.addEventListener('keydown',function(e){if(!isOpen())return;if(e.key==='Escape')close();else if(mode==='image'&&e.key==='ArrowLeft')nav(-1);else if(mode==='image'&&e.key==='ArrowRight')nav(1);});
+  window.addEventListener('cecp-pm-viewport-change',function(){if(isOpen()){placeOverlay();fitAndCenter();}});
   window.addEventListener('resize',function(){if(isOpen()){clampPan();apply();}});
   window.CecpZoom={openImage:openImage};               // 宿主原图 lightbox 改调这个, 体验统一
 })();
@@ -6829,7 +6763,6 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
   function _run(cfg, root) {
     C = cfg;
     ROOT = root;
-    buildModal();
     buildPage();
     setupYouthMotion(ROOT);
     initLightbox();
