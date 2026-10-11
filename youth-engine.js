@@ -407,7 +407,12 @@ window.YouthEngine = {};
 .ym-sec-h .k{font-family:var(--ym-serif);font-size:clamp(20px,4.8vw,25px);font-weight:400;letter-spacing:.01em;color:var(--ym-ink);line-height:1.2;word-break:break-word}
 .ym-sec-h .n{font-size:12.5px;color:var(--ym-ink3);font-family:'DM Mono','SF Mono',ui-monospace,monospace;letter-spacing:.02em;white-space:nowrap;flex:0 0 auto}
 .ym-sec.is-featured .k{font-size:clamp(23px,5.4vw,29px)}
-.ym-sec-rule{height:1px;background:var(--ym-rule);margin-bottom:2px}
+.ym-sec{--section-color:var(--ym-accent)}
+.ym-sec[data-tone="gold"]{--section-color:#B78335}
+.ym-sec[data-tone="violet"]{--section-color:var(--ym-team-b)}
+.ym-sec[data-tone="teal"]{--section-color:var(--ym-team-c)}
+.ym-sec[data-tone="rose"]{--section-color:#A36363}
+.ym-sec-rule{height:1px;background:color-mix(in srgb,var(--section-color) 32%,transparent);margin-bottom:2px}
 
 /* ── Order of service (schedule) ── */
 .ym-flow{width:100%;min-width:0;margin:34px auto 0;color:var(--ym-ink)}
@@ -446,13 +451,13 @@ window.YouthEngine = {};
 .wr-actions button{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--ym-line);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;background:var(--ym-chip);color:var(--ym-ink2);margin-left:6px;transition:color var(--ym-dur) var(--ym-ease),border-color var(--ym-dur) var(--ym-ease),transform var(--ym-dur) var(--ym-ease)}
 .wr-actions button:hover{color:var(--ym-ink);border-color:var(--ym-border-md);transform:translateY(-1px)}
 .wr-group{margin-top:20px}
-.wr-group-hd{display:flex;align-items:baseline;gap:9px;margin:0 0 2px;padding-bottom:9px;border-bottom:1px solid var(--ym-line)}
+.wr-group-hd{display:flex;align-items:baseline;gap:9px;margin:0 0 2px;padding-bottom:9px;border-bottom:1px solid color-mix(in srgb,var(--tc) 22%,transparent)}
 .wr-group-ic{display:inline-flex;align-items:center;font-size:14px;color:var(--ym-ink3)}
 .wr-group-nm{font-size:13.5px;font-weight:600;letter-spacing:.06em;color:var(--ym-ink)}
 .wr-group-ct{font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:11.5px;color:var(--ym-ink3);margin-left:auto}
 .wr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 @media(min-width:640px){.wr-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}}
-.wr-section{position:relative;background:var(--ym-bg-elevated-2);border-radius:12px;padding:12px 13px 13px;border:1px solid var(--ym-line);box-sizing:border-box;min-width:0}
+.wr-section{position:relative;background:color-mix(in srgb,var(--tc) 4%,var(--ym-bg-elevated-2));border-radius:12px;padding:12px 13px 13px;border:1px solid var(--ym-line);box-sizing:border-box;min-width:0}
 .wr-section-title{display:flex;align-items:center;gap:7px;font-weight:600;font-size:12.5px;margin-bottom:10px;color:var(--ym-ink2)}
 .wr-section-title .ym-ic{font-size:14px;color:var(--ym-ink3)}
 .wr-people{display:flex;flex-direction:column;gap:7px}
@@ -632,6 +637,8 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
 .ym-section-title.is-featured{font-size:1.52rem;font-weight:800;letter-spacing:.01em}
 .ym-block{max-width:100%;min-width:0;background:none;border:0;border-radius:0;padding:4px 2px 0;margin-bottom:1rem;box-shadow:none}
 .ym-block.is-featured{border:0;box-shadow:none;padding:4px 2px 0;background:none}
+.ym-block.ym-message-soft{background:color-mix(in srgb,var(--ym-team-b) 4%,transparent);border-radius:8px}
+.ym-block.ym-game-soft{background:color-mix(in srgb,#A36363 4%,transparent);border-radius:8px}
 .ym-meta{font-size:14px;color:var(--ym-ink2);line-height:1.8}
 .ym-meta.is-featured{font-size:15.5px;line-height:1.95;color:var(--ym-ink);font-weight:400}
 .ym-meta strong{color:var(--ym-ink)}
@@ -640,14 +647,6 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
 .ym-meta-row:last-child{border-bottom:0}
 .ym-meta-label{font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:none;color:var(--ym-ink3);flex:0 0 auto}
 .ym-meta-value{font-family:var(--ym-serif);font-size:clamp(17px,4.4vw,20px);font-weight:400;color:var(--ym-ink);line-height:1.4}
-/* Quiet sermon typography, aligned with the surrounding section. */
-.ym-message{margin:20px 0 28px;min-width:0}
-.ym-message-label{margin:0 0 9px;font-size:12px;font-weight:500;letter-spacing:.12em;color:var(--ym-ink3)}
-.ym-message-topic{margin:0;max-width:26em;font-family:var(--ym-serif);font-size:clamp(22px,4.8vw,26px);font-weight:400;line-height:1.65;letter-spacing:0;color:var(--ym-ink);overflow-wrap:anywhere;text-wrap:pretty}
-.ym-message-speaker{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 10px;margin:12px 0 0;font-size:16px;line-height:1.6;color:var(--ym-ink2)}
-.ym-message-speaker-label{font-size:12px;letter-spacing:.12em;color:var(--ym-ink3)}
-@media(max-width:520px){.ym-message{margin:18px 0 24px}}
-
 .ppt-card{display:flex;align-items:center;gap:14px;width:100%;box-sizing:border-box;padding:16px 18px;margin:6px 0;border:1px solid var(--ym-line);border-radius:10px;background:var(--ym-bg-elevated);color:var(--ym-ink);text-decoration:none;transition:border-color var(--ym-dur) var(--ym-ease),background var(--ym-dur) var(--ym-ease),box-shadow var(--ym-dur) var(--ym-ease)}
 .ppt-card:hover,.ppt-card:focus-visible{border-color:var(--ym-border-md);background:var(--ym-accent-subtle)}
 .ppt-card:hover .ppt-card-s,.ppt-card:focus-visible .ppt-card-s{color:var(--ym-ink2)}
@@ -6562,7 +6561,8 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
   /* ══════════════ Section title ══════════════ */
   function secTitle(txt, cls){
     var parts = ymSplitLabel(String(txt||''));
-    var wrap = el('div',{class:'ym-sec'+(cls?' '+cls:'')});
+    var tone = /诗歌|敬拜/.test(parts.text) ? 'gold' : /圣经|信息/.test(parts.text) ? 'violet' : /游戏/.test(parts.text) ? 'rose' : /PPT|教程/.test(parts.text) ? 'teal' : 'blue';
+    var wrap = el('div',{class:'ym-sec'+(cls?' '+cls:''), 'data-tone':tone});
     var h = el('div',{class:'ym-sec-h'},[ el('h2',{class:'k',style:'margin:0',text: parts.text || String(txt||'')}) ]);
     wrap.appendChild(h);
     wrap.appendChild(el('div',{class:'ym-sec-rule'}));
@@ -6618,14 +6618,12 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     var frag = document.createDocumentFragment();
     frag.appendChild(anchor('ym-message'));
     frag.appendChild(secTitle('📖 圣经分享', 'is-featured'));
-    var metaDiv = div('ym-message ym-reveal', [
-      el('p', {class:'ym-message-label', text:'主题'}),
-      el('h3', {class:'ym-message-topic', text:C.topic || '主题待更新'}),
-      el('p', {class:'ym-message-speaker'}, [
-        el('span', {class:'ym-message-speaker-label', text:'讲员'}),
-        el('span', {text:C.speaker || '待公布'}),
-      ]),
-    ]);
+    var metaDiv = div('ym-block is-featured ym-message-soft ym-tilt ym-reveal');
+    metaDiv.innerHTML =
+      '<div class="ym-meta is-featured">' +
+        '<div class="ym-meta-row"><span class="ym-meta-label">讲员</span><span class="ym-meta-value">' + (C.speaker||'—') + '</span></div>' +
+        '<div class="ym-meta-row"><span class="ym-meta-label">主题</span><span class="ym-meta-value">' + (C.topic||'—') + '</span></div>' +
+      '</div>';
     frag.appendChild(metaDiv);
     frag.appendChild(buildBible());
     return frag;
@@ -6666,7 +6664,7 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     var frag = document.createDocumentFragment();
     frag.appendChild(anchor('ym-game'));
     frag.appendChild(secTitle('🎮 游戏活动', 'is-featured'));
-    var gameDiv = div('ym-block is-featured ym-tilt ym-reveal');
+    var gameDiv = div('ym-block is-featured ym-game-soft ym-tilt ym-reveal');
     gameDiv.appendChild(el('p',{class:'ym-feature-copy',text:C.gameText}));
     frag.appendChild(gameDiv);
     return frag;
