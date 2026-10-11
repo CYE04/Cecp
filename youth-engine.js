@@ -640,6 +640,14 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
 .ym-meta-row:last-child{border-bottom:0}
 .ym-meta-label{font-family:'DM Mono','SF Mono',ui-monospace,monospace;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:none;color:var(--ym-ink3);flex:0 0 auto}
 .ym-meta-value{font-family:var(--ym-serif);font-size:clamp(17px,4.4vw,20px);font-weight:400;color:var(--ym-ink);line-height:1.4}
+/* Quiet sermon typography, aligned with the surrounding section. */
+.ym-message{margin:20px 0 28px;min-width:0}
+.ym-message-label{margin:0 0 9px;font-size:12px;font-weight:500;letter-spacing:.12em;color:var(--ym-ink3)}
+.ym-message-topic{margin:0;max-width:26em;font-family:var(--ym-serif);font-size:clamp(22px,4.8vw,26px);font-weight:400;line-height:1.65;letter-spacing:0;color:var(--ym-ink);overflow-wrap:anywhere;text-wrap:pretty}
+.ym-message-speaker{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 10px;margin:12px 0 0;font-size:16px;line-height:1.6;color:var(--ym-ink2)}
+.ym-message-speaker-label{font-size:12px;letter-spacing:.12em;color:var(--ym-ink3)}
+@media(max-width:520px){.ym-message{margin:18px 0 24px}}
+
 .ppt-card{display:flex;align-items:center;gap:14px;width:100%;box-sizing:border-box;padding:16px 18px;margin:6px 0;border:1px solid var(--ym-line);border-radius:10px;background:var(--ym-bg-elevated);color:var(--ym-ink);text-decoration:none;transition:border-color var(--ym-dur) var(--ym-ease),background var(--ym-dur) var(--ym-ease),box-shadow var(--ym-dur) var(--ym-ease)}
 .ppt-card:hover,.ppt-card:focus-visible{border-color:var(--ym-border-md);background:var(--ym-accent-subtle)}
 .ppt-card:hover .ppt-card-s,.ppt-card:focus-visible .ppt-card-s{color:var(--ym-ink2)}
@@ -1694,7 +1702,6 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
       ],
       songs: [
         {label:'🎧 本周诗歌', href:'#ym-songs'},
-        {label:'🎼 歌谱', href:'#ym-score'},
       ],
       message: [
         {label:'📖 信息分享', href:'#ym-message'},
@@ -6611,12 +6618,14 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     var frag = document.createDocumentFragment();
     frag.appendChild(anchor('ym-message'));
     frag.appendChild(secTitle('📖 圣经分享', 'is-featured'));
-    var metaDiv = div('ym-block is-featured ym-tilt ym-reveal');
-    metaDiv.innerHTML =
-      '<div class="ym-meta is-featured">' +
-        '<div class="ym-meta-row"><span class="ym-meta-label">讲员</span><span class="ym-meta-value">' + (C.speaker||'—') + '</span></div>' +
-        '<div class="ym-meta-row"><span class="ym-meta-label">主题</span><span class="ym-meta-value">' + (C.topic||'—') + '</span></div>' +
-      '</div>';
+    var metaDiv = div('ym-message ym-reveal', [
+      el('p', {class:'ym-message-label', text:'主题'}),
+      el('h3', {class:'ym-message-topic', text:C.topic || '主题待更新'}),
+      el('p', {class:'ym-message-speaker'}, [
+        el('span', {class:'ym-message-speaker-label', text:'讲员'}),
+        el('span', {text:C.speaker || '待公布'}),
+      ]),
+    ]);
     frag.appendChild(metaDiv);
     frag.appendChild(buildBible());
     return frag;
