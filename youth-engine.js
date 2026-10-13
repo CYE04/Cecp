@@ -561,11 +561,11 @@ window.YouthEngine = {};
 .jp-dual-bot .jp-dot-top{height:2px}
 .jp-dual .jp-dual-top .jp-dot-bot,.jp-dual .jp-dual-bot .jp-dot-top{top:0}
 .jp-slur{display:inline-flex;align-items:flex-end;position:relative;padding-top:var(--slur-pad,12px)}
-.jp-slur::before{content:'';position:absolute;top:2px;left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
+.jp-slur::before{content:'';position:absolute;top:var(--jp-nav-arc-top,2px);left:15%;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
 .jp-slur-open{display:inline-flex;align-items:flex-end;position:relative;padding-top:var(--slur-pad,12px)}
-.jp-slur-open::before{content:'';position:absolute;top:2px;left:15%;right:-4px;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-radius:50% 0 0 0/100% 0 0 0}
+.jp-slur-open::before{content:'';position:absolute;top:var(--jp-nav-arc-top,2px);left:15%;right:-4px;height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-radius:50% 0 0 0/100% 0 0 0}
 .jp-slur-close{display:inline-flex;align-items:flex-end;position:relative;padding-top:var(--slur-pad,12px)}
-.jp-slur-close::before{content:'';position:absolute;top:2px;left:-4px;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:0 50% 0 0/0 100% 0 0}
+.jp-slur-close::before{content:'';position:absolute;top:var(--jp-nav-arc-top,2px);left:-4px;right:15%;height:8px;border-top:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:0 50% 0 0/0 100% 0 0}
 .jp-tie{display:inline-flex;width:0;height:0;position:relative;overflow:visible;pointer-events:none}
 .jp-tie::before{content:'';position:absolute;left:var(--tie-l,-0.75em);top:var(--tie-t,-34px);width:var(--tie-w,1.5em);height:8px;border-top:1.5px solid var(--ym-ink);border-left:1.5px solid var(--ym-ink);border-right:1.5px solid var(--ym-ink);border-radius:50% 50% 0 0/100% 100% 0 0}
 .jp-tuplet{display:inline-flex;align-items:flex-end;position:relative;padding-top:var(--slur-pad,12px);margin-right:1px}
@@ -1279,9 +1279,9 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
       style.setAttribute('data-export-symbol-fix','1');
       style.textContent=[
         '.jp-slur,.jp-slur-open,.jp-slur-close,.jp-tuplet{padding-top:calc(var(--slur-pad,12px) + 10px)!important;overflow:visible!important;}',
-        '.jp-slur::before{top:3px!important;left:12%!important;right:12%!important;height:11px!important;border-top:2.4px solid #111!important;border-left:2.4px solid #111!important;border-right:2.4px solid #111!important;background:transparent!important;z-index:2!important;}',
-        '.jp-slur-open::before{top:3px!important;left:12%!important;right:-4px!important;height:11px!important;border-top:2.4px solid #111!important;border-left:2.4px solid #111!important;background:transparent!important;z-index:2!important;}',
-        '.jp-slur-close::before{top:3px!important;left:-4px!important;right:12%!important;height:11px!important;border-top:2.4px solid #111!important;border-right:2.4px solid #111!important;background:transparent!important;z-index:2!important;}',
+        '.jp-slur::before{top:var(--jp-nav-arc-top,3px)!important;left:12%!important;right:12%!important;height:11px!important;border-top:2.4px solid #111!important;border-left:2.4px solid #111!important;border-right:2.4px solid #111!important;background:transparent!important;z-index:2!important;}',
+        '.jp-slur-open::before{top:var(--jp-nav-arc-top,3px)!important;left:12%!important;right:-4px!important;height:11px!important;border-top:2.4px solid #111!important;border-left:2.4px solid #111!important;background:transparent!important;z-index:2!important;}',
+        '.jp-slur-close::before{top:var(--jp-nav-arc-top,3px)!important;left:-4px!important;right:12%!important;height:11px!important;border-top:2.4px solid #111!important;border-right:2.4px solid #111!important;background:transparent!important;z-index:2!important;}',
         '.jp-tie::before{height:11px!important;border-top:2.4px solid #111!important;border-left:2.4px solid #111!important;border-right:2.4px solid #111!important;background:transparent!important;z-index:2!important;}',
         '.jp-tuplet-br{top:3px!important;left:2px!important;right:2px!important;height:11px!important;border-top:2.4px solid #111!important;border-left:2.4px solid #111!important;border-right:2.4px solid #111!important;background:transparent!important;z-index:1!important;}',
         '.jp-tuplet-num{top:-4px!important;font-size:10px!important;line-height:1!important;padding:0 5px!important;background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;z-index:4!important;}'
@@ -2019,12 +2019,12 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
   }
   function makeBarline(tok){
     var _bn=barNavOf(tok),bar=_bn.bar,nav=_bn.nav;
-    var o=document.createElement('span');
+    var o=document.createElement('span');o.className='jp-bar';
     o.style.cssText='display:inline-flex;flex-direction:column;align-items:flex-start;vertical-align:bottom;';
-    var top=document.createElement('span');top.style.height='12px';o.appendChild(top);
-    var mid=document.createElement('span');mid.style.cssText='display:inline-flex;align-items:stretch;height:26px;';
-    function thin(){var l=document.createElement('span');l.style.cssText='width:1.5px;background:currentColor;flex-shrink:0;';return l;}
-    function thick(){var l=document.createElement('span');l.style.cssText='width:3.5px;background:currentColor;flex-shrink:0;';return l;}
+    var top=document.createElement('span');top.className='jp-bar-top';top.style.height='12px';o.appendChild(top);
+    var mid=document.createElement('span');mid.className='jp-bar-mid';mid.style.cssText='display:inline-flex;align-items:stretch;height:26px;';
+    function thin(){var l=document.createElement('span');l.className='jp-bar-stroke';l.style.cssText='width:1.5px;background:currentColor;flex-shrink:0;';return l;}
+    function thick(){var l=document.createElement('span');l.className='jp-bar-stroke';l.style.cssText='width:3.5px;background:currentColor;flex-shrink:0;';return l;}
     function gap(px){var g=document.createElement('span');g.style.cssText='width:'+px+'px;flex-shrink:0;';return g;}
     function dots(){var d=document.createElement('span');d.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:6px;flex-shrink:0;';var d1=document.createElement('span');d1.style.cssText='width:3px;height:3px;border-radius:50%;background:currentColor;';var d2=document.createElement('span');d2.style.cssText='width:3px;height:3px;border-radius:50%;background:currentColor;';d.appendChild(d1);d.appendChild(d2);return d;}
     if(bar==='|'){mid.appendChild(thin());}
@@ -2035,7 +2035,7 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
     else if(bar==='|:|'){mid.appendChild(dots());mid.appendChild(gap(3));mid.appendChild(thin());mid.appendChild(gap(1.5));mid.appendChild(thick());mid.appendChild(gap(2));mid.appendChild(thick());mid.appendChild(gap(1.5));mid.appendChild(thin());mid.appendChild(gap(3));mid.appendChild(dots());}
     else if(nav==='coda'||nav==='segno'){mid.appendChild(thin());}
     o.appendChild(mid);
-    var bot=document.createElement('span');bot.style.height='16px';o.appendChild(bot);
+    var bot=document.createElement('span');bot.className='jp-bar-bot';bot.style.height='16px';o.appendChild(bot);
     // 导航记号：Coda=椭圆十字SVG；Segno=官方 Bravura 字形(U+E047)；Fine/D.C./D.S.=双线下方斜体标签
     if(nav==='coda'||nav==='segno'){
       top.style.cssText='display:flex;align-items:flex-end;justify-content:center;height:22px;line-height:1;';
@@ -2048,8 +2048,101 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
       bot.style.cssText='display:flex;align-items:flex-start;justify-content:center;height:16px;font-family:"Noto Serif SC",Georgia,serif;font-style:italic;font-size:9.5px;line-height:1;white-space:nowrap;padding-top:2px;';
       o.style.alignItems='center';
     }
+    if(nav){o.setAttribute('data-jp-nav-base-height',top.style.height||'22px');o.setAttribute('data-jp-nav',nav);o.setAttribute('data-jp-nav-above',(nav==='coda'||nav==='segno')?'1':'0');}
     return o;
   }
+/* CECP-JP-NAVIGATION-BEGIN
+   与 youth / musictool / musiclib 同步。此块在编辑器 srcdoc 中，禁止反斜杠及反引号。
+   反复圆点不参与导航记号的中心计算；上方记号为经过它的连音线留出空间。 */
+function jpNoteArcTop(atom){
+  var box=atom.getBoundingClientRect();
+  if(!atom.querySelector('.jp-navmark'))return box.top;
+  var top=Infinity,scale=atom.offsetWidth?box.width/atom.offsetWidth:1;
+  [].forEach.call(atom.querySelectorAll('.jp-num,.jp-plain-sym,.jp-dot-top > span'),function(note){var r=note.getBoundingClientRect();if(r.height)top=Math.min(top,r.top);});
+  return top===Infinity?box.top:top-4*(scale||1);
+}
+function jpResetNavigation(scope){
+  if(!scope)return;
+  [].forEach.call(scope.querySelectorAll('[data-jp-nav],.jp-navmark'),function(el){
+    var mark=el.classList.contains('jp-navmark')?el:el.querySelector('.jp-bar-top,.jp-bar-bot');
+    if(!mark)return;
+    mark.style.transform='';mark.style.paddingBottom='';
+    if(el.hasAttribute('data-jp-nav')){
+      mark=el.querySelector(el.getAttribute('data-jp-nav-above')==='1'?'.jp-bar-top':'.jp-bar-bot');
+      if(mark){mark.style.transform='';mark.style.paddingBottom='';if(el.getAttribute('data-jp-nav-above')==='1')mark.style.height=el.getAttribute('data-jp-nav-base-height')||'22px';}
+    }
+  });
+  [].forEach.call(scope.querySelectorAll('.jp-slur,.jp-slur-open,.jp-slur-close'),function(group){group.style.removeProperty('--jp-nav-arc-top');});
+}
+function jpPrepareLegacyNavigation(scope){
+  if(!scope)return;
+  [].forEach.call(scope.querySelectorAll('.jp-slur,.jp-slur-open,.jp-slur-close'),function(group){
+    if(!group.querySelector('[data-jp-nav],.jp-navmark'))return;
+    var gr=group.getBoundingClientRect(),scale=group.offsetWidth?gr.width/group.offsetWidth:1;
+    if(!gr.width||!scale)return;
+    var noteTop=Infinity;
+    [].forEach.call(group.querySelectorAll('.jp-num,.jp-dot-top:not(:empty)'),function(note){var r=note.getBoundingClientRect();if(r.height)noteTop=Math.min(noteTop,r.top);});
+    if(noteTop===Infinity)return;
+    var ps=getComputedStyle(group,'::before');
+    var height=parseFloat(ps.height)||8;
+    var layer=Math.max(0,(parseFloat(getComputedStyle(group).paddingTop)||12)-12);
+    group.style.setProperty('--jp-nav-arc-top',((noteTop-gr.top)/scale-height-3-layer).toFixed(3)+'px');
+  });
+}
+function jpLayoutNavigation(scope){
+  if(!scope)return false;
+  var changed=false;
+  [].forEach.call(scope.querySelectorAll('[data-jp-nav],.jp-navmark'),function(el){
+    var attached=el.classList.contains('jp-navmark');
+    var above=attached||el.getAttribute('data-jp-nav-above')==='1';
+    var mark=attached?el:el.querySelector(above?'.jp-bar-top':'.jp-bar-bot');
+    if(!mark)return;
+    var paint=mark.querySelector('svg')||mark,mr=paint.getBoundingClientRect();
+    if(!mr.width||!mr.height)return;
+    var natural=parseFloat(getComputedStyle(paint).height)||paint.offsetHeight;
+    var scale=natural?mr.height/natural:1;if(!scale||!isFinite(scale))scale=1;
+    if(!attached){
+      var strokes=[].slice.call(el.querySelectorAll('.jp-bar-stroke'));
+      if(strokes.length){
+        var left=Infinity,right=-Infinity;
+        strokes.forEach(function(stroke){var r=stroke.getBoundingClientRect();left=Math.min(left,r.left);right=Math.max(right,r.right);});
+        mark.style.transform='translateX('+(((left+right-mr.left-mr.right)/2)/scale).toFixed(3)+'px)';
+        mr=paint.getBoundingClientRect();
+      }
+    }
+    if(!above)return;
+    var row=el.closest('.prev-row')||el.closest('.sw-lrow')||el.closest('.p-notes');if(!row)return;
+    var ceiling=Infinity;
+    [].forEach.call(row.querySelectorAll('.strict-arc-svg > div,.strict-arc-svg path,.strict-arc-tup text'),function(arc){
+      var r=arc.getBoundingClientRect();
+      if(r.width&&r.height&&r.left<mr.right&&r.right>mr.left)ceiling=Math.min(ceiling,r.top);
+    });
+    [].forEach.call(row.querySelectorAll('.jp-slur,.jp-slur-open,.jp-slur-close,.jp-tie'),function(group){
+      var gr=group.getBoundingClientRect(),gs=group.offsetWidth?gr.width/group.offsetWidth:scale;
+      var ps=getComputedStyle(group,'::before'),top=parseFloat(ps.top),left=parseFloat(ps.left)||0,right=parseFloat(ps.right)||0;
+      if(String(ps.left).indexOf('%')>=0)left=group.offsetWidth*left/100;
+      if(String(ps.right).indexOf('%')>=0)right=group.offsetWidth*right/100;
+      var width=parseFloat(ps.width)||0;
+      var arcRight=group.classList.contains('jp-tie')?gr.left+(left+width)*gs:gr.right-right*gs;
+      if((gr.width||width)&&isFinite(top)&&gr.left+left*gs<mr.right&&arcRight>mr.left)ceiling=Math.min(ceiling,gr.top+top*gs);
+    });
+    if(ceiling===Infinity)return;
+    var lift=Math.max(0,(mr.bottom-ceiling)/scale+4);
+    if(lift<0.25)return;
+    mark.style.paddingBottom=lift.toFixed(3)+'px';
+    if(!attached){mark.style.boxSizing='border-box';mark.style.height=((parseFloat(getComputedStyle(mark).height)||22)+lift).toFixed(3)+'px';}
+    changed=true;
+  });
+  return changed;
+}
+var jpBaseLayoutArcs=layoutStrictArcs;
+layoutStrictArcs=function(row){jpResetNavigation(row);jpBaseLayoutArcs(row);jpPrepareLegacyNavigation(row);if(jpLayoutNavigation(row)){jpBaseLayoutArcs(row);jpPrepareLegacyNavigation(row);}};
+var jpBaseLayoutArcsAll=layoutStrictArcsAll;
+layoutStrictArcsAll=function(scope){jpResetNavigation(scope);jpBaseLayoutArcsAll(scope);jpPrepareLegacyNavigation(scope);if(jpLayoutNavigation(scope)){jpBaseLayoutArcsAll(scope);jpPrepareLegacyNavigation(scope);}};
+var jpBaseLayoutNoteArcs=layoutJpArcs;
+layoutJpArcs=function(lane){jpResetNavigation(lane);jpBaseLayoutNoteArcs(lane);jpPrepareLegacyNavigation(lane);if(jpLayoutNavigation(lane)){jpBaseLayoutNoteArcs(lane);jpPrepareLegacyNavigation(lane);}};
+/* CECP-JP-NAVIGATION-END */
+
   /* ── 导航记号挂在音符正上方：写法 = `*` + 记号名，如 `1 *coda`、`3_ *segno` ──
      与小节线写法(||coda/:|fine)并存；`*` 前缀这一档不画小节线、不占音位（isDualAtom 已判 false，
      所以 chord/lyric 不用补 @）。记号用绝对定位挂在前一个音符上，不参与布局 → 不会把行撑高。 */
@@ -2342,8 +2435,8 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
       if(!scale)scale=1;
       var minTop=Infinity;
       for(var k=a.start;k<=a.end;k++){
-        var r2=atoms[k].getBoundingClientRect();
-        if(r2.top<minTop)minTop=r2.top;
+        var noteTop=jpNoteArcTop(atoms[k]);
+        if(noteTop<minTop)minTop=noteTop;
       }
       var x1=(pr.left+pr.width/2-tr.left)/scale;
       var x2=(nr.left+nr.width/2-tr.left)/scale;
@@ -2370,6 +2463,7 @@ hr.ym-hr{border:none;margin:1.2rem 0;background:none}
     if(!nStr||!nStr.trim())return d;
     var hasTie=false;
     function appendRenderedTok(parent,tk){
+      var noteNav=noteNavOf(tk);if(noteNav){attachNoteNavMark(parent.lastElementChild,noteNav);return;}
       var ts2=jpTieSpan(tk);
       if(ts2){parent.appendChild(makeJpTie(ts2));hasTie=true;return;}
       var inlineTs=extractInlineTimeSignToken(tk);
@@ -5588,11 +5682,11 @@ if(typeof window!=='undefined'){window.ChordEngine=ChordEngine;}
     function relayoutRowExtras(){
       if(song.align==='strict'){
         lbDiv.querySelectorAll('.sw-lrow').forEach(connectStrictBeams);
-        layoutStrictArcsAll(lbDiv);
       }else{
         var _sl=lbDiv.querySelectorAll('.sec-label-holder');
         Array.prototype.forEach.call(_sl,function(h){ if(h.cecpPlaceSecLabel)h.cecpPlaceSecLabel(); });
       }
+      layoutStrictArcsAll(lbDiv);
       positionVoltaRails(lbDiv);
       return lbDiv.scrollHeight||0;
     }

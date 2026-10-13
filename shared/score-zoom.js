@@ -15,6 +15,11 @@
   var mode='node',imgList=[],imgIdx=0,lastClose=0;
   var s=1,tx=0,ty=0,minS=1,maxS=4,natW=1,natH=1;
   var pts={},pinch=null,pan=null,down=null,dragged=false;
+  function notifyHost(open){
+    if(window.parent&&window.parent!==window){
+      window.parent.postMessage({type:'cecp-pm-score-zoom',open:!!open},'*');
+    }
+  }
   function injectCss(){
     if(document.getElementById('cecp-scorezoom-css'))return;
     var st=document.createElement('style');st.id='cecp-scorezoom-css';
@@ -24,17 +29,31 @@
       '#cecp-scorezoom .czoom-content{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;width:max-content;padding:16px;box-sizing:border-box;}',
       '#cecp-scorezoom .czoom-content.czoom-img{padding:0;}',
       '#cecp-scorezoom .czoom-content.czoom-img img{display:block;max-width:none;}',
-      '#cecp-scorezoom .czoom-nav{position:fixed;top:50%;transform:translateY(-50%);width:44px;height:66px;border:none;border-radius:12px;background:rgba(0,0,0,.34);color:#fff;font-size:30px;line-height:1;cursor:pointer;z-index:3;display:none;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}',
+      '#cecp-scorezoom .czoom-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:66px;border:none;border-radius:12px;background:rgba(0,0,0,.34);color:#fff;font-size:30px;line-height:1;cursor:pointer;z-index:3;display:none;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}',
       '#cecp-scorezoom .czoom-prev{left:10px;}#cecp-scorezoom .czoom-next{right:10px;}',
-      '#cecp-scorezoom .czoom-count{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;font-size:13px;letter-spacing:1px;color:rgba(255,255,255,.62);font-family:"Noto Sans SC",sans-serif;pointer-events:none;display:none;z-index:3;}',
-      '#cecp-scorezoom .czoom-hint{position:fixed;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;letter-spacing:1px;color:var(--text3,rgba(140,140,150,.72));font-family:"Noto Sans SC",sans-serif;pointer-events:none;}',
+      '#cecp-scorezoom .czoom-count{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;font-size:13px;letter-spacing:1px;color:rgba(255,255,255,.62);font-family:"Noto Sans SC",sans-serif;pointer-events:none;display:none;z-index:3;}',
+      '#cecp-scorezoom .czoom-hint{position:absolute;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;letter-spacing:1px;color:var(--text3,rgba(140,140,150,.72));font-family:"Noto Sans SC",sans-serif;pointer-events:none;}',
       '.sw-lb-zoomable{cursor:zoom-in;}'
     ].join('');
     (document.head||document.documentElement).appendChild(st);
   }
+  function embedViewport(){
+    var css=getComputedStyle(document.documentElement);
+    var top=parseFloat(css.getPropertyValue('--cecp-embed-visible-top'));
+    var height=parseFloat(css.getPropertyValue('--cecp-embed-visible-height'));
+    return isFinite(top)&&isFinite(height)&&height>0?{top:Math.max(0,top),height:height}:null;
+  }
+  function placeOverlay(){
+    var box=embedViewport();
+    if(box){overlay.style.inset='auto 0 auto 0';overlay.style.top=box.top+'px';overlay.style.height=box.height+'px';}
+    else{overlay.style.inset='0';overlay.style.top='';overlay.style.height='';}
+  }
+  function viewportSize(){
+    return {w:(overlay&&overlay.clientWidth)||window.innerWidth,h:(overlay&&overlay.clientHeight)||window.innerHeight};
+  }
   function apply(){content.style.transform='translate('+tx+'px,'+ty+'px) scale('+s+')';}
   function clampPan(){
-    var vw=window.innerWidth,vh=window.innerHeight,w=natW*s,h=natH*s;
+    var size=viewportSize(),vw=size.w,vh=size.h,w=natW*s,h=natH*s;
     if(w<=vw)tx=(vw-w)/2; else tx=Math.min(0,Math.max(vw-w,tx));
     if(h<=vh)ty=(vh-h)/2; else ty=Math.min(12,Math.max(vh-h-12,ty));
   }
@@ -57,7 +76,7 @@
     content.style.transform='none';
     natW=content.offsetWidth||content.scrollWidth||1;
     natH=content.offsetHeight||content.scrollHeight||1;
-    var vw=window.innerWidth,vh=window.innerHeight;
+    var size=viewportSize(),vw=size.w,vh=size.h;
     if(mode==='image'){var f=Math.min((vw-16)/natW,(vh-64)/natH);if(!(f>0))f=1;f=Math.min(3,f);minS=f;s=f;maxS=f*4;}
     else{minS=Math.min(1,(vw-8)/natW);s=Math.max(minS,Math.min(2.4,(vw-8)/natW));maxS=Math.max(minS*4,s*4);}
     tx=0;ty=(mode==='image'?0:12);clampPan();apply();
@@ -92,7 +111,7 @@
        放大器本来就是只读的图片式查看器，不需要墨迹层，直接摘掉。 */
     var inks=content.querySelectorAll('.cecp-ink-layer');
     for(var ii=0;ii<inks.length;ii++)inks[ii].parentNode.removeChild(inks[ii]);
-    overlay.classList.add('open');document.documentElement.style.overflow='hidden';
+    placeOverlay();overlay.classList.add('open');document.documentElement.style.overflow='hidden';notifyHost(true);
     updateNav();fitAndCenter();
   }
   function openImage(list,idx){                          // 图片模式(宿主调用)
@@ -101,7 +120,7 @@
     if(overlay.parentNode!==document.body)document.body.appendChild(overlay);
     imgList=(list||[]).filter(Boolean);if(!imgList.length)return;
     mode='image';imgIdx=Math.max(0,Math.min(imgList.length-1,idx||0));
-    overlay.classList.add('open');document.documentElement.style.overflow='hidden';
+    placeOverlay();overlay.classList.add('open');document.documentElement.style.overflow='hidden';notifyHost(true);
     showImg();
   }
   function showImg(){
@@ -114,7 +133,7 @@
     updateNav();
   }
   function nav(d){if(mode!=='image'||imgList.length<2)return;imgIdx=(imgIdx+d+imgList.length)%imgList.length;showImg();}
-  function close(){if(overlay){overlay.classList.remove('open');document.documentElement.style.overflow='';pts={};pinch=pan=down=null;lastClose=Date.now();}}
+  function close(){if(overlay){overlay.classList.remove('open');document.documentElement.style.overflow='';pts={};pinch=pan=down=null;lastClose=Date.now();notifyHost(false);}}
   function d2(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
   function mid(a,b){return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};}
   function zoomAt(ns,cx,cy){ns=Math.max(minS,Math.min(maxS,ns));var k=ns/s;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;s=ns;clampPan();apply();}
@@ -130,7 +149,7 @@
       if(!pts[e.pointerId])return;
       pts[e.pointerId]={x:e.clientX,y:e.clientY};
       var ids=Object.keys(pts);
-      if(ids.length>=2&&pinch){e.preventDefault();var p=ids.map(function(i){return pts[i];});var m=mid(p[0],p[1]);zoomAt(pinch.s*(d2(p[0],p[1])/pinch.d),m.x,m.y);}
+      if(ids.length>=2&&pinch){e.preventDefault();var p=ids.map(function(i){return pts[i];});var m=mid(p[0],p[1]),r=overlay.getBoundingClientRect();zoomAt(pinch.s*(d2(p[0],p[1])/pinch.d),m.x-r.left,m.y-r.top);}
       else if(ids.length===1&&pan){var dx=e.clientX-pan.x,dy=e.clientY-pan.y;if(dragged||Math.abs(dx)>6||Math.abs(dy)>6){dragged=true;e.preventDefault();tx=pan.tx+dx;ty=pan.ty+dy;clampPan();apply();}}
     });
     function up(e){
@@ -151,8 +170,8 @@
     overlay.addEventListener('pointercancel',up);
     overlay.addEventListener('dblclick',function(e){
       if(e.target.closest('.p-chord:not(.empty)')||e.target.closest('.czoom-nav'))return;e.preventDefault();
-      var fit=(mode==='image')?minS:Math.max(minS,Math.min(2.4,(window.innerWidth-8)/natW));
-      if(s>fit*1.05){s=fit;tx=0;ty=(mode==='image'?0:12);clampPan();apply();}else zoomAt(fit*2.2,e.clientX,e.clientY);
+      var size=viewportSize(),fit=(mode==='image')?minS:Math.max(minS,Math.min(2.4,(size.w-8)/natW));
+      if(s>fit*1.05){s=fit;tx=0;ty=(mode==='image'?0:12);clampPan();apply();}else{var r=overlay.getBoundingClientRect();zoomAt(fit*2.2,e.clientX-r.left,e.clientY-r.top);}
     });
   }
   document.addEventListener('click',function(e){       // 未放大时点谱 -> 打开(图片由宿主 openImage 触发)
@@ -173,6 +192,7 @@
     if(box&&box.textContent.trim())open(box);
   },false);
   document.addEventListener('keydown',function(e){if(!isOpen())return;if(e.key==='Escape')close();else if(mode==='image'&&e.key==='ArrowLeft')nav(-1);else if(mode==='image'&&e.key==='ArrowRight')nav(1);});
+  window.addEventListener('cecp-pm-viewport-change',function(){if(isOpen()){placeOverlay();fitAndCenter();}});
   window.addEventListener('resize',function(){if(isOpen()){clampPan();apply();}});
   window.CecpZoom={openImage:openImage};               // 宿主原图 lightbox 改调这个, 体验统一
 })();
