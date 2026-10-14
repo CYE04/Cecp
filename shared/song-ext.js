@@ -184,14 +184,14 @@ function segRenderLabelBlock(seg,row){
      老代码是一次性 rAF + 直接 return，于是回调永远没跑成 —— 徽章停在初始 top:16px、
      和弦也没让位，两者就撞在一起（严格模式因为 layoutStrictArcsAll 每次都会重设
      .p-chord 的 marginBottom，所以看不出问题）。 */
-  function placeSecLabel(){
+  function placeSecLabel(keepChordHeight){
     if(!holder.isConnected)return false;
     var scope=holder.closest?holder.closest('.prev-row'):null;
     if(!scope)return false;
     var pillH=tag.offsetHeight||13;
     var band=pillH+SEC_LABEL_TOP_GAP_PX*2;
     var chords=scope.querySelectorAll('.p-chord');
-    for(var i=0;i<chords.length;i++){
+    for(var i=0;!keepChordHeight&&i<chords.length;i++){
       chords[i].style.marginBottom=(2+band)+'px';
     }
     var ref=holder.nextElementSibling;

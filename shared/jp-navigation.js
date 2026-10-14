@@ -38,7 +38,6 @@ function jpPrepareLegacyNavigation(scope){
 }
 function jpLayoutNavigation(scope){
   if(!scope)return false;
-  var changed=false;
   [].forEach.call(scope.querySelectorAll('[data-jp-nav],.jp-navmark'),function(el){
     var attached=el.classList.contains('jp-navmark');
     var above=attached||el.getAttribute('data-jp-nav-above')==='1';
@@ -73,19 +72,19 @@ function jpLayoutNavigation(scope){
       var arcRight=group.classList.contains('jp-tie')?gr.left+(left+width)*gs:gr.right-right*gs;
       if((gr.width||width)&&isFinite(top)&&gr.left+left*gs<mr.right&&arcRight>mr.left)ceiling=Math.min(ceiling,gr.top+top*gs);
     });
+    var anchors=attached?el.parentElement.querySelectorAll('.jp-num,.jp-plain-sym,.jp-dot-top > span'):el.querySelectorAll('.jp-bar-stroke');
+    [].forEach.call(anchors,function(anchor){var r=anchor.getBoundingClientRect();if(r.width&&r.height)ceiling=Math.min(ceiling,r.top);});
     if(ceiling===Infinity)return;
-    var lift=Math.max(0,(mr.bottom-ceiling)/scale+4);
-    if(lift<0.25)return;
-    mark.style.paddingBottom=lift.toFixed(3)+'px';
-    if(!attached){mark.style.boxSizing='border-box';mark.style.height=((parseFloat(getComputedStyle(mark).height)||22)+lift).toFixed(3)+'px';}
-    changed=true;
+    var move=(ceiling-mr.bottom)/scale-4;
+    if(Math.abs(move)<.25)return;
+    mark.style.transform=(mark.style.transform||'')+' translateY('+move.toFixed(3)+'px)';
   });
-  return changed;
+  // 只移动记号墨迹，不再次增高音格或累加预留空间。
 }
 var jpBaseLayoutArcs=layoutStrictArcs;
-layoutStrictArcs=function(row){jpResetNavigation(row);jpBaseLayoutArcs(row);jpPrepareLegacyNavigation(row);if(jpLayoutNavigation(row)){jpBaseLayoutArcs(row);jpPrepareLegacyNavigation(row);}};
+layoutStrictArcs=function(row){jpResetNavigation(row);scoreResetChordHeight(row);scoreNormalizeNotes(row);jpBaseLayoutArcs(row);jpPrepareLegacyNavigation(row);jpLayoutNavigation(row);scoreLayoutChordRows(row);};
 var jpBaseLayoutArcsAll=layoutStrictArcsAll;
-layoutStrictArcsAll=function(scope){jpResetNavigation(scope);jpBaseLayoutArcsAll(scope);jpPrepareLegacyNavigation(scope);if(jpLayoutNavigation(scope)){jpBaseLayoutArcsAll(scope);jpPrepareLegacyNavigation(scope);}};
+layoutStrictArcsAll=function(scope){jpResetNavigation(scope);scoreResetChordHeight(scope);scoreNormalizeNotes(scope);jpBaseLayoutArcsAll(scope);jpPrepareLegacyNavigation(scope);jpLayoutNavigation(scope);scoreLayoutChordRows(scope);};
 var jpBaseLayoutNoteArcs=layoutJpArcs;
-layoutJpArcs=function(lane){jpResetNavigation(lane);jpBaseLayoutNoteArcs(lane);jpPrepareLegacyNavigation(lane);if(jpLayoutNavigation(lane)){jpBaseLayoutNoteArcs(lane);jpPrepareLegacyNavigation(lane);}};
+layoutJpArcs=function(lane){jpResetNavigation(lane);jpBaseLayoutNoteArcs(lane);jpPrepareLegacyNavigation(lane);jpLayoutNavigation(lane);var row=lane&&lane.closest('.prev-row');if(row)scoreLayoutChordRows(row);};
 /* CECP-JP-NAVIGATION-END */
