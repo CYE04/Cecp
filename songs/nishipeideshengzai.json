@@ -1,0 +1,52 @@
+{
+  "version": "1",
+  "created": "YuEn",
+  "createdTime": "2026-10-15 18:34:41",
+  "id": "nishipeideshengzai",
+  "title": "祢是配得（圣哉圣哉）",
+  "artist": "赞美之泉",
+  "sub": "赞美之泉【相信有爱就有奇迹】(2011) (赛6:3,启4:8,7:9,12) 曾祥怡词曲",
+  "origKey": "G",
+  "timeSign": "4/4",
+  "bpm": 72,
+  "mp3": "/upload/nishipeideshengzai.mp3",
+  "cover": "https://cecpadua.github.io/resouces/covers/weiyouyesu.jpg",
+  "lrc": "https://cecpadua.github.io/resouces/lyrics/nishipeideshengzai.lrc",
+  "youtube": "https://youtu.be/Y3eE_e5rMvc?si=MJGNswB9SexiQSYB",
+  "scoreImg": "https://cecpadua.github.io/resouces/scoreIMG/nishipeideshengzaiG.jpg",
+  "align": "strict",
+  "sections": [
+  {
+    "name": "祢是配得（圣哉圣哉）",
+    "lines": [
+      { "b": true, "line": [
+        {"chord":"G@D/F#@C/E@@G/D@C@Dsus4@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5, 1 2 7, | 1 7,_ 6,_ 5,· 5,_ | 4 3 2· 1_ | 1 - - - ||","lyric":"@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G@D/F#@C/E@@G/D@C@G/B@@A A/C#@Dsus4 D @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"|| 5, 1 2 7, | 1 ( 7,_ 6,_ ) 5, - | 6, 1 5, 1_ 1_ | 6, ( 3_ 2_ ) 2 - |","lyric":"圣哉圣哉全地@唱，@昔在今在以后永@在。 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"G@D/F#@C/E@@G/D@C@Dsus4@G@@G G/B @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"5, 1 2 7, | 1 ( 7,_ 6,_ ) 5,· 5,_ | 4 3 2· 1_ | 1 - - 1__ 2·_ ||","lyric":"圣哉圣哉全能@神，永远在宝座上。@@祢是 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"},
+        {"label":"Chorus","dx":499,"dy":34}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Cmaj7@D/C@Bm@Em@Am@C/D@@C/G@@G@G/B @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"|:segno ( 3· 2_ ) 2 - | ( 2· 1_ ) 1 - | 1 7, 6,_ 6, 5,_ | ( 4· 3__ 2__ ) 3 1__ 2·_ |","lyric":"配 @得，@ 配@ 得，@ 配得尊崇和赞@@ 美。祢是 @ @ @ @ @ @ @ @ @ @ @ @ @","lyric2":"圣 @洁，@ 圣 @洁，@ 圣洁荣光在全@@地。你是 @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Cmaj7@D/C@B@Em@Am@C/D@C/G@G@G/B @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"( 3· 2_ ) 2 - | ( 2· 1_ ) 1 - | 4 3 2· 1_ | 1 - 0 1__ 2·_ :| [v1 ]v","lyric":"配@得， @配@ 得， @万物敬拜你。 @@你是 @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      { "b": true, "line": [
+        {"chord":"Cmaj7@D/C@B@Em@@Am@C/D@C/G@G@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"( 3· 2_ ) 2 - | ( 2· 1_ ) 1 2_ 3_ | 4 3 2· 1_ | ( 2· 1_ ) ( 1 - | 1 ) - - 0_ 5,_ ||/ [v2","lyric":"圣 @洁， @圣@ 洁，以圣洁妆饰敬拜@你。@@@@@ 愿 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"},
+        {"label":"Bridge","dx":577,"dy":52}
+      ]},
+      { "b": true, "line": [
+        {"chord":"C@@D/C@@B/D#@@@Em@@C@D@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"|| 6,·_ ( 6,__ 6, ) 7,·_ ( 7,__ 7, ) | 7,·_ ( 7,__ ! 7,_ ) 2_ ! 2·_ ( 1__ 1 ) | 4 3 2· 1_ | 3 - - 0_ 5,_ |","lyric":"尊贵、@荣耀、@ 权柄 @和能力，@ 都归全 能 神; @@@愿 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"}
+      ]},
+      [
+        {"chord":"C@@D/C@@B/D#@@@Em@@C@D@G @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @","n":"6,·_ ( 6,__ 6, ) 7,·_ ( 7,__ 7, ) | 7,·_ ( 7,__ ! 7,_ ) 2_ ! 2·_ ( 1__ 1 ) | 4 3 2· 1_ | 3 - - 1__ 2·_ ||","lyric":"各族、 @各方、@ 万国 @和万邦， @敬拜神 羔羊。 @@祢是 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @"},
+        {"label":"To Chorus","style":"jump","dx":552,"dy":27}
+      ]
+    ]
+  }
+]
+}
