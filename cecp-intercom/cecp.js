@@ -1397,19 +1397,19 @@
     var setParam = '';
     try { setParam = new URLSearchParams(location.search).get('set') || ''; } catch (err) {}
     this.liveSongs = String(d.songs || setParam || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean);
-    this.songsBase = String(d.songsBase || 'https://cye04.github.io/Cecp').replace(/\/+$/, '');
+    this.songsBase = String(d.songsBase || 'https://cye04.github.io/songs').replace(/\/+$/, '');
     this.musiclibBase = String(d.musiclibBase || 'https://musiclib.cecp.it').replace(/\/+$/, '');
     /* musiclib 的访问 key（在页面源码里可见，只是轻量门槛，不是密码） */
     this.musiclibKey = ('musiclibKey' in d) ? String(d.musiclibKey || '').trim() : 'cecp2026';
     /* 曲库文件清单（实时枚举 GitHub，新加的诗歌才选得到） */
-    this.libApi = String(d.libApi || 'https://api.github.com/repos/CYE04/Cecp/contents/songs');
+    this.libApi = String(d.libApi || 'https://api.github.com/repos/CYE04/songs/contents');
     this.library = null;
     /* 可移调真谱渲染器（youth-engine），不给就只显示谱图。
        ⚠️ 默认地址必须带版本号：youth-engine.js 是直接 <script src> 加载的，
        不带 ?v= 浏览器会一直用缓存里的旧引擎 —— 表现成「youth 的谱跟 musiclib 不一样」
        （musiclib 那边有完整的版本链，改了就更新；youth 这边没有，就一直是旧的）。
        改了 youth-engine.js 就把这个日期串往上抬一位。 */
-    this.scoreEngine = ('scoreEngine' in d) ? String(d.scoreEngine || '').trim() : (this.songsBase + '/youth-engine.js?v=20261014-chord2');
+    this.scoreEngine = ('scoreEngine' in d) ? String(d.scoreEngine || '').trim() : 'https://cye04.github.io/Cecp/youth-engine.js?v=20261017-songs-repo';
     var liveTitle = '';
     try { liveTitle = new URLSearchParams(location.search).get('title') || ''; } catch (err) {}
     this.liveTitle = String(d.liveTitle || liveTitle || '敬拜现场');
@@ -3148,8 +3148,10 @@
     if (this._libPromise) return this._libPromise;
 
     var LIST_TTL = 60 * 60 * 1000;
-    var titleCache = parseJsonMaybe(lsGet('cecp2:libtitles')) || {};
-    var listCache = parseJsonMaybe(lsGet('cecp2:liblist'));
+    var titleCacheKey = 'cecp2:libtitles:' + this.libApi + ':' + this.songsBase;
+    var listCacheKey = 'cecp2:liblist:' + this.libApi;
+    var titleCache = parseJsonMaybe(lsGet(titleCacheKey)) || {};
+    var listCache = parseJsonMaybe(lsGet(listCacheKey));
     var fresh = listCache && listCache.ts && (Date.now() - listCache.ts < LIST_TTL) && Array.isArray(listCache.ids);
 
     var idsPromise = fresh
@@ -3160,7 +3162,7 @@
             var ids = (files || [])
               .filter(function (f) { return f && f.type === 'file' && /\.json$/i.test(f.name); })
               .map(function (f) { return f.name.replace(/\.json$/i, ''); });
-            lsSet('cecp2:liblist', JSON.stringify({ ts: Date.now(), ids: ids }));
+            lsSet(listCacheKey, JSON.stringify({ ts: Date.now(), ids: ids }));
             return ids;
           })
           .catch(function () { return (listCache && listCache.ids) || []; });   /* 取不到就用旧的 */
@@ -3170,14 +3172,14 @@
       if (!missing.length) return ids.map(function (id) { return titleCache[id]; });
       /* 只拉没见过的歌名，分批避免一次性太多请求 */
       return Promise.all(missing.map(function (id) {
-        return fetch(self.songsBase + '/songs/' + encodeURIComponent(id) + '.json')
+        return fetch(self.songsBase + '/' + encodeURIComponent(id) + '.json')
           .then(function (r) { return r.ok ? r.json() : null; })
           .then(function (s) {
             titleCache[id] = { id: id, title: (s && s.title) || id, key: (s && s.origKey) || '' };
           })
           .catch(function () { titleCache[id] = { id: id, title: id, key: '' }; });
       })).then(function () {
-        lsSet('cecp2:libtitles', JSON.stringify(titleCache));
+        lsSet(titleCacheKey, JSON.stringify(titleCache));
         return ids.map(function (id) { return titleCache[id]; });
       });
     }).then(function (list) {
@@ -3222,7 +3224,7 @@
       out.img = ref; out.title = '谱图'; out.id = '';
       return Promise.resolve(out);
     }
-    return fetch(this.songsBase + '/songs/' + encodeURIComponent(ref) + '.json')
+    return fetch(this.songsBase + '/' + encodeURIComponent(ref) + '.json')
       .then(function (r) { if (!r.ok) throw new Error('404'); return r.json(); })
       .then(function (song) {
         out.title = song.title || ref;
