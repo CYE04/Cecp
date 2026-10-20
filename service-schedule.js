@@ -18,7 +18,7 @@
     }
   })();
 
-  var TYPE_ORDER = ['青年团契', '主日下午', '主日晚上', '祷告会'];
+  var TYPE_ORDER = ['主日下午', '主日晚上', '青年团契', '祷告会'];
   var WEEK_ORDER = ['第一周', '第二周', '第三周', '第四周', '第五周'];
   var EXPORT_ITEMS = [
     { key: 'all', label: '全部合并' },
@@ -550,6 +550,102 @@
   .cec-badge{font-size:10px;padding:5px 10px}
   .cec-zoombar{display:flex}
   }
+#cecp-schedule{min-width:0;container-type:inline-size;container-name:cecp-schedule}
+#cecp-schedule .cec-btn:focus-visible,#cecp-schedule select:focus-visible,.cec-preview button:focus-visible{outline:2px solid var(--cec-ref);outline-offset:2px}
+.cec-controls{display:flex;gap:10px;flex-wrap:wrap;padding:12px;background:var(--cec-bg2);border-bottom:1px solid var(--cec-border)}
+.cec-week-controls,.cec-view-controls,.cec-person-controls{display:flex;align-items:center;gap:6px;min-width:0}
+.cec-person-controls{margin-left:auto}
+.cec-control{min-height:40px;padding:8px 12px;border:1px solid var(--cec-border);border-radius:9px;background:var(--cec-btn-bg);color:var(--cec-ink2);font-size:13px;font-weight:700}
+.cec-control.on{background:var(--cec-active);border-color:var(--cec-active-border);color:var(--cec-ink)}
+.cec-controls select{min-width:0;max-width:100%;height:40px;padding:0 8px;border:1px solid var(--cec-border);border-radius:9px;background:var(--cec-bg);color:var(--cec-ink);font:inherit;font-size:13px}
+.cec-chevron{display:block;width:16px;height:16px;flex:none}
+.cec-label-short{display:none}
+.cec-week-picker{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;min-width:0;border:1px solid var(--cec-border);border-radius:9px;background:var(--cec-bg);overflow:hidden}
+.cec-week-picker #scheduleWeek{border:0;border-radius:0;text-align:center;text-align-last:center;appearance:none;padding:0 3px;width:100%;height:38px}
+.cec-week-arrow{width:36px;height:38px;background:transparent;color:var(--cec-ink2)}
+.cec-week-arrow:hover{background:var(--cec-hover)}
+.cec-btn:disabled{cursor:default}
+.cec-date{display:block;margin-top:5px;font-size:11px;font-weight:500;color:var(--cec-ink3)}
+.cec-view-caption{padding:12px 16px 0;color:var(--cec-ink2);font-size:13px;line-height:1.5}
+.cec-cards{display:grid;gap:14px;padding:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));align-items:start}
+.cec-week-card{min-width:0;border:1px solid var(--cec-border);border-radius:12px;overflow:hidden;background:var(--cec-bg2)}
+.cec-card-head{padding:14px 16px;background:var(--cec-bg3);border-bottom:1px solid var(--cec-border)}
+.cec-card-head h3{margin:0;font-size:16px;line-height:1.5;color:var(--cec-ink);font-weight:800}
+.cec-card-head p{margin:4px 0 0;font-size:12px;line-height:1.5;color:var(--cec-ink2)}
+.cec-week-card dl{margin:0;padding:0 14px}
+.cec-detail{display:grid;grid-template-columns:88px minmax(0,1fr);gap:10px;align-items:center;min-height:52px;padding:10px 0;border-bottom:1px solid var(--cec-border)}
+.cec-detail:last-child{border-bottom:0}
+.cec-detail-label{font-size:12px;font-weight:700;line-height:1.6;color:var(--cec-ink2);overflow-wrap:anywhere}
+.cec-detail-value{min-width:0;margin:0;text-align:left;overflow-wrap:anywhere;color:var(--cec-ink)}
+.cec-detail-value .cec-cellbox{min-height:0;align-items:flex-start;height:auto;gap:5px}
+.cec-detail-value .cec-badges,.cec-detail-value .cec-note,.cec-detail-value .cec-reading{justify-content:flex-start;align-items:flex-start;gap:5px}
+.cec-detail-value .cec-note,.cec-detail-value .cec-reading{flex-direction:row;flex-wrap:wrap;align-items:center}
+.cec-detail-value .cec-badge{max-width:100%;min-height:30px;font-size:12px;padding:6px 9px;white-space:normal;overflow-wrap:anywhere}
+.cec-detail-value .cec-badge-txt{white-space:normal;overflow-wrap:anywhere;display:block}
+.cec-card-empty{padding:26px 12px;text-align:center;color:var(--cec-ink2);font-size:14px;line-height:1.8}
+.cec-preview-mask{position:fixed;inset:0;z-index:10000;background:rgba(10,13,18,.72);padding:16px;display:flex;align-items:center;justify-content:center;font-family:"PingFang SC","Noto Sans SC",system-ui,sans-serif}
+.cec-preview-mask *{box-sizing:border-box}
+.cec-preview{width:720px;max-width:100%;max-height:calc(100dvh - 32px);overflow:auto;border-radius:14px;background:var(--cec-bg);color:var(--cec-ink);outline:none}
+.cec-preview-toolbar,.cec-preview-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 16px;background:var(--cec-bg2);position:sticky;z-index:1;top:0}
+.cec-preview-actions{top:auto;bottom:0;border-top:1px solid var(--cec-border);font-size:12px;color:var(--cec-ink2)}
+.cec-share-sheet{--cec-bg:#f4f6f9;--cec-bg2:#fff;--cec-bg3:#f0f2f6;--cec-border:#d0d5df;--cec-ink:#1a1d24;--cec-ink2:#5a6275;--cec-ref:#1a7a3c;--cec-npfx:#7a5500;background:#fff;color:#1a1d24;padding:20px;overflow-wrap:anywhere}
+.cec-share-sheet h2{font-size:22px;line-height:1.4;margin:0 0 6px}
+.cec-share-sheet>p{font-size:13px;margin:0;color:#5a6275}
+.cec-share-sheet .cec-cards{padding:18px 0;grid-template-columns:1fr}
+.cec-share-sheet .cec-share-foot{font-size:11px;text-align:right}
+@container cecp-schedule (max-width:760px){
+  .cec-label-long{display:none}
+  .cec-label-short{display:inline}
+  .cec-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px}
+  .cec-top .cec-nav{display:grid;width:100%;grid-template-columns:32px minmax(0,1fr) 32px;gap:4px}
+  .cec-nav #mPrevText,.cec-nav #mNextText{display:none}
+  .cec-nav .cec-btn-month.on{grid-column:2;grid-row:1;padding:0 4px;font-size:14px}
+  .cec-nav #mPrev{grid-column:1;grid-row:1}
+  .cec-nav #mNext{grid-column:3;grid-row:1}
+  .cec-top .cec-tools{width:auto;min-width:0;margin:0}
+  .cec-top .cec-btn-tool{height:34px;padding:0 10px;gap:5px;border-radius:9px;font-size:12px}
+  .cec-top .cec-btn-tool-icon{width:15px;height:15px}
+  .cec-top .cec-menu{left:auto;right:0;width:min(270px,calc(100vw - 52px));min-width:0}
+  .cec-typebar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:8px 10px}
+  .cec-typebar .cec-btn-type{min-height:40px;padding:0 4px;font-size:12px;gap:4px}
+  .cec-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px}
+  .cec-week-controls{display:grid;grid-template-columns:46px minmax(0,1fr);grid-column:1/-1}
+  .cec-view-controls{display:grid;grid-template-columns:repeat(2,40px);gap:4px;grid-column:2;grid-row:2}
+  .cec-person-controls{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:4px;margin:0;grid-column:1;grid-row:2}
+  .cec-control{padding:8px 6px}
+  .cec-cards{padding:10px;gap:10px;grid-template-columns:minmax(0,1fr)}
+  .cec-card-head{padding:12px}
+  .cec-week-card dl{padding:0 12px}
+  .cec-detail{grid-template-columns:76px minmax(0,1fr);gap:8px}
+  .cec-preview-mask{padding:8px}
+  .cec-preview{max-height:calc(100dvh - 16px)}
+  .cec-share-sheet{padding:14px}
+}
+@media(max-width:760px){.cec-preview-mask{padding:8px}.cec-preview{max-height:calc(100dvh - 16px)}.cec-share-sheet{padding:14px}}
+
+.cec-is-matrix .cec-week-controls,.cec-is-matrix .cec-view-controls{display:none}
+@container cecp-schedule (max-width:760px){
+  .cec-is-matrix .cec-person-controls{grid-row:1;grid-column:1/-1;grid-template-columns:minmax(0,1fr) 88px}
+  .cec-is-matrix .cec-person-controls .cec-label-long{display:inline}
+  .cec-is-matrix .cec-person-controls .cec-label-short{display:none}
+  .cec-is-matrix .cec-zoombar{justify-content:flex-end;padding:3px 10px;background:var(--cec-bg2)}
+  .cec-is-matrix .cec-btn-zoom{width:auto;height:28px;padding:0 4px;border:0;border-radius:4px;background:transparent;font-size:11px;font-weight:500}
+  .cec-month-table{overflow-x:visible}
+  .cec-month-table .cec-tbl{width:100%;min-width:0;table-layout:fixed}
+  .cec-month-table col:first-child{width:20%!important}
+  .cec-month-table col:not(:first-child){width:calc(80% / var(--cec-week-columns))!important}
+  .cec-month-table .cec-corner,.cec-month-table .cec-h{padding:10px 2px;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+  .cec-month-table .cec-date{font-size:10px;margin-top:2px;white-space:nowrap}
+  .cec-month-table .cec-rowlbl{padding:9px 3px;text-align:center;font-size:10px;line-height:1.6;white-space:normal;overflow-wrap:anywhere}
+  .cec-month-table .cec-cell{min-width:0;height:auto;padding:7px 2px;vertical-align:middle}
+  .cec-month-table .cec-cellbox{min-height:38px;gap:4px;justify-content:center}
+  .cec-month-table .cec-badges{flex-direction:column;gap:4px}
+  .cec-month-table .cec-badge{max-width:100%;min-height:25px;padding:5px 2px;font-size:clamp(10px,3.6cqw,12px);line-height:1.45;white-space:normal;overflow-wrap:anywhere;text-align:center}
+  .cec-month-table .cec-badge-txt{display:block;white-space:normal;overflow-wrap:anywhere;line-height:inherit}
+  .cec-month-table .cec-note,.cec-month-table .cec-reading{gap:4px;min-width:0;overflow-wrap:anywhere}
+  .cec-month-table .cec-ref,.cec-month-table .cec-npfx{font-size:10px;line-height:1.5;max-width:100%;overflow-wrap:anywhere}
+}
+@media(prefers-reduced-motion:reduce){#cecp-schedule .cec-badge,#cecp-schedule .cec-btn{transition:none}}
 `;
     document.head.appendChild(st);
   }
@@ -588,9 +684,21 @@
       byMonth[m].push(r);
     });
 
+    // Keep the upcoming Sunday visible even before its month's roster is published.
+    var today = new Date();
+    var upcomingSunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (7 - today.getDay()) % 7, 12);
+    var upcomingMonth = upcomingSunday.getFullYear() + '年' + (upcomingSunday.getMonth() + 1) + '月';
+    if (!byMonth[upcomingMonth]) byMonth[upcomingMonth] = [];
     var months = Object.keys(byMonth).sort(function (a, b) { return ymOrd(a) - ymOrd(b); });
-    var activeMonthIdx = pickCurrentMonth(months);
-    var activeType = '青年团契';
+    var activeMonthIdx = pickScheduleMonth(months);
+    var activeType = readPreference('type');
+    if (TYPE_ORDER.indexOf(activeType) < 0) activeType = '主日下午';
+    var selectedName = readPreference('name');
+    var names = scheduleNames(rows);
+    if (names.indexOf(selectedName) < 0) selectedName = '';
+    var personalView = false;
+    var activeView = 'matrix';
+    var activeWeek = currentSundayWeek(months[activeMonthIdx]);
     var exportMenuOpen = false;
     var exportBusy = false;
     var activeRatio = '4:3';
@@ -616,11 +724,11 @@
       var monthRows = byMonth[month] || [];
 
       var nav = '<div class="cec-nav">';
-      if (activeMonthIdx > 0) nav += '<button class="cec-btn cec-btn-arr" id="mPrev">←</button>';
+      if (activeMonthIdx > 0) nav += '<button type="button" class="cec-btn cec-btn-arr" id="mPrev" aria-label="上个月">' + scheduleChevron(false) + '</button>';
       if (activeMonthIdx > 0) nav += '<button class="cec-btn cec-btn-month" id="mPrevText">' + esc(months[activeMonthIdx - 1]) + '</button>';
       nav += '<button class="cec-btn cec-btn-month on">' + esc(month) + '</button>';
       if (activeMonthIdx < months.length - 1) nav += '<button class="cec-btn cec-btn-month" id="mNextText">' + esc(months[activeMonthIdx + 1]) + '</button>';
-      if (activeMonthIdx < months.length - 1) nav += '<button class="cec-btn cec-btn-arr" id="mNext">→</button>';
+      if (activeMonthIdx < months.length - 1) nav += '<button type="button" class="cec-btn cec-btn-arr" id="mNext" aria-label="下个月">' + scheduleChevron(true) + '</button>';
       nav += '</div>';
 
       var toolBtnText = exportBusy ? '导出中...' : '导出图片';
@@ -639,7 +747,7 @@
         '</div>' +
         '<div class="cec-menu-divider"></div>' +
         '<div class="cec-menu-title">选择要下载的内容</div>' +
-        EXPORT_ITEMS.map(function (item) {
+        [{key:'week',label:'当前周 · ' + activeType}, {key:'personal',label:'我的服事' + (selectedName ? ' · ' + selectedName : '（先选择姓名）')}].concat(EXPORT_ITEMS).map(function (item) {
           return '<button class="cec-btn cec-menu-item" type="button" data-export-target="' + esc(item.key) + '">' + esc(item.label) + '</button>';
         }).join('') +
         '</div>' +
@@ -651,15 +759,27 @@
       var typebar = '<div class="cec-typebar">';
       TYPE_ORDER.forEach(function (tp) {
         var c = TYPE_C[tp];
-        typebar += '<button class="cec-btn cec-btn-type' + (tp === activeType ? ' on' : '') + '" data-type="' + esc(tp) + '">' +
-          '<span class="cec-dot" style="background:' + c.accent + '"></span>' + esc(tp) +
+        typebar += '<button class="cec-btn cec-btn-type' + (tp === activeType ? ' on' : '') + '" data-type="' + esc(tp) + '" aria-label="' + esc(tp) + '">' +
+          '<span class="cec-dot" style="background:' + c.accent + '"></span><span class="cec-label-long">' + esc(tp) + '</span><span class="cec-label-short">' + esc({'主日下午':'下午','主日晚上':'晚上','青年团契':'青年','祷告会':'祷告会'}[tp]) + '</span>' +
           '</button>';
       });
       typebar += '</div>';
 
-      var body = activeType === '祷告会'
-        ? renderPrayerMatrix(monthRows)
-        : renderServiceMatrix(monthRows, activeType);
+      var body = personalView || activeView === 'week'
+        ? renderScheduleCards(monthRows, { type: activeType, week: activeWeek, name: personalView ? selectedName : '' })
+        : activeType === '祷告会' ? renderPrayerMatrix(monthRows, {adaptive:true}) : renderServiceMatrix(monthRows, activeType, {adaptive:true, trimEmptyRows:true, month: activeType === '青年团契' ? '' : month});
+      if (!monthRows.length) body = '<div class="cec-card-empty">本月服事安排尚未公布</div>';
+      var controls = '<div class="cec-controls">' +
+        '<div class="cec-week-controls"><button type="button" class="cec-btn cec-control" id="scheduleToday">本周</button>' +
+        '<div class="cec-week-picker"><button type="button" class="cec-btn cec-week-arrow" id="scheduleWeekPrev" aria-label="上一周"' + (activeWeek === WEEK_ORDER[0] && activeMonthIdx === 0 ? ' disabled' : '') + '>' + scheduleChevron(false) + '</button><select id="scheduleWeek" aria-label="选择周次">' + WEEK_ORDER.filter(function (week) { return !!sundayLabel(month, week); }).map(function (week) {
+          return '<option value="' + esc(week) + '"' + (week === activeWeek ? ' selected' : '') + '>' + esc(week + ' · ' + sundayLabel(month, week)) + '</option>';
+        }).join('') + '</select><button type="button" class="cec-btn cec-week-arrow" id="scheduleWeekNext" aria-label="下一周"' + (!sundayDate(month, WEEK_ORDER[WEEK_ORDER.indexOf(activeWeek) + 1]) && activeMonthIdx === months.length - 1 ? ' disabled' : '') + '>' + scheduleChevron(true) + '</button></div></div>' +
+        '<div class="cec-view-controls"><button type="button" class="cec-btn cec-control' + (!personalView && activeView === 'week' ? ' on' : '') + '" id="scheduleWeekly" aria-pressed="' + (!personalView && activeView === 'week') + '"><span class="cec-label-long">按周看</span><span class="cec-label-short">周卡</span></button>' +
+        '<button type="button" class="cec-btn cec-control' + (!personalView && activeView === 'matrix' ? ' on' : '') + '" id="scheduleMatrix" aria-pressed="' + (!personalView && activeView === 'matrix') + '"><span class="cec-label-long">月度总表</span><span class="cec-label-short">月表</span></button></div>' +
+        '<div class="cec-person-controls"><select id="scheduleName" aria-label="选择服事姓名"><option value="">选择我的姓名</option>' + names.map(function (name) {
+          return '<option value="' + esc(name) + '"' + (name === selectedName ? ' selected' : '') + '>' + esc(name) + '</option>';
+        }).join('') + '</select><button type="button" id="schedulePersonal" class="cec-btn cec-control' + (personalView ? ' on' : '') + '" aria-pressed="' + personalView + '"' + (!selectedName ? ' disabled' : '') + '><span class="cec-label-long">我的服事</span><span class="cec-label-short">我的</span></button></div></div>' +
+        (personalView ? '<div class="cec-view-caption">' + esc(selectedName) + ' · 本月全部聚会的服事</div>' : '');
 
       var zoombar = '<div class="cec-zoombar">' +
         '<button class="cec-btn cec-btn-zoom" id="zoomOpen" type="button">' +
@@ -667,19 +787,20 @@
         '<path d="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm9.5 16-4.4-4.4M10.5 8v5M8 10.5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>' +
         '</svg>点击放大查看</button></div>';
 
-      EL.innerHTML = top + typebar + zoombar + body;
+      EL.classList.toggle('cec-is-matrix', !personalView && activeView === 'matrix');
+      EL.innerHTML = top + typebar + controls + (!personalView && activeView === 'matrix' ? zoombar : '') + body;
 
       bind('#mPrev', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; render(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
       });
       bind('#mPrevText', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; render(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
       });
       bind('#mNext', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; render(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
       });
       bind('#mNextText', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; render(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
       });
       bind('#exportToggle', function (e) {
         if (exportBusy) return;
@@ -695,6 +816,8 @@
       EL.querySelectorAll('[data-type]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           activeType = this.getAttribute('data-type');
+          writePreference('type', activeType);
+          personalView = false;
           lockedName = null;
           exportMenuOpen = false;
           render();
@@ -716,13 +839,50 @@
         });
       });
 
+      bind('#scheduleWeekPrev', function () { moveWeek(-1); });
+      bind('#scheduleWeekNext', function () { moveWeek(1); });
+      bind('#scheduleToday', function () {
+        activeMonthIdx = pickScheduleMonth(months);
+        activeWeek = currentSundayWeek(months[activeMonthIdx]);
+        activeView = 'week'; personalView = false; render();
+      });
+      bind('#scheduleWeekly', function () { activeView = 'week'; personalView = false; render(); });
+      bind('#scheduleMatrix', function () { activeView = 'matrix'; personalView = false; render(); });
+      bind('#schedulePersonal', function () { personalView = !personalView; render(); });
+      EL.querySelector('#scheduleWeek').addEventListener('change', function () {
+        activeWeek = this.value; activeView = 'week'; personalView = false; render();
+      });
+      EL.querySelector('#scheduleName').addEventListener('change', function () {
+        selectedName = this.value; writePreference('name', selectedName);
+        personalView = !!selectedName; render();
+      });
       bindHighlight();
+    }
+
+    function moveWeek(direction) {
+      var next = WEEK_ORDER.indexOf(activeWeek) + direction;
+      if (next < 0 || !sundayDate(months[activeMonthIdx], WEEK_ORDER[next])) {
+        var monthIndex = activeMonthIdx + direction;
+        if (monthIndex < 0 || monthIndex >= months.length) return;
+        activeMonthIdx = monthIndex;
+        var weeks = WEEK_ORDER.filter(function (week) { return sundayDate(months[activeMonthIdx], week); });
+        activeWeek = direction > 0 ? weeks[0] : weeks[weeks.length - 1];
+      } else activeWeek = WEEK_ORDER[next];
+      activeView = 'week'; personalView = false; render();
     }
 
     function startExport(target) {
       if (exportBusy) return;
       var month = months[activeMonthIdx];
       var monthRows = byMonth[month] || [];
+      if (target === 'week' || target === 'personal') {
+        if (target === 'personal' && !selectedName) {
+          exportMenuOpen = false; render(); EL.querySelector('#scheduleName').focus(); return;
+        }
+        exportMenuOpen = false; render();
+        openSchedulePreview(month, monthRows, {type: activeType, week: activeWeek, name: target === 'personal' ? selectedName : ''});
+        return;
+      }
       var types = target === 'all'
         ? TYPE_ORDER.filter(function (tp) { return hasTypeRows(monthRows, tp); })
         : [target];
@@ -750,6 +910,139 @@
     }
   }
 
+  function scheduleChevron(next) {
+    return '<svg class="cec-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (next ? 'm9 6 6 6-6 6' : 'm15 6-6 6 6 6') + '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  function readPreference(key) {
+    try { return localStorage.getItem('cecp-schedule-' + key) || ''; } catch (_) { return ''; }
+  }
+
+  function writePreference(key, value) {
+    try { localStorage.setItem('cecp-schedule-' + key, value); } catch (_) {}
+  }
+
+  function assignmentNames(kind, value) {
+    value = tv(value);
+    if (kind === 'reading') value = parseReading(value).name;
+    if (kind === 'note') value = /^证道[：:]\s*(.+)$/.test(value) ? value.replace(/^证道[：:]\s*/, '') : '';
+    return value.split(/[\/\n]/).map(tv).filter(Boolean);
+  }
+
+  function scheduleNames(rows) {
+    var names = new Set();
+    rows.forEach(function (row) {
+      var defs = row.type === '祷告会' ? [{key:'leader', kind:'badges'}] : serviceRowsForType(row.type);
+      defs.forEach(function (def) { assignmentNames(def.kind, row[def.key]).forEach(function (name) { names.add(name); }); });
+    });
+    return Array.from(names).sort(function (a, b) { return a.localeCompare(b, 'zh-CN'); });
+  }
+
+  function sundayDate(month, week) {
+    var match = tv(month).match(/^(\d{4})年(\d{1,2})月$/);
+    var index = WEEK_ORDER.indexOf(week);
+    if (!match || index < 0) return null;
+    var first = new Date(Number(match[1]), Number(match[2]) - 1, 1, 12);
+    var date = new Date(first.getFullYear(), first.getMonth(), 1 + (7 - first.getDay()) % 7 + index * 7, 12);
+    return date.getMonth() === first.getMonth() ? date : null;
+  }
+
+  function sundayLabel(month, week) {
+    var date = sundayDate(month, week);
+    return date ? (date.getMonth() + 1) + '月' + date.getDate() + '日 周日' : '';
+  }
+
+  function pickScheduleMonth(months) {
+    var now = new Date();
+    var sunday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (7 - now.getDay()) % 7, 12);
+    var label = sunday.getFullYear() + '年' + (sunday.getMonth() + 1) + '月';
+    var index = months.indexOf(label);
+    return index >= 0 ? index : pickCurrentMonth(months);
+  }
+
+  function currentSundayWeek(month) {
+    var now = new Date();
+    var sunday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (7 - now.getDay()) % 7, 12);
+    var week = WEEK_ORDER.find(function (value) {
+      var date = sundayDate(month, value);
+      return date && date.getTime() === sunday.getTime();
+    });
+    if (week) return week;
+    var available = WEEK_ORDER.filter(function (value) { return sundayDate(month, value); });
+    if (!available.length) return WEEK_ORDER[0];
+    return ymOrd(month) <= now.getFullYear() * 100 + now.getMonth() + 1 ? available[available.length - 1] : available[0];
+  }
+
+  function renderScheduleCards(rows, options) {
+    var items = options.name ? rows.slice() : rows.filter(function (row) {
+      return tv(row.week) === options.week && tv(row.type) === options.type;
+    });
+    if (!options.name && options.type === '祷告会') {
+      var sunday = rows.find(function (row) { return row.type === '主日下午' && row.week === options.week && tv(row.prayerLeader); });
+      if (sunday) items.push({month:sunday.month, week:sunday.week, type:'祷告会', subtype:'周日下午祷告会', leader:sunday.prayerLeader, time:sunday.time});
+    }
+    items.sort(function (a, b) {
+      return WEEK_ORDER.indexOf(a.week) - WEEK_ORDER.indexOf(b.week) || TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type);
+    });
+    var cards = items.map(function (row) {
+      var defs = row.type === '祷告会' ? [{key:'leader', label:'祷告会带领', kind:'badges'}, {key:'time', label:'时间', kind:'text'}] : serviceRowsForType(row.type);
+      if (options.name && !defs.some(function (def) { return assignmentNames(def.kind, row[def.key]).indexOf(options.name) >= 0; })) return '';
+      defs = defs.filter(function (def) {
+        return tv(row[def.key]) && (!options.name || def.kind === 'text' || assignmentNames(def.kind, row[def.key]).indexOf(options.name) >= 0);
+      });
+      if (options.name && !defs.length) return '';
+      var details = defs.map(function (def) {
+        var content = def.kind === 'text' ? '<div class="cec-cellbox">' + esc(row[def.key]) + '</div>' : renderMatrixCell(def.kind === 'note' && /^证道[：:]/.test(tv(row[def.key])) ? 'badges' : def.kind, def.kind === 'note' ? tv(row[def.key]).replace(/^证道[：:]\s*/, '') : row[def.key]).replace(/^<td[^>]*>|<\/td>$/g, '');
+        return '<div class="cec-detail"><dt class="cec-detail-label">' + esc(def.label) + '</dt><dd class="cec-detail-value">' + content + '</dd></div>';
+      }).join('');
+      var date = row.type === '主日下午' || row.type === '主日晚上' || row.subtype === '周日下午祷告会' ? sundayLabel(row.month, row.week) : '';
+      return '<article class="cec-week-card"><header class="cec-card-head"><div><h3>' + esc(row.subtype || row.type) + '</h3><p>' + esc(row.week + (date ? ' · ' + date : '')) + '</p></div></header><dl>' +
+        (details || '<div class="cec-card-empty">本周服事人员尚未填写</div>') + '</dl></article>';
+    }).join('');
+    return '<div class="cec-cards">' + (cards || '<div class="cec-card-empty">' + (options.name ? '本月暂无你的服事安排' : esc(options.week) + '暂无' + esc(options.type) + '安排，请选择其他周次') + '</div>') + '</div>';
+  }
+
+  function openSchedulePreview(month, rows, options) {
+    if (document.querySelector('.cec-preview-mask')) return;
+    var mask = document.createElement('div');
+    mask.className = 'cec-preview-mask';
+    var title = options.name ? options.name + ' · 我的服事' : options.week + ' · ' + options.type;
+    mask.innerHTML = '<section class="cec-preview" role="dialog" aria-modal="true" aria-label="导出预览" tabindex="-1"><div class="cec-preview-toolbar"><strong>导出预览</strong><button class="cec-btn cec-control cec-preview-close" type="button">关闭</button></div><div class="cec-share-sheet"><h2>' + esc(month) + '</h2><p>' + esc(title) + '</p>' + renderScheduleCards(rows, options) + '<p class="cec-share-foot">生成于 ' + esc(new Date().toLocaleString('zh-CN', {timeZone:'Europe/Rome'})) + '</p></div><div class="cec-preview-actions"><span role="status">确认内容后保存图片</span><button class="cec-btn cec-control cec-preview-save" type="button">保存图片</button></div></section>';
+    var previousFocus = document.activeElement;
+    var previousOverflow = document.body.style.overflow;
+    document.body.appendChild(mask); document.body.style.overflow = 'hidden';
+    var dialog = mask.querySelector('.cec-preview');
+    dialog.focus();
+    function close() {
+      if (mask.querySelector('.cec-preview-save').disabled) return;
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow; mask.remove();
+      if (previousFocus && previousFocus.isConnected) previousFocus.focus();
+    }
+    function onKey(event) {
+      if (event.key === 'Escape') close();
+      if (event.key !== 'Tab') return;
+      var buttons = Array.from(dialog.querySelectorAll('button:not(:disabled)'));
+      if (!buttons.length) { event.preventDefault(); return; }
+      if (event.shiftKey && (document.activeElement === buttons[0] || document.activeElement === dialog)) { event.preventDefault(); buttons[buttons.length - 1].focus(); }
+      else if (!event.shiftKey && (document.activeElement === buttons[buttons.length - 1] || document.activeElement === dialog)) { event.preventDefault(); buttons[0].focus(); }
+    }
+    document.addEventListener('keydown', onKey);
+    mask.querySelector('.cec-preview-close').onclick = close;
+    mask.onclick = function (event) { if (event.target === mask) close(); };
+    mask.querySelector('.cec-preview-save').onclick = function () {
+      var button = this, status = mask.querySelector('[role="status"]');
+      button.disabled = true; status.textContent = '正在生成图片…';
+      var sheet = mask.querySelector('.cec-share-sheet');
+      var host = document.createElement('div'); host.className = 'cec-export-shot';
+      var copy = sheet.cloneNode(true); copy.style.width = '680px'; host.appendChild(copy); document.body.appendChild(host);
+      var fonts = document.fonts ? document.fonts.ready : Promise.resolve();
+      fonts.then(waitPaint2).then(function () { return nodeToPngBlobRobust(copy, '#ffffff'); }).then(function (blob) {
+        saveBlobAs(blob, safeFileName(month + '_' + title) + '.png'); status.textContent = '图片已保存';
+      }).catch(function () { status.textContent = '生成失败，请重试'; }).finally(function () { host.remove(); button.disabled = false; });
+    };
+  }
+
   function renderServiceMatrix(rows, type, opt) {
     opt = opt || {};
     var filtered = rows.filter(function (r) { return tv(r.type) === type; });
@@ -768,12 +1061,13 @@
       '</colgroup>';
 
     var thead = '<thead><tr><th class="cec-corner">服事安排</th>' +
-      weeks.map(function (w) { return '<th class="cec-h">' + esc(w) + '</th>'; }).join('') +
+      weeks.map(function (w) { return '<th class="cec-h">' + esc(w) + (opt.month && sundayDate(opt.month, w) ? '<small class="cec-date" title="' + esc(sundayLabel(opt.month, w)) + '">' + (sundayDate(opt.month, w).getMonth() + 1) + '/' + sundayDate(opt.month, w).getDate() + '</small>' : '') + '</th>'; }).join('') +
       '</tr></thead>';
 
     var tbody = '<tbody>';
     rowDefs.forEach(function (rowDef) {
-      tbody += '<tr><td class="cec-rowlbl">' + esc(rowDef.label) + '</td>';
+      var shortLabel = {leader:'主领', worship:'敬拜', prayerLeader:'祷告带领'}[rowDef.key] || rowDef.label;
+      tbody += '<tr><td class="cec-rowlbl">' + (opt.adaptive ? '<span class="cec-label-long">' + esc(rowDef.label) + '</span><span class="cec-label-short">' + esc(shortLabel) + '</span>' : esc(rowDef.label)) + '</td>';
 
       weeks.forEach(function (w) {
         var item = filtered.find(function (r) { return tv(r.week) === w; });
@@ -785,7 +1079,7 @@
     });
     tbody += '</tbody>';
 
-    return '<div class="cec-wrap"><table class="cec-tbl">' + cg + thead + tbody + '</table></div>';
+    return '<div class="cec-wrap' + (opt.adaptive ? ' cec-month-table' : '') + '" style="--cec-week-columns:' + weeks.length + '"><table class="cec-tbl">' + cg + thead + tbody + '</table></div>';
   }
 
   function renderPrayerMatrix(rows, opt) {
@@ -831,7 +1125,7 @@
     });
     tbody += '</tbody>';
 
-    return '<div class="cec-wrap"><table class="cec-tbl">' + cg + thead + tbody + '</table></div>';
+    return '<div class="cec-wrap' + (opt.adaptive ? ' cec-month-table' : '') + '" style="--cec-week-columns:' + cols.length + '"><table class="cec-tbl">' + cg + thead + tbody + '</table></div>';
   }
 
   function renderPrayerCell(item, opt) {
@@ -1005,12 +1299,13 @@
       });
     });
 
-    EL.addEventListener('click', function () {
+    EL.onclick = function () {
       if (lockedName) {
         lockedName = null;
         clearHighlight();
       }
-    });
+    };
+    if (lockedName) applyHighlight(lockedName, true);
   }
 
   function applyHighlight(name, locked) {
@@ -1168,7 +1463,7 @@
       '</colgroup>';
 
     var thead = '<thead><tr><th class="cec-corner">聚会</th><th class="cec-h">项目</th>' +
-      weeks.map(function (w) { return '<th class="cec-h">' + esc(w) + '</th>'; }).join('') +
+      weeks.map(function (w) { return '<th class="cec-h">' + esc(w) + (opt.month ? '<small class="cec-date">' + esc(sundayLabel(opt.month, w)) + '</small>' : '') + '</th>'; }).join('') +
       '</tr></thead>';
 
     var tbody = '<tbody>';
@@ -1288,7 +1583,8 @@
   function waitForNodeImages(node) {
     if (!node) return Promise.resolve();
     var imgs = Array.prototype.slice.call(node.querySelectorAll('img'));
-    var pending = imgs.filter(function (img) { return !img.complete || !img.naturalWidth; });
+    // A completed failed image has already fired its error event.
+    var pending = imgs.filter(function (img) { return !img.complete; });
     if (!pending.length) return Promise.resolve();
 
     return Promise.all(pending.map(function (img) {
