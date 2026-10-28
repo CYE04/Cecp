@@ -4018,11 +4018,14 @@ function renderNStr(nStr,opts){
   }
   return div;
 }
-var mtFitFrame=0,mtPreviewFitTimer=0;
+var mtFitFrame=0;
 function fitPreview(){
-  if(mtPreviewFitTimer)clearTimeout(mtPreviewFitTimer);mtPreviewFitTimer=0;
   if(mtFitFrame)return;
-  mtFitFrame=requestAnimationFrame(function(){
+  mtFitFrame=requestAnimationFrame(fitPreviewNow);
+}
+/* Row replacement and its final geometry must finish before the browser paints. */
+function fitPreviewNow(){
+    if(mtFitFrame)cancelAnimationFrame(mtFitFrame);
     mtFitFrame=0;
     var wrap=document.getElementById('previewWrap');
     var inner=wrap.querySelector('.prev-inner');
@@ -4060,7 +4063,6 @@ function fitPreview(){
     inner.style.transform='translateX('+centerX.toFixed(1)+'px)'+(scale<1?(' scale('+scale+')'):'');
     inner.style.transformOrigin='left top';
     if(scale<1){var h=inner.offsetHeight;inner.style.marginBottom=(h*(scale-1))+'px';}
-  });
 }
 /* 网页字体(Space Mono / Noto Serif SC)是异步加载的：justify 与量宽若在字体到位前跑，
    量到的是回退字体的宽度，字体一到行宽就变、两端对齐就散了（实测各行差十几 px）。
@@ -4359,10 +4361,7 @@ function flushPreview(){
     Array.prototype.forEach.call(old,function(node){node.remove();});
   }
   normalizePreviewRowHeights(null,changed);
-  if(changed.length){
-    if(mtPreviewFitTimer)clearTimeout(mtPreviewFitTimer);
-    mtPreviewFitTimer=setTimeout(fitPreview,100);
-  }
+  if(changed.length)fitPreviewNow();
   scheduleCode();
   updateStrictUi();
 }
@@ -4468,7 +4467,7 @@ function renderPreview(){
   });
   wrap.appendChild(inner);
   normalizePreviewRowHeights(inner);
-  fitPreview();
+  fitPreviewNow();
   renderCode();
   updateStrictUi();
 }
