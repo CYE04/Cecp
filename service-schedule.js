@@ -8,12 +8,13 @@
   var EL = document.getElementById('cecp-schedule');
   if (!EL) return;
 
-  var DEFAULT_API = 'https://script.google.com/macros/s/AKfycbxJaY7RxxThCIGMeuxnlPW7diAJs0M34b5lK8Qn_CzxbIbCZY3AeuYKJadPF8gsLpvK/exec';
+  var SHEET_ID = '1o0FkHnVtvKCZwjIhzPEHSEW-3oZeNsJnh68Qs3GU0TQ';
+  var NEW_API = 'https://script.google.com/macros/s/AKfycbxJaY7RxxThCIGMeuxnlPW7diAJs0M34b5lK8Qn_CzxbIbCZY3AeuYKJadPF8gsLpvK/exec';
+  var OLD_API = 'https://script.google.com/macros/s/AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX/exec';
   var rawApi = (EL.dataset.api || '').trim();
-  if (!rawApi || rawApi.indexOf('AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX') >= 0) {
-    rawApi = DEFAULT_API;
-  }
-  var API = rawApi;
+  var API = (!rawApi || rawApi.indexOf('AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX') >= 0)
+    ? NEW_API
+    : rawApi;
   var LOGO_SRC = (function () {
     try {
       var cur = document.currentScript && document.currentScript.src ? new URL(document.currentScript.src, location.href) : null;
@@ -746,20 +747,12 @@
     return;
   }
 
-  fetch(API + '?action=all&_ts=' + Date.now(), { cache: 'no-store' })
-    .then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    })
-    .then(function (res) {
-      if (!res.ok) throw new Error(res.error || '脚本错误');
-      return enrichRowsWithSoundFromSheets(res.data || []);
-    })
+  loadScheduleWithFogli()
     .then(function (rows) {
       boot(rows);
     })
     .catch(function (e) {
-      EL.innerHTML = '<div class="cec-err">⚠ ' + esc(e.message) + '</div>';
+      EL.innerHTML = '<div class="cec-err">⚠ ' + esc(e && e.message ? e.message : '加载失败') + '</div>';
     });
 
   function fetchTextWithTimeout(url, ms) {
@@ -767,8 +760,8 @@
       var done = false;
       var timer = setTimeout(function () {
         if (!done) { done = true; resolve(''); }
-      }, ms || 4000);
-      fetch(url, { cache: 'no-store' })
+      }, ms || 5000);
+      fetch(url, { cache: 'no-store', credentials: 'omit' })
         .then(function (r) { return r.ok ? r.text() : ''; })
         .catch(function () { return ''; })
         .then(function (txt) {
@@ -781,9 +774,110 @@
     });
   }
 
+  function fetchApiRows(apiUrl, ms) {
+    if (!apiUrl) return Promise.resolve([]);
+    var sep = apiUrl.indexOf('?') >= 0 ? '&' : '?';
+    return fetchTextWithTimeout(apiUrl + sep + 'action=all&_ts=' + Date.now(), ms || 6000)
+      .then(function (txt) {
+        if (!txt) return [];
+        var res = JSON.parse(txt);
+        return (res && res.ok && Array.isArray(res.data)) ? res.data : [];
+      })
+      .catch(function () { return []; });
+  }
+
+  function normalizeGvizMonth(raw) {
+    var s = tv(raw);
+    var m = s.match(/^(\d{4})\s*年\s*(\d{1,2})\s*月$/);
+    if (m) return parseInt(m[1], 10) + '年' + parseInt(m[2], 10) + '月';
+    var md = s.match(/^Date\((\d{4}),\s*(\d{1,2}),/);
+    if (md) return parseInt(md[1], 10) + '年' + (parseInt(md[2], 10) + 1) + '月';
+    return '';
+  }
+
+  function parseGvizMainSchedule(text) {
+    var result = [];
+    if (!text || text.indexOf('"status":"ok"') < 0) return result;
+    var start = text.indexOf('{');
+    var end = text.lastIndexOf('}');
+    if (start < 0 || end <= start) return result;
+    var json;
+    try {
+      json = JSON.parse(text.slice(start, end + 1));
+    } catch (_) {
+      return result;
+    }
+    var tableRows = (json && json.table && json.table.rows) || [];
+    var blankStreak = 0;
+    var hasStarted = false;
+
+    for (var i = 0; i < tableRows.length; i++) {
+      var r = tableRows[i];
+      var cells = (r && r.c ? r.c : []).map(function (c) {
+        if (!c) return '';
+        return tv(c.f != null ? c.f : c.v);
+      });
+      var month = normalizeGvizMonth(cells[0]);
+      var week = tv(cells[1]);
+      var type = tv(cells[2]);
+      var subtype = tv(cells[3]);
+
+      if (!month) {
+        if (hasStarted) {
+          blankStreak++;
+          if (blankStreak >= 5) break;
+        }
+        continue;
+      }
+      hasStarted = true;
+      blankStreak = 0;
+      if (!week || !type) continue;
+
+      var vSound = tv(cells[16]);
+      var vPpt = tv(cells[17]);
+      var vBroadcast = tv(cells[18]);
+      if (vSound === '—' || vSound === '-') vSound = '';
+      if (vPpt === '—' || vPpt === '-') vPpt = '';
+      if (vBroadcast === '—' || vBroadcast === '-') vBroadcast = '';
+
+      result.push({
+        month: month,
+        week: week,
+        type: type,
+        subtype: subtype,
+        leader: tv(cells[4]),
+        worship: tv(cells[5]),
+        prayerLeader: tv(cells[6]),
+        praisePrayer: tv(cells[7]),
+        memorialPrayer: tv(cells[8]),
+        piano: tv(cells[9]),
+        drums: tv(cells[10]),
+        guitar: tv(cells[11]),
+        bass: tv(cells[12]),
+        reading: tv(cells[13]),
+        note: tv(cells[14]),
+        time: tv(cells[15]),
+        sound: vSound,
+        ppt: vPpt,
+        broadcast: vBroadcast
+      });
+    }
+
+    result.sort(function (a, b) {
+      var dm = ymOrd(a.month) - ymOrd(b.month); if (dm) return dm;
+      var dw = WEEK_ORDER.indexOf(a.week) - WEEK_ORDER.indexOf(b.week); if (dw) return dw;
+      var tord = { '主日下午': 0, '主日晚上': 1, '青年团契': 2, '祷告会': 3 };
+      var dt = (tord[a.type] == null ? 9 : tord[a.type]) - (tord[b.type] == null ? 9 : tord[b.type]); if (dt) return dt;
+      var sord = { '周三祷告会': 0, '周六祷告会': 1 };
+      return (sord[a.subtype] == null ? 9 : sord[a.subtype]) - (sord[b.subtype] == null ? 9 : sord[b.subtype]);
+    });
+
+    return result;
+  }
+
   function parseGvizSoundTable(text, defaultYear) {
     var map = {};
-    if (!text) return map;
+    if (!text || text.indexOf('"status":"ok"') < 0) return map;
     var start = text.indexOf('{');
     var end = text.lastIndexOf('}');
     if (start < 0 || end <= start) return map;
@@ -857,24 +951,46 @@
     return map;
   }
 
-  function enrichRowsWithSoundFromSheets(rows) {
-    if (!rows || !rows.length) return Promise.resolve(rows || []);
+  function loadScheduleWithFogli() {
+    var ts = Date.now();
+    var fogliMainUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent('服事安排') + '&_ts=' + ts;
+    var fogliSoundUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent('🎛 调音组安排') + '&_ts=' + ts;
 
-    var mainUrl = 'https://docs.google.com/spreadsheets/d/1o0FkHnVtvKCZwjIhzPEHSEW-3oZeNsJnh68Qs3GU0TQ/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent('🎛 调音组安排') + '&_ts=' + Date.now();
+    return Promise.all([
+      fetchTextWithTimeout(fogliMainUrl, 5000),
+      fetchTextWithTimeout(fogliSoundUrl, 5000)
+    ]).then(function (texts) {
+      var fogliRows = parseGvizMainSchedule(texts[0]);
+      var hasSoundSheet = texts[1] && texts[1].indexOf('"status":"ok"') >= 0;
+      var mapSound = hasSoundSheet ? parseGvizSoundTable(texts[1], 2026) : null;
 
-    return fetchTextWithTimeout(mainUrl, 4500).then(function (txt) {
-      if (!txt || txt.indexOf('"status":"ok"') < 0) return rows;
-      var mapMain = parseGvizSoundTable(txt, 2026);
-      rows.forEach(function (r) {
-        var key = tv(r.month) + '|' + tv(r.week) + '|' + tv(r.type);
-        var sm = mapMain[key];
-        r.sound = (sm && sm.sound) ? sm.sound : '';
-        r.ppt = (sm && sm.ppt) ? sm.ppt : '';
-        r.broadcast = (sm && sm.broadcast) ? sm.broadcast : '';
-      });
-      return rows;
-    }).catch(function () {
-      return rows;
+      function applySoundMap(rows) {
+        if (!mapSound) return rows;
+        rows.forEach(function (r) {
+          var key = tv(r.month) + '|' + tv(r.week) + '|' + tv(r.type);
+          var sm = mapSound[key];
+          r.sound = (sm && sm.sound) ? sm.sound : '';
+          r.ppt = (sm && sm.ppt) ? sm.ppt : '';
+          r.broadcast = (sm && sm.broadcast) ? sm.broadcast : '';
+        });
+        return rows;
+      }
+
+      if (fogliRows.length > 0) {
+        return applySoundMap(fogliRows);
+      }
+
+      // Fallback to Apps Script API (tries NEW_API first, then OLD_API)
+      return fetchApiRows(API, 6000)
+        .then(function (apiRows) {
+          if (apiRows.length > 0) return apiRows;
+          if (API !== OLD_API) return fetchApiRows(OLD_API, 6000);
+          return [];
+        })
+        .then(function (apiRows) {
+          if (!apiRows.length) throw new Error('无法从 Google 表格读取服事安排');
+          return applySoundMap(apiRows);
+        });
     });
   }
 
