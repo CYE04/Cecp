@@ -1066,7 +1066,7 @@
 
     var tbody = '<tbody>';
     rowDefs.forEach(function (rowDef) {
-      var shortLabel = {leader:'主领', worship:'敬拜', prayerLeader:'祷告带领'}[rowDef.key] || rowDef.label;
+      var shortLabel = {leader:'主领', worship:'敬拜', prayerLeader:'祷告带领', sound:'调音', ppt:'PPT', broadcast:'转播'}[rowDef.key] || rowDef.label;
       tbody += '<tr><td class="cec-rowlbl">' + (opt.adaptive ? '<span class="cec-label-long">' + esc(rowDef.label) + '</span><span class="cec-label-short">' + esc(shortLabel) + '</span>' : esc(rowDef.label)) + '</td>';
 
       weeks.forEach(function (w) {
@@ -1185,29 +1185,38 @@
         { key: 'guitar',         label: '吉他',        kind: 'badges' },
         { key: 'bass',           label: '贝斯',        kind: 'badges' },
         { key: 'reading',        label: '读经',        kind: 'reading' },
-        { key: 'note',           label: '证道',        kind: 'note' }
+        { key: 'note',           label: '证道',        kind: 'note' },
+        { key: 'sound',          label: '调音',        kind: 'badges' },
+        { key: 'ppt',            label: 'PPT播放',     kind: 'badges' },
+        { key: 'broadcast',      label: '转播和话筒',  kind: 'badges' }
       ];
     }
 
     if (type === '主日晚上') {
       return [
-        { key: 'leader',  label: '主领 / 带领', kind: 'badges' },
-        { key: 'worship', label: '敬拜带领',    kind: 'badges' },
-        { key: 'piano',   label: '司琴',        kind: 'badges' },
-        { key: 'drums',   label: '鼓',          kind: 'badges' },
-        { key: 'guitar',  label: '吉他',        kind: 'badges' },
-        { key: 'bass',    label: '贝斯',        kind: 'badges' },
-        { key: 'note',    label: '证道',        kind: 'note' }
+        { key: 'leader',    label: '主领 / 带领', kind: 'badges' },
+        { key: 'worship',   label: '敬拜带领',    kind: 'badges' },
+        { key: 'piano',     label: '司琴',        kind: 'badges' },
+        { key: 'drums',     label: '鼓',          kind: 'badges' },
+        { key: 'guitar',    label: '吉他',        kind: 'badges' },
+        { key: 'bass',      label: '贝斯',        kind: 'badges' },
+        { key: 'note',      label: '证道',        kind: 'note' },
+        { key: 'sound',     label: '调音',        kind: 'badges' },
+        { key: 'ppt',       label: 'PPT播放',     kind: 'badges' },
+        { key: 'broadcast', label: '转播和话筒',  kind: 'badges' }
       ];
     }
 
     return [
-      { key: 'worship', label: '敬拜带领', kind: 'badges' },
-      { key: 'piano',   label: '司琴',     kind: 'badges' },
-      { key: 'drums',   label: '鼓',       kind: 'badges' },
-      { key: 'guitar',  label: '吉他',     kind: 'badges' },
-      { key: 'bass',    label: '贝斯',     kind: 'badges' },
-      { key: 'note',    label: '证道 / 主题', kind: 'note' }
+      { key: 'worship',   label: '敬拜带领',    kind: 'badges' },
+      { key: 'piano',     label: '司琴',        kind: 'badges' },
+      { key: 'drums',     label: '鼓',          kind: 'badges' },
+      { key: 'guitar',    label: '吉他',        kind: 'badges' },
+      { key: 'bass',      label: '贝斯',        kind: 'badges' },
+      { key: 'note',      label: '证道 / 主题', kind: 'note' },
+      { key: 'sound',     label: '调音',        kind: 'badges' },
+      { key: 'ppt',       label: 'PPT播放',     kind: 'badges' },
+      { key: 'broadcast', label: '转播和话筒',  kind: 'badges' }
     ];
   }
 
