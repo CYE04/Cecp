@@ -905,7 +905,7 @@
         curMonth = parseInt(mFull[1], 10) + '年' + parseInt(mFull[2], 10) + '月';
         curType = '';
       } else {
-        var mShort = c1.match(/^(\d{1,2})\s*月\s*主日大堂调音/);
+        var mShort = c0.match(/(?:^|\D)(\d{1,2})\s*月(?:\s|$|主日)/) || c1.match(/^(\d{1,2})\s*月\s*主日大堂调音/);
         if (mShort) {
           curMonth = (defaultYear || 2026) + '年' + parseInt(mShort[1], 10) + '月';
           curType = '';
@@ -969,9 +969,9 @@
         rows.forEach(function (r) {
           var key = tv(r.month) + '|' + tv(r.week) + '|' + tv(r.type);
           var sm = mapSound[key];
-          r.sound = (sm && sm.sound) ? sm.sound : '';
-          r.ppt = (sm && sm.ppt) ? sm.ppt : '';
-          r.broadcast = (sm && sm.broadcast) ? sm.broadcast : '';
+          r.sound = tv(r.sound) || (sm && sm.sound) || '';
+          r.ppt = tv(r.ppt) || (sm && sm.ppt) || '';
+          r.broadcast = tv(r.broadcast) || (sm && sm.broadcast) || '';
         });
         return rows;
       }
