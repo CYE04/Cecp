@@ -786,37 +786,67 @@
       .catch(function () { return []; });
   }
 
+  function parseCsvRows(text) {
+    var rows = [];
+    if (!text || text.trim().charAt(0) === '<') return rows;
+    var curRow = [];
+    var curCell = '';
+    var inQuotes = false;
+    for (var i = 0; i < text.length; i++) {
+      var ch = text.charAt(i);
+      if (inQuotes) {
+        if (ch === '"') {
+          if (text.charAt(i + 1) === '"') {
+            curCell += '"';
+            i++;
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          curCell += ch;
+        }
+      } else {
+        if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ',') {
+          curRow.push(tv(curCell));
+          curCell = '';
+        } else if (ch === '\n' || ch === '\r') {
+          if (ch === '\r' && text.charAt(i + 1) === '\n') i++;
+          curRow.push(tv(curCell));
+          rows.push(curRow);
+          curRow = [];
+          curCell = '';
+        } else {
+          curCell += ch;
+        }
+      }
+    }
+    if (curCell.length > 0 || curRow.length > 0) {
+      curRow.push(tv(curCell));
+      rows.push(curRow);
+    }
+    return rows;
+  }
+
   function normalizeGvizMonth(raw) {
     var s = tv(raw);
-    var m = s.match(/^(\d{4})\s*年\s*(\d{1,2})\s*月$/);
+    var m = s.match(/(\d{4})\s*[年\/\-]\s*(\d{1,2})/);
     if (m) return parseInt(m[1], 10) + '年' + parseInt(m[2], 10) + '月';
     var md = s.match(/^Date\((\d{4}),\s*(\d{1,2}),/);
     if (md) return parseInt(md[1], 10) + '年' + (parseInt(md[2], 10) + 1) + '月';
     return '';
   }
 
-  function parseGvizMainSchedule(text) {
+  function parseCsvMainSchedule(csvText) {
     var result = [];
-    if (!text || text.indexOf('"status":"ok"') < 0) return result;
-    var start = text.indexOf('{');
-    var end = text.lastIndexOf('}');
-    if (start < 0 || end <= start) return result;
-    var json;
-    try {
-      json = JSON.parse(text.slice(start, end + 1));
-    } catch (_) {
-      return result;
-    }
-    var tableRows = (json && json.table && json.table.rows) || [];
+    var tableRows = parseCsvRows(csvText);
+    if (!tableRows.length) return result;
     var blankStreak = 0;
     var hasStarted = false;
 
     for (var i = 0; i < tableRows.length; i++) {
-      var r = tableRows[i];
-      var cells = (r && r.c ? r.c : []).map(function (c) {
-        if (!c) return '';
-        return tv(c.f != null ? c.f : c.v);
-      });
+      var cells = tableRows[i];
       var month = normalizeGvizMonth(cells[0]);
       var week = tv(cells[1]);
       var type = tv(cells[2]);
@@ -875,41 +905,37 @@
     return result;
   }
 
-  function parseGvizSoundTable(text, defaultYear) {
+  function parseCsvSoundTable(csvText, defaultYear) {
     var map = {};
-    if (!text || text.indexOf('"status":"ok"') < 0) return map;
-    var start = text.indexOf('{');
-    var end = text.lastIndexOf('}');
-    if (start < 0 || end <= start) return map;
-    var json;
-    try {
-      json = JSON.parse(text.slice(start, end + 1));
-    } catch (_) {
-      return map;
-    }
-    var tableRows = (json && json.table && json.table.rows) || [];
+    var tableRows = parseCsvRows(csvText);
+    if (!tableRows.length) return map;
     var curMonth = '';
+    var bannerMonth = '';
     var curType = '';
 
-    tableRows.forEach(function (r) {
-      var cells = (r && r.c ? r.c : []).map(function (c) {
-        if (!c) return '';
-        return tv(c.f != null ? c.f : c.v);
-      });
-      var c0 = cells[0] || '';
-      var c1 = cells[1] || '';
-      var c2 = cells[2] || '';
+    tableRows.forEach(function (cells) {
+      var c0 = tv(cells[0]);
+      var c1 = tv(cells[1]);
+      var c2 = tv(cells[2]);
 
-      var mFull = c0.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/) || c1.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/);
-      if (mFull) {
-        curMonth = parseInt(mFull[1], 10) + '年' + parseInt(mFull[2], 10) + '月';
-        curType = '';
-      } else {
+      var isBannerRow = (c1 === '聚会时段' || c2 === '服事岗位' || c0.indexOf('📅') >= 0);
+      var parsedM = normalizeGvizMonth(c0) || normalizeGvizMonth(c1);
+      if (!parsedM) {
         var mShort = c0.match(/(?:^|\D)(\d{1,2})\s*月(?:\s|$|主日)/) || c1.match(/^(\d{1,2})\s*月\s*主日大堂调音/);
-        if (mShort) {
-          curMonth = (defaultYear || 2026) + '年' + parseInt(mShort[1], 10) + '月';
-          curType = '';
-        }
+        if (mShort) parsedM = (defaultYear || 2026) + '年' + parseInt(mShort[1], 10) + '月';
+      }
+
+      if (isBannerRow) {
+        if (parsedM) bannerMonth = parsedM;
+        curMonth = '';
+        curType = '';
+        return;
+      }
+
+      if (parsedM) {
+        curMonth = parsedM;
+      } else if (!curMonth && bannerMonth) {
+        curMonth = bannerMonth;
       }
 
       if (c1.indexOf('主日学') >= 0) {
@@ -953,16 +979,15 @@
 
   function loadScheduleWithFogli() {
     var ts = Date.now();
-    var fogliMainUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent('服事安排') + '&_ts=' + ts;
-    var fogliSoundUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent('🎛 调音组安排') + '&_ts=' + ts;
+    var fogliMainUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent('服事安排') + '&_ts=' + ts;
+    var fogliSoundUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent('🎛 调音组安排') + '&_ts=' + ts;
 
     return Promise.all([
       fetchTextWithTimeout(fogliMainUrl, 5000),
       fetchTextWithTimeout(fogliSoundUrl, 5000)
     ]).then(function (texts) {
-      var fogliRows = parseGvizMainSchedule(texts[0]);
-      var hasSoundSheet = texts[1] && texts[1].indexOf('"status":"ok"') >= 0;
-      var mapSound = hasSoundSheet ? parseGvizSoundTable(texts[1], 2026) : null;
+      var fogliRows = parseCsvMainSchedule(texts[0]);
+      var mapSound = texts[1] ? parseCsvSoundTable(texts[1], 2026) : null;
 
       function applySoundMap(rows) {
         if (!mapSound) return rows;
