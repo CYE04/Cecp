@@ -64,6 +64,42 @@
   ];
 
   var lockedName = null;
+  var hiddenRoles = readHiddenRoles();
+
+  function readHiddenRoles() {
+    try {
+      var raw = localStorage.getItem('cecp-schedule-hidden-roles');
+      var parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function writeHiddenRoles(list) {
+    hiddenRoles = Array.isArray(list) ? list : [];
+    try { localStorage.setItem('cecp-schedule-hidden-roles', JSON.stringify(hiddenRoles)); } catch (_) {}
+  }
+
+  function isRoleHidden(key) {
+    return hiddenRoles.indexOf(key) >= 0;
+  }
+
+  function toggleRoleHidden(key) {
+    if (!key) return;
+    var next = hiddenRoles.slice();
+    var idx = next.indexOf(key);
+    if (idx >= 0) next.splice(idx, 1);
+    else next.push(key);
+    writeHiddenRoles(next);
+  }
+
+  function eyeIconSvg(off) {
+    if (off) {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.1A10.7 10.7 0 0 1 12 5c5 0 9.3 3.1 11 7.5a11.8 11.8 0 0 1-4 5.2M6.6 6.6A11.8 11.8 0 0 0 1 12.5C2.7 16.9 7 20 12 20c1.8 0 3.5-.4 5-1.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+  }
 
   if (!document.getElementById('_cecp_yearsafe_style_v2')) {
     var st = document.createElement('style');
@@ -206,10 +242,53 @@
   background:var(--cec-bg3);
   color:var(--cec-ink);
   font-size:13px;font-weight:800;
-  padding:14px 12px;
+  padding:14px 10px 14px 12px;
   vertical-align:middle;
   white-space:nowrap;
 }
+.cec-rowlbl-inner{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;
+}
+.cec-rowlbl-text{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.cec-row-hide{
+  width:22px;height:22px;padding:0;border-radius:6px;flex:none;
+  background:transparent;color:var(--cec-ink3);opacity:.35;
+}
+.cec-tbl tr:hover .cec-row-hide,.cec-detail:hover .cec-row-hide{opacity:.75}
+.cec-row-hide:hover{opacity:1!important;background:var(--cec-hover);color:var(--cec-ink)}
+.cec-row-hide svg{width:13px;height:13px;display:block}
+.cec-role-wrap{position:relative}
+.cec-role-menu{
+  position:absolute;right:0;top:calc(100% + 8px);z-index:25;display:none;flex-direction:column;
+  min-width:210px;max-height:340px;overflow-y:auto;padding:8px;border:1px solid var(--cec-border);
+  border-radius:14px;background:var(--cec-bg2);box-shadow:0 18px 36px rgba(18,24,38,.16);
+}
+.cec-role-wrap.open .cec-role-menu{display:flex}
+.cec-role-item{
+  width:100%;min-height:36px;padding:0 10px;border-radius:9px;border:1px solid transparent;
+  background:transparent;color:var(--cec-ink);justify-content:space-between;font-size:12px;font-weight:700;gap:8px;
+}
+.cec-role-item:hover{background:var(--cec-hover);border-color:var(--cec-border)}
+.cec-role-item.is-hidden{color:var(--cec-ink3);opacity:.65}
+.cec-role-item-left{display:inline-flex;align-items:center;gap:7px}
+.cec-role-item svg{width:14px;height:14px;flex:none}
+.cec-hidden-bar{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  padding:8px 12px;background:var(--cec-bg3);border-bottom:1px solid var(--cec-border);
+  font-size:12px;color:var(--cec-ink2);
+}
+.cec-hidden-lbl{font-weight:700;color:var(--cec-ink3);margin-right:2px}
+.cec-hidden-chip{
+  height:26px;padding:0 10px;border-radius:999px;border:1px solid var(--cec-border);
+  background:var(--cec-bg2);color:var(--cec-ink);font-size:12px;font-weight:700;gap:5px;
+}
+.cec-hidden-chip:hover{background:var(--cec-hover);border-color:var(--cec-active-border)}
+.cec-hidden-chip svg{width:13px;height:13px;color:var(--cec-ink3)}
+.cec-hidden-reset{
+  height:26px;padding:0 10px;border-radius:999px;border:1px dashed var(--cec-active-border);
+  background:transparent;color:var(--cec-ink2);font-size:12px;font-weight:700;
+}
+.cec-hidden-reset:hover{background:var(--cec-hover);color:var(--cec-ink)}
 .cec-cell{
   min-width:140px;height:82px;padding:10px;
   vertical-align:top;text-align:center;background:var(--cec-bg);
@@ -637,6 +716,10 @@
   .cec-month-table .cec-corner,.cec-month-table .cec-h{padding:10px 2px;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
   .cec-month-table .cec-date{font-size:10px;margin-top:2px;white-space:nowrap}
   .cec-month-table .cec-rowlbl{padding:9px 3px;text-align:center;font-size:10px;line-height:1.6;white-space:normal;overflow-wrap:anywhere}
+  .cec-month-table .cec-rowlbl-inner{justify-content:center;gap:2px}
+  .cec-month-table .cec-row-hide{width:16px;height:16px}
+  .cec-month-table .cec-row-hide svg{width:11px;height:11px}
+  .cec-top .cec-role-menu{left:auto;right:0;width:min(240px,calc(100vw - 52px));min-width:0}
   .cec-month-table .cec-cell{min-width:0;height:auto;padding:7px 2px;vertical-align:middle}
   .cec-month-table .cec-cellbox{min-height:38px;gap:4px;justify-content:center}
   .cec-month-table .cec-badges{flex-direction:column;gap:4px}
@@ -645,6 +728,7 @@
   .cec-month-table .cec-note,.cec-month-table .cec-reading{gap:4px;min-width:0;overflow-wrap:anywhere}
   .cec-month-table .cec-ref,.cec-month-table .cec-npfx{font-size:10px;line-height:1.5;max-width:100%;overflow-wrap:anywhere}
 }
+.cec-zoom-mask .cec-row-hide,.cec-export-shot .cec-row-hide{display:none!important}
 @media(prefers-reduced-motion:reduce){#cecp-schedule .cec-badge,#cecp-schedule .cec-btn{transition:none}}
 `;
     document.head.appendChild(st);
@@ -664,11 +748,146 @@
     })
     .then(function (res) {
       if (!res.ok) throw new Error(res.error || '脚本错误');
-      boot(res.data || []);
+      return enrichRowsWithSoundFromSheets(res.data || []);
+    })
+    .then(function (rows) {
+      boot(rows);
     })
     .catch(function (e) {
       EL.innerHTML = '<div class="cec-err">⚠ ' + esc(e.message) + '</div>';
     });
+
+  function fetchTextWithTimeout(url, ms) {
+    return new Promise(function (resolve) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (!done) { done = true; resolve(''); }
+      }, ms || 4000);
+      fetch(url)
+        .then(function (r) { return r.ok ? r.text() : ''; })
+        .catch(function () { return ''; })
+        .then(function (txt) {
+          if (!done) {
+            done = true;
+            clearTimeout(timer);
+            resolve(txt || '');
+          }
+        });
+    });
+  }
+
+  function parseGvizSoundTable(text, defaultYear, minYmOrd) {
+    var map = {};
+    if (!text) return map;
+    var start = text.indexOf('{');
+    var end = text.lastIndexOf('}');
+    if (start < 0 || end <= start) return map;
+    var json;
+    try {
+      json = JSON.parse(text.slice(start, end + 1));
+    } catch (_) {
+      return map;
+    }
+    var tableRows = (json && json.table && json.table.rows) || [];
+    var curMonth = '';
+    var curType = '';
+
+    tableRows.forEach(function (r) {
+      var cells = (r && r.c ? r.c : []).map(function (c) {
+        if (!c) return '';
+        return tv(c.f != null ? c.f : c.v);
+      });
+      var c0 = cells[0] || '';
+      var c1 = cells[1] || '';
+      var c2 = cells[2] || '';
+
+      var mFull = c0.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/) || c1.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/);
+      if (mFull) {
+        curMonth = parseInt(mFull[1], 10) + '年' + parseInt(mFull[2], 10) + '月';
+        curType = '';
+      } else {
+        var mShort = c1.match(/^(\d{1,2})\s*月\s*主日大堂调音/);
+        if (mShort) {
+          curMonth = (defaultYear || 2026) + '年' + parseInt(mShort[1], 10) + '月';
+          curType = '';
+        }
+      }
+
+      if (c1.indexOf('主日学') >= 0) {
+        curType = '';
+      } else if (c1.indexOf('青年团契') >= 0 || c1.indexOf('中午12:00') >= 0) {
+        curType = '青年团契';
+      } else if (c1 === '主日下午' || c1 === '下午') {
+        curType = '主日下午';
+      } else if (c1 === '主日晚上' || c1 === '晚上') {
+        curType = '主日晚上';
+      }
+
+      if (!curMonth || !curType) return;
+      if (minYmOrd && ymOrd(curMonth) < minYmOrd) return;
+
+      var roleText = '';
+      var weekOffset = 3;
+      if (c2 === '调音' || c2 === 'PPT播放' || c2 === '投影' || c2 === '转播和话筒' || c2 === '转播') {
+        roleText = c2;
+        weekOffset = 3;
+      } else if (c1 === '调音' || c1 === 'PPT播放' || c1 === '投影' || c1 === '转播和话筒' || c1 === '转播') {
+        roleText = c1;
+        weekOffset = 2;
+      }
+      if (!roleText) return;
+
+      var roleKey = roleText === '调音' ? 'sound'
+        : (roleText === 'PPT播放' || roleText === '投影') ? 'ppt'
+        : 'broadcast';
+
+      for (var w = 0; w < 5; w++) {
+        var val = tv(cells[weekOffset + w]);
+        if (!val || val === '—' || val === '-' || val === roleText) continue;
+        var k = curMonth + '|' + WEEK_ORDER[w] + '|' + curType;
+        if (!map[k]) map[k] = {};
+        map[k][roleKey] = val;
+      }
+    });
+
+    return map;
+  }
+
+  function enrichRowsWithSoundFromSheets(rows) {
+    if (!rows || !rows.length) return Promise.resolve(rows || []);
+    var hasAnySound = rows.some(function (r) {
+      return tv(r.sound) || tv(r.ppt) || tv(r.broadcast);
+    });
+    if (hasAnySound) return Promise.resolve(rows);
+
+    var mainUrl = 'https://docs.google.com/spreadsheets/d/1o0FkHnVtvKCZwjIhzPEHSEW-3oZeNsJnh68Qs3GU0TQ/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent('🎛 调音组安排');
+    var pdUrl = 'https://docs.google.com/spreadsheets/d/1gLCINCZq2KD3ijnBuM3G93fHrGtB5CkfdpTc95uMcPs/gviz/tq?tqx=out:json&headers=0&gid=2110695898';
+
+    return Promise.all([
+      fetchTextWithTimeout(mainUrl, 3800),
+      fetchTextWithTimeout(pdUrl, 3800)
+    ]).then(function (texts) {
+      var mapPd = parseGvizSoundTable(texts[1], 2026, 202612);
+      var mapMain = parseGvizSoundTable(texts[0], 2026, 202612);
+      var merged = {};
+      Object.keys(mapPd).forEach(function (k) { merged[k] = mapPd[k]; });
+      Object.keys(mapMain).forEach(function (k) {
+        merged[k] = Object.assign({}, merged[k] || {}, mapMain[k]);
+      });
+
+      rows.forEach(function (r) {
+        var key = tv(r.month) + '|' + tv(r.week) + '|' + tv(r.type);
+        var sm = merged[key];
+        if (!sm) return;
+        if (!tv(r.sound) && sm.sound) r.sound = sm.sound;
+        if (!tv(r.ppt) && sm.ppt) r.ppt = sm.ppt;
+        if (!tv(r.broadcast) && sm.broadcast) r.broadcast = sm.broadcast;
+      });
+      return rows;
+    }).catch(function () {
+      return rows;
+    });
+  }
 
   function boot(rows) {
     if (!rows.length) {
@@ -700,18 +919,22 @@
     var activeView = 'matrix';
     var activeWeek = currentSundayWeek(months[activeMonthIdx]);
     var exportMenuOpen = false;
+    var roleMenuOpen = false;
     var exportBusy = false;
     var activeRatio = '4:3';
 
     function onDocClick(e) {
-      if (!exportMenuOpen) return;
+      if (!exportMenuOpen && !roleMenuOpen) return;
       if (!EL.isConnected) {
         document.removeEventListener('click', onDocClick);
         return;
       }
       var wrap = EL.querySelector('.cec-export-wrap');
+      var roleWrap = EL.querySelector('.cec-role-wrap');
       if (wrap && wrap.contains(e.target)) return;
+      if (roleWrap && roleWrap.contains(e.target)) return;
       exportMenuOpen = false;
+      roleMenuOpen = false;
       render();
     }
 
@@ -722,6 +945,9 @@
     function render() {
       var month = months[activeMonthIdx];
       var monthRows = byMonth[month] || [];
+      var typeFilteredRows = monthRows.filter(function (r) { return tv(r.type) === activeType; });
+      var activeRoleDefs = activeType === '祷告会' ? [] : getNonEmptyServiceRows(activeType, typeFilteredRows, { trimEmptyRows: true });
+      var hiddenActiveDefs = activeRoleDefs.filter(function (d) { return isRoleHidden(d.key); });
 
       var nav = '<div class="cec-nav">';
       if (activeMonthIdx > 0) nav += '<button type="button" class="cec-btn cec-btn-arr" id="mPrev" aria-label="上个月">' + scheduleChevron(false) + '</button>';
@@ -731,11 +957,30 @@
       if (activeMonthIdx < months.length - 1) nav += '<button type="button" class="cec-btn cec-btn-arr" id="mNext" aria-label="下个月">' + scheduleChevron(true) + '</button>';
       nav += '</div>';
 
+      var roleMenuHtml = '';
+      if (activeRoleDefs.length) {
+        var roleBtnLabel = hiddenActiveDefs.length ? ('岗位 (' + (activeRoleDefs.length - hiddenActiveDefs.length) + '/' + activeRoleDefs.length + ')') : '显示/隐藏';
+        roleMenuHtml = '<div class="cec-role-wrap' + (roleMenuOpen ? ' open' : '') + '">' +
+          '<button class="cec-btn cec-btn-month' + (hiddenActiveDefs.length ? ' on' : '') + '" id="roleMenuToggle" type="button" style="gap:5px;padding:0 11px" title="选择要显示或隐藏的服事岗位">' +
+          '<span style="width:15px;height:15px;display:inline-flex">' + eyeIconSvg(false) + '</span><span>' + esc(roleBtnLabel) + '</span></button>' +
+          '<div class="cec-role-menu">' +
+          '<div class="cec-menu-title">点击切换显示 / 隐藏</div>' +
+          activeRoleDefs.map(function (def) {
+            var hidden = isRoleHidden(def.key);
+            return '<button class="cec-btn cec-role-item' + (hidden ? ' is-hidden' : '') + '" type="button" data-toggle-role="' + esc(def.key) + '">' +
+              '<span class="cec-role-item-left">' + eyeIconSvg(hidden) + '<span>' + esc(def.label) + '</span></span>' +
+              '<span style="font-size:11px;color:var(--cec-ink3)">' + (hidden ? '已隐藏' : '显示中') + '</span></button>';
+          }).join('') +
+          (hiddenActiveDefs.length ? '<div class="cec-menu-divider"></div><button class="cec-btn cec-menu-item" type="button" id="roleShowAll" style="font-size:12px;min-height:34px;justify-content:center">恢复全部显示</button>' : '') +
+          '</div></div>';
+      }
+
       var toolBtnText = exportBusy ? '导出中...' : '导出图片';
       var toolBtnIcon = '<svg class="cec-btn-tool-icon" viewBox="0 0 24 24" aria-hidden="true">' +
         '<path d="M12 3v10.5m0 0 4-4m-4 4-4-4M5 17v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>' +
         '</svg>';
-      var toolMenu = '<div class="cec-tools">' +
+      var toolMenu = '<div class="cec-tools" style="display:flex;align-items:center;gap:8px">' +
+        roleMenuHtml +
         '<div class="cec-export-wrap' + (exportMenuOpen ? ' open' : '') + '">' +
         '<button class="cec-btn cec-btn-tool" id="exportToggle" type="button"' + (exportBusy ? ' disabled' : '') + '>' + toolBtnIcon + '<span class="cec-btn-tool-label">' + toolBtnText + '</span></button>' +
         '<div class="cec-menu">' +
@@ -765,6 +1010,16 @@
       });
       typebar += '</div>';
 
+      var hiddenBar = '';
+      if (!personalView && hiddenActiveDefs.length) {
+        hiddenBar = '<div class="cec-hidden-bar"><span class="cec-hidden-lbl">已隐藏岗位（点击恢复）：</span>' +
+          hiddenActiveDefs.map(function (def) {
+            return '<button type="button" class="cec-btn cec-hidden-chip" data-toggle-role="' + esc(def.key) + '" title="点击重新显示「' + esc(def.label) + '」">' +
+              eyeIconSvg(false) + '<span>' + esc(def.label) + '</span></button>';
+          }).join('') +
+          '<button type="button" class="cec-btn cec-hidden-reset" id="hiddenBarReset">恢复全部</button></div>';
+      }
+
       var body = personalView || activeView === 'week'
         ? renderScheduleCards(monthRows, { type: activeType, week: activeWeek, name: personalView ? selectedName : '' })
         : activeType === '祷告会' ? renderPrayerMatrix(monthRows, {adaptive:true}) : renderServiceMatrix(monthRows, activeType, {adaptive:true, trimEmptyRows:true, month: activeType === '青年团契' ? '' : month});
@@ -788,7 +1043,7 @@
         '</svg>点击放大查看</button></div>';
 
       EL.classList.toggle('cec-is-matrix', !personalView && activeView === 'matrix');
-      EL.innerHTML = top + typebar + controls + (!personalView && activeView === 'matrix' ? zoombar : '') + body;
+      EL.innerHTML = top + typebar + controls + hiddenBar + (!personalView && activeView === 'matrix' ? zoombar : '') + body;
 
       bind('#mPrev', function () {
         if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
@@ -805,12 +1060,38 @@
       bind('#exportToggle', function (e) {
         if (exportBusy) return;
         e.stopPropagation();
+        roleMenuOpen = false;
         exportMenuOpen = !exportMenuOpen;
+        render();
+      });
+      bind('#roleMenuToggle', function (e) {
+        e.stopPropagation();
+        exportMenuOpen = false;
+        roleMenuOpen = !roleMenuOpen;
+        render();
+      });
+      bind('#roleShowAll', function (e) {
+        e.stopPropagation();
+        writeHiddenRoles([]);
+        roleMenuOpen = false;
+        render();
+      });
+      bind('#hiddenBarReset', function (e) {
+        e.stopPropagation();
+        writeHiddenRoles([]);
         render();
       });
       bind('#zoomOpen', function (e) {
         e.stopPropagation();
         openZoomModal();
+      });
+
+      EL.querySelectorAll('[data-toggle-role]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          toggleRoleHidden(this.getAttribute('data-toggle-role'));
+          render();
+        });
       });
 
       EL.querySelectorAll('[data-type]').forEach(function (btn) {
@@ -988,12 +1269,16 @@
       var defs = row.type === '祷告会' ? [{key:'leader', label:'祷告会带领', kind:'badges'}, {key:'time', label:'时间', kind:'text'}] : serviceRowsForType(row.type);
       if (options.name && !defs.some(function (def) { return assignmentNames(def.kind, row[def.key]).indexOf(options.name) >= 0; })) return '';
       defs = defs.filter(function (def) {
+        if (!options.name && row.type !== '祷告会' && isRoleHidden(def.key)) return false;
         return tv(row[def.key]) && (!options.name || def.kind === 'text' || assignmentNames(def.kind, row[def.key]).indexOf(options.name) >= 0);
       });
       if (options.name && !defs.length) return '';
       var details = defs.map(function (def) {
         var content = def.kind === 'text' ? '<div class="cec-cellbox">' + esc(row[def.key]) + '</div>' : renderMatrixCell(def.kind === 'note' && /^证道[：:]/.test(tv(row[def.key])) ? 'badges' : def.kind, def.kind === 'note' ? tv(row[def.key]).replace(/^证道[：:]\s*/, '') : row[def.key]).replace(/^<td[^>]*>|<\/td>$/g, '');
-        return '<div class="cec-detail"><dt class="cec-detail-label">' + esc(def.label) + '</dt><dd class="cec-detail-value">' + content + '</dd></div>';
+        var hideBtn = (!options.forExport && !options.name && row.type !== '祷告会')
+          ? '<button type="button" class="cec-btn cec-row-hide" data-toggle-role="' + esc(def.key) + '" title="隐藏「' + esc(def.label) + '」" aria-label="隐藏' + esc(def.label) + '">' + eyeIconSvg(true) + '</button>'
+          : '';
+        return '<div class="cec-detail"><dt class="cec-detail-label"><span class="cec-rowlbl-inner"><span class="cec-rowlbl-text">' + esc(def.label) + '</span>' + hideBtn + '</span></dt><dd class="cec-detail-value">' + content + '</dd></div>';
       }).join('');
       var date = row.type === '主日下午' || row.type === '主日晚上' || row.subtype === '周日下午祷告会' ? sundayLabel(row.month, row.week) : '';
       return '<article class="cec-week-card"><header class="cec-card-head"><div><h3>' + esc(row.subtype || row.type) + '</h3><p>' + esc(row.week + (date ? ' · ' + date : '')) + '</p></div></header><dl>' +
@@ -1007,7 +1292,8 @@
     var mask = document.createElement('div');
     mask.className = 'cec-preview-mask';
     var title = options.name ? options.name + ' · 我的服事' : options.week + ' · ' + options.type;
-    mask.innerHTML = '<section class="cec-preview" role="dialog" aria-modal="true" aria-label="导出预览" tabindex="-1"><div class="cec-preview-toolbar"><strong>导出预览</strong><button class="cec-btn cec-control cec-preview-close" type="button">关闭</button></div><div class="cec-share-sheet"><h2>' + esc(month) + '</h2><p>' + esc(title) + '</p>' + renderScheduleCards(rows, options) + '<p class="cec-share-foot">生成于 ' + esc(new Date().toLocaleString('zh-CN', {timeZone:'Europe/Rome'})) + '</p></div><div class="cec-preview-actions"><span role="status">确认内容后保存图片</span><button class="cec-btn cec-control cec-preview-save" type="button">保存图片</button></div></section>';
+    var previewOpts = Object.assign({}, options, { forExport: true });
+    mask.innerHTML = '<section class="cec-preview" role="dialog" aria-modal="true" aria-label="导出预览" tabindex="-1"><div class="cec-preview-toolbar"><strong>导出预览</strong><button class="cec-btn cec-control cec-preview-close" type="button">关闭</button></div><div class="cec-share-sheet"><h2>' + esc(month) + '</h2><p>' + esc(title) + '</p>' + renderScheduleCards(rows, previewOpts) + '<p class="cec-share-foot">生成于 ' + esc(new Date().toLocaleString('zh-CN', {timeZone:'Europe/Rome'})) + '</p></div><div class="cec-preview-actions"><span role="status">确认内容后保存图片</span><button class="cec-btn cec-control cec-preview-save" type="button">保存图片</button></div></section>';
     var previousFocus = document.activeElement;
     var previousOverflow = document.body.style.overflow;
     document.body.appendChild(mask); document.body.style.overflow = 'hidden';
@@ -1067,7 +1353,13 @@
     var tbody = '<tbody>';
     rowDefs.forEach(function (rowDef) {
       var shortLabel = {leader:'主领', worship:'敬拜', prayerLeader:'祷告带领', sound:'调音', ppt:'PPT', broadcast:'转播'}[rowDef.key] || rowDef.label;
-      tbody += '<tr><td class="cec-rowlbl">' + (opt.adaptive ? '<span class="cec-label-long">' + esc(rowDef.label) + '</span><span class="cec-label-short">' + esc(shortLabel) + '</span>' : esc(rowDef.label)) + '</td>';
+      var labelHtml = opt.adaptive
+        ? '<span class="cec-label-long">' + esc(rowDef.label) + '</span><span class="cec-label-short">' + esc(shortLabel) + '</span>'
+        : esc(rowDef.label);
+      var hideBtn = !opt.compact
+        ? '<button type="button" class="cec-btn cec-row-hide" data-toggle-role="' + esc(rowDef.key) + '" title="隐藏「' + esc(rowDef.label) + '」" aria-label="隐藏' + esc(rowDef.label) + '">' + eyeIconSvg(true) + '</button>'
+        : '';
+      tbody += '<tr><td class="cec-rowlbl"><div class="cec-rowlbl-inner"><span class="cec-rowlbl-text">' + labelHtml + '</span>' + hideBtn + '</div></td>';
 
       weeks.forEach(function (w) {
         var item = filtered.find(function (r) { return tv(r.week) === w; });
@@ -1186,9 +1478,9 @@
         { key: 'bass',           label: '贝斯',        kind: 'badges' },
         { key: 'reading',        label: '读经',        kind: 'reading' },
         { key: 'note',           label: '证道',        kind: 'note' },
-        { key: 'sound',          label: '调音',        kind: 'badges', alwaysShow: true },
-        { key: 'ppt',            label: 'PPT播放',     kind: 'badges', alwaysShow: true },
-        { key: 'broadcast',      label: '转播和话筒',  kind: 'badges', alwaysShow: true }
+        { key: 'sound',          label: '调音',        kind: 'badges' },
+        { key: 'ppt',            label: 'PPT播放',     kind: 'badges' },
+        { key: 'broadcast',      label: '转播和话筒',  kind: 'badges' }
       ];
     }
 
@@ -1201,9 +1493,9 @@
         { key: 'guitar',    label: '吉他',        kind: 'badges' },
         { key: 'bass',      label: '贝斯',        kind: 'badges' },
         { key: 'note',      label: '证道',        kind: 'note' },
-        { key: 'sound',     label: '调音',        kind: 'badges', alwaysShow: true },
-        { key: 'ppt',       label: 'PPT播放',     kind: 'badges', alwaysShow: true },
-        { key: 'broadcast', label: '转播和话筒',  kind: 'badges', alwaysShow: true }
+        { key: 'sound',     label: '调音',        kind: 'badges' },
+        { key: 'ppt',       label: 'PPT播放',     kind: 'badges' },
+        { key: 'broadcast', label: '转播和话筒',  kind: 'badges' }
       ];
     }
 
@@ -1214,19 +1506,28 @@
       { key: 'guitar',    label: '吉他',        kind: 'badges' },
       { key: 'bass',      label: '贝斯',        kind: 'badges' },
       { key: 'note',      label: '证道 / 主题', kind: 'note' },
-      { key: 'sound',     label: '调音',        kind: 'badges', alwaysShow: true },
-      { key: 'ppt',       label: 'PPT播放',     kind: 'badges', alwaysShow: true },
-      { key: 'broadcast', label: '转播和话筒',  kind: 'badges', alwaysShow: true }
+      { key: 'sound',     label: '调音',        kind: 'badges' },
+      { key: 'ppt',       label: 'PPT播放',     kind: 'badges' },
+      { key: 'broadcast', label: '转播和话筒',  kind: 'badges' }
     ];
   }
 
-  function getVisibleServiceRows(type, filteredRows, opt) {
+  function getNonEmptyServiceRows(type, filteredRows, opt) {
     var defs = serviceRowsForType(type);
     if (!opt || !opt.trimEmptyRows) return defs;
     var visible = defs.filter(function (def) {
-      return def.alwaysShow || filteredRows.some(function (row) { return tv(row[def.key]); });
+      return filteredRows.some(function (row) { return tv(row[def.key]); });
     });
     return visible.length ? visible : defs;
+  }
+
+  function getVisibleServiceRows(type, filteredRows, opt) {
+    var active = getNonEmptyServiceRows(type, filteredRows, opt);
+    if (opt && opt.ignoreHidden) return active;
+    var shown = active.filter(function (def) {
+      return !isRoleHidden(def.key);
+    });
+    return shown.length ? shown : active;
   }
 
   function renderEmptyCell() {
