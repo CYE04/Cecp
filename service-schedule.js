@@ -1186,9 +1186,9 @@
         { key: 'bass',           label: '贝斯',        kind: 'badges' },
         { key: 'reading',        label: '读经',        kind: 'reading' },
         { key: 'note',           label: '证道',        kind: 'note' },
-        { key: 'sound',          label: '调音',        kind: 'badges' },
-        { key: 'ppt',            label: 'PPT播放',     kind: 'badges' },
-        { key: 'broadcast',      label: '转播和话筒',  kind: 'badges' }
+        { key: 'sound',          label: '调音',        kind: 'badges', alwaysShow: true },
+        { key: 'ppt',            label: 'PPT播放',     kind: 'badges', alwaysShow: true },
+        { key: 'broadcast',      label: '转播和话筒',  kind: 'badges', alwaysShow: true }
       ];
     }
 
@@ -1201,9 +1201,9 @@
         { key: 'guitar',    label: '吉他',        kind: 'badges' },
         { key: 'bass',      label: '贝斯',        kind: 'badges' },
         { key: 'note',      label: '证道',        kind: 'note' },
-        { key: 'sound',     label: '调音',        kind: 'badges' },
-        { key: 'ppt',       label: 'PPT播放',     kind: 'badges' },
-        { key: 'broadcast', label: '转播和话筒',  kind: 'badges' }
+        { key: 'sound',     label: '调音',        kind: 'badges', alwaysShow: true },
+        { key: 'ppt',       label: 'PPT播放',     kind: 'badges', alwaysShow: true },
+        { key: 'broadcast', label: '转播和话筒',  kind: 'badges', alwaysShow: true }
       ];
     }
 
@@ -1214,9 +1214,9 @@
       { key: 'guitar',    label: '吉他',        kind: 'badges' },
       { key: 'bass',      label: '贝斯',        kind: 'badges' },
       { key: 'note',      label: '证道 / 主题', kind: 'note' },
-      { key: 'sound',     label: '调音',        kind: 'badges' },
-      { key: 'ppt',       label: 'PPT播放',     kind: 'badges' },
-      { key: 'broadcast', label: '转播和话筒',  kind: 'badges' }
+      { key: 'sound',     label: '调音',        kind: 'badges', alwaysShow: true },
+      { key: 'ppt',       label: 'PPT播放',     kind: 'badges', alwaysShow: true },
+      { key: 'broadcast', label: '转播和话筒',  kind: 'badges', alwaysShow: true }
     ];
   }
 
@@ -1224,7 +1224,7 @@
     var defs = serviceRowsForType(type);
     if (!opt || !opt.trimEmptyRows) return defs;
     var visible = defs.filter(function (def) {
-      return filteredRows.some(function (row) { return tv(row[def.key]); });
+      return def.alwaysShow || filteredRows.some(function (row) { return tv(row[def.key]); });
     });
     return visible.length ? visible : defs;
   }
