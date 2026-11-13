@@ -8,7 +8,12 @@
   var EL = document.getElementById('cecp-schedule');
   if (!EL) return;
 
-  var API = (EL.dataset.api || '').trim();
+  var DEFAULT_API = 'https://script.google.com/macros/s/AKfycbxJaY7RxxThCIGMeuxnlPW7diAJs0M34b5lK8Qn_CzxbIbCZY3AeuYKJadPF8gsLpvK/exec';
+  var rawApi = (EL.dataset.api || '').trim();
+  if (!rawApi || rawApi.indexOf('AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX') >= 0) {
+    rawApi = DEFAULT_API;
+  }
+  var API = rawApi;
   var LOGO_SRC = (function () {
     try {
       var cur = document.currentScript && document.currentScript.src ? new URL(document.currentScript.src, location.href) : null;
@@ -741,7 +746,7 @@
     return;
   }
 
-  fetch(API + '?action=all')
+  fetch(API + '?action=all&_ts=' + Date.now(), { cache: 'no-store' })
     .then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
@@ -763,7 +768,7 @@
       var timer = setTimeout(function () {
         if (!done) { done = true; resolve(''); }
       }, ms || 4000);
-      fetch(url)
+      fetch(url, { cache: 'no-store' })
         .then(function (r) { return r.ok ? r.text() : ''; })
         .catch(function () { return ''; })
         .then(function (txt) {
@@ -776,7 +781,7 @@
     });
   }
 
-  function parseGvizSoundTable(text, defaultYear, minYmOrd) {
+  function parseGvizSoundTable(text, defaultYear) {
     var map = {};
     if (!text) return map;
     var start = text.indexOf('{');
@@ -824,7 +829,6 @@
       }
 
       if (!curMonth || !curType) return;
-      if (minYmOrd && ymOrd(curMonth) < minYmOrd) return;
 
       var roleText = '';
       var weekOffset = 3;
@@ -855,33 +859,18 @@
 
   function enrichRowsWithSoundFromSheets(rows) {
     if (!rows || !rows.length) return Promise.resolve(rows || []);
-    var hasAnySound = rows.some(function (r) {
-      return tv(r.sound) || tv(r.ppt) || tv(r.broadcast);
-    });
-    if (hasAnySound) return Promise.resolve(rows);
 
-    var mainUrl = 'https://docs.google.com/spreadsheets/d/1o0FkHnVtvKCZwjIhzPEHSEW-3oZeNsJnh68Qs3GU0TQ/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent('🎛 调音组安排');
-    var pdUrl = 'https://docs.google.com/spreadsheets/d/1gLCINCZq2KD3ijnBuM3G93fHrGtB5CkfdpTc95uMcPs/gviz/tq?tqx=out:json&headers=0&gid=2110695898';
+    var mainUrl = 'https://docs.google.com/spreadsheets/d/1o0FkHnVtvKCZwjIhzPEHSEW-3oZeNsJnh68Qs3GU0TQ/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent('🎛 调音组安排') + '&_ts=' + Date.now();
 
-    return Promise.all([
-      fetchTextWithTimeout(mainUrl, 3800),
-      fetchTextWithTimeout(pdUrl, 3800)
-    ]).then(function (texts) {
-      var mapPd = parseGvizSoundTable(texts[1], 2026, 202612);
-      var mapMain = parseGvizSoundTable(texts[0], 2026, 202612);
-      var merged = {};
-      Object.keys(mapPd).forEach(function (k) { merged[k] = mapPd[k]; });
-      Object.keys(mapMain).forEach(function (k) {
-        merged[k] = Object.assign({}, merged[k] || {}, mapMain[k]);
-      });
-
+    return fetchTextWithTimeout(mainUrl, 4500).then(function (txt) {
+      if (!txt || txt.indexOf('"status":"ok"') < 0) return rows;
+      var mapMain = parseGvizSoundTable(txt, 2026);
       rows.forEach(function (r) {
         var key = tv(r.month) + '|' + tv(r.week) + '|' + tv(r.type);
-        var sm = merged[key];
-        if (!sm) return;
-        if (!tv(r.sound) && sm.sound) r.sound = sm.sound;
-        if (!tv(r.ppt) && sm.ppt) r.ppt = sm.ppt;
-        if (!tv(r.broadcast) && sm.broadcast) r.broadcast = sm.broadcast;
+        var sm = mapMain[key];
+        r.sound = (sm && sm.sound) ? sm.sound : '';
+        r.ppt = (sm && sm.ppt) ? sm.ppt : '';
+        r.broadcast = (sm && sm.broadcast) ? sm.broadcast : '';
       });
       return rows;
     }).catch(function () {
