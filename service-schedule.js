@@ -977,6 +977,24 @@
     return map;
   }
 
+  var NOV_2026_SOUND_DEFAULT = {
+    '2026年11月|第一周|青年团契': { sound: '胡恩典', ppt: '陈煜恩', broadcast: '' },
+    '2026年11月|第二周|青年团契': { sound: '倪翰俊', ppt: '林DANIELE', broadcast: '' },
+    '2026年11月|第三周|青年团契': { sound: '陈煜恩', ppt: '戴DANTE', broadcast: '' },
+    '2026年11月|第四周|青年团契': { sound: '戴DANTE', ppt: '林DANIELE', broadcast: '' },
+    '2026年11月|第五周|青年团契': { sound: '林DANIELE', ppt: '戴DANTE', broadcast: '' },
+    '2026年11月|第一周|主日下午': { sound: '陈煜恩', ppt: '倪翰耀', broadcast: '何正' },
+    '2026年11月|第二周|主日下午': { sound: '林DANIELE', ppt: '倪翰耀', broadcast: '倪翰俊' },
+    '2026年11月|第三周|主日下午': { sound: '倪翰俊', ppt: '叶Romano', broadcast: '吴以勒' },
+    '2026年11月|第四周|主日下午': { sound: '林DANIELE', ppt: '杨Samuele', broadcast: '吴以勒' },
+    '2026年11月|第五周|主日下午': { sound: '吴以勒', ppt: '陈欣豪', broadcast: '黄振宇' },
+    '2026年11月|第一周|主日晚上': { sound: '卓毅豪', ppt: 'Alex', broadcast: '黄振宇' },
+    '2026年11月|第二周|主日晚上': { sound: '何正', ppt: '苏Alessio', broadcast: '卓毅豪' },
+    '2026年11月|第三周|主日晚上': { sound: '黄振宇', ppt: '毛俊龙', broadcast: '卓毅豪' },
+    '2026年11月|第四周|主日晚上': { sound: '黄振宇', ppt: 'Vitto', broadcast: '何正' },
+    '2026年11月|第五周|主日晚上': { sound: '何正', ppt: 'Alex', broadcast: '卓毅豪' }
+  };
+
   function loadScheduleWithFogli() {
     var ts = Date.now();
     var fogliMainUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent('服事安排') + '&_ts=' + ts;
@@ -987,13 +1005,15 @@
       fetchTextWithTimeout(fogliSoundUrl, 5000)
     ]).then(function (texts) {
       var fogliRows = parseCsvMainSchedule(texts[0]);
-      var mapSound = texts[1] ? parseCsvSoundTable(texts[1], 2026) : null;
+      var mapSound = texts[1] ? parseCsvSoundTable(texts[1], 2026) : {};
 
       function applySoundMap(rows) {
-        if (!mapSound) return rows;
+        var hasNovInSheet = mapSound && Object.keys(mapSound).some(function (k) {
+          return k.indexOf('2026年11月|') === 0;
+        });
         rows.forEach(function (r) {
           var key = tv(r.month) + '|' + tv(r.week) + '|' + tv(r.type);
-          var sm = mapSound[key];
+          var sm = (mapSound && mapSound[key]) || (!hasNovInSheet ? NOV_2026_SOUND_DEFAULT[key] : null);
           r.sound = tv(r.sound) || (sm && sm.sound) || '';
           r.ppt = tv(r.ppt) || (sm && sm.ppt) || '';
           r.broadcast = tv(r.broadcast) || (sm && sm.broadcast) || '';
