@@ -735,12 +735,156 @@
   .cec-month-table .cec-ref,.cec-month-table .cec-npfx{font-size:10px;line-height:1.5;max-width:100%;overflow-wrap:anywhere}
 }
 .cec-zoom-mask .cec-row-hide,.cec-export-shot .cec-row-hide{display:none!important}
+#cecp-schedule.is-collapsed{border-color:#262421;background:#11100e}
+#cecp-schedule.is-collapsed .cec-body{display:none!important}
+#cecp-schedule.is-expanded .cec-gate{display:none!important}
+.nt-board.cec-board-host{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.nt-board.cec-board-host>.nt-kicker,.nt-board.cec-board-host>h2,.nt-board.cec-board-host>p,.nt-board.cec-board-host>.nt-board-actions{display:none!important}
+.nt-board.cec-board-host>.nt-board-schedule{margin-top:0!important}
+.cec-gate{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:clamp(28px,4.2vw,44px) clamp(16px,3.6vw,36px);
+  background:radial-gradient(120% 120% at 50% 0%,#24201b 0%,#141210 58%,#0d0c0a 100%);
+  color:#f5f2eb;position:relative;overflow:hidden;
+}
+.cec-gate-eyebrow{
+  margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:#9c9488;
+}
+.cec-gate-title{
+  margin:0;font-family:"Noto Serif SC","Songti SC","STSong",Georgia,serif;
+  font-size:clamp(32px,4.8vw,46px);font-weight:700;line-height:1.18;letter-spacing:.06em;
+}
+.cec-gate-title-hi{color:#ffffff}
+.cec-gate-title-lo{color:#8a847c}
+.cec-gate-sub{
+  margin:10px 0 0;font-size:13px;line-height:1.5;color:#9c9488;
+}
+.cec-gate-actions{
+  margin-top:22px;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:520px;
+}
+.cec-gate-primary{
+  width:min(100%,236px);min-height:48px;padding:0 26px;border-radius:11px;
+  background:#f7f5f0;color:#141311;font-size:16px;font-weight:800;letter-spacing:.03em;
+  box-shadow:0 6px 20px rgba(0,0,0,.28);
+}
+.cec-gate-primary:hover{background:#ffffff;color:#0a0908;transform:translateY(-1px)}
+.cec-gate-pills{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;width:100%;
+}
+.cec-gate-pill{
+  min-height:38px;padding:0 14px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.10);background:#252320;color:#ece8e0;
+  font-size:13px;font-weight:700;gap:7px;
+}
+.cec-gate-pill:hover{background:#302d29;border-color:rgba(255,255,255,.20);color:#ffffff}
+.cec-gate-pill--me{border-color:rgba(151,216,166,.35);background:rgba(40,75,55,.45);color:#cfead6}
+.cec-exp-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:10px 14px;background:#161412;color:#f5f2eb;border-bottom:1px solid #2a2723;
+}
+.cec-exp-title{
+  display:inline-flex;align-items:baseline;gap:8px;min-width:0;
+  font-family:"Noto Serif SC","Songti SC","STSong",Georgia,serif;font-size:18px;font-weight:700;letter-spacing:.04em;
+}
+.cec-exp-title-hi{color:#ffffff}
+.cec-exp-title-lo{color:#8f887f}
+.cec-exp-meta{
+  font-family:"PingFang SC","Noto Sans SC",system-ui,sans-serif;
+  font-size:12px;font-weight:600;color:#9c9488;letter-spacing:0;
+}
+.cec-btn-collapse{
+  min-height:32px;padding:0 12px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#f5f2eb;
+  font-size:12px;font-weight:700;gap:5px;
+}
+.cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff}
+.cec-btn-collapse svg,.cec-btn-collapse-foot svg{width:14px;height:14px;display:block;flex:none}
+.cec-exp-foot{
+  display:flex;justify-content:center;padding:10px 12px;
+  background:var(--cec-bg2);border-top:1px solid var(--cec-border);
+}
+.cec-btn-collapse-foot{
+  min-height:34px;padding:0 16px;border-radius:999px;
+  border:1px solid var(--cec-border);background:var(--cec-btn-bg);color:var(--cec-ink2);
+  font-size:12px;font-weight:700;gap:6px;
+}
+.cec-btn-collapse-foot:hover{background:var(--cec-hover);color:var(--cec-ink)}
+@container cecp-schedule (max-width:420px){
+  .cec-gate-pills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .cec-gate-pill{width:100%;padding:0 8px;font-size:12px}
+  .cec-gate-pill--me{grid-column:1/-1}
+  .cec-exp-head{padding:8px 10px}
+  .cec-exp-meta{display:none}
+}
 @media(prefers-reduced-motion:reduce){#cecp-schedule .cec-badge,#cecp-schedule .cec-btn{transition:none}}
 `;
     document.head.appendChild(st);
   }
 
-  EL.innerHTML = '<div class="cec-state"><div class="cec-spin"></div>加载服事安排…</div>';
+  var isCollapsible = EL.getAttribute('data-collapsible') !== 'false' && EL.getAttribute('data-expanded') !== 'true';
+  var isExpanded = !isCollapsible;
+  var pendingGateType = '';
+  var pendingGatePersonal = false;
+  var hostBoard = EL.closest ? EL.closest('.nt-board') : null;
+
+  function syncExpandState() {
+    EL.classList.toggle('is-collapsed', !isExpanded);
+    EL.classList.toggle('is-expanded', isExpanded);
+    if (hostBoard) {
+      hostBoard.classList.add('cec-board-host');
+      hostBoard.classList.toggle('cec-board-collapsed', !isExpanded);
+      hostBoard.classList.toggle('cec-board-expanded', isExpanded);
+    }
+  }
+
+  function renderGateHtml(month, savedName) {
+    var subText = (month ? month + ' · ' : '') + '主日崇拜 · 青年团契 · 祷告会同工排班';
+    var pills = TYPE_ORDER.map(function (tp) {
+      var c = TYPE_C[tp];
+      return '<button type="button" class="cec-btn cec-gate-pill" data-gate-type="' + esc(tp) + '">' +
+        '<span class="cec-dot" style="background:' + c.accent + '"></span>' +
+        '<span>' + esc(tp) + '</span></button>';
+    }).join('');
+    if (savedName) {
+      pills += '<button type="button" class="cec-btn cec-gate-pill cec-gate-pill--me" id="cecGatePersonal">' +
+        '<span>我的服事 · ' + esc(savedName) + '</span></button>';
+    }
+    return '<div class="cec-gate">' +
+      '<p class="cec-gate-eyebrow">MINISTRY SCHEDULE</p>' +
+      '<h2 class="cec-gate-title"><span class="cec-gate-title-hi">服事</span><span class="cec-gate-title-lo">安排</span></h2>' +
+      '<p class="cec-gate-sub">' + esc(subText) + '</p>' +
+      '<div class="cec-gate-actions">' +
+      '<button type="button" class="cec-btn cec-gate-primary" id="cecGateOpen">查看服事安排</button>' +
+      '<div class="cec-gate-pills">' + pills + '</div>' +
+      '</div></div>';
+  }
+
+  function bindPreBootGate() {
+    if (!isCollapsible) return;
+    bind('#cecGateOpen', function () {
+      isExpanded = true;
+      syncExpandState();
+    });
+    EL.querySelectorAll('[data-gate-type]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        pendingGateType = this.getAttribute('data-gate-type') || '';
+        if (pendingGateType) writePreference('type', pendingGateType);
+        isExpanded = true;
+        syncExpandState();
+      });
+    });
+    bind('#cecGatePersonal', function () {
+      pendingGatePersonal = true;
+      isExpanded = true;
+      syncExpandState();
+    });
+  }
+
+  syncExpandState();
+  EL.innerHTML = (isCollapsible ? renderGateHtml('', readPreference('name')) : '') +
+    '<div class="cec-body"><div class="cec-state"><div class="cec-spin"></div>加载服事安排…</div></div>';
+  bindPreBootGate();
 
   if (!API || API === 'DEMO') {
     setTimeout(function () { boot(demo()); }, 120);
@@ -752,7 +896,9 @@
       boot(rows);
     })
     .catch(function (e) {
-      EL.innerHTML = '<div class="cec-err">⚠ ' + esc(e && e.message ? e.message : '加载失败') + '</div>';
+      EL.innerHTML = (isCollapsible ? renderGateHtml('', readPreference('name')) : '') +
+        '<div class="cec-body"><div class="cec-err">⚠ ' + esc(e && e.message ? e.message : '加载失败') + '</div></div>';
+      bindPreBootGate();
     });
 
   function fetchTextWithTimeout(url, ms) {
@@ -1060,12 +1206,12 @@
     if (!byMonth[upcomingMonth]) byMonth[upcomingMonth] = [];
     var months = Object.keys(byMonth).sort(function (a, b) { return ymOrd(a) - ymOrd(b); });
     var activeMonthIdx = pickScheduleMonth(months);
-    var activeType = readPreference('type');
+    var activeType = pendingGateType || readPreference('type');
     if (TYPE_ORDER.indexOf(activeType) < 0) activeType = '主日下午';
     var selectedName = readPreference('name');
     var names = scheduleNames(rows);
     if (names.indexOf(selectedName) < 0) selectedName = '';
-    var personalView = false;
+    var personalView = !!(pendingGatePersonal && selectedName);
     var activeView = 'matrix';
     var activeWeek = currentSundayWeek(months[activeMonthIdx]);
     var exportMenuOpen = false;
@@ -1192,8 +1338,63 @@
         '<path d="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm9.5 16-4.4-4.4M10.5 8v5M8 10.5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>' +
         '</svg>点击放大查看</button></div>';
 
+      var gateHtml = isCollapsible ? renderGateHtml(month, selectedName) : '';
+      var expHead = isCollapsible ? (
+        '<div class="cec-exp-head">' +
+          '<div class="cec-exp-title"><span class="cec-exp-title-hi">服事</span><span class="cec-exp-title-lo">安排</span><span class="cec-exp-meta">' + esc(month) + '</span></div>' +
+          '<button type="button" class="cec-btn cec-btn-collapse" id="cecCollapseBtn" aria-expanded="true">' +
+            '<span>收起服事安排</span>' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</button>' +
+        '</div>'
+      ) : '';
+      var expFoot = isCollapsible ? (
+        '<div class="cec-exp-foot">' +
+          '<button type="button" class="cec-btn cec-btn-collapse-foot" id="cecCollapseFoot">' +
+            '<span>收起服事安排</span>' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</button>' +
+        '</div>'
+      ) : '';
+
+      syncExpandState();
       EL.classList.toggle('cec-is-matrix', !personalView && activeView === 'matrix');
-      EL.innerHTML = top + typebar + controls + hiddenBar + (!personalView && activeView === 'matrix' ? zoombar : '') + body;
+      EL.innerHTML = gateHtml + '<div class="cec-body">' + expHead + top + typebar + controls + hiddenBar + (!personalView && activeView === 'matrix' ? zoombar : '') + body + expFoot + '</div>';
+
+      function collapseSchedule(scrollBack) {
+        isExpanded = false;
+        exportMenuOpen = false;
+        roleMenuOpen = false;
+        syncExpandState();
+        if (scrollBack && EL.scrollIntoView) {
+          try { EL.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (_) {}
+        }
+      }
+
+      bind('#cecGateOpen', function () {
+        isExpanded = true;
+        syncExpandState();
+      });
+      EL.querySelectorAll('[data-gate-type]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activeType = this.getAttribute('data-gate-type') || activeType;
+          writePreference('type', activeType);
+          personalView = false;
+          lockedName = null;
+          exportMenuOpen = false;
+          isExpanded = true;
+          render();
+        });
+      });
+      bind('#cecGatePersonal', function () {
+        if (selectedName) {
+          personalView = true;
+          isExpanded = true;
+          render();
+        }
+      });
+      bind('#cecCollapseBtn', function () { collapseSchedule(false); });
+      bind('#cecCollapseFoot', function () { collapseSchedule(true); });
 
       bind('#mPrev', function () {
         if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
