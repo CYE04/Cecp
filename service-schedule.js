@@ -2476,24 +2476,12 @@
         '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' +
         esc(curYear + '年' + meta.rangeLabel + '主日崇拜事工表') +
         '</title><style>' + cssText +
-        '@page{size:A4 portrait;margin:8mm 10mm}' +
-        'html,body{margin:0;padding:0;width:100%;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
-        '.cec-hy-sheet{width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;margin:0 auto!important;padding:2mm 3mm!important;box-sizing:border-box!important;overflow:visible!important;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid}' +
+        '@page{size:A4 portrait;margin:0}' +
+        'html,body{margin:0;padding:0;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        // 与下载图片完全同一版式：每页就是一张 794×1123 的 A4 画布，四周留白与图片一致
+        '.cec-hy-sheet{width:210mm!important;max-width:none!important;height:296mm!important;min-height:0!important;margin:0!important;padding:30px 44px 28px!important;box-sizing:border-box!important;overflow:hidden!important;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid}' +
         '.cec-hy-sheet:last-child{page-break-after:auto;break-after:auto}' +
-        '.cec-hy-h1{margin:0 0 6px!important;font-size:22px!important}' +
-        '.cec-hy-sec{margin:7px 0 3px!important;font-size:14px!important}' +
-        '.cec-hy-subcap{margin:8px 0 3px!important;font-size:12.5px!important}' +
-        '.cec-hy-tbl{width:calc(100% - 4px)!important;margin:0 auto!important;border-collapse:separate!important;border-spacing:0!important;border-top:1.5px solid #000!important;border-left:1.5px solid #000!important;font-size:12px!important;page-break-inside:avoid;break-inside:avoid}' +
-        '.cec-hy-tbl th,.cec-hy-tbl td{border-right:1px solid #111!important;border-bottom:1px solid #111!important;height:25px!important;padding:3px 3px!important;line-height:1.2!important}' +
-        '.cec-hy-tbl thead th{height:28px!important}' +
-        '.cec-hy-tbl-prog td{height:22px!important;padding:2px 10px!important;font-size:12.5px!important}' +
-        '.cec-hy-diag{height:32px!important}' +
-        '.cec-hy-tbl-rd tbody td{height:34px!important;padding:2px 2px!important}' +
-        '.cec-hy-rd-ref,.cec-hy-rd-name{font-size:11px!important;line-height:1.15!important}' +
-        '.cec-hy-tbl tr th:last-child,.cec-hy-tbl tr td:last-child{border-right:1.5px solid #000!important}' +
-        '.cec-hy-tbl tbody tr:last-child td{border-bottom:1.5px solid #000!important}' +
-        '.cec-hy-foot-notes{padding-top:14px!important;font-size:12.5px!important;line-height:1.7!important}' +
-        '.cec-hy-church-sign{margin-top:10px!important;padding-right:4mm!important;font-size:16px!important}' +
+        '.cec-hy-tbl{page-break-inside:avoid;break-inside:avoid}' +
         '</style></head><body>' + pagesHtml +
         '<script>window.onload=function(){setTimeout(function(){window.print();},200);};<\/script></body></html>'
       );
