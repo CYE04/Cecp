@@ -764,21 +764,27 @@
 .cec-hy-tbl tr th:last-child,.cec-hy-tbl tr td:last-child{border-right:1.5px solid #000}
 .cec-hy-tbl tbody tr:last-child td{border-bottom:1.5px solid #000}
 .cec-hy-tbl thead th{height:31px;font-weight:800;background:#fafafa;letter-spacing:.02em}
-.cec-hy-tbl-prog td{height:25px;padding:3px 12px;font-size:13px;font-weight:700;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
-.cec-hy-tbl-bold td,.cec-hy-tbl-bold th{font-weight:700}
+.cec-hy-tbl-prog td{height:26px;padding:3px 12px;font-size:13.5px;font-weight:700;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+.cec-hy-tbl-bold{font-size:15.5px}
+.cec-hy-tbl-bold thead th{font-size:15px;font-weight:800;height:34px}
+.cec-hy-tbl-bold tbody td{height:32px;padding:4px 6px;font-weight:700;letter-spacing:.01em}
+.cec-hy-tbl-bold tbody td.cec-hy-row-wk{font-size:15px;font-weight:800}
 .cec-hy-row-wk{font-weight:800;background:#fcfcfc;letter-spacing:.02em}
 .cec-hy-diag{position:relative;height:36px!important;padding:0!important;background:#fafafa}
 .cec-hy-diag-svg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
-.cec-hy-diag-top{position:absolute;top:4px;right:6px;font-size:10.5px;font-weight:800;line-height:1;color:#000}
-.cec-hy-diag-bot{position:absolute;bottom:4px;left:6px;font-size:10.5px;font-weight:800;line-height:1;color:#000}
-.cec-hy-tbl-rd tbody td{height:38px;padding:3px 3px}
-.cec-hy-rd-ref{display:block;font-weight:800;font-size:11.5px;line-height:1.2;color:#000}
-.cec-hy-rd-name{display:block;font-weight:700;font-size:11.5px;line-height:1.2;margin-top:1px;color:#111}
-.cec-hy-notes{margin-top:8px;padding:0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:12px;font-weight:700;color:#000;line-height:1.6}
+.cec-hy-diag-top{position:absolute;top:4px;right:6px;font-size:11px;font-weight:800;line-height:1;color:#000}
+.cec-hy-diag-bot{position:absolute;bottom:4px;left:6px;font-size:11px;font-weight:800;line-height:1;color:#000}
+.cec-hy-tbl-rd thead th{font-size:14.5px;font-weight:800}
+.cec-hy-tbl-rd tbody td{height:40px;padding:3px 3px}
+.cec-hy-tbl-rd tbody td.cec-hy-row-wk{font-size:14.5px}
+.cec-hy-rd-ref{display:block;font-weight:800;font-size:12.5px;line-height:1.25;color:#000}
+.cec-hy-rd-name{display:block;font-weight:700;font-size:12.5px;line-height:1.25;margin-top:2px;color:#111}
+.cec-hy-notes{margin-top:8px;padding:0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:12.5px;font-weight:700;color:#000;line-height:1.6}
 .cec-hy-foot-notes{margin-top:auto;padding:16px 6px 0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:13.5px;font-weight:700;color:#000;line-height:1.8}
 .cec-hy-church-sign{margin-top:14px;padding-right:8px;text-align:right;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;font-weight:800;letter-spacing:.04em;color:#000}
-.cec-hy-tbl-left td{text-align:left;padding:5px 14px;font-weight:700;height:31px}
-.cec-hy-tbl-left thead th{text-align:left;padding:6px 14px;font-weight:800;background:#fafafa}
+.cec-hy-tbl-left{font-size:14.5px}
+.cec-hy-tbl-left td{text-align:left;padding:6px 16px;font-weight:700;height:36px}
+.cec-hy-tbl-left thead th{text-align:left;padding:7px 16px;font-size:15px;font-weight:800;background:#fafafa;height:36px}
 .cec-hy-tbl-big{font-size:17px}
 .cec-hy-tbl-big tbody td{height:32px;font-weight:700;letter-spacing:.02em}
 .cec-hy-tbl-big thead th{font-size:15.5px}
