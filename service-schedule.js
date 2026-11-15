@@ -197,11 +197,18 @@
 .cec-export-wrap{position:relative}
 .cec-export-wrap.open .cec-btn-tool{background:#161b24;color:#ffffff;border-color:#465165}
 .cec-menu{
-  position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:none;flex-direction:column;
+  position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:flex;flex-direction:column;
   min-width:220px;padding:8px;border:1px solid var(--cec-border);border-radius:14px;
   background:var(--cec-bg2);box-shadow:0 18px 36px rgba(18,24,38,.16);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateY(-8px) scale(.96);transform-origin:top right;
+  transition:opacity .18s cubic-bezier(.22,1,.36,1),transform .22s cubic-bezier(.16,1,.3,1),visibility 0s linear .22s;
 }
-.cec-export-wrap.open .cec-menu{display:flex}
+.cec-export-wrap.open .cec-menu{
+  opacity:1;visibility:visible;pointer-events:auto;
+  transform:translateY(0) scale(1);
+  transition:opacity .18s cubic-bezier(.22,1,.36,1),transform .24s cubic-bezier(.16,1,.3,1),visibility 0s linear 0s;
+}
 .cec-menu-title{
   padding:6px 8px 10px;color:var(--cec-ink3);font-size:12px;font-weight:700;letter-spacing:.02em;
 }
@@ -265,11 +272,18 @@
 .cec-row-hide svg{width:13px;height:13px;display:block}
 .cec-role-wrap{position:relative}
 .cec-role-menu{
-  position:absolute;right:0;top:calc(100% + 8px);z-index:25;display:none;flex-direction:column;
+  position:absolute;right:0;top:calc(100% + 8px);z-index:25;display:flex;flex-direction:column;
   min-width:210px;max-height:340px;overflow-y:auto;padding:8px;border:1px solid var(--cec-border);
   border-radius:14px;background:var(--cec-bg2);box-shadow:0 18px 36px rgba(18,24,38,.16);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateY(-8px) scale(.96);transform-origin:top right;
+  transition:opacity .18s cubic-bezier(.22,1,.36,1),transform .22s cubic-bezier(.16,1,.3,1),visibility 0s linear .22s;
 }
-.cec-role-wrap.open .cec-role-menu{display:flex}
+.cec-role-wrap.open .cec-role-menu{
+  opacity:1;visibility:visible;pointer-events:auto;
+  transform:translateY(0) scale(1);
+  transition:opacity .18s cubic-bezier(.22,1,.36,1),transform .24s cubic-bezier(.16,1,.3,1),visibility 0s linear 0s;
+}
 .cec-role-item{
   width:100%;min-height:36px;padding:0 10px;border-radius:9px;border:1px solid transparent;
   background:transparent;color:var(--cec-ink);justify-content:space-between;font-size:12px;font-weight:700;gap:8px;
@@ -678,6 +692,59 @@
 .cec-share-sheet>p{font-size:13px;margin:0;color:#5a6275}
 .cec-share-sheet .cec-cards{padding:18px 0;grid-template-columns:1fr}
 .cec-share-sheet .cec-share-foot{font-size:11px;text-align:right}
+.cec-hy-modal{width:900px;max-width:100%}
+.cec-hy-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:12px 16px;background:var(--cec-bg2);border-bottom:1px solid var(--cec-border);position:sticky;top:0;z-index:5}
+.cec-hy-toolbar-left,.cec-hy-toolbar-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cec-hy-toolbar select{height:34px;padding:0 8px;border:1px solid var(--cec-border);border-radius:8px;background:var(--cec-bg);color:var(--cec-ink);font:inherit;font-size:13px;font-weight:700}
+.cec-hy-btn{min-height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--cec-border);background:var(--cec-btn-bg);color:var(--cec-ink2);font-size:12px;font-weight:700;gap:5px}
+.cec-hy-btn:hover{background:var(--cec-hover);color:var(--cec-ink)}
+.cec-hy-btn.on{background:var(--cec-active);border-color:var(--cec-active-border);color:var(--cec-ink)}
+.cec-hy-btn.primary{background:#111827;border-color:#2f3a50;color:#ffffff}
+.cec-hy-btn.primary:hover{background:#1f2937}
+.cec-hy-stage{padding:16px;background:#e5e7eb;display:flex;flex-direction:column;gap:20px;align-items:center}
+.cec-hy-page-wrap{width:100%;max-width:794px;display:flex;flex-direction:column;gap:8px}
+.cec-hy-page-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;border-radius:8px;background:#1f242d;color:#f3f4f6;font-size:12px;font-weight:700}
+.cec-hy-page-dl{min-height:28px;padding:0 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:11px;font-weight:700}
+.cec-hy-page-dl:hover{background:rgba(255,255,255,.2)}
+.cec-hy-page-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.cec-hy-sheet{
+  width:794px;min-height:1123px;padding:38px 44px;background:#ffffff;color:#000000;
+  font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  display:flex;flex-direction:column;justify-content:flex-start;
+}
+.cec-hy-sheet *{box-sizing:border-box}
+.cec-hy-h1{
+  margin:0 0 14px;text-align:center;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
+  font-size:26px;font-weight:800;letter-spacing:.04em;color:#000;line-height:1.25;
+}
+.cec-hy-sec{
+  margin:12px 0 6px;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
+  font-size:16px;font-weight:800;color:#000;line-height:1.35;
+}
+.cec-hy-subcap{
+  margin:10px 0 5px;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
+  font-size:14px;font-weight:700;color:#000;line-height:1.4;
+}
+.cec-hy-tbl{
+  width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #111;background:#fff;color:#000;font-size:13px;
+}
+.cec-hy-tbl th,.cec-hy-tbl td{
+  border:1px solid #222;padding:5px 4px;text-align:center;vertical-align:middle;line-height:1.35;overflow-wrap:anywhere;color:#000;
+}
+.cec-hy-tbl th{font-weight:700;background:#fff}
+.cec-hy-tbl-prog td{padding:4px 10px;font-size:13px;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+.cec-hy-tbl-bold td,.cec-hy-tbl-bold th{font-weight:700}
+.cec-hy-diag{position:relative;height:40px;padding:0!important}
+.cec-hy-diag-svg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.cec-hy-diag-top{position:absolute;top:4px;right:6px;font-size:11px;font-weight:700;line-height:1}
+.cec-hy-diag-bot{position:absolute;bottom:4px;left:6px;font-size:11px;font-weight:700;line-height:1}
+.cec-hy-rd-ref{display:block;font-weight:800;font-size:12px;line-height:1.3}
+.cec-hy-rd-name{display:block;font-weight:700;font-size:12px;line-height:1.3;margin-top:1px}
+.cec-hy-notes{margin-top:8px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:12px;color:#111;line-height:1.7}
+.cec-hy-foot-notes{margin-top:auto;padding-top:24px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:14px;color:#111;line-height:1.85}
+.cec-hy-church-sign{margin-top:18px;text-align:right;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:18px;font-weight:800;letter-spacing:.03em;color:#000}
+.cec-hy-tbl-left td{text-align:left;padding:5px 10px;font-weight:700}
+.cec-hy-tbl-left th{text-align:left;padding:6px 10px;font-weight:800}
 @container cecp-schedule (max-width:760px){
   .cec-label-long{display:none}
   .cec-label-short{display:inline}
@@ -735,49 +802,106 @@
   .cec-month-table .cec-ref,.cec-month-table .cec-npfx{font-size:10px;line-height:1.5;max-width:100%;overflow-wrap:anywhere}
 }
 .cec-zoom-mask .cec-row-hide,.cec-export-shot .cec-row-hide{display:none!important}
+@keyframes cecBodyReveal{
+  from{opacity:0;transform:translateY(14px) scale(.985)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes cecBodyHide{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(-12px) scale(.98)}
+}
+@keyframes cecGateReveal{
+  from{opacity:0;transform:translateY(8px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes cecGateHide{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(-10px) scale(.96)}
+}
+@keyframes cecSwapIn{
+  from{opacity:0;transform:translateY(8px) scale(.994)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes cecMaskFade{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes cecMaskFadeOut{
+  from{opacity:1}
+  to{opacity:0}
+}
+@keyframes cecModalPop{
+  from{opacity:0;transform:translateY(14px) scale(.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes cecModalPopOut{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(10px) scale(.96)}
+}
+#cecp-schedule{position:relative;transition:background-color .28s ease,border-color .28s ease}
 #cecp-schedule.is-collapsed{border-color:#262421!important;background:#11100e!important}
-#cecp-schedule.is-collapsed .cec-body{display:none!important}
-#cecp-schedule.is-expanded .cec-gate{display:none!important}
+#cecp-schedule.is-collapsed:not(.is-morphing-close) .cec-body{display:none!important}
+#cecp-schedule.is-expanded:not(.is-morphing-open) .cec-gate{display:none!important}
+#cecp-schedule.is-morphing-open .cec-gate{
+  display:flex!important;position:absolute!important;inset:0 0 auto 0!important;width:100%!important;z-index:5;pointer-events:none;
+  animation:cecGateHide .22s cubic-bezier(.32,.72,0,1) forwards;
+}
+#cecp-schedule.is-morphing-open .cec-body{
+  animation:cecBodyReveal .38s cubic-bezier(.16,1,.3,1) both;
+}
+#cecp-schedule.is-morphing-close .cec-body{
+  display:block!important;position:absolute!important;inset:0 0 auto 0!important;width:100%!important;z-index:4;pointer-events:none;
+  animation:cecBodyHide .24s cubic-bezier(.32,.72,0,1) forwards;
+}
+#cecp-schedule.is-morphing-close .cec-gate{
+  position:relative;z-index:5;
+  animation:cecGateReveal .34s cubic-bezier(.16,1,.3,1) both;
+}
+#cecp-schedule.is-switching .cec-wrap,#cecp-schedule.is-switching .cec-cards{animation:cecSwapIn .26s cubic-bezier(.16,1,.3,1) both}
+.cec-preview-mask{-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.cec-zoom-mask,.cec-preview-mask{animation:cecMaskFade .22s cubic-bezier(.22,1,.36,1) both}
+.cec-zoom-panel,.cec-preview{animation:cecModalPop .3s cubic-bezier(.16,1,.3,1) both}
+.cec-zoom-mask.is-closing,.cec-preview-mask.is-closing{animation:cecMaskFadeOut .18s cubic-bezier(.32,.72,0,1) forwards;pointer-events:none}
+.cec-zoom-mask.is-closing .cec-zoom-panel,.cec-preview-mask.is-closing .cec-preview{animation:cecModalPopOut .18s cubic-bezier(.32,.72,0,1) forwards}
 .nt-board.cec-board-host{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
 .nt-board.cec-board-host>.nt-kicker,.nt-board.cec-board-host>h2,.nt-board.cec-board-host>p,.nt-board.cec-board-host>.nt-board-actions{display:none!important}
 .nt-board.cec-board-host>.nt-board-schedule{margin-top:0!important}
 .cec-gate{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:clamp(28px,4.2vw,44px) clamp(16px,3.6vw,36px);
+  text-align:center;padding:clamp(18px,2.5vw,26px) clamp(14px,2.8vw,28px);
   background:radial-gradient(120% 120% at 50% 0%,#24201b 0%,#141210 58%,#0d0c0a 100%);
   color:#f5f2eb;position:relative;overflow:hidden;
 }
-.cec-gate-eyebrow{
-  margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
-  color:#9c9488;
-}
 .cec-gate-title{
   margin:0;font-family:"Noto Serif SC","Songti SC","STSong",Georgia,serif;
-  font-size:clamp(32px,4.8vw,46px);font-weight:700;line-height:1.18;letter-spacing:.06em;
+  font-size:clamp(22px,3vw,30px);font-weight:700;line-height:1.18;letter-spacing:.06em;
 }
 .cec-gate-title-hi{color:#ffffff}
 .cec-gate-title-lo{color:#8a847c}
 .cec-gate-sub{
-  margin:10px 0 0;font-size:13px;line-height:1.5;color:#9c9488;
+  margin:6px 0 0;font-size:12px;line-height:1.45;color:#9c9488;
 }
 .cec-gate-actions{
-  margin-top:22px;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:520px;
+  margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:460px;
 }
 .cec-gate-primary{
-  width:min(100%,236px);min-height:48px;padding:0 26px;border-radius:11px;
-  background:#f7f5f0;color:#141311;font-size:16px;font-weight:800;letter-spacing:.03em;
-  box-shadow:0 6px 20px rgba(0,0,0,.28);
+  width:min(100%,184px);min-height:38px;padding:0 18px;border-radius:9px;
+  background:#f7f5f0;color:#141311;font-size:14px;font-weight:800;letter-spacing:.03em;
+  box-shadow:0 4px 14px rgba(0,0,0,.26);
+  transition:transform .16s cubic-bezier(.22,1,.36,1),background-color .16s ease,box-shadow .16s ease;
 }
-.cec-gate-primary:hover{background:#ffffff;color:#0a0908;transform:translateY(-1px)}
+.cec-gate-primary:hover{background:#ffffff;color:#0a0908;transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.34)}
+.cec-gate-primary:active,.cec-gate-pill:active,.cec-btn-collapse:active,.cec-btn-collapse-foot:active{transform:scale(.97)}
 .cec-gate-pills{
-  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;width:100%;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;width:100%;
 }
 .cec-gate-pill{
-  min-height:38px;padding:0 14px;border-radius:10px;
+  min-height:31px;padding:0 11px;border-radius:8px;
   border:1px solid rgba(255,255,255,.10);background:#252320;color:#ece8e0;
-  font-size:13px;font-weight:700;gap:7px;
+  font-size:12px;font-weight:700;gap:6px;
+  transition:transform .15s cubic-bezier(.22,1,.36,1),background-color .15s ease,border-color .15s ease;
 }
-.cec-gate-pill:hover{background:#302d29;border-color:rgba(255,255,255,.20);color:#ffffff}
+.cec-gate-pill:hover{background:#302d29;border-color:rgba(255,255,255,.20);color:#ffffff;transform:translateY(-1px)}
 .cec-gate-pill--me{border-color:rgba(151,216,166,.35);background:rgba(40,75,55,.45);color:#cfead6}
 .cec-exp-head{
   display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
@@ -785,7 +909,7 @@
 }
 .cec-exp-title{
   display:inline-flex;align-items:baseline;gap:8px;min-width:0;
-  font-family:"Noto Serif SC","Songti SC","STSong",Georgia,serif;font-size:18px;font-weight:700;letter-spacing:.04em;
+  font-family:"Noto Serif SC","Songti SC","STSong",Georgia,serif;font-size:17px;font-weight:700;letter-spacing:.04em;
 }
 .cec-exp-title-hi{color:#ffffff}
 .cec-exp-title-lo{color:#8f887f}
@@ -794,9 +918,10 @@
   font-size:12px;font-weight:600;color:#9c9488;letter-spacing:0;
 }
 .cec-btn-collapse{
-  min-height:32px;padding:0 12px;border-radius:8px;
+  min-height:30px;padding:0 11px;border-radius:8px;
   border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#f5f2eb;
   font-size:12px;font-weight:700;gap:5px;
+  transition:transform .15s cubic-bezier(.22,1,.36,1),background-color .15s ease;
 }
 .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff}
 .cec-btn-collapse svg,.cec-btn-collapse-foot svg{width:14px;height:14px;display:block;flex:none}
@@ -805,9 +930,10 @@
   background:var(--cec-bg2);border-top:1px solid var(--cec-border);
 }
 .cec-btn-collapse-foot{
-  min-height:34px;padding:0 16px;border-radius:999px;
+  min-height:32px;padding:0 14px;border-radius:999px;
   border:1px solid var(--cec-border);background:var(--cec-btn-bg);color:var(--cec-ink2);
   font-size:12px;font-weight:700;gap:6px;
+  transition:transform .15s cubic-bezier(.22,1,.36,1),background-color .15s ease;
 }
 .cec-btn-collapse-foot:hover{background:var(--cec-hover);color:var(--cec-ink)}
 @container cecp-schedule (max-width:420px){
@@ -817,7 +943,10 @@
   .cec-exp-head{padding:8px 10px}
   .cec-exp-meta{display:none}
 }
-@media(prefers-reduced-motion:reduce){#cecp-schedule .cec-badge,#cecp-schedule .cec-btn{transition:none}}
+@media(prefers-reduced-motion:reduce){
+  #cecp-schedule .cec-badge,#cecp-schedule .cec-btn,.cec-menu,.cec-role-menu{transition:none!important}
+  #cecp-schedule.is-morphing-open .cec-body,#cecp-schedule.is-morphing-open .cec-gate,#cecp-schedule.is-morphing-close .cec-body,#cecp-schedule.is-morphing-close .cec-gate,#cecp-schedule.is-switching .cec-wrap,#cecp-schedule.is-switching .cec-cards,.cec-zoom-mask,.cec-preview-mask,.cec-zoom-panel,.cec-preview{animation:none!important}
+}
 `;
     document.head.appendChild(st);
   }
@@ -827,6 +956,8 @@
   var pendingGateType = '';
   var pendingGatePersonal = false;
   var hostBoard = EL.closest ? EL.closest('.nt-board') : null;
+  var animTimer = 0;
+  var activeHeightAnim = null;
 
   function syncExpandState() {
     EL.classList.toggle('is-collapsed', !isExpanded);
@@ -836,6 +967,53 @@
       hostBoard.classList.toggle('cec-board-collapsed', !isExpanded);
       hostBoard.classList.toggle('cec-board-expanded', isExpanded);
     }
+  }
+
+  function animateContainerHeight(startH, endH, durationMs) {
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || typeof EL.animate !== 'function' || startH <= 0 || endH <= 0 || Math.abs(endH - startH) <= 2) return;
+    if (activeHeightAnim) {
+      try { activeHeightAnim.cancel(); } catch (_) {}
+      activeHeightAnim = null;
+    }
+    try {
+      activeHeightAnim = EL.animate(
+        [{ height: startH + 'px', overflow: 'hidden' }, { height: endH + 'px', overflow: 'hidden' }],
+        { duration: durationMs, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' }
+      );
+      activeHeightAnim.onfinish = function () { activeHeightAnim = null; };
+    } catch (_) {}
+  }
+
+  function animateExpandTransition(opening, applyFn) {
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var startH = (!reduceMotion && EL.getBoundingClientRect) ? EL.getBoundingClientRect().height : 0;
+    if (animTimer) clearTimeout(animTimer);
+    EL.classList.remove('is-morphing-open', 'is-morphing-close', 'is-switching');
+    applyFn();
+    var endH = (!reduceMotion && EL.getBoundingClientRect) ? EL.getBoundingClientRect().height : 0;
+    if (!reduceMotion) {
+      EL.classList.add(opening ? 'is-morphing-open' : 'is-morphing-close');
+      animateContainerHeight(startH, endH, opening ? 380 : 340);
+      animTimer = setTimeout(function () {
+        EL.classList.remove('is-morphing-open', 'is-morphing-close');
+      }, opening ? 390 : 350);
+    }
+  }
+
+  function closeModalAnimated(mask, afterClose) {
+    if (!mask || mask.classList.contains('is-closing')) return;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      mask.remove();
+      if (afterClose) afterClose();
+      return;
+    }
+    mask.classList.add('is-closing');
+    setTimeout(function () {
+      mask.remove();
+      if (afterClose) afterClose();
+    }, 185);
   }
 
   function renderGateHtml(month, savedName) {
@@ -851,7 +1029,6 @@
         '<span>我的服事 · ' + esc(savedName) + '</span></button>';
     }
     return '<div class="cec-gate">' +
-      '<p class="cec-gate-eyebrow">MINISTRY SCHEDULE</p>' +
       '<h2 class="cec-gate-title"><span class="cec-gate-title-hi">服事</span><span class="cec-gate-title-lo">安排</span></h2>' +
       '<p class="cec-gate-sub">' + esc(subText) + '</p>' +
       '<div class="cec-gate-actions">' +
@@ -863,21 +1040,27 @@
   function bindPreBootGate() {
     if (!isCollapsible) return;
     bind('#cecGateOpen', function () {
-      isExpanded = true;
-      syncExpandState();
+      animateExpandTransition(true, function () {
+        isExpanded = true;
+        syncExpandState();
+      });
     });
     EL.querySelectorAll('[data-gate-type]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         pendingGateType = this.getAttribute('data-gate-type') || '';
         if (pendingGateType) writePreference('type', pendingGateType);
-        isExpanded = true;
-        syncExpandState();
+        animateExpandTransition(true, function () {
+          isExpanded = true;
+          syncExpandState();
+        });
       });
     });
     bind('#cecGatePersonal', function () {
       pendingGatePersonal = true;
-      isExpanded = true;
-      syncExpandState();
+      animateExpandTransition(true, function () {
+        isExpanded = true;
+        syncExpandState();
+      });
     });
   }
 
@@ -1141,17 +1324,94 @@
     '2026年11月|第五周|主日晚上': { sound: '何正', ppt: 'Alex', broadcast: '卓毅豪' }
   };
 
+  var EVE_PRAYER_DEFAULT = {
+    '第一周': '戴献和',
+    '第二周': '徐永西',
+    '第三周': '金展',
+    '第四周': '林文宝、董希昆',
+    '第五周': '林文宝'
+  };
+
+  function expandYmLabels(startYm, endYm) {
+    var m1 = String(startYm || '').match(/(\d{4})\D+(\d{1,2})/);
+    var m2 = String(endYm || '').match(/(\d{4})\D+(\d{1,2})/);
+    if (!m1 || !m2) return [];
+    var sy = parseInt(m1[1], 10), sm = parseInt(m1[2], 10);
+    var ey = parseInt(m2[1], 10), em = parseInt(m2[2], 10);
+    var out = [];
+    var guard = 0;
+    while ((sy < ey || (sy === ey && sm <= em)) && guard++ < 48) {
+      out.push(sy + '年' + sm + '月');
+      sm++;
+      if (sm > 12) { sm = 1; sy++; }
+    }
+    return out;
+  }
+
+  function parseCsvZhouQiTable(csvText) {
+    var map = {};
+    var rows = parseCsvRows(csvText);
+    if (!rows.length) return map;
+    var activeMonths = ['2026年1月','2026年2月','2026年3月','2026年4月','2026年5月','2026年6月'];
+    var curType = '';
+
+    rows.forEach(function (cells) {
+      var c0 = tv(cells[0]);
+      if (/^【周期】/.test(c0)) {
+        var parts = c0.replace(/^【周期】/, '').split(/[~～到至]/);
+        var expanded = parts.length >= 2 ? expandYmLabels(parts[0], parts[1]) : [];
+        if (expanded.length) activeMonths = expanded;
+        curType = '';
+        return;
+      }
+      if (c0 === '【主日下午】') { curType = '主日下午'; return; }
+      if (c0 === '【主日晚上】') { curType = '主日晚上'; return; }
+      if (!curType || WEEK_ORDER.indexOf(c0) < 0) return;
+
+      var entry = curType === '主日下午'
+        ? {
+            leader: tv(cells[1]),
+            worship: tv(cells[2]),
+            piano: tv(cells[3]),
+            drums: tv(cells[4]),
+            guitar: tv(cells[5]),
+            bass: tv(cells[6]),
+            praisePrayer: tv(cells[7]),
+            memorialPrayer: tv(cells[8])
+          }
+        : {
+            leader: tv(cells[1]),
+            prayerLeader: tv(cells[2]),
+            worship: tv(cells[3]),
+            piano: tv(cells[4]),
+            drums: tv(cells[5]),
+            guitar: tv(cells[6]),
+            bass: tv(cells[7])
+          };
+
+      map['default|' + c0 + '|' + curType] = entry;
+      activeMonths.forEach(function (mo) {
+        map[mo + '|' + c0 + '|' + curType] = entry;
+      });
+    });
+
+    return map;
+  }
+
   function loadScheduleWithFogli() {
     var ts = Date.now();
     var fogliMainUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent('服事安排') + '&_ts=' + ts;
     var fogliSoundUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent('🎛 调音组安排') + '&_ts=' + ts;
+    var fogliZhouQiUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent('⚙️ 事工周期表') + '&_ts=' + ts;
 
     return Promise.all([
       fetchTextWithTimeout(fogliMainUrl, 5000),
-      fetchTextWithTimeout(fogliSoundUrl, 5000)
+      fetchTextWithTimeout(fogliSoundUrl, 5000),
+      fetchTextWithTimeout(fogliZhouQiUrl, 4000)
     ]).then(function (texts) {
       var fogliRows = parseCsvMainSchedule(texts[0]);
       var mapSound = texts[1] ? parseCsvSoundTable(texts[1], 2026) : {};
+      var mapZhouQi = texts[2] ? parseCsvZhouQiTable(texts[2]) : {};
 
       function applySoundMap(rows) {
         var hasNovInSheet = mapSound && Object.keys(mapSound).some(function (k) {
@@ -1163,6 +1423,19 @@
           r.sound = tv(r.sound) || (sm && sm.sound) || '';
           r.ppt = tv(r.ppt) || (sm && sm.ppt) || '';
           r.broadcast = tv(r.broadcast) || (sm && sm.broadcast) || '';
+
+          var zq = (mapZhouQi && (mapZhouQi[key] || mapZhouQi['default|' + tv(r.week) + '|' + tv(r.type)])) || null;
+          if (zq) {
+            r.leader = tv(r.leader) || zq.leader || '';
+            r.worship = tv(r.worship) || zq.worship || '';
+            r.piano = tv(r.piano) || zq.piano || '';
+            r.praisePrayer = tv(r.praisePrayer) || zq.praisePrayer || '';
+            r.memorialPrayer = tv(r.memorialPrayer) || zq.memorialPrayer || '';
+            r.prayerLeader = tv(r.prayerLeader) || zq.prayerLeader || '';
+          }
+          if (tv(r.type) === '主日晚上' && !tv(r.prayerLeader)) {
+            r.prayerLeader = EVE_PRAYER_DEFAULT[tv(r.week)] || '';
+          }
         });
         return rows;
       }
@@ -1219,6 +1492,13 @@
     var exportBusy = false;
     var activeRatio = '4:3';
 
+    function syncMenusDom() {
+      var wrap = EL.querySelector('.cec-export-wrap');
+      var roleWrap = EL.querySelector('.cec-role-wrap');
+      if (wrap) wrap.classList.toggle('open', !!exportMenuOpen);
+      if (roleWrap) roleWrap.classList.toggle('open', !!roleMenuOpen);
+    }
+
     function onDocClick(e) {
       if (!exportMenuOpen && !roleMenuOpen) return;
       if (!EL.isConnected) {
@@ -1231,7 +1511,7 @@
       if (roleWrap && roleWrap.contains(e.target)) return;
       exportMenuOpen = false;
       roleMenuOpen = false;
-      render();
+      syncMenusDom();
     }
 
     document.addEventListener('click', onDocClick);
@@ -1280,14 +1560,20 @@
         '<div class="cec-export-wrap' + (exportMenuOpen ? ' open' : '') + '">' +
         '<button class="cec-btn cec-btn-tool" id="exportToggle" type="button"' + (exportBusy ? ' disabled' : '') + '>' + toolBtnIcon + '<span class="cec-btn-tool-label">' + toolBtnText + '</span></button>' +
         '<div class="cec-menu">' +
-        '<div class="cec-menu-title">画面比例</div>' +
+        '<div class="cec-menu-title">半年打印事工表（A4 竖版 · 3页）</div>' +
+        '<div class="cec-ratio-bar">' +
+        '<button class="cec-btn cec-ratio-item" type="button" data-export-half="H1">1–6月 (上半年)</button>' +
+        '<button class="cec-btn cec-ratio-item" type="button" data-export-half="H2">7–12月 (下半年)</button>' +
+        '</div>' +
+        '<div class="cec-menu-divider"></div>' +
+        '<div class="cec-menu-title">单月画面比例</div>' +
         '<div class="cec-ratio-bar">' +
         EXPORT_RATIOS.map(function (item) {
           return '<button class="cec-btn cec-ratio-item' + (item.key === activeRatio ? ' on' : '') + '" type="button" data-export-ratio="' + esc(item.key) + '">' + esc(item.label) + '</button>';
         }).join('') +
         '</div>' +
         '<div class="cec-menu-divider"></div>' +
-        '<div class="cec-menu-title">选择要下载的内容</div>' +
+        '<div class="cec-menu-title">选择要下载的单月内容</div>' +
         [{key:'week',label:'当前周 · ' + activeType}, {key:'personal',label:'我的服事' + (selectedName ? ' · ' + selectedName : '（先选择姓名）')}].concat(EXPORT_ITEMS).map(function (item) {
           return '<button class="cec-btn cec-menu-item" type="button" data-export-target="' + esc(item.key) + '">' + esc(item.label) + '</button>';
         }).join('') +
@@ -1361,19 +1647,36 @@
       EL.classList.toggle('cec-is-matrix', !personalView && activeView === 'matrix');
       EL.innerHTML = gateHtml + '<div class="cec-body">' + expHead + top + typebar + controls + hiddenBar + (!personalView && activeView === 'matrix' ? zoombar : '') + body + expFoot + '</div>';
 
+      function renderWithSwap() {
+        var startH = EL.getBoundingClientRect ? EL.getBoundingClientRect().height : 0;
+        if (animTimer) clearTimeout(animTimer);
+        EL.classList.remove('is-morphing-open', 'is-morphing-close');
+        EL.classList.add('is-switching');
+        render();
+        var endH = EL.getBoundingClientRect ? EL.getBoundingClientRect().height : 0;
+        animateContainerHeight(startH, endH, 280);
+        animTimer = setTimeout(function () {
+          EL.classList.remove('is-switching');
+        }, 280);
+      }
+
       function collapseSchedule(scrollBack) {
-        isExpanded = false;
-        exportMenuOpen = false;
-        roleMenuOpen = false;
-        syncExpandState();
+        animateExpandTransition(false, function () {
+          isExpanded = false;
+          exportMenuOpen = false;
+          roleMenuOpen = false;
+          syncExpandState();
+        });
         if (scrollBack && EL.scrollIntoView) {
           try { EL.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (_) {}
         }
       }
 
       bind('#cecGateOpen', function () {
-        isExpanded = true;
-        syncExpandState();
+        animateExpandTransition(true, function () {
+          isExpanded = true;
+          syncExpandState();
+        });
       });
       EL.querySelectorAll('[data-gate-type]').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -1382,55 +1685,59 @@
           personalView = false;
           lockedName = null;
           exportMenuOpen = false;
-          isExpanded = true;
-          render();
+          animateExpandTransition(true, function () {
+            isExpanded = true;
+            render();
+          });
         });
       });
       bind('#cecGatePersonal', function () {
         if (selectedName) {
           personalView = true;
-          isExpanded = true;
-          render();
+          animateExpandTransition(true, function () {
+            isExpanded = true;
+            render();
+          });
         }
       });
       bind('#cecCollapseBtn', function () { collapseSchedule(false); });
       bind('#cecCollapseFoot', function () { collapseSchedule(true); });
 
       bind('#mPrev', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); renderWithSwap(); }
       });
       bind('#mPrevText', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); renderWithSwap(); }
       });
       bind('#mNext', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); renderWithSwap(); }
       });
       bind('#mNextText', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); render(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); renderWithSwap(); }
       });
       bind('#exportToggle', function (e) {
         if (exportBusy) return;
         e.stopPropagation();
         roleMenuOpen = false;
         exportMenuOpen = !exportMenuOpen;
-        render();
+        syncMenusDom();
       });
       bind('#roleMenuToggle', function (e) {
         e.stopPropagation();
         exportMenuOpen = false;
         roleMenuOpen = !roleMenuOpen;
-        render();
+        syncMenusDom();
       });
       bind('#roleShowAll', function (e) {
         e.stopPropagation();
         writeHiddenRoles([]);
         roleMenuOpen = false;
-        render();
+        renderWithSwap();
       });
       bind('#hiddenBarReset', function (e) {
         e.stopPropagation();
         writeHiddenRoles([]);
-        render();
+        renderWithSwap();
       });
       bind('#zoomOpen', function (e) {
         e.stopPropagation();
@@ -1441,7 +1748,7 @@
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
           toggleRoleHidden(this.getAttribute('data-toggle-role'));
-          render();
+          renderWithSwap();
         });
       });
 
@@ -1452,7 +1759,19 @@
           personalView = false;
           lockedName = null;
           exportMenuOpen = false;
-          render();
+          renderWithSwap();
+        });
+      });
+
+      EL.querySelectorAll('[data-export-half]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var hk = this.getAttribute('data-export-half') || 'H2';
+          var mMatch = String(month || '').match(/^(\d{4})年/);
+          var yr = mMatch ? parseInt(mMatch[1], 10) : new Date().getFullYear();
+          exportMenuOpen = false;
+          syncMenusDom();
+          openHalfYearPrintModal(yr, hk, rows, byMonth);
         });
       });
 
@@ -1460,7 +1779,9 @@
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
           activeRatio = this.getAttribute('data-export-ratio') || activeRatio;
-          render();
+          EL.querySelectorAll('[data-export-ratio]').forEach(function (b) {
+            b.classList.toggle('on', b.getAttribute('data-export-ratio') === activeRatio);
+          });
         });
       });
 
@@ -1476,17 +1797,17 @@
       bind('#scheduleToday', function () {
         activeMonthIdx = pickScheduleMonth(months);
         activeWeek = currentSundayWeek(months[activeMonthIdx]);
-        activeView = 'week'; personalView = false; render();
+        activeView = 'week'; personalView = false; renderWithSwap();
       });
-      bind('#scheduleWeekly', function () { activeView = 'week'; personalView = false; render(); });
-      bind('#scheduleMatrix', function () { activeView = 'matrix'; personalView = false; render(); });
-      bind('#schedulePersonal', function () { personalView = !personalView; render(); });
+      bind('#scheduleWeekly', function () { activeView = 'week'; personalView = false; renderWithSwap(); });
+      bind('#scheduleMatrix', function () { activeView = 'matrix'; personalView = false; renderWithSwap(); });
+      bind('#schedulePersonal', function () { personalView = !personalView; renderWithSwap(); });
       EL.querySelector('#scheduleWeek').addEventListener('change', function () {
-        activeWeek = this.value; activeView = 'week'; personalView = false; render();
+        activeWeek = this.value; activeView = 'week'; personalView = false; renderWithSwap();
       });
       EL.querySelector('#scheduleName').addEventListener('change', function () {
         selectedName = this.value; writePreference('name', selectedName);
-        personalView = !!selectedName; render();
+        personalView = !!selectedName; renderWithSwap();
       });
       bindHighlight();
     }
@@ -1500,7 +1821,7 @@
         var weeks = WEEK_ORDER.filter(function (week) { return sundayDate(months[activeMonthIdx], week); });
         activeWeek = direction > 0 ? weeks[0] : weeks[weeks.length - 1];
       } else activeWeek = WEEK_ORDER[next];
-      activeView = 'week'; personalView = false; render();
+      activeView = 'week'; personalView = false; renderWithSwap();
     }
 
     function startExport(target) {
@@ -1678,6 +1999,464 @@
         saveBlobAs(blob, safeFileName(month + '_' + title) + '.png'); status.textContent = '图片已保存';
       }).catch(function () { status.textContent = '生成失败，请重试'; }).finally(function () { host.remove(); button.disabled = false; });
     };
+  }
+
+  var CN_DIGITS = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+  var CN_MONTHS = ['', '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+  var WEEK_SHORT = ['一周', '二周', '三周', '四周', '五周'];
+  var WEEK_SPACED = ['一 周', '二 周', '三 周', '四 周', '五 周'];
+
+  function toCnYear(year) {
+    return String(year || 2026).split('').map(function (d) {
+      return CN_DIGITS[parseInt(d, 10)] || d;
+    }).join('');
+  }
+
+  function getHalfYearMeta(year, halfKey) {
+    var isH1 = halfKey === 'H1';
+    var startM = isH1 ? 1 : 7;
+    var months = [];
+    for (var m = startM; m < startM + 6; m++) {
+      months.push({
+        num: m,
+        key: year + '年' + m + '月',
+        cn: CN_MONTHS[m]
+      });
+    }
+    return {
+      year: year,
+      cnYear: toCnYear(year),
+      halfKey: isH1 ? 'H1' : 'H2',
+      quarterLabel: isH1 ? '一、二季度' : '三、四季度',
+      rangeLabel: isH1 ? '1-6月' : '7-12月',
+      months: months
+    };
+  }
+
+  function diagCornerCell(widthPct) {
+    return '<th class="cec-hy-diag" style="width:' + (widthPct || 13) + '%">' +
+      '<svg class="cec-hy-diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#222" stroke-width="1.2"/></svg>' +
+      '<span class="cec-hy-diag-top">月份</span>' +
+      '<span class="cec-hy-diag-bot">周期</span>' +
+      '</th>';
+  }
+
+  function findHalfRow(byMonth, monthKey, week, type, subtype) {
+    var list = byMonth[monthKey] || [];
+    for (var i = 0; i < list.length; i++) {
+      var r = list[i];
+      if (tv(r.week) !== week || tv(r.type) !== type) continue;
+      if (subtype && tv(r.subtype) !== subtype) continue;
+      return r;
+    }
+    return null;
+  }
+
+  function cleanPreacherText(val) {
+    var s = tv(val);
+    if (!s) return '';
+    return s.replace(/^证道[：:]\s*/, '').trim();
+  }
+
+  function pickHalfCycleRole(byMonth, meta, week, type, roleKey, joinSep) {
+    var sep = joinSep || '、';
+    var i, r, val;
+    for (i = 0; i < meta.months.length; i++) {
+      r = findHalfRow(byMonth, meta.months[i].key, week, type, '');
+      val = r ? tv(r[roleKey]) : '';
+      if (val) return roleKey === 'piano' ? val : val.replace(/\s*\/\s*/g, sep);
+    }
+    var allKeys = Object.keys(byMonth);
+    for (i = 0; i < allKeys.length; i++) {
+      r = findHalfRow(byMonth, allKeys[i], week, type, '');
+      val = r ? tv(r[roleKey]) : '';
+      if (val) return roleKey === 'piano' ? val : val.replace(/\s*\/\s*/g, sep);
+    }
+    return '';
+  }
+
+  function buildHalfYearPage1Html(meta, byMonth) {
+    var progRows = [
+      ['祷告会', '14:00—14:50'],
+      ['敬拜', '15:00—15:25'],
+      ['读经', '15:25—15:30'],
+      ['诗班献诗', '15:30—15:35'],
+      ['颂赞、纪念', '15:35—16:00'],
+      ['证道', '16:00—17:00'],
+      ['唱诗、祷告(散会)', '17:00']
+    ].map(function (pair) {
+      return '<tr><td>' + esc(pair[0]) + '</td><td>' + esc(pair[1]) + '</td></tr>';
+    }).join('');
+
+    var monthHeaders = meta.months.map(function (m) {
+      return '<th>' + esc(m.cn) + '</th>';
+    }).join('');
+
+    var preachRows = WEEK_ORDER.map(function (wk, wIdx) {
+      var cells = meta.months.map(function (m) {
+        var r = findHalfRow(byMonth, m.key, wk, '主日下午', '');
+        var spk = r ? cleanPreacherText(r.note) : '';
+        return '<td>' + esc(spk) + '</td>';
+      }).join('');
+      return '<tr><td>' + esc(WEEK_SHORT[wIdx]) + '</td>' + cells + '</tr>';
+    }).join('');
+
+    var pmRoleCols = [
+      { key: 'leader', label: '领 会', width: '11%' },
+      { key: 'worship', label: '敬 拜', width: '11%' },
+      { key: 'piano', label: '司琴', width: '18%' },
+      { key: 'praisePrayer', label: '颂赞祷告', width: '24%' },
+      { key: 'memorialPrayer', label: '纪念祷告', width: '25%' }
+    ];
+    var pmRoleHeaders = '<th style="width:11%"></th>' + pmRoleCols.map(function (c) {
+      return '<th style="width:' + c.width + '">' + esc(c.label) + '</th>';
+    }).join('');
+    var pmRoleBody = WEEK_ORDER.map(function (wk, wIdx) {
+      var tds = pmRoleCols.map(function (c) {
+        var v = pickHalfCycleRole(byMonth, meta, wk, '主日下午', c.key);
+        return '<td>' + esc(v) + '</td>';
+      }).join('');
+      return '<tr><td>' + esc(WEEK_SHORT[wIdx]) + '</td>' + tds + '</tr>';
+    }).join('');
+
+    var readingRows = WEEK_ORDER.map(function (wk, wIdx) {
+      var cells = meta.months.map(function (m) {
+        var r = findHalfRow(byMonth, m.key, wk, '主日下午', '');
+        var raw = r ? tv(r.reading) : '';
+        if (!raw) return '<td></td>';
+        var rd = parseReading(raw);
+        return '<td><span class="cec-hy-rd-ref">' + esc(rd.ref) + '</span>' +
+          (rd.name ? '<span class="cec-hy-rd-name">' + esc(rd.name) + '</span>' : '') + '</td>';
+      }).join('');
+      return '<tr><td style="font-weight:700">' + esc(WEEK_SHORT[wIdx]) + '</td>' + cells + '</tr>';
+    }).join('');
+
+    return '<div class="cec-hy-sheet" data-hy-page="1">' +
+      '<h2 class="cec-hy-h1">' + esc(meta.cnYear + '年' + meta.quarterLabel + '主日崇拜事工表') + '</h2>' +
+      '<div class="cec-hy-sec">※主日崇拜程序</div>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-prog"><tbody>' + progRows + '</tbody></table>' +
+      '<div class="cec-hy-sec">※圣工表</div>' +
+      '<table class="cec-hy-tbl"><thead><tr>' + diagCornerCell(14) + monthHeaders + '</tr></thead><tbody>' + preachRows + '</tbody></table>' +
+      '<div class="cec-hy-sec">※主日下午事工表</div>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-bold"><thead><tr>' + pmRoleHeaders + '</tr></thead><tbody>' + pmRoleBody + '</tbody></table>' +
+      '<div class="cec-hy-sec">※主日读经</div>' +
+      '<table class="cec-hy-tbl"><thead><tr>' + diagCornerCell(14) + monthHeaders + '</tr></thead><tbody>' + readingRows + '</tbody></table>' +
+      '</div>';
+  }
+
+  function buildHalfYearPage2Html(meta, byMonth) {
+    var monthHeaders = meta.months.map(function (m) {
+      return '<th>' + esc(m.cn) + '</th>';
+    }).join('');
+
+    function buildPrayerGrid(getter) {
+      var body = WEEK_ORDER.map(function (wk, wIdx) {
+        var tds = meta.months.map(function (m) {
+          return '<td>' + esc(getter(m.key, wk) || '') + '</td>';
+        }).join('');
+        return '<tr><td style="font-weight:700">' + esc(WEEK_SHORT[wIdx]) + '</td>' + tds + '</tr>';
+      }).join('');
+      return '<table class="cec-hy-tbl"><thead><tr>' + diagCornerCell(14) + monthHeaders + '</tr></thead><tbody>' + body + '</tbody></table>';
+    }
+
+    var sunGrid = buildPrayerGrid(function (mKey, wk) {
+      var r = findHalfRow(byMonth, mKey, wk, '主日下午', '');
+      return r ? tv(r.prayerLeader) : '';
+    });
+    var wedGrid = buildPrayerGrid(function (mKey, wk) {
+      var r = findHalfRow(byMonth, mKey, wk, '祷告会', '周三祷告会');
+      return r ? tv(r.leader) : '';
+    });
+    var satGrid = buildPrayerGrid(function (mKey, wk) {
+      var r = findHalfRow(byMonth, mKey, wk, '祷告会', '周六祷告会');
+      return r ? tv(r.leader) : '';
+    });
+
+    return '<div class="cec-hy-sheet" data-hy-page="2">' +
+      '<div class="cec-hy-sec" style="font-size:18px;margin-top:0">※祷告会</div>' +
+      '<div class="cec-hy-subcap">主日祷告会带领 &nbsp;时间:14:00-14:50 &nbsp;祷告内容:为主日事奉的人员和会场祷告</div>' +
+      sunGrid +
+      '<div class="cec-hy-subcap" style="margin-top:18px">周三祷告会带领 &nbsp;时间：21:00----22:00</div>' +
+      wedGrid +
+      '<div class="cec-hy-subcap" style="margin-top:18px">周六祷告会带领 &nbsp;时间：7:30----8:30</div>' +
+      satGrid +
+      '<div class="cec-hy-notes">注：PADOVA 祷告会联络负责：胡蓉</div>' +
+      '<div class="cec-hy-foot-notes">' +
+        '<div>☆星期六 21:00—22:30 练习唱诗</div>' +
+        '<div>☆需要代祷的弟兄姐妹散会后留下来,教会同工乐意为您代祷.</div>' +
+        '<div>☆初次参加聚会的弟兄姐妹或慕道友,请留下您的电话号码给接待的弟兄姐妹,以便联络。</div>' +
+        '<div class="cec-hy-church-sign">PADOVA 基督教华人教会</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function buildHalfYearPage3Html(meta, byMonth) {
+    var monthHeaders = meta.months.map(function (m) {
+      return '<th>' + esc(m.cn) + '</th>';
+    }).join('');
+
+    var evePreachRows = WEEK_ORDER.map(function (wk, wIdx) {
+      var rowLbl = wIdx === 0 ? '一周<br><span style="font-size:11px">（圣餐）</span>' : esc(WEEK_SHORT[wIdx]);
+      var tds = meta.months.map(function (m) {
+        var r = findHalfRow(byMonth, m.key, wk, '主日晚上', '');
+        var spk = r ? cleanPreacherText(r.note) : '';
+        return '<td>' + esc(spk) + '</td>';
+      }).join('');
+      return '<tr><td style="font-weight:700">' + rowLbl + '</td>' + tds + '</tr>';
+    }).join('');
+
+    var eveRoleCols = [
+      { key: 'leader', label: '领会', width: '18%' },
+      { key: 'prayerLeader', label: '带领祷告', width: '22%' },
+      { key: 'worship', label: '诗歌敬拜', width: '24%' },
+      { key: 'piano', label: '司琴', width: '24%' }
+    ];
+    var eveRoleHeaders = '<th style="width:12%"></th>' + eveRoleCols.map(function (c) {
+      return '<th style="width:' + c.width + '">' + esc(c.label) + '</th>';
+    }).join('');
+    var eveRoleBody = WEEK_ORDER.map(function (wk, wIdx) {
+      var tds = eveRoleCols.map(function (c) {
+        var v = pickHalfCycleRole(byMonth, meta, wk, '主日晚上', c.key, '、');
+        if (c.key === 'piano') v = v.replace(/\s*\/\s*/g, '、');
+        return '<td>' + esc(v) + '</td>';
+      }).join('');
+      return '<tr><td>' + esc(WEEK_SPACED[wIdx]) + '</td>' + tds + '</tr>';
+    }).join('');
+
+    var timeRows = [
+      ['20:00', '19:30', '开始用餐'],
+      ['20:30—20:55', '20:00—20:25', '诗歌敬拜'],
+      ['20:55—21:00', '20:25—20:30', '祷告'],
+      ['21:00—22:00', '20:30—21:30', '证道'],
+      ['22:00', '21:30', '祝福祷告散会']
+    ].map(function (r) {
+      return '<tr><td>' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>';
+    }).join('');
+
+    return '<div class="cec-hy-sheet" data-hy-page="3">' +
+      '<h2 class="cec-hy-h1">' + esc(meta.cnYear + '年' + meta.quarterLabel + '主日晚上崇拜事工表') + '</h2>' +
+      '<div class="cec-hy-sec">※圣工表</div>' +
+      '<table class="cec-hy-tbl"><thead><tr>' + diagCornerCell(14) + monthHeaders + '</tr></thead><tbody>' + evePreachRows + '</tbody></table>' +
+      '<div class="cec-hy-sec" style="margin-top:24px">※事工表：</div>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-bold"><thead><tr>' + eveRoleHeaders + '</tr></thead><tbody>' + eveRoleBody + '</tbody></table>' +
+      '<div class="cec-hy-sec" style="margin-top:28px">※聚会时间表：</div>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-left"><thead><tr><th>夏令时</th><th>冬令时</th><th>聚会程序</th></tr></thead><tbody>' + timeRows + '</tbody></table>' +
+      '</div>';
+  }
+
+  function openHalfYearPrintModal(initialYear, initialHalf, allRows, byMonth) {
+    if (document.querySelector('.cec-preview-mask')) return;
+
+    var yearsSet = {};
+    yearsSet[initialYear] = true;
+    Object.keys(byMonth).forEach(function (m) {
+      var mm = m.match(/^(\d{4})年/);
+      if (mm) yearsSet[parseInt(mm[1], 10)] = true;
+    });
+    var years = Object.keys(yearsSet).map(Number).sort();
+    var curYear = initialYear;
+    var curHalf = initialHalf === 'H1' ? 'H1' : 'H2';
+    var busy = false;
+
+    var mask = document.createElement('div');
+    mask.className = 'cec-preview-mask';
+    var previousFocus = document.activeElement;
+    var previousOverflow = document.body.style.overflow;
+
+    function renderModal() {
+      var meta = getHalfYearMeta(curYear, curHalf);
+      var yearOpts = years.map(function (y) {
+        return '<option value="' + y + '"' + (y === curYear ? ' selected' : '') + '>' + y + '年</option>';
+      }).join('');
+
+      mask.innerHTML =
+        '<section class="cec-preview cec-hy-modal" role="dialog" aria-modal="true" aria-label="半年打印事工表预览" tabindex="-1">' +
+          '<div class="cec-hy-toolbar">' +
+            '<div class="cec-hy-toolbar-left">' +
+              '<strong style="font-size:14px;margin-right:4px">📄 半年打印表</strong>' +
+              '<select id="cecHyYear" aria-label="选择年份">' + yearOpts + '</select>' +
+              '<button type="button" class="cec-btn cec-hy-btn' + (curHalf === 'H1' ? ' on' : '') + '" data-hy-half="H1">1–6月 (一、二季度)</button>' +
+              '<button type="button" class="cec-btn cec-hy-btn' + (curHalf === 'H2' ? ' on' : '') + '" data-hy-half="H2">7–12月 (三、四季度)</button>' +
+            '</div>' +
+            '<div class="cec-hy-toolbar-right">' +
+              '<button type="button" class="cec-btn cec-hy-btn primary" id="cecHyDlMerged">下载合并长图</button>' +
+              '<button type="button" class="cec-btn cec-hy-btn" id="cecHyDlAll3">逐页下载 (3张)</button>' +
+              '<button type="button" class="cec-btn cec-hy-btn" id="cecHyPrint">打印 / PDF</button>' +
+              '<button type="button" class="cec-btn cec-hy-btn" id="cecHyClose">关闭</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cec-hy-stage">' +
+            '<div class="cec-hy-page-wrap">' +
+              '<div class="cec-hy-page-bar"><span>第 1 页 · 主日崇拜事工表（下午程序 / 圣工 / 事工 / 读经）</span><button type="button" class="cec-btn cec-hy-page-dl" data-hy-dl-page="1">下载第1页 PNG</button></div>' +
+              '<div class="cec-hy-page-scroll">' + buildHalfYearPage1Html(meta, byMonth) + '</div>' +
+            '</div>' +
+            '<div class="cec-hy-page-wrap">' +
+              '<div class="cec-hy-page-bar"><span>第 2 页 · 祷告会事工表（主日 / 周三 / 周六）</span><button type="button" class="cec-btn cec-hy-page-dl" data-hy-dl-page="2">下载第2页 PNG</button></div>' +
+              '<div class="cec-hy-page-scroll">' + buildHalfYearPage2Html(meta, byMonth) + '</div>' +
+            '</div>' +
+            '<div class="cec-hy-page-wrap">' +
+              '<div class="cec-hy-page-bar"><span>第 3 页 · 主日晚上崇拜事工表（圣工 / 事工 / 聚会时间）</span><button type="button" class="cec-btn cec-hy-page-dl" data-hy-dl-page="3">下载第3页 PNG</button></div>' +
+              '<div class="cec-hy-page-scroll">' + buildHalfYearPage3Html(meta, byMonth) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cec-preview-actions"><span role="status" id="cecHyStatus">已按 PDF 打印版式生成 ' + esc(curYear + '年' + meta.rangeLabel) + ' 事工表（共 3 页）</span></div>' +
+        '</section>';
+
+      var yearSel = mask.querySelector('#cecHyYear');
+      if (yearSel) {
+        yearSel.onchange = function () {
+          curYear = parseInt(this.value, 10) || curYear;
+          renderModal();
+        };
+      }
+      mask.querySelectorAll('[data-hy-half]').forEach(function (btn) {
+        btn.onclick = function () {
+          curHalf = this.getAttribute('data-hy-half') || 'H2';
+          renderModal();
+        };
+      });
+      mask.querySelector('#cecHyClose').onclick = close;
+      mask.querySelectorAll('[data-hy-dl-page]').forEach(function (btn) {
+        btn.onclick = function () {
+          var pNo = parseInt(this.getAttribute('data-hy-dl-page'), 10);
+          downloadSinglePage(pNo);
+        };
+      });
+      mask.querySelector('#cecHyDlAll3').onclick = downloadAllPagesSeparately;
+      mask.querySelector('#cecHyDlMerged').onclick = downloadMergedLongImage;
+      mask.querySelector('#cecHyPrint').onclick = printHalfYearSheets;
+    }
+
+    function setStatus(txt) {
+      var st = mask.querySelector('#cecHyStatus');
+      if (st) st.textContent = txt;
+    }
+
+    function exportSheetElementToBlob(sheetEl) {
+      var host = document.createElement('div');
+      host.className = 'cec-export-shot';
+      var copy = sheetEl.cloneNode(true);
+      copy.style.width = '794px';
+      host.appendChild(copy);
+      document.body.appendChild(host);
+      var fonts = document.fonts ? document.fonts.ready : Promise.resolve();
+      return fonts
+        .then(waitPaint2)
+        .then(function () { return nodeToPngBlobRobust(copy, '#ffffff'); })
+        .finally(function () { host.remove(); });
+    }
+
+    function downloadSinglePage(pageNo) {
+      if (busy) return Promise.resolve();
+      var meta = getHalfYearMeta(curYear, curHalf);
+      var sheetEl = mask.querySelector('[data-hy-page="' + pageNo + '"]');
+      if (!sheetEl) return Promise.resolve();
+      var pageNames = { 1: '第1页_主日下午崇拜', 2: '第2页_祷告会', 3: '第3页_主日晚上崇拜' };
+      busy = true;
+      setStatus('正在生成第 ' + pageNo + ' 页高清图片…');
+      return exportSheetElementToBlob(sheetEl)
+        .then(function (blob) {
+          saveBlobAs(blob, safeFileName(curYear + '年' + meta.rangeLabel + '_事工表_' + (pageNames[pageNo] || ('第' + pageNo + '页'))) + '.png');
+          setStatus('第 ' + pageNo + ' 页图片已保存');
+        })
+        .catch(function () {
+          setStatus('生成失败，请重试');
+        })
+        .finally(function () {
+          busy = false;
+        });
+    }
+
+    function downloadAllPagesSeparately() {
+      if (busy) return;
+      downloadSinglePage(1)
+        .then(function () { return downloadSinglePage(2); })
+        .then(function () { return downloadSinglePage(3); })
+        .then(function () { setStatus('全部 3 页图片已依次保存'); });
+    }
+
+    function downloadMergedLongImage() {
+      if (busy) return;
+      var meta = getHalfYearMeta(curYear, curHalf);
+      var sheets = mask.querySelectorAll('.cec-hy-sheet');
+      if (!sheets.length) return;
+      busy = true;
+      setStatus('正在生成 3 页合并高清长图…');
+      var host = document.createElement('div');
+      host.className = 'cec-export-shot';
+      var wrapper = document.createElement('div');
+      wrapper.style.cssText = 'width:794px;background:#ffffff;display:flex;flex-direction:column;gap:0;';
+      Array.prototype.forEach.call(sheets, function (sh, idx) {
+        var copy = sh.cloneNode(true);
+        copy.style.width = '794px';
+        if (idx > 0) copy.style.borderTop = '2px dashed #cbd5e1';
+        wrapper.appendChild(copy);
+      });
+      host.appendChild(wrapper);
+      document.body.appendChild(host);
+      var fonts = document.fonts ? document.fonts.ready : Promise.resolve();
+      fonts
+        .then(waitPaint2)
+        .then(function () { return nodeToPngBlobRobust(wrapper, '#ffffff'); })
+        .then(function (blob) {
+          saveBlobAs(blob, safeFileName(curYear + '年' + meta.rangeLabel + '_主日崇拜事工表_全3页') + '.png');
+          setStatus('合并长图已保存');
+        })
+        .catch(function () {
+          setStatus('生成失败，请重试');
+        })
+        .finally(function () {
+          host.remove();
+          busy = false;
+        });
+    }
+
+    function printHalfYearSheets() {
+      var meta = getHalfYearMeta(curYear, curHalf);
+      var styleEl = document.getElementById('_cecp_yearsafe_style_v2');
+      var cssText = styleEl ? styleEl.textContent : '';
+      var pagesHtml = Array.prototype.map.call(mask.querySelectorAll('.cec-hy-sheet'), function (sh) {
+        return sh.outerHTML;
+      }).join('');
+      var w = window.open('', '_blank');
+      if (!w) {
+        window.print();
+        return;
+      }
+      w.document.open();
+      w.document.write(
+        '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' +
+        esc(curYear + '年' + meta.rangeLabel + '主日崇拜事工表') +
+        '</title><style>' + cssText +
+        '@page{size:A4 portrait;margin:10mm}' +
+        'body{margin:0;padding:0;background:#fff;color:#000}' +
+        '.cec-hy-sheet{width:100%!important;min-height:0!important;padding:6mm 8mm!important;page-break-after:always;break-after:page}' +
+        '.cec-hy-sheet:last-child{page-break-after:auto;break-after:auto}' +
+        '</style></head><body>' + pagesHtml +
+        '<script>window.onload=function(){setTimeout(function(){window.print();},200);};<\/script></body></html>'
+      );
+      w.document.close();
+    }
+
+    function close() {
+      if (busy) return;
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow;
+      mask.remove();
+      if (previousFocus && previousFocus.isConnected) previousFocus.focus();
+    }
+
+    function onKey(event) {
+      if (event.key === 'Escape') close();
+    }
+
+    document.body.appendChild(mask);
+    document.body.style.overflow = 'hidden';
+    renderModal();
+    var dialog = mask.querySelector('.cec-preview');
+    if (dialog) dialog.focus();
+    document.addEventListener('keydown', onKey);
+    mask.onclick = function (event) { if (event.target === mask) close(); };
   }
 
   function renderServiceMatrix(rows, type, opt) {
