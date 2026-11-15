@@ -198,7 +198,7 @@
 .cec-export-wrap.open .cec-btn-tool{background:#161b24;color:#ffffff;border-color:#465165}
 .cec-menu{
   position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:flex;flex-direction:column;
-  min-width:220px;padding:8px;border:1px solid var(--cec-border);border-radius:14px;
+  min-width:296px;padding:10px;border:1px solid var(--cec-border);border-radius:14px;
   background:var(--cec-bg2);box-shadow:0 18px 36px rgba(18,24,38,.16);
   opacity:0;visibility:hidden;pointer-events:none;
   transform:translateY(-8px) scale(.96);transform-origin:top right;
@@ -216,11 +216,11 @@
   margin:8px 4px;border-top:1px solid var(--cec-border);
 }
 .cec-ratio-bar{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 4px 4px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 4px 4px;
 }
 .cec-ratio-item{
-  min-height:36px;border-radius:10px;border:1px solid var(--cec-border);
-  background:var(--cec-bg3);color:var(--cec-ink2);font-weight:800;
+  min-height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--cec-border);
+  background:var(--cec-bg3);color:var(--cec-ink2);font-size:12.5px;font-weight:800;white-space:nowrap;
 }
 .cec-ratio-item:hover{background:var(--cec-hover);color:var(--cec-ink)}
 .cec-ratio-item.on{
@@ -370,12 +370,12 @@
   transform:translate(-50%,-50%);opacity:.03;pointer-events:none;z-index:0;
 }
 .cec-export-stage{
-  position:absolute;inset:22px;padding:18px;border-radius:0;overflow:hidden;
+  position:absolute;inset:20px;padding:16px 24px 16px 16px;border-radius:0;overflow:visible;
   background:transparent;border:0;box-shadow:none;z-index:1;
 }
-.cec-export-frame.is-r16x9 .cec-export-stage{inset:18px;padding:14px}
+.cec-export-frame.is-r16x9 .cec-export-stage{inset:16px;padding:14px 22px 14px 14px}
 .cec-export-viewport{
-  position:relative;width:100%;height:100%;overflow:hidden;
+  position:relative;width:100%;height:100%;overflow:visible;
 }
 .cec-export-scale{
   position:relative;width:100%;height:100%;
@@ -385,43 +385,45 @@
   --cec-bg2:#ffffff;
   --cec-bg3:#f0f2f6;
   --cec-btn-bg:#eaecf1;
-  --cec-border:#e9edf3;
-  --cec-border2:#e9edf3;
-  --cec-ink:#1a1d24;
-  --cec-ink2:#5a6275;
-  --cec-ink3:#8a94a6;
-  --cec-ink4:#9aa0ad;
-  --cec-ref:#3e5c8f;
-  --cec-npfx:#6b7688;
+  --cec-border:#e2e8f0;
+  --cec-border2:#e2e8f0;
+  --cec-ink:#141820;
+  --cec-ink2:#4b5568;
+  --cec-ink3:#7c879b;
+  --cec-ink4:#94a3b8;
+  --cec-ref:#2d4f85;
+  --cec-npfx:#5b677a;
   width:max-content;max-width:none;min-width:0;padding:0;
-  border-radius:0;border:0;
+  border-radius:16px;border:1px solid #dfe5ef;
   background:#ffffff;
-  box-shadow:none;
+  box-shadow:0 10px 30px rgba(15,23,42,.06);
+  overflow:hidden;
   color:var(--cec-ink);
   font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
 }
 .cec-export-head{
-  display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;
-  margin:0;padding:30px 34px 22px;
-  background:#ffffff;
-  border-bottom:1px solid #edf0f5;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  margin:0;padding:26px 32px 22px;
+  background:linear-gradient(180deg,#ffffff 0%,#fafbfd 100%);
+  border-bottom:1.5px solid #e6ebf3;
 }
-.cec-export-head-left{display:flex;flex-direction:column;gap:10px}
+.cec-export-head-left{display:flex;flex-direction:column;gap:6px}
 .cec-export-eyebrow{
-  font-size:11px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#a3adbd;
+  font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#8894a8;
 }
-.cec-export-month{font-size:42px;font-weight:800;letter-spacing:.01em;line-height:1.04;color:#161c26}
+.cec-export-month{font-size:38px;font-weight:800;letter-spacing:.01em;line-height:1.1;color:#111827}
 .cec-export-meta{
-  display:flex;align-items:baseline;justify-content:flex-end;gap:14px;
-  padding-bottom:4px;
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;
 }
 .cec-export-chip{
   display:inline-flex;align-items:center;justify-content:center;
-  border:0;background:transparent;padding:0;min-width:0;
-  color:#8b95a7;font-size:12px;font-weight:700;letter-spacing:.1em;
+  height:30px;padding:0 12px;border-radius:999px;
+  border:1px solid #e2e8f0;background:#f8fafc;
+  color:#475569;font-size:12px;font-weight:700;letter-spacing:.04em;
 }
 .cec-export-chip.is-ratio{
-  border:0;background:transparent;color:#3e5c8f;
+  border-color:#d5e0f2;background:#f0f5ff;color:#2d4f85;font-weight:800;
 }
 .cec-export-sub{
   font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cec-ink3);
@@ -429,49 +431,60 @@
 .cec-export-body{background:var(--cec-bg2)}
 .cec-export-card *{box-sizing:border-box}
 .cec-export-grid{
-  display:flex;align-items:flex-start;gap:14px;padding:14px;
-  background:transparent;
+  display:flex;align-items:flex-start;gap:14px;padding:16px;
+  background:#f8fafc;
 }
 .cec-export-col{
   display:flex;flex-direction:column;gap:14px;flex:0 1 auto;min-width:0;
 }
 .cec-export-panel{
-  display:flex;flex-direction:column;overflow:hidden;border:1px solid #e9edf3;
-  border-radius:12px;background:#ffffff;box-shadow:none;
+  display:flex;flex-direction:column;overflow:hidden;border:1px solid #dfe5ef;
+  border-radius:12px;background:#ffffff;box-shadow:0 2px 8px rgba(15,23,42,.03);
 }
 .cec-export-section{
-  margin-top:0;border:none;border-radius:0;overflow:hidden;background:var(--cec-bg2);
+  margin:16px;border:1px solid #dfe5ef;border-radius:12px;overflow:hidden;background:#ffffff;
 }
 .cec-export-label{
-  display:flex;align-items:center;gap:10px;padding:13px 16px 12px;
-  border-bottom:1px solid #edf0f5;background:#ffffff;
-  font-size:15px;font-weight:800;color:#252d3a;
+  display:flex;align-items:center;gap:10px;padding:12px 18px;
+  border-bottom:1px solid #e6ebf3;background:#f8fafc;
+  font-size:15px;font-weight:800;color:#1e293b;letter-spacing:.02em;
 }
-.cec-export-label .cec-dot{width:7px;height:7px;background:#3e5c8f!important}
+.cec-export-label .cec-dot{width:8px;height:8px;border-radius:50%;background:#3e5c8f!important}
 .cec-export-empty{
-  padding:18px 16px;color:var(--cec-ink2);font-size:13px;font-weight:700;
+  padding:20px 18px;color:var(--cec-ink2);font-size:13px;font-weight:700;text-align:center;
 }
 .cec-export-card .cec-wrap{overflow:visible;background:transparent}
-.cec-export-card .cec-tbl{min-width:0;width:max-content}
+.cec-export-card .cec-tbl{min-width:0;width:max-content;border-collapse:collapse;table-layout:fixed}
 .cec-export-badge-img{
   display:block;flex:0 0 auto;overflow:visible;
 }
 .cec-export-card .cec-corner,
 .cec-export-card .cec-h{
-  position:static;padding:10px 10px;background:#fafbfd;color:#7d8798;
-  font-size:14px;font-weight:800;
+  position:static;padding:11px 10px;background:#f8fafc;color:#475569;
+  font-size:13px;font-weight:800;text-align:center;vertical-align:middle;
+  border-bottom:1.5px solid #e2e8f0;
+}
+.cec-export-card .cec-corner{
+  text-align:left;padding-left:16px;color:#64748b;
+}
+.cec-export-card .cec-date{
+  display:block;margin-top:3px;font-size:11px;font-weight:600;color:#8894a8;
 }
 .cec-export-card .cec-rowlbl{
-  padding:10px 12px;background:#ffffff;font-size:13px;font-weight:800;line-height:1.14;
+  padding:10px 16px;background:#ffffff;font-size:13px;font-weight:800;line-height:1.25;
+  color:#1e293b;text-align:left;vertical-align:middle;border-right:1px solid #e9edf3;
+}
+.cec-export-card .cec-rowlbl-inner{
+  justify-content:flex-start;
 }
 .cec-export-card .cec-cell{
-  min-width:132px;height:72px;padding:8px 8px;background:#ffffff;
+  min-width:138px;height:68px;padding:8px 10px;background:#ffffff;vertical-align:middle;
 }
 .cec-export-card .cec-cellbox{
-  min-height:56px;gap:6px;
+  min-height:50px;gap:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;
 }
 .cec-export-card tbody tr:nth-child(2n) .cec-rowlbl,
-.cec-export-card tbody tr:nth-child(2n) .cec-cell{background:#fbfcfd}
+.cec-export-card tbody tr:nth-child(2n) .cec-cell{background:#fafbfd}
 .cec-export-card .cec-cell:hover{background:#ffffff}
 .cec-export-card .cec-cell,
 .cec-export-card .cec-empty,
@@ -480,30 +493,30 @@
   text-align:center;
 }
 .cec-export-card .cec-badges{
-  gap:8px;justify-content:center;align-items:center;align-content:center;
+  gap:6px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-badge{
   display:inline-flex;box-sizing:border-box;
-  min-height:32px;padding:6px 12px;border-radius:8px;
-  font-size:11px;font-weight:800;line-height:1.2;letter-spacing:0;text-align:center;
+  min-height:30px;padding:5px 12px;border-radius:8px;
+  font-size:12px;font-weight:800;line-height:1.2;letter-spacing:.01em;text-align:center;
   justify-content:center;align-items:center;vertical-align:middle;
   white-space:nowrap;
 }
 .cec-export-card .cec-badge-txt{
-  min-height:auto;line-height:inherit;transform:translateY(-0.1em);
+  min-height:auto;line-height:1.2;transform:none;display:inline-flex;align-items:center;justify-content:center;
 }
 .cec-export-card .cec-note,
 .cec-export-card .cec-reading{
-  gap:6px;justify-content:center;align-items:center;align-content:center;
+  gap:5px;justify-content:center;align-items:center;align-content:center;
 }
 .cec-export-card .cec-ref,
 .cec-export-card .cec-npfx,
 .cec-export-card .cec-empty{
   display:block;width:100%;text-align:center;
 }
-.cec-export-card .cec-ref{font-size:12px}
-.cec-export-card .cec-npfx{font-size:11px}
-.cec-export-card .cec-empty{font-size:12px;color:#ccd3dd}
+.cec-export-card .cec-ref{font-size:12px;font-weight:700;color:#2d4f85}
+.cec-export-card .cec-npfx{font-size:11px;font-weight:600;color:#64748b}
+.cec-export-card .cec-empty{font-size:12px;color:#cbd5e1}
 .cec-tbl-all .cec-corner,
 .cec-tbl-all .cec-typecell{
   width:var(--cec-type-col,112px);min-width:var(--cec-type-col,112px);
@@ -527,44 +540,50 @@
 }
 .cec-export-card .cec-tbl-all .cec-typecell{background:#fbfcfd}
 .cec-export-frame.is-r16x9 .cec-export-head{
-  padding:20px 26px 15px;
+  padding:20px 26px 16px;
 }
-.cec-export-frame.is-r16x9 .cec-export-month{font-size:34px}
+.cec-export-frame.is-r16x9 .cec-export-month{font-size:32px}
 .cec-export-frame.is-r16x9 .cec-export-grid{
-  gap:12px;padding:12px;
+  gap:12px;padding:14px;
+}
+.cec-export-frame.is-r16x9 .cec-export-section{
+  margin:14px;
 }
 .cec-export-frame.is-r16x9 .cec-export-col{gap:12px}
 .cec-export-frame.is-r16x9 .cec-export-panel{
   border-radius:12px;
 }
 .cec-export-frame.is-r16x9 .cec-export-label{
-  padding:10px 14px 9px;font-size:13px;
+  padding:10px 16px;font-size:13px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-corner,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-h{
-  padding:8px 8px;font-size:12px;
+  padding:9px 8px;font-size:12px;
+}
+.cec-export-frame.is-r16x9 .cec-export-card .cec-corner{
+  padding-left:14px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-rowlbl{
-  padding:7px 9px;font-size:11px;
+  padding:8px 14px;font-size:11.5px;
 }
 .cec-export-frame.is-r16x9 .cec-tbl-all .cec-typecell{
-  padding:7px 9px;
+  padding:8px 10px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-cell{
-  min-width:114px;height:52px;padding:5px 5px;
+  min-width:118px;height:52px;padding:5px 6px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-cellbox{
-  min-height:42px;gap:4px;
+  min-height:40px;gap:4px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badges{
   gap:5px;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge{
-  min-height:24px;padding:4px 9px;border-radius:7px;
-  font-size:9px;line-height:1.15;
+  min-height:24px;padding:4px 10px;border-radius:7px;
+  font-size:10px;line-height:1.15;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-badge-txt{
-  line-height:inherit;transform:translateY(-0.1em);
+  line-height:1.15;transform:none;
 }
 .cec-export-frame.is-r16x9 .cec-export-card .cec-note,
 .cec-export-frame.is-r16x9 .cec-export-card .cec-reading{
@@ -687,12 +706,16 @@
 .cec-preview{width:720px;max-width:100%;max-height:calc(100dvh - 32px);overflow:auto;border-radius:14px;background:var(--cec-bg);color:var(--cec-ink);outline:none}
 .cec-preview-toolbar,.cec-preview-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 16px;background:var(--cec-bg2);position:sticky;z-index:1;top:0}
 .cec-preview-actions{top:auto;bottom:0;border-top:1px solid var(--cec-border);font-size:12px;color:var(--cec-ink2)}
-.cec-share-sheet{--cec-bg:#f4f6f9;--cec-bg2:#fff;--cec-bg3:#f0f2f6;--cec-border:#d0d5df;--cec-ink:#1a1d24;--cec-ink2:#5a6275;--cec-ref:#1a7a3c;--cec-npfx:#7a5500;background:#fff;color:#1a1d24;padding:20px;overflow-wrap:anywhere}
-.cec-share-sheet h2{font-size:22px;line-height:1.4;margin:0 0 6px}
-.cec-share-sheet>p{font-size:13px;margin:0;color:#5a6275}
-.cec-share-sheet .cec-cards{padding:18px 0;grid-template-columns:1fr}
-.cec-share-sheet .cec-share-foot{font-size:11px;text-align:right}
-.cec-hy-modal{width:900px;max-width:100%}
+.cec-share-sheet{--cec-bg:#f4f6f9;--cec-bg2:#fff;--cec-bg3:#f8fafc;--cec-border:#dfe5ef;--cec-ink:#141820;--cec-ink2:#4b5568;--cec-ref:#1a7a3c;--cec-npfx:#7a5500;background:#fff;color:#141820;padding:24px 26px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.cec-share-sheet h2{font-size:24px;font-weight:800;line-height:1.3;margin:0 0 4px;color:#111827}
+.cec-share-sheet>p{font-size:13px;font-weight:600;margin:0;color:#64748b}
+.cec-share-sheet .cec-cards{padding:18px 0 14px;grid-template-columns:1fr;gap:14px}
+.cec-share-sheet .cec-week-card{border:1px solid #dfe5ef;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.03)}
+.cec-share-sheet .cec-card-head{display:flex;align-items:baseline;justify-content:space-between;padding:12px 16px;background:#f8fafc;border-bottom:1px solid #dfe5ef}
+.cec-share-sheet .cec-detail{grid-template-columns:104px minmax(0,1fr);gap:12px;min-height:48px;padding:9px 0;border-bottom:1px solid #edf1f7}
+.cec-share-sheet .cec-detail-label{font-size:12.5px;font-weight:800;color:#334155}
+.cec-share-sheet .cec-share-foot{font-size:11px;font-weight:600;color:#94a3b8;text-align:right;padding-top:4px}
+.cec-hy-modal{width:920px;max-width:100%}
 .cec-hy-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:12px 16px;background:var(--cec-bg2);border-bottom:1px solid var(--cec-border);position:sticky;top:0;z-index:5}
 .cec-hy-toolbar-left,.cec-hy-toolbar-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .cec-hy-toolbar select{height:34px;padding:0 8px;border:1px solid var(--cec-border);border-radius:8px;background:var(--cec-bg);color:var(--cec-ink);font:inherit;font-size:13px;font-weight:700}
@@ -701,50 +724,61 @@
 .cec-hy-btn.on{background:var(--cec-active);border-color:var(--cec-active-border);color:var(--cec-ink)}
 .cec-hy-btn.primary{background:#111827;border-color:#2f3a50;color:#ffffff}
 .cec-hy-btn.primary:hover{background:#1f2937}
-.cec-hy-stage{padding:16px;background:#e5e7eb;display:flex;flex-direction:column;gap:20px;align-items:center}
+.cec-hy-stage{padding:18px;background:#e2e8f0;display:flex;flex-direction:column;gap:22px;align-items:center}
 .cec-hy-page-wrap{width:100%;max-width:794px;display:flex;flex-direction:column;gap:8px}
-.cec-hy-page-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;border-radius:8px;background:#1f242d;color:#f3f4f6;font-size:12px;font-weight:700}
-.cec-hy-page-dl{min-height:28px;padding:0 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:11px;font-weight:700}
+.cec-hy-page-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 12px;border-radius:8px;background:#1e293b;color:#f8fafc;font-size:12px;font-weight:700}
+.cec-hy-page-dl{min-height:28px;padding:0 10px;border-radius:6px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);color:#fff;font-size:11px;font-weight:700}
 .cec-hy-page-dl:hover{background:rgba(255,255,255,.2)}
-.cec-hy-page-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.cec-hy-page-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:6px;box-shadow:0 10px 28px rgba(15,23,42,.18)}
 .cec-hy-sheet{
-  width:794px;min-height:1123px;padding:38px 44px;background:#ffffff;color:#000000;
+  width:794px;min-height:1123px;padding:42px 48px 38px;background:#ffffff;color:#000000;
   font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  font-variant-numeric:tabular-nums;
   display:flex;flex-direction:column;justify-content:flex-start;
 }
 .cec-hy-sheet *{box-sizing:border-box}
 .cec-hy-h1{
-  margin:0 0 14px;text-align:center;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
-  font-size:26px;font-weight:800;letter-spacing:.04em;color:#000;line-height:1.25;
+  margin:0 0 16px;text-align:center;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
+  font-size:26px;font-weight:800;letter-spacing:.05em;color:#000;line-height:1.28;
 }
 .cec-hy-sec{
-  margin:12px 0 6px;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
-  font-size:16px;font-weight:800;color:#000;line-height:1.35;
+  margin:14px 0 6px;display:flex;align-items:center;gap:4px;
+  font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
+  font-size:16px;font-weight:800;color:#000;line-height:1.35;letter-spacing:.02em;
 }
 .cec-hy-subcap{
-  margin:10px 0 5px;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
+  margin:12px 0 6px;display:flex;align-items:baseline;flex-wrap:wrap;gap:14px;
+  font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
   font-size:14px;font-weight:700;color:#000;line-height:1.4;
 }
+.cec-hy-subcap-meta{
+  font-weight:700;color:#111;
+}
 .cec-hy-tbl{
-  width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #111;background:#fff;color:#000;font-size:13px;
+  width:calc(100% - 4px);margin:0 auto;border-collapse:separate;border-spacing:0;table-layout:fixed;
+  border-top:1.5px solid #000;border-left:1.5px solid #000;background:#fff;color:#000;font-size:13px;
 }
 .cec-hy-tbl th,.cec-hy-tbl td{
-  border:1px solid #222;padding:5px 4px;text-align:center;vertical-align:middle;line-height:1.35;overflow-wrap:anywhere;color:#000;
+  border-right:1px solid #111;border-bottom:1px solid #111;padding:5px 4px;height:33px;text-align:center;vertical-align:middle;line-height:1.35;overflow-wrap:anywhere;color:#000;
 }
-.cec-hy-tbl th{font-weight:700;background:#fff}
-.cec-hy-tbl-prog td{padding:4px 10px;font-size:13px;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+.cec-hy-tbl tr th:last-child,.cec-hy-tbl tr td:last-child{border-right:1.5px solid #000}
+.cec-hy-tbl tbody tr:last-child td{border-bottom:1.5px solid #000}
+.cec-hy-tbl thead th{height:36px;font-weight:800;background:#fafafa;letter-spacing:.02em}
+.cec-hy-tbl-prog td{height:30px;padding:4px 12px;font-size:13.5px;font-weight:700;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
 .cec-hy-tbl-bold td,.cec-hy-tbl-bold th{font-weight:700}
-.cec-hy-diag{position:relative;height:40px;padding:0!important}
+.cec-hy-row-wk{font-weight:800;background:#fcfcfc;letter-spacing:.02em}
+.cec-hy-diag{position:relative;height:42px!important;padding:0!important;background:#fafafa}
 .cec-hy-diag-svg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
-.cec-hy-diag-top{position:absolute;top:4px;right:6px;font-size:11px;font-weight:700;line-height:1}
-.cec-hy-diag-bot{position:absolute;bottom:4px;left:6px;font-size:11px;font-weight:700;line-height:1}
-.cec-hy-rd-ref{display:block;font-weight:800;font-size:12px;line-height:1.3}
-.cec-hy-rd-name{display:block;font-weight:700;font-size:12px;line-height:1.3;margin-top:1px}
-.cec-hy-notes{margin-top:8px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:12px;color:#111;line-height:1.7}
-.cec-hy-foot-notes{margin-top:auto;padding-top:24px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:14px;color:#111;line-height:1.85}
-.cec-hy-church-sign{margin-top:18px;text-align:right;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:18px;font-weight:800;letter-spacing:.03em;color:#000}
-.cec-hy-tbl-left td{text-align:left;padding:5px 10px;font-weight:700}
-.cec-hy-tbl-left th{text-align:left;padding:6px 10px;font-weight:800}
+.cec-hy-diag-top{position:absolute;top:5px;right:7px;font-size:11px;font-weight:800;line-height:1;color:#000}
+.cec-hy-diag-bot{position:absolute;bottom:5px;left:7px;font-size:11px;font-weight:800;line-height:1;color:#000}
+.cec-hy-tbl-rd tbody td{height:44px;padding:4px 3px}
+.cec-hy-rd-ref{display:block;font-weight:800;font-size:12px;line-height:1.25;color:#000}
+.cec-hy-rd-name{display:block;font-weight:700;font-size:12px;line-height:1.25;margin-top:2px;color:#111}
+.cec-hy-notes{margin-top:10px;padding:0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:12.5px;font-weight:700;color:#000;line-height:1.7}
+.cec-hy-foot-notes{margin-top:auto;padding:24px 6px 0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:14px;font-weight:700;color:#000;line-height:1.9}
+.cec-hy-church-sign{margin-top:18px;padding-right:8px;text-align:right;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:18px;font-weight:800;letter-spacing:.04em;color:#000}
+.cec-hy-tbl-left td{text-align:left;padding:6px 14px;font-weight:700;height:34px}
+.cec-hy-tbl-left thead th{text-align:left;padding:7px 14px;font-weight:800;background:#fafafa}
 @container cecp-schedule (max-width:760px){
   .cec-label-long{display:none}
   .cec-label-short{display:inline}
@@ -1974,8 +2008,10 @@
     function close() {
       if (mask.querySelector('.cec-preview-save').disabled) return;
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = previousOverflow; mask.remove();
-      if (previousFocus && previousFocus.isConnected) previousFocus.focus();
+      document.body.style.overflow = previousOverflow;
+      closeModalAnimated(mask, function () {
+        if (previousFocus && previousFocus.isConnected) previousFocus.focus();
+      });
     }
     function onKey(event) {
       if (event.key === 'Escape') close();
@@ -2035,10 +2071,16 @@
 
   function diagCornerCell(widthPct) {
     return '<th class="cec-hy-diag" style="width:' + (widthPct || 13) + '%">' +
-      '<svg class="cec-hy-diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#222" stroke-width="1.2"/></svg>' +
+      '<svg class="cec-hy-diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#111" stroke-width="1.2"/></svg>' +
       '<span class="cec-hy-diag-top">月份</span>' +
       '<span class="cec-hy-diag-bot">周期</span>' +
       '</th>';
+  }
+
+  function sevenColGroup() {
+    return '<colgroup><col style="width:13%">' +
+      '<col style="width:14.5%"><col style="width:14.5%"><col style="width:14.5%">' +
+      '<col style="width:14.5%"><col style="width:14.5%"><col style="width:14.5%"></colgroup>';
   }
 
   function findHalfRow(byMonth, monthKey, week, type, subtype) {
@@ -2098,25 +2140,28 @@
         var spk = r ? cleanPreacherText(r.note) : '';
         return '<td>' + esc(spk) + '</td>';
       }).join('');
-      return '<tr><td>' + esc(WEEK_SHORT[wIdx]) + '</td>' + cells + '</tr>';
+      return '<tr><td class="cec-hy-row-wk">' + esc(WEEK_SHORT[wIdx]) + '</td>' + cells + '</tr>';
     }).join('');
 
     var pmRoleCols = [
-      { key: 'leader', label: '领 会', width: '11%' },
-      { key: 'worship', label: '敬 拜', width: '11%' },
-      { key: 'piano', label: '司琴', width: '18%' },
-      { key: 'praisePrayer', label: '颂赞祷告', width: '24%' },
-      { key: 'memorialPrayer', label: '纪念祷告', width: '25%' }
+      { key: 'leader', label: '领 会', width: '13%' },
+      { key: 'worship', label: '敬 拜', width: '13%' },
+      { key: 'piano', label: '司琴', width: '17%' },
+      { key: 'praisePrayer', label: '颂赞祷告', width: '22%' },
+      { key: 'memorialPrayer', label: '纪念祷告', width: '22%' }
     ];
-    var pmRoleHeaders = '<th style="width:11%"></th>' + pmRoleCols.map(function (c) {
-      return '<th style="width:' + c.width + '">' + esc(c.label) + '</th>';
+    var pmRoleCg = '<colgroup><col style="width:13%">' + pmRoleCols.map(function (c) {
+      return '<col style="width:' + c.width + '">';
+    }).join('') + '</colgroup>';
+    var pmRoleHeaders = '<th>周期</th>' + pmRoleCols.map(function (c) {
+      return '<th>' + esc(c.label) + '</th>';
     }).join('');
     var pmRoleBody = WEEK_ORDER.map(function (wk, wIdx) {
       var tds = pmRoleCols.map(function (c) {
         var v = pickHalfCycleRole(byMonth, meta, wk, '主日下午', c.key);
         return '<td>' + esc(v) + '</td>';
       }).join('');
-      return '<tr><td>' + esc(WEEK_SHORT[wIdx]) + '</td>' + tds + '</tr>';
+      return '<tr><td class="cec-hy-row-wk">' + esc(WEEK_SHORT[wIdx]) + '</td>' + tds + '</tr>';
     }).join('');
 
     var readingRows = WEEK_ORDER.map(function (wk, wIdx) {
@@ -2128,19 +2173,19 @@
         return '<td><span class="cec-hy-rd-ref">' + esc(rd.ref) + '</span>' +
           (rd.name ? '<span class="cec-hy-rd-name">' + esc(rd.name) + '</span>' : '') + '</td>';
       }).join('');
-      return '<tr><td style="font-weight:700">' + esc(WEEK_SHORT[wIdx]) + '</td>' + cells + '</tr>';
+      return '<tr><td class="cec-hy-row-wk">' + esc(WEEK_SHORT[wIdx]) + '</td>' + cells + '</tr>';
     }).join('');
 
     return '<div class="cec-hy-sheet" data-hy-page="1">' +
       '<h2 class="cec-hy-h1">' + esc(meta.cnYear + '年' + meta.quarterLabel + '主日崇拜事工表') + '</h2>' +
       '<div class="cec-hy-sec">※主日崇拜程序</div>' +
-      '<table class="cec-hy-tbl cec-hy-tbl-prog"><tbody>' + progRows + '</tbody></table>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-prog"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><tbody>' + progRows + '</tbody></table>' +
       '<div class="cec-hy-sec">※圣工表</div>' +
-      '<table class="cec-hy-tbl"><thead><tr>' + diagCornerCell(14) + monthHeaders + '</tr></thead><tbody>' + preachRows + '</tbody></table>' +
+      '<table class="cec-hy-tbl">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + preachRows + '</tbody></table>' +
       '<div class="cec-hy-sec">※主日下午事工表</div>' +
-      '<table class="cec-hy-tbl cec-hy-tbl-bold"><thead><tr>' + pmRoleHeaders + '</tr></thead><tbody>' + pmRoleBody + '</tbody></table>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-bold">' + pmRoleCg + '<thead><tr>' + pmRoleHeaders + '</tr></thead><tbody>' + pmRoleBody + '</tbody></table>' +
       '<div class="cec-hy-sec">※主日读经</div>' +
-      '<table class="cec-hy-tbl"><thead><tr>' + diagCornerCell(14) + monthHeaders + '</tr></thead><tbody>' + readingRows + '</tbody></table>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-rd">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + readingRows + '</tbody></table>' +
       '</div>';
   }
 
@@ -2154,9 +2199,9 @@
         var tds = meta.months.map(function (m) {
           return '<td>' + esc(getter(m.key, wk) || '') + '</td>';
         }).join('');
-        return '<tr><td style="font-weight:700">' + esc(WEEK_SHORT[wIdx]) + '</td>' + tds + '</tr>';
+        return '<tr><td class="cec-hy-row-wk">' + esc(WEEK_SHORT[wIdx]) + '</td>' + tds + '</tr>';
       }).join('');
-      return '<table class="cec-hy-tbl"><thead><tr>' + diagCornerCell(14) + monthHeaders + '</tr></thead><tbody>' + body + '</tbody></table>';
+      return '<table class="cec-hy-tbl">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + body + '</tbody></table>';
     }
 
     var sunGrid = buildPrayerGrid(function (mKey, wk) {
@@ -2174,17 +2219,17 @@
 
     return '<div class="cec-hy-sheet" data-hy-page="2">' +
       '<div class="cec-hy-sec" style="font-size:18px;margin-top:0">※祷告会</div>' +
-      '<div class="cec-hy-subcap">主日祷告会带领 &nbsp;时间:14:00-14:50 &nbsp;祷告内容:为主日事奉的人员和会场祷告</div>' +
+      '<div class="cec-hy-subcap"><span>主日祷告会带领</span><span class="cec-hy-subcap-meta">时间：14:00—14:50</span><span class="cec-hy-subcap-meta">祷告内容：为主日事奉的人员和会场祷告</span></div>' +
       sunGrid +
-      '<div class="cec-hy-subcap" style="margin-top:18px">周三祷告会带领 &nbsp;时间：21:00----22:00</div>' +
+      '<div class="cec-hy-subcap" style="margin-top:18px"><span>周三祷告会带领</span><span class="cec-hy-subcap-meta">时间：21:00—22:00</span></div>' +
       wedGrid +
-      '<div class="cec-hy-subcap" style="margin-top:18px">周六祷告会带领 &nbsp;时间：7:30----8:30</div>' +
+      '<div class="cec-hy-subcap" style="margin-top:18px"><span>周六祷告会带领</span><span class="cec-hy-subcap-meta">时间：07:30—08:30</span></div>' +
       satGrid +
       '<div class="cec-hy-notes">注：PADOVA 祷告会联络负责：胡蓉</div>' +
       '<div class="cec-hy-foot-notes">' +
         '<div>☆星期六 21:00—22:30 练习唱诗</div>' +
-        '<div>☆需要代祷的弟兄姐妹散会后留下来,教会同工乐意为您代祷.</div>' +
-        '<div>☆初次参加聚会的弟兄姐妹或慕道友,请留下您的电话号码给接待的弟兄姐妹,以便联络。</div>' +
+        '<div>☆需要代祷的弟兄姐妹散会后留下来，教会同工乐意为您代祷。</div>' +
+        '<div>☆初次参加聚会的弟兄姐妹或慕道友，请留下您的电话号码给接待的弟兄姐妹，以便联络。</div>' +
         '<div class="cec-hy-church-sign">PADOVA 基督教华人教会</div>' +
       '</div>' +
       '</div>';
@@ -2196,23 +2241,26 @@
     }).join('');
 
     var evePreachRows = WEEK_ORDER.map(function (wk, wIdx) {
-      var rowLbl = wIdx === 0 ? '一周<br><span style="font-size:11px">（圣餐）</span>' : esc(WEEK_SHORT[wIdx]);
+      var rowLbl = wIdx === 0 ? '一周<br><span style="font-size:11px;font-weight:700">（圣餐）</span>' : esc(WEEK_SHORT[wIdx]);
       var tds = meta.months.map(function (m) {
         var r = findHalfRow(byMonth, m.key, wk, '主日晚上', '');
         var spk = r ? cleanPreacherText(r.note) : '';
         return '<td>' + esc(spk) + '</td>';
       }).join('');
-      return '<tr><td style="font-weight:700">' + rowLbl + '</td>' + tds + '</tr>';
+      return '<tr><td class="cec-hy-row-wk">' + rowLbl + '</td>' + tds + '</tr>';
     }).join('');
 
     var eveRoleCols = [
-      { key: 'leader', label: '领会', width: '18%' },
+      { key: 'leader', label: '领会', width: '19%' },
       { key: 'prayerLeader', label: '带领祷告', width: '22%' },
-      { key: 'worship', label: '诗歌敬拜', width: '24%' },
-      { key: 'piano', label: '司琴', width: '24%' }
+      { key: 'worship', label: '诗歌敬拜', width: '23%' },
+      { key: 'piano', label: '司琴', width: '23%' }
     ];
-    var eveRoleHeaders = '<th style="width:12%"></th>' + eveRoleCols.map(function (c) {
-      return '<th style="width:' + c.width + '">' + esc(c.label) + '</th>';
+    var eveRoleCg = '<colgroup><col style="width:13%">' + eveRoleCols.map(function (c) {
+      return '<col style="width:' + c.width + '">';
+    }).join('') + '</colgroup>';
+    var eveRoleHeaders = '<th>周期</th>' + eveRoleCols.map(function (c) {
+      return '<th>' + esc(c.label) + '</th>';
     }).join('');
     var eveRoleBody = WEEK_ORDER.map(function (wk, wIdx) {
       var tds = eveRoleCols.map(function (c) {
@@ -2220,7 +2268,7 @@
         if (c.key === 'piano') v = v.replace(/\s*\/\s*/g, '、');
         return '<td>' + esc(v) + '</td>';
       }).join('');
-      return '<tr><td>' + esc(WEEK_SPACED[wIdx]) + '</td>' + tds + '</tr>';
+      return '<tr><td class="cec-hy-row-wk">' + esc(WEEK_SPACED[wIdx]) + '</td>' + tds + '</tr>';
     }).join('');
 
     var timeRows = [
@@ -2236,11 +2284,11 @@
     return '<div class="cec-hy-sheet" data-hy-page="3">' +
       '<h2 class="cec-hy-h1">' + esc(meta.cnYear + '年' + meta.quarterLabel + '主日晚上崇拜事工表') + '</h2>' +
       '<div class="cec-hy-sec">※圣工表</div>' +
-      '<table class="cec-hy-tbl"><thead><tr>' + diagCornerCell(14) + monthHeaders + '</tr></thead><tbody>' + evePreachRows + '</tbody></table>' +
+      '<table class="cec-hy-tbl">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + evePreachRows + '</tbody></table>' +
       '<div class="cec-hy-sec" style="margin-top:24px">※事工表：</div>' +
-      '<table class="cec-hy-tbl cec-hy-tbl-bold"><thead><tr>' + eveRoleHeaders + '</tr></thead><tbody>' + eveRoleBody + '</tbody></table>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-bold">' + eveRoleCg + '<thead><tr>' + eveRoleHeaders + '</tr></thead><tbody>' + eveRoleBody + '</tbody></table>' +
       '<div class="cec-hy-sec" style="margin-top:28px">※聚会时间表：</div>' +
-      '<table class="cec-hy-tbl cec-hy-tbl-left"><thead><tr><th>夏令时</th><th>冬令时</th><th>聚会程序</th></tr></thead><tbody>' + timeRows + '</tbody></table>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-left"><colgroup><col style="width:32%"><col style="width:32%"><col style="width:36%"></colgroup><thead><tr><th>夏令时</th><th>冬令时</th><th>聚会程序</th></tr></thead><tbody>' + timeRows + '</tbody></table>' +
       '</div>';
   }
 
@@ -2428,10 +2476,15 @@
         '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' +
         esc(curYear + '年' + meta.rangeLabel + '主日崇拜事工表') +
         '</title><style>' + cssText +
-        '@page{size:A4 portrait;margin:10mm}' +
-        'body{margin:0;padding:0;background:#fff;color:#000}' +
-        '.cec-hy-sheet{width:100%!important;min-height:0!important;padding:6mm 8mm!important;page-break-after:always;break-after:page}' +
+        '@page{size:A4 portrait;margin:0}' +
+        'html,body{margin:0;padding:0;width:100%;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        '.cec-hy-sheet{width:100%!important;max-width:210mm!important;min-height:0!important;margin:0 auto!important;padding:12mm 14mm!important;box-sizing:border-box!important;page-break-after:always;break-after:page}' +
         '.cec-hy-sheet:last-child{page-break-after:auto;break-after:auto}' +
+        '.cec-hy-tbl{width:calc(100% - 4px)!important;margin:0 auto!important;border-collapse:separate!important;border-spacing:0!important;border-top:1.5px solid #000!important;border-left:1.5px solid #000!important}' +
+        '.cec-hy-tbl th,.cec-hy-tbl td{border-right:1px solid #111!important;border-bottom:1px solid #111!important}' +
+        '.cec-hy-tbl tr th:last-child,.cec-hy-tbl tr td:last-child{border-right:1.5px solid #000!important}' +
+        '.cec-hy-tbl tbody tr:last-child td{border-bottom:1.5px solid #000!important}' +
+        '.cec-hy-church-sign{padding-right:4mm!important}' +
         '</style></head><body>' + pagesHtml +
         '<script>window.onload=function(){setTimeout(function(){window.print();},200);};<\/script></body></html>'
       );
@@ -2442,8 +2495,9 @@
       if (busy) return;
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = previousOverflow;
-      mask.remove();
-      if (previousFocus && previousFocus.isConnected) previousFocus.focus();
+      closeModalAnimated(mask, function () {
+        if (previousFocus && previousFocus.isConnected) previousFocus.focus();
+      });
     }
 
     function onKey(event) {
@@ -2823,7 +2877,7 @@
     function close() {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
-      mask.remove();
+      closeModalAnimated(mask);
     }
     document.addEventListener('keydown', onKey);
 
@@ -2997,22 +3051,22 @@
   }
 
   function fitExportFrame(card, scaleWrap, viewport, frame) {
-    var naturalW = Math.max(1, Math.ceil(card.scrollWidth));
-    var naturalH = Math.max(1, Math.ceil(card.scrollHeight));
-    var viewportW = Math.max(1, Math.ceil(viewport.clientWidth));
-    var viewportH = Math.max(1, Math.ceil(viewport.clientHeight));
+    var naturalW = Math.max(1, Math.ceil(card.scrollWidth || card.offsetWidth) + 8);
+    var naturalH = Math.max(1, Math.ceil(card.scrollHeight || card.offsetHeight) + 8);
+    var viewportW = Math.max(1, Math.floor(viewport.clientWidth) - 8);
+    var viewportH = Math.max(1, Math.floor(viewport.clientHeight) - 8);
 
-    // 严格保持画布比例：内容整体等比缩放塞进 viewport 并居中，frame 尺寸不变
+    // 严格保持画布比例：内容整体等比缩放塞进 viewport 并居中，预留安全边距防止右边与底部边框被裁切
     var scale = Math.min(viewportW / naturalW, viewportH / naturalH);
     if (!isFinite(scale) || scale <= 0) scale = 1;
 
-    var scaledW = Math.max(1, Math.round(naturalW * scale));
-    var scaledH = Math.max(1, Math.round(naturalH * scale));
+    var scaledW = Math.max(1, Math.ceil(naturalW * scale));
+    var scaledH = Math.max(1, Math.ceil(naturalH * scale));
 
     scaleWrap.style.width = scaledW + 'px';
     scaleWrap.style.height = scaledH + 'px';
-    scaleWrap.style.marginLeft = Math.max(0, Math.floor((viewportW - scaledW) / 2)) + 'px';
-    scaleWrap.style.marginTop = Math.max(0, Math.floor((viewportH - scaledH) / 2)) + 'px';
+    scaleWrap.style.marginLeft = Math.max(0, Math.floor((viewport.clientWidth - scaledW) / 2)) + 'px';
+    scaleWrap.style.marginTop = Math.max(0, Math.floor((viewport.clientHeight - scaledH) / 2)) + 'px';
     card.style.position = 'absolute';
     card.style.left = '0px';
     card.style.top = '0px';
