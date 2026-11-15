@@ -731,54 +731,54 @@
 .cec-hy-page-dl:hover{background:rgba(255,255,255,.2)}
 .cec-hy-page-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:6px;box-shadow:0 10px 28px rgba(15,23,42,.18)}
 .cec-hy-sheet{
-  width:794px;min-height:1123px;padding:42px 48px 38px;background:#ffffff;color:#000000;
+  width:794px;height:1123px;padding:30px 44px 28px;background:#ffffff;color:#000000;
   font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
   font-variant-numeric:tabular-nums;
-  display:flex;flex-direction:column;justify-content:flex-start;
+  display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;
 }
 .cec-hy-sheet *{box-sizing:border-box}
 .cec-hy-h1{
-  margin:0 0 16px;text-align:center;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
-  font-size:26px;font-weight:800;letter-spacing:.05em;color:#000;line-height:1.28;
+  margin:0 0 10px;text-align:center;font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
+  font-size:24px;font-weight:800;letter-spacing:.05em;color:#000;line-height:1.22;
 }
 .cec-hy-sec{
-  margin:14px 0 6px;display:flex;align-items:center;gap:4px;
+  margin:10px 0 4px;display:flex;align-items:center;gap:4px;
   font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
-  font-size:16px;font-weight:800;color:#000;line-height:1.35;letter-spacing:.02em;
+  font-size:15px;font-weight:800;color:#000;line-height:1.3;letter-spacing:.02em;
 }
 .cec-hy-subcap{
-  margin:12px 0 6px;display:flex;align-items:baseline;flex-wrap:wrap;gap:14px;
+  margin:10px 0 4px;display:flex;align-items:baseline;flex-wrap:wrap;gap:14px;
   font-family:"Songti SC","Noto Serif SC","STSong","SimSun",serif;
-  font-size:14px;font-weight:700;color:#000;line-height:1.4;
+  font-size:13.5px;font-weight:700;color:#000;line-height:1.35;
 }
 .cec-hy-subcap-meta{
   font-weight:700;color:#111;
 }
 .cec-hy-tbl{
   width:calc(100% - 4px);margin:0 auto;border-collapse:separate;border-spacing:0;table-layout:fixed;
-  border-top:1.5px solid #000;border-left:1.5px solid #000;background:#fff;color:#000;font-size:13px;
+  border-top:1.5px solid #000;border-left:1.5px solid #000;background:#fff;color:#000;font-size:12.5px;
 }
 .cec-hy-tbl th,.cec-hy-tbl td{
-  border-right:1px solid #111;border-bottom:1px solid #111;padding:5px 4px;height:33px;text-align:center;vertical-align:middle;line-height:1.35;overflow-wrap:anywhere;color:#000;
+  border-right:1px solid #111;border-bottom:1px solid #111;padding:4px 4px;height:28px;text-align:center;vertical-align:middle;line-height:1.25;overflow-wrap:anywhere;color:#000;
 }
 .cec-hy-tbl tr th:last-child,.cec-hy-tbl tr td:last-child{border-right:1.5px solid #000}
 .cec-hy-tbl tbody tr:last-child td{border-bottom:1.5px solid #000}
-.cec-hy-tbl thead th{height:36px;font-weight:800;background:#fafafa;letter-spacing:.02em}
-.cec-hy-tbl-prog td{height:30px;padding:4px 12px;font-size:13.5px;font-weight:700;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
+.cec-hy-tbl thead th{height:31px;font-weight:800;background:#fafafa;letter-spacing:.02em}
+.cec-hy-tbl-prog td{height:25px;padding:3px 12px;font-size:13px;font-weight:700;font-family:"Songti SC","Noto Serif SC","SimSun",serif}
 .cec-hy-tbl-bold td,.cec-hy-tbl-bold th{font-weight:700}
 .cec-hy-row-wk{font-weight:800;background:#fcfcfc;letter-spacing:.02em}
-.cec-hy-diag{position:relative;height:42px!important;padding:0!important;background:#fafafa}
+.cec-hy-diag{position:relative;height:36px!important;padding:0!important;background:#fafafa}
 .cec-hy-diag-svg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
-.cec-hy-diag-top{position:absolute;top:5px;right:7px;font-size:11px;font-weight:800;line-height:1;color:#000}
-.cec-hy-diag-bot{position:absolute;bottom:5px;left:7px;font-size:11px;font-weight:800;line-height:1;color:#000}
-.cec-hy-tbl-rd tbody td{height:44px;padding:4px 3px}
-.cec-hy-rd-ref{display:block;font-weight:800;font-size:12px;line-height:1.25;color:#000}
-.cec-hy-rd-name{display:block;font-weight:700;font-size:12px;line-height:1.25;margin-top:2px;color:#111}
-.cec-hy-notes{margin-top:10px;padding:0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:12.5px;font-weight:700;color:#000;line-height:1.7}
-.cec-hy-foot-notes{margin-top:auto;padding:24px 6px 0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:14px;font-weight:700;color:#000;line-height:1.9}
-.cec-hy-church-sign{margin-top:18px;padding-right:8px;text-align:right;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:18px;font-weight:800;letter-spacing:.04em;color:#000}
-.cec-hy-tbl-left td{text-align:left;padding:6px 14px;font-weight:700;height:34px}
-.cec-hy-tbl-left thead th{text-align:left;padding:7px 14px;font-weight:800;background:#fafafa}
+.cec-hy-diag-top{position:absolute;top:4px;right:6px;font-size:10.5px;font-weight:800;line-height:1;color:#000}
+.cec-hy-diag-bot{position:absolute;bottom:4px;left:6px;font-size:10.5px;font-weight:800;line-height:1;color:#000}
+.cec-hy-tbl-rd tbody td{height:38px;padding:3px 3px}
+.cec-hy-rd-ref{display:block;font-weight:800;font-size:11.5px;line-height:1.2;color:#000}
+.cec-hy-rd-name{display:block;font-weight:700;font-size:11.5px;line-height:1.2;margin-top:1px;color:#111}
+.cec-hy-notes{margin-top:8px;padding:0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:12px;font-weight:700;color:#000;line-height:1.6}
+.cec-hy-foot-notes{margin-top:auto;padding:16px 6px 0 2px;font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:13.5px;font-weight:700;color:#000;line-height:1.8}
+.cec-hy-church-sign{margin-top:14px;padding-right:8px;text-align:right;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;font-weight:800;letter-spacing:.04em;color:#000}
+.cec-hy-tbl-left td{text-align:left;padding:5px 14px;font-weight:700;height:31px}
+.cec-hy-tbl-left thead th{text-align:left;padding:6px 14px;font-weight:800;background:#fafafa}
 @container cecp-schedule (max-width:760px){
   .cec-label-long{display:none}
   .cec-label-short{display:inline}
@@ -2476,15 +2476,24 @@
         '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' +
         esc(curYear + '年' + meta.rangeLabel + '主日崇拜事工表') +
         '</title><style>' + cssText +
-        '@page{size:A4 portrait;margin:0}' +
+        '@page{size:A4 portrait;margin:8mm 10mm}' +
         'html,body{margin:0;padding:0;width:100%;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
-        '.cec-hy-sheet{width:100%!important;max-width:210mm!important;min-height:0!important;margin:0 auto!important;padding:12mm 14mm!important;box-sizing:border-box!important;page-break-after:always;break-after:page}' +
+        '.cec-hy-sheet{width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;margin:0 auto!important;padding:2mm 3mm!important;box-sizing:border-box!important;overflow:visible!important;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid}' +
         '.cec-hy-sheet:last-child{page-break-after:auto;break-after:auto}' +
-        '.cec-hy-tbl{width:calc(100% - 4px)!important;margin:0 auto!important;border-collapse:separate!important;border-spacing:0!important;border-top:1.5px solid #000!important;border-left:1.5px solid #000!important}' +
-        '.cec-hy-tbl th,.cec-hy-tbl td{border-right:1px solid #111!important;border-bottom:1px solid #111!important}' +
+        '.cec-hy-h1{margin:0 0 6px!important;font-size:22px!important}' +
+        '.cec-hy-sec{margin:7px 0 3px!important;font-size:14px!important}' +
+        '.cec-hy-subcap{margin:8px 0 3px!important;font-size:12.5px!important}' +
+        '.cec-hy-tbl{width:calc(100% - 4px)!important;margin:0 auto!important;border-collapse:separate!important;border-spacing:0!important;border-top:1.5px solid #000!important;border-left:1.5px solid #000!important;font-size:12px!important;page-break-inside:avoid;break-inside:avoid}' +
+        '.cec-hy-tbl th,.cec-hy-tbl td{border-right:1px solid #111!important;border-bottom:1px solid #111!important;height:25px!important;padding:3px 3px!important;line-height:1.2!important}' +
+        '.cec-hy-tbl thead th{height:28px!important}' +
+        '.cec-hy-tbl-prog td{height:22px!important;padding:2px 10px!important;font-size:12.5px!important}' +
+        '.cec-hy-diag{height:32px!important}' +
+        '.cec-hy-tbl-rd tbody td{height:34px!important;padding:2px 2px!important}' +
+        '.cec-hy-rd-ref,.cec-hy-rd-name{font-size:11px!important;line-height:1.15!important}' +
         '.cec-hy-tbl tr th:last-child,.cec-hy-tbl tr td:last-child{border-right:1.5px solid #000!important}' +
         '.cec-hy-tbl tbody tr:last-child td{border-bottom:1.5px solid #000!important}' +
-        '.cec-hy-church-sign{padding-right:4mm!important}' +
+        '.cec-hy-foot-notes{padding-top:14px!important;font-size:12.5px!important;line-height:1.7!important}' +
+        '.cec-hy-church-sign{margin-top:10px!important;padding-right:4mm!important;font-size:16px!important}' +
         '</style></head><body>' + pagesHtml +
         '<script>window.onload=function(){setTimeout(function(){window.print();},200);};<\/script></body></html>'
       );
