@@ -779,6 +779,11 @@
 .cec-hy-church-sign{margin-top:14px;padding-right:8px;text-align:right;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;font-weight:800;letter-spacing:.04em;color:#000}
 .cec-hy-tbl-left td{text-align:left;padding:5px 14px;font-weight:700;height:31px}
 .cec-hy-tbl-left thead th{text-align:left;padding:6px 14px;font-weight:800;background:#fafafa}
+.cec-hy-tbl-big{font-size:17px}
+.cec-hy-tbl-big tbody td{height:32px;font-weight:700;letter-spacing:.02em}
+.cec-hy-tbl-big thead th{font-size:15.5px}
+.cec-hy-tbl-big tbody td.cec-hy-row-wk{font-size:15px}
+.cec-hy-tbl-pray tbody td{height:38px}
 @container cecp-schedule (max-width:760px){
   .cec-label-long{display:none}
   .cec-label-short{display:inline}
@@ -2181,7 +2186,7 @@
       '<div class="cec-hy-sec">※主日崇拜程序</div>' +
       '<table class="cec-hy-tbl cec-hy-tbl-prog"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><tbody>' + progRows + '</tbody></table>' +
       '<div class="cec-hy-sec">※圣工表</div>' +
-      '<table class="cec-hy-tbl">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + preachRows + '</tbody></table>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-big">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + preachRows + '</tbody></table>' +
       '<div class="cec-hy-sec">※主日下午事工表</div>' +
       '<table class="cec-hy-tbl cec-hy-tbl-bold">' + pmRoleCg + '<thead><tr>' + pmRoleHeaders + '</tr></thead><tbody>' + pmRoleBody + '</tbody></table>' +
       '<div class="cec-hy-sec">※主日读经</div>' +
@@ -2201,7 +2206,7 @@
         }).join('');
         return '<tr><td class="cec-hy-row-wk">' + esc(WEEK_SHORT[wIdx]) + '</td>' + tds + '</tr>';
       }).join('');
-      return '<table class="cec-hy-tbl">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + body + '</tbody></table>';
+      return '<table class="cec-hy-tbl cec-hy-tbl-big cec-hy-tbl-pray">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + body + '</tbody></table>';
     }
 
     var sunGrid = buildPrayerGrid(function (mKey, wk) {
@@ -2284,7 +2289,7 @@
     return '<div class="cec-hy-sheet" data-hy-page="3">' +
       '<h2 class="cec-hy-h1">' + esc(meta.cnYear + '年' + meta.quarterLabel + '主日晚上崇拜事工表') + '</h2>' +
       '<div class="cec-hy-sec">※圣工表</div>' +
-      '<table class="cec-hy-tbl">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + evePreachRows + '</tbody></table>' +
+      '<table class="cec-hy-tbl cec-hy-tbl-big">' + sevenColGroup() + '<thead><tr>' + diagCornerCell(13) + monthHeaders + '</tr></thead><tbody>' + evePreachRows + '</tbody></table>' +
       '<div class="cec-hy-sec" style="margin-top:24px">※事工表：</div>' +
       '<table class="cec-hy-tbl cec-hy-tbl-bold">' + eveRoleCg + '<thead><tr>' + eveRoleHeaders + '</tr></thead><tbody>' + eveRoleBody + '</tbody></table>' +
       '<div class="cec-hy-sec" style="margin-top:28px">※聚会时间表：</div>' +
