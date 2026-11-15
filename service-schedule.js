@@ -735,7 +735,7 @@
   .cec-month-table .cec-ref,.cec-month-table .cec-npfx{font-size:10px;line-height:1.5;max-width:100%;overflow-wrap:anywhere}
 }
 .cec-zoom-mask .cec-row-hide,.cec-export-shot .cec-row-hide{display:none!important}
-#cecp-schedule.is-collapsed{border-color:#262421;background:#11100e}
+#cecp-schedule.is-collapsed{border-color:#262421!important;background:#11100e!important}
 #cecp-schedule.is-collapsed .cec-body{display:none!important}
 #cecp-schedule.is-expanded .cec-gate{display:none!important}
 .nt-board.cec-board-host{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
