@@ -655,12 +655,7 @@
 .cec-zoom-body .cec-npfx{font-size:12px}
 .cec-zoom-body .cec-empty{font-size:14px}
 @media(max-width:760px){
-  .cec-top{align-items:flex-start}
-  .cec-nav,.cec-tools{width:100%}
-  .cec-tools{margin-left:0}
-  .cec-export-wrap,.cec-btn-tool{width:100%}
-  .cec-menu{left:0;right:auto;min-width:min(100%,280px)}
-  .cec-btn-tool{justify-content:flex-start}
+  .cec-menu{left:auto;right:0;min-width:0;width:min(280px,calc(100vw - 40px))}
   .cec-ratio-bar{grid-template-columns:repeat(2,minmax(0,1fr))}
   .cec-cell{min-width:120px;height:74px;padding:8px}
   .cec-corner,.cec-h,.cec-rowlbl{padding:10px 8px}
@@ -793,22 +788,23 @@
 @container cecp-schedule (max-width:760px){
   .cec-label-long{display:none}
   .cec-label-short{display:inline}
-  .cec-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px}
-  .cec-top .cec-nav{display:grid;width:100%;grid-template-columns:32px minmax(0,1fr) 32px;gap:4px}
+  .cec-top{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px}
+  .cec-top .cec-nav{display:grid;width:100%;min-width:0;grid-template-columns:36px minmax(0,1fr) 36px;gap:6px}
   .cec-nav #mPrevText,.cec-nav #mNextText{display:none}
-  .cec-nav .cec-btn-month.on{grid-column:2;grid-row:1;padding:0 4px;font-size:14px}
-  .cec-nav #mPrev{grid-column:1;grid-row:1}
-  .cec-nav #mNext{grid-column:3;grid-row:1}
-  .cec-top .cec-tools{width:auto;min-width:0;margin:0}
-  .cec-top .cec-btn-tool{height:34px;padding:0 10px;gap:5px;border-radius:9px;font-size:12px}
+  .cec-nav .cec-btn-month.on{grid-column:2;grid-row:1;min-width:0;width:100%;padding:0 8px;font-size:14px;overflow:hidden;text-overflow:ellipsis}
+  .cec-nav #mPrev{grid-column:1;grid-row:1;width:36px}
+  .cec-nav #mNext{grid-column:3;grid-row:1;width:36px}
+  .cec-top .cec-tools{display:flex!important;align-items:center;gap:8px;width:100%;min-width:0;margin:0}
+  .cec-top .cec-role-wrap,.cec-top .cec-export-wrap{flex:1 1 0;min-width:0;width:auto}
+  .cec-top #roleMenuToggle,.cec-top .cec-btn-tool{width:100%;height:36px;padding:0 10px;gap:5px;border-radius:10px;font-size:12.5px;justify-content:center}
   .cec-top .cec-btn-tool-icon{width:15px;height:15px}
-  .cec-top .cec-menu{left:auto;right:0;width:min(270px,calc(100vw - 52px));min-width:0}
+  .cec-top .cec-menu{left:auto;right:0;width:min(280px,calc(100vw - 40px));min-width:0}
   .cec-typebar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:8px 10px}
-  .cec-typebar .cec-btn-type{min-height:40px;padding:0 4px;font-size:12px;gap:4px}
+  .cec-typebar .cec-btn-type{min-width:0;min-height:40px;padding:0 4px;font-size:12px;gap:4px;overflow:hidden}
   .cec-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px}
-  .cec-week-controls{display:grid;grid-template-columns:46px minmax(0,1fr);grid-column:1/-1}
+  .cec-week-controls{display:grid;grid-template-columns:46px minmax(0,1fr);grid-column:1/-1;min-width:0}
   .cec-view-controls{display:grid;grid-template-columns:repeat(2,40px);gap:4px;grid-column:2;grid-row:2}
-  .cec-person-controls{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:4px;margin:0;grid-column:1;grid-row:2}
+  .cec-person-controls{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:4px;margin:0;grid-column:1;grid-row:2;min-width:0}
   .cec-control{padding:8px 6px}
   .cec-cards{padding:10px;gap:10px;grid-template-columns:minmax(0,1fr)}
   .cec-card-head{padding:12px}
