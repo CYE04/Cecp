@@ -158,7 +158,7 @@ html.dark{
   color:var(--cec-ink);
   border:1px solid var(--cec-border);
   border-radius:16px;
-  overflow:hidden;
+  overflow:visible;
 }
 #cecp-schedule *{box-sizing:border-box}
 .cec-top,.cec-sub,.cec-typebar{
@@ -196,7 +196,7 @@ html.dark{
 .cec-export-wrap.open .cec-btn-tool{background:#161b24;color:#ffffff;border-color:#465165}
 .cec-menu{
   position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:flex;flex-direction:column;
-  min-width:296px;padding:10px;border:1px solid var(--cec-border);border-radius:14px;
+  min-width:296px;max-width:calc(100vw - 24px);padding:10px;border:1px solid var(--cec-border);border-radius:14px;
   background:var(--cec-bg2);box-shadow:0 18px 36px rgba(18,24,38,.16);
   opacity:0;visibility:hidden;pointer-events:none;
   transform:translateY(-8px) scale(.96);transform-origin:top right;
@@ -271,7 +271,7 @@ html.dark{
 .cec-role-wrap{position:relative}
 .cec-role-menu{
   position:absolute;right:0;top:calc(100% + 8px);z-index:25;display:flex;flex-direction:column;
-  min-width:210px;max-height:340px;overflow-y:auto;padding:8px;border:1px solid var(--cec-border);
+  min-width:210px;max-width:calc(100vw - 24px);max-height:min(340px,55vh);overflow-y:auto;padding:8px;border:1px solid var(--cec-border);
   border-radius:14px;background:var(--cec-bg2);box-shadow:0 18px 36px rgba(18,24,38,.16);
   opacity:0;visibility:hidden;pointer-events:none;
   transform:translateY(-8px) scale(.96);transform-origin:top right;
@@ -653,7 +653,7 @@ html.dark{
 .cec-zoom-body .cec-npfx{font-size:12px}
 .cec-zoom-body .cec-empty{font-size:14px}
 @media(max-width:760px){
-  .cec-menu{left:auto;right:0;min-width:0;width:min(280px,calc(100vw - 40px))}
+  .cec-menu{left:auto;right:0;min-width:0;width:min(280px,calc(100vw - 24px))}
   .cec-ratio-bar{grid-template-columns:repeat(2,minmax(0,1fr))}
   .cec-cell{min-width:120px;height:74px;padding:8px}
   .cec-corner,.cec-h,.cec-rowlbl{padding:10px 8px}
@@ -796,7 +796,7 @@ html.dark{
   .cec-top .cec-role-wrap,.cec-top .cec-export-wrap{flex:1 1 0;min-width:0;width:auto}
   .cec-top #roleMenuToggle,.cec-top .cec-btn-tool{width:100%;height:36px;padding:0 10px;gap:5px;border-radius:10px;font-size:12.5px;justify-content:center}
   .cec-top .cec-btn-tool-icon{width:15px;height:15px}
-  .cec-top .cec-menu{left:auto;right:0;width:min(280px,calc(100vw - 40px));min-width:0}
+  .cec-top .cec-menu{left:auto;right:0;transform-origin:top right;width:min(280px,calc(100cqi - 20px),calc(100vw - 24px));min-width:0}
   .cec-typebar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:8px 10px}
   .cec-typebar .cec-btn-type{min-width:0;min-height:40px;padding:0 4px;font-size:12px;gap:4px;overflow:hidden}
   .cec-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px}
@@ -831,7 +831,7 @@ html.dark{
   .cec-month-table .cec-rowlbl-inner{justify-content:center;gap:2px}
   .cec-month-table .cec-row-hide{width:16px;height:16px}
   .cec-month-table .cec-row-hide svg{width:11px;height:11px}
-  .cec-top .cec-role-menu{left:auto;right:0;width:min(240px,calc(100vw - 52px));min-width:0}
+  .cec-top .cec-role-menu{left:0;right:auto;transform-origin:top left;width:min(240px,calc(100cqi - 20px),calc(100vw - 24px));min-width:0}
   .cec-month-table .cec-cell{min-width:0;height:auto;padding:7px 2px;vertical-align:middle}
   .cec-month-table .cec-cellbox{min-height:38px;gap:4px;justify-content:center}
   .cec-month-table .cec-badges{flex-direction:column;gap:4px}
@@ -878,6 +878,18 @@ html.dark{
   to{opacity:0;transform:translateY(10px) scale(.96)}
 }
 #cecp-schedule{position:relative;transition:background-color .28s ease,border-color .28s ease}
+#cecp-schedule.has-open-menu{z-index:30}
+#cecp-schedule.is-collapsed,#cecp-schedule.is-morphing-open,#cecp-schedule.is-morphing-close{overflow:hidden}
+.cec-gate{border-radius:15px}
+.cec-body>:first-child{border-top-left-radius:15px;border-top-right-radius:15px}
+.cec-body>:last-child{border-bottom-left-radius:15px;border-bottom-right-radius:15px}
+.cec-body>.cec-wrap:last-child .cec-tbl tbody tr:last-child>:first-child{border-bottom-left-radius:15px}
+.cec-body>.cec-wrap:last-child .cec-tbl tbody tr:last-child>:last-child{border-bottom-right-radius:15px}
+.nt-board-schedule #cecp-schedule .cec-gate{border-radius:13px}
+.nt-board-schedule #cecp-schedule .cec-body>:first-child{border-top-left-radius:13px;border-top-right-radius:13px}
+.nt-board-schedule #cecp-schedule .cec-body>:last-child{border-bottom-left-radius:13px;border-bottom-right-radius:13px}
+.nt-board-schedule #cecp-schedule .cec-body>.cec-wrap:last-child .cec-tbl tbody tr:last-child>:first-child{border-bottom-left-radius:13px}
+.nt-board-schedule #cecp-schedule .cec-body>.cec-wrap:last-child .cec-tbl tbody tr:last-child>:last-child{border-bottom-right-radius:13px}
 #cecp-schedule.is-collapsed{border-color:rgba(0,0,0,.09)!important;background:#f7f6f2!important}
 html.dark #cecp-schedule.is-collapsed{border-color:#262421!important;background:#11100e!important}
 #cecp-schedule.is-collapsed:not(.is-morphing-close) .cec-body{display:none!important}
@@ -1558,11 +1570,95 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
     var exportBusy = false;
     var activeRatio = '4:3';
 
+    function positionDropdownMenu(wrap, menu, isOpen, defaultPreferLeft) {
+      if (!wrap || !menu) return;
+      menu.style.left = '';
+      menu.style.right = '';
+      menu.style.transformOrigin = '';
+      if (!isOpen) return;
+
+      var vw = document.documentElement ? document.documentElement.clientWidth : 0;
+      if (!vw) vw = window.innerWidth || 0;
+      if (!vw) return;
+
+      var pad = 12;
+      var wrapRect = wrap.getBoundingClientRect();
+      var elRect = EL.getBoundingClientRect ? EL.getBoundingClientRect() : null;
+      var menuW = menu.offsetWidth;
+      if (!menuW) return;
+
+      var safeLeft = pad;
+      var safeRight = vw - pad;
+      var cLeft = elRect ? Math.max(safeLeft, elRect.left + 8) : safeLeft;
+      var cRight = elRect ? Math.min(safeRight, elRect.right - 8) : safeRight;
+      if (cRight - cLeft < menuW) {
+        cLeft = safeLeft;
+        cRight = safeRight;
+      }
+
+      var preferLeft = defaultPreferLeft;
+      if (elRect && wrap.classList.contains('cec-role-wrap')) {
+        var wrapCenter = (wrapRect.left + wrapRect.right) / 2;
+        var elCenter = (elRect.left + elRect.right) / 2;
+        preferLeft = wrapCenter <= elCenter;
+      }
+
+      var leftPos = wrapRect.left;
+      var rightPos = wrapRect.right - menuW;
+      var fitsContainer = function (x) { return x >= cLeft - 0.5 && x + menuW <= cRight + 0.5; };
+      var fitsViewport = function (x) { return x >= safeLeft - 0.5 && x + menuW <= safeRight + 0.5; };
+
+      if (preferLeft) {
+        if (fitsContainer(leftPos) || (!fitsContainer(rightPos) && fitsViewport(leftPos))) {
+          menu.style.left = '0px';
+          menu.style.right = 'auto';
+          menu.style.transformOrigin = 'top left';
+          return;
+        }
+        if (fitsContainer(rightPos) || fitsViewport(rightPos)) {
+          menu.style.left = 'auto';
+          menu.style.right = '0px';
+          menu.style.transformOrigin = 'top right';
+          return;
+        }
+      } else {
+        if (fitsContainer(rightPos) || (!fitsContainer(leftPos) && fitsViewport(rightPos))) {
+          menu.style.left = 'auto';
+          menu.style.right = '0px';
+          menu.style.transformOrigin = 'top right';
+          return;
+        }
+        if (fitsContainer(leftPos) || fitsViewport(leftPos)) {
+          menu.style.left = '0px';
+          menu.style.right = 'auto';
+          menu.style.transformOrigin = 'top left';
+          return;
+        }
+      }
+
+      var preferred = preferLeft ? leftPos : rightPos;
+      var clampedLeft = Math.max(safeLeft, Math.min(preferred, Math.max(safeLeft, safeRight - menuW)));
+      menu.style.left = Math.round(clampedLeft - wrapRect.left) + 'px';
+      menu.style.right = 'auto';
+      menu.style.transformOrigin = 'top ' + (preferLeft ? 'left' : 'right');
+    }
+
     function syncMenusDom() {
       var wrap = EL.querySelector('.cec-export-wrap');
       var roleWrap = EL.querySelector('.cec-role-wrap');
       if (wrap) wrap.classList.toggle('open', !!exportMenuOpen);
       if (roleWrap) roleWrap.classList.toggle('open', !!roleMenuOpen);
+      EL.classList.toggle('has-open-menu', !!(exportMenuOpen || roleMenuOpen));
+      if (wrap) positionDropdownMenu(wrap, wrap.querySelector('.cec-menu'), !!exportMenuOpen, false);
+      if (roleWrap) positionDropdownMenu(roleWrap, roleWrap.querySelector('.cec-role-menu'), !!roleMenuOpen, false);
+    }
+
+    function onWinResize() {
+      if (!EL.isConnected) {
+        window.removeEventListener('resize', onWinResize);
+        return;
+      }
+      if (exportMenuOpen || roleMenuOpen) syncMenusDom();
     }
 
     function onDocClick(e) {
@@ -1581,6 +1677,21 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
     }
 
     document.addEventListener('click', onDocClick);
+    window.addEventListener('resize', onWinResize);
+
+    function renderWithSwap() {
+      var skipHeightAnim = !!(roleMenuOpen || exportMenuOpen);
+      var startH = (!skipHeightAnim && EL.getBoundingClientRect) ? EL.getBoundingClientRect().height : 0;
+      if (animTimer) clearTimeout(animTimer);
+      EL.classList.remove('is-morphing-open', 'is-morphing-close');
+      EL.classList.add('is-switching');
+      render();
+      var endH = (!skipHeightAnim && EL.getBoundingClientRect) ? EL.getBoundingClientRect().height : 0;
+      if (!skipHeightAnim) animateContainerHeight(startH, endH, 280);
+      animTimer = setTimeout(function () {
+        EL.classList.remove('is-switching');
+      }, 280);
+    }
 
     render();
 
@@ -1713,19 +1824,6 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
       EL.classList.toggle('cec-is-matrix', !personalView && activeView === 'matrix');
       EL.innerHTML = gateHtml + '<div class="cec-body">' + expHead + top + typebar + controls + hiddenBar + (!personalView && activeView === 'matrix' ? zoombar : '') + body + expFoot + '</div>';
 
-      function renderWithSwap() {
-        var startH = EL.getBoundingClientRect ? EL.getBoundingClientRect().height : 0;
-        if (animTimer) clearTimeout(animTimer);
-        EL.classList.remove('is-morphing-open', 'is-morphing-close');
-        EL.classList.add('is-switching');
-        render();
-        var endH = EL.getBoundingClientRect ? EL.getBoundingClientRect().height : 0;
-        animateContainerHeight(startH, endH, 280);
-        animTimer = setTimeout(function () {
-          EL.classList.remove('is-switching');
-        }, 280);
-      }
-
       function collapseSchedule(scrollBack) {
         animateExpandTransition(false, function () {
           isExpanded = false;
@@ -1751,6 +1849,7 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
           personalView = false;
           lockedName = null;
           exportMenuOpen = false;
+          roleMenuOpen = false;
           animateExpandTransition(true, function () {
             isExpanded = true;
             render();
@@ -1760,6 +1859,8 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
       bind('#cecGatePersonal', function () {
         if (selectedName) {
           personalView = true;
+          exportMenuOpen = false;
+          roleMenuOpen = false;
           animateExpandTransition(true, function () {
             isExpanded = true;
             render();
@@ -1770,16 +1871,16 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
       bind('#cecCollapseFoot', function () { collapseSchedule(true); });
 
       bind('#mPrev', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); renderWithSwap(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); exportMenuOpen = false; roleMenuOpen = false; renderWithSwap(); }
       });
       bind('#mPrevText', function () {
-        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); renderWithSwap(); }
+        if (activeMonthIdx > 0) { activeMonthIdx--; activeWeek = currentSundayWeek(months[activeMonthIdx]); exportMenuOpen = false; roleMenuOpen = false; renderWithSwap(); }
       });
       bind('#mNext', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); renderWithSwap(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); exportMenuOpen = false; roleMenuOpen = false; renderWithSwap(); }
       });
       bind('#mNextText', function () {
-        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); renderWithSwap(); }
+        if (activeMonthIdx < months.length - 1) { activeMonthIdx++; activeWeek = currentSundayWeek(months[activeMonthIdx]); exportMenuOpen = false; roleMenuOpen = false; renderWithSwap(); }
       });
       bind('#exportToggle', function (e) {
         if (exportBusy) return;
@@ -1813,6 +1914,7 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
       EL.querySelectorAll('[data-toggle-role]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
+          if (!this.closest || !this.closest('.cec-role-menu')) roleMenuOpen = false;
           toggleRoleHidden(this.getAttribute('data-toggle-role'));
           renderWithSwap();
         });
@@ -1825,6 +1927,7 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
           personalView = false;
           lockedName = null;
           exportMenuOpen = false;
+          roleMenuOpen = false;
           renderWithSwap();
         });
       });
@@ -1858,24 +1961,25 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
         });
       });
 
-      bind('#scheduleWeekPrev', function () { moveWeek(-1); });
-      bind('#scheduleWeekNext', function () { moveWeek(1); });
+      bind('#scheduleWeekPrev', function () { exportMenuOpen = false; roleMenuOpen = false; moveWeek(-1); });
+      bind('#scheduleWeekNext', function () { exportMenuOpen = false; roleMenuOpen = false; moveWeek(1); });
       bind('#scheduleToday', function () {
         activeMonthIdx = pickScheduleMonth(months);
         activeWeek = currentSundayWeek(months[activeMonthIdx]);
-        activeView = 'week'; personalView = false; renderWithSwap();
+        activeView = 'week'; personalView = false; exportMenuOpen = false; roleMenuOpen = false; renderWithSwap();
       });
-      bind('#scheduleWeekly', function () { activeView = 'week'; personalView = false; renderWithSwap(); });
-      bind('#scheduleMatrix', function () { activeView = 'matrix'; personalView = false; renderWithSwap(); });
-      bind('#schedulePersonal', function () { personalView = !personalView; renderWithSwap(); });
+      bind('#scheduleWeekly', function () { activeView = 'week'; personalView = false; exportMenuOpen = false; roleMenuOpen = false; renderWithSwap(); });
+      bind('#scheduleMatrix', function () { activeView = 'matrix'; personalView = false; exportMenuOpen = false; roleMenuOpen = false; renderWithSwap(); });
+      bind('#schedulePersonal', function () { personalView = !personalView; exportMenuOpen = false; roleMenuOpen = false; renderWithSwap(); });
       EL.querySelector('#scheduleWeek').addEventListener('change', function () {
-        activeWeek = this.value; activeView = 'week'; personalView = false; renderWithSwap();
+        activeWeek = this.value; activeView = 'week'; personalView = false; exportMenuOpen = false; roleMenuOpen = false; renderWithSwap();
       });
       EL.querySelector('#scheduleName').addEventListener('change', function () {
         selectedName = this.value; writePreference('name', selectedName);
-        personalView = !!selectedName; renderWithSwap();
+        personalView = !!selectedName; exportMenuOpen = false; roleMenuOpen = false; renderWithSwap();
       });
       bindHighlight();
+      if (exportMenuOpen || roleMenuOpen) syncMenusDom();
     }
 
     function moveWeek(direction) {
