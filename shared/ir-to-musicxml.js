@@ -161,6 +161,24 @@
           var tm = e.tuplet ? (e.tuplet.num === 3 ? [3, 2] : [5, 4]) : null;
           var pieces = e.pieces && e.pieces.length ? e.pieces : [{ units: e.units, dots: 0 }];
 
+          if (e.gracePitches && e.gracePitches.length) {
+            e.gracePitches.forEach(function (gp) {
+              var gOct = gp.octave + shift;
+              var gType = (gp.underlines && gp.underlines < 2) ? 'eighth' : '16th';
+              L.push('      <note>');
+              L.push('        <grace/>');
+              L.push('        <pitch><step>' + gp.step + '</step>' +
+                (gp.alter ? '<alter>' + gp.alter + '</alter>' : '') +
+                '<octave>' + gOct + '</octave></pitch>');
+              L.push('        <voice>1</voice>');
+              L.push('        <type>' + gType + '</type>');
+              var gWant = gp.alter, gHave = keySigAlter(key, gp.step);
+              if (gWant !== gHave && ACC_NAME[gWant] != null)
+                L.push('        <accidental>' + ACC_NAME[gWant] + '</accidental>');
+              L.push('      </note>');
+            });
+          }
+
           pieces.forEach(function (piece, pi) {
             var dur = piece.units * DIV_PER_UNIT;
             if (tm) dur = dur * tm[1] / tm[0];
