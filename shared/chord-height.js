@@ -29,7 +29,7 @@ function scoreResetChordHeight(scope){
 }
 function scoreHeightObstacles(row){
   var rects=[];
-  [].forEach.call(row.querySelectorAll('.jp-num,.jp-plain-sym,.jp-dot-top > span,.jp-navmark svg,[data-jp-nav-above="1"] .jp-bar-top svg,.strict-arc-svg > div,.strict-arc-svg path,.strict-arc-svg text,.strict-arc-tup text'),function(el){var r=el.getBoundingClientRect();if(r.width&&r.height)rects.push(r);});
+  [].forEach.call(row.querySelectorAll('.jp-num,.jp-plain-sym,.jp-dot-top > span,.jp-grace-num,.jp-grace-dot-top > span,.jp-navmark svg,[data-jp-nav-above="1"] .jp-bar-top svg,.strict-arc-svg > div,.strict-arc-svg path,.strict-arc-svg text,.strict-arc-tup text'),function(el){var r=el.getBoundingClientRect();if(r.width&&r.height)rects.push(r);});
   [].forEach.call(row.querySelectorAll('.jp-slur,.jp-slur-open,.jp-slur-close,.jp-tie'),function(group){
     var r=group.getBoundingClientRect(),s=scoreHeightScale(group),ps=getComputedStyle(group,'::before');
     if(ps.content==='none')return;
@@ -40,14 +40,21 @@ function scoreHeightObstacles(row){
   return rects;
 }
 function scoreHeightHouses(row,obstacles){
-  var rails=[];
+  var rails=[],items=[];
   [].slice.call(row.querySelectorAll('.prev-volta,.jp-volta')).reverse().forEach(function(house){
     var r=house.getBoundingClientRect(),s=scoreHeightScale(house),ceiling=Infinity;
     obstacles.concat(rails).forEach(function(o){if(o.left<r.right&&o.right>r.left)ceiling=Math.min(ceiling,o.top);});
     if(!isFinite(ceiling)||!s)return;
     var top=ceiling-12*s;
-    house.style.setProperty(house.classList.contains('jp-volta')?'--jp-volta-top':'--volta-top',((top-r.top)/s).toFixed(3)+'px');
+    items.push({house:house,r:r,s:s,top:top});
     rails.push({left:r.left,right:r.right,top:top});
+  });
+  if(!items.length)return rails;
+  var unifiedTop=Infinity;
+  items.forEach(function(it){if(it.top<unifiedTop)unifiedTop=it.top;});
+  items.forEach(function(it,idx){
+    it.house.style.setProperty(it.house.classList.contains('jp-volta')?'--jp-volta-top':'--volta-top',((unifiedTop-it.r.top)/it.s).toFixed(3)+'px');
+    rails[idx].top=unifiedTop;
   });
   return rails;
 }

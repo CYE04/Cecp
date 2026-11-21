@@ -100,15 +100,21 @@
     var stretch = (opts.stretchLast === undefined) ? 0.38 : opts.stretchLast;
     if (stretch !== false) out.push('%%stretchlast ' + (stretch === true ? 'true' : stretch));
     out.push('X:1');
+    out.push('%%titlefont serif 30');
+    out.push('%%subtitlefont sans-serif 13');
+    out.push('%%composerfont sans-serif 11');
     out.push('T:' + (ir.meta.title || '').replace(/[\r\n]/g, ' '));
-    if (ir.meta.artist) out.push('C:' + ir.meta.artist.replace(/[\r\n]/g, ' '));
+    [ir.meta.titleEn,ir.meta.artist,ir.meta.sub].forEach(function(text){if(text)out.push('T:'+String(text).replace(/[\r\n]/g,' '));});
+    var lyricist=String(ir.meta.lyricist||'').replace(/[\r\n]/g,' '),composer=String(ir.meta.composer||'').replace(/[\r\n]/g,' ');
+    var credits=lyricist&&lyricist===composer?'词曲：'+lyricist:[lyricist?'作词：'+lyricist:'',composer?'作曲：'+composer:''].filter(Boolean).join(' / ');
+    if(credits)out.push('C:'+credits);
     out.push('M:' + ir.meta.timeSign);
     out.push('L:1/32');
     out.push('Q:1/4=' + (ir.meta.bpm || 72));
     out.push('K:' + key);
 
     ir.sections.forEach(function (sec) {
-      if (sec.name) out.push('%%text ' + sec.name.replace(/[\r\n]/g, ' '));
+      if (sec.name && sec.name.trim() !== String(ir.meta.title || '').trim()) out.push('%%text ' + sec.name.replace(/[\r\n]/g, ' '));
       var body = '', measuresOnLine = 0, curTs = ir.meta.timeSign;
       var words = [];
       for (var vi = 0; vi < verseCount; vi++) words.push('');
@@ -150,9 +156,25 @@
 
         m.events.forEach(function (e) {
           if (e.beamBreakBefore) body += ' ';
-          if (e.chordSymbol) body += '"' + String(e.chordSymbol).replace(/"/g, '') + '"';
+          if (e.chordSymbol) {
+            // Source stacks are bottom-first; ABC lays adjacent chord symbols top-first.
+            String(e.chordSymbol).split(',').map(function (chord) { return chord.trim(); }).filter(Boolean).reverse().forEach(function (chord) {
+              body += '"' + chord.replace(/"/g, '') + '"';
+            });
+          }
           (e.slurStarts || []).forEach(function () { body += '('; });
           if (e.fermata) body += 'H';                        // ABC 的装饰记号是**前缀**
+          if (e.gracePitches && e.gracePitches.length) {
+            var gNotes = e.gracePitches.map(function (gp) {
+              var gOct = gp.octave + shift;
+              var gWant = gp.alter;
+              var gHave = (accState[gp.step + gOct] !== undefined) ? accState[gp.step + gOct] : keySigAlter(key, gp.step);
+              var gAcc = '';
+              if (gWant !== gHave) { gAcc = accSymbol(gWant); accState[gp.step + gOct] = gWant; }
+              return gAcc + abcNoteName(gp.step, gOct);
+            }).join('');
+            body += '{' + gNotes + '}';
+          }
 
           e.pieces.forEach(function (piece, pi) {
             var head = '';
