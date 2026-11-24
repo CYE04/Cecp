@@ -40,6 +40,7 @@
 var CHORD_FIT_GAP=4;          /* 两个和弦之间的最小安全间距(px, scale=1) */
 var CHORD_FIT_EMPTY_RUN=4;    /* 连续这么多个「歌词空位」才触发收紧（用户定的：4 个以上 @） */
 var CHORD_FIT_LONG_ROW=0.9;   /* 还要这行确实长：自然宽 >= 最宽行 * 这个比例才收紧，位置够就正常排 */
+var CHORD_FIT_MAX_W=760;      /* 只有超过固定上限的行才做纯空歌词收紧（justify 开启时由 justifyScoreRows 分层收紧） */
 var CHORD_FIT_TIGHT=0.3;      /* 收紧强度参考值：列外边距归零 + 最小列宽 1.2em -> 0.9em，约省三成横向占位 */
 
 /* 空白字符：普通空格 / TAB / NBSP / 韩文填充符 ㅤ / 全角空格 */
@@ -159,7 +160,9 @@ function layoutStrictChords(row,allowTight){
   for(i=0;i<all.length;i++)cols.push(all[i]);
 
   var prevDisp=row.style.display;
+  var prevW=row.style.width;
   row.style.display='inline-flex';        /* 摊到自然宽再量，免得被容器挤扁量歪 */
+  row.style.width='max-content';
 
   /* 音位序号（小节线/拍号列不算音位） */
   var slotNo=[],sn=0;
@@ -188,7 +191,7 @@ function layoutStrictChords(row,allowTight){
   for(i=0;i<items.length;i++){
     m=chordFitInk(items[i].ch);
     if(prevR!==null&&m.L<prevR+CHORD_FIT_GAP){
-      need=prevR+CHORD_FIT_GAP-m.L;
+      need=Math.ceil((prevR+CHORD_FIT_GAP-m.L)*100)/100;
       /* 推前一列的右内边距：本列连同后面所有音位一起右移，音位之间的基础间距不变。
          没有前一列(行首/volta 首列)就推自己的左内边距，效果一样。 */
       host=items[i].col.previousElementSibling;
@@ -229,31 +232,44 @@ function layoutStrictChords(row,allowTight){
     }
   }
   row.style.display=prevDisp;
+  row.style.width=prevW;
   return changed;
 }
 /* 整首：逐行做「连续空歌词收紧 + 和弦避让」。
-   非严格模式(没有 .p-slot)全程 no-op。 */
-function layoutStrictChordsAll(scope){
+   非严格模式(没有 .p-slot)全程 no-op。
+   opts.skipTight 为真时跳过 cf-tight（由随后的 justifyScoreRows 按目标宽度统一分层收紧）。 */
+function layoutStrictChordsAll(scope,opts){
+  opts=opts||{};
   if(!scope||!scope.querySelectorAll)return false;
   var list=scope.querySelectorAll('.prev-row'),rows=[],i;
   for(i=0;i<list.length;i++){ if(list[i].querySelector('.prev-seg.p-slot'))rows.push(list[i]); }
   if(!rows.length)return false;
   layoutStrictChordsClear(scope);
+  if(opts.skipTight){
+    var changedSkip=false;
+    for(i=0;i<rows.length;i++){
+      if(layoutStrictChords(rows[i],false))changedSkip=true;
+    }
+    return changedSkip;
+  }
 
   /* 先量各行的自然宽（此时还没加任何收紧/避让），用来判断哪些行「确实长」。
      只有拖着整首谱缩小的那些行才值得收紧；位置够的行收了白收，只会显得局促。 */
-  var widths=[],maxW=0,prevDisp,w;
+  var widths=[],maxW=0,prevDisp,prevW,w;
   for(i=0;i<rows.length;i++){
     prevDisp=rows[i].style.display;
+    prevW=rows[i].style.width;
     rows[i].style.display='inline-flex';
+    rows[i].style.width='max-content';
     w=rows[i].offsetWidth;
     rows[i].style.display=prevDisp;
+    rows[i].style.width=prevW;
     widths.push(w);
     if(w>maxW)maxW=w;
   }
   var changed=false,longEnough;
   for(i=0;i<rows.length;i++){
-    longEnough=(maxW>0&&widths[i]>=maxW*CHORD_FIT_LONG_ROW);
+    longEnough=(maxW>0&&widths[i]>=maxW*CHORD_FIT_LONG_ROW&&widths[i]>CHORD_FIT_MAX_W);
     if(layoutStrictChords(rows[i],longEnough))changed=true;
   }
   return changed;
