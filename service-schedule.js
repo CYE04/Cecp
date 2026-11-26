@@ -2669,7 +2669,7 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
 
     var tbody = '<tbody>';
     rowDefs.forEach(function (rowDef) {
-      var shortLabel = {leader:'主领', worship:'敬拜', prayerLeader:'祷告带领', sound:'调音', ppt:'PPT', broadcast:'转播'}[rowDef.key] || rowDef.label;
+      var shortLabel = {leader:'司会', worship:'敬拜', prayerLeader:'祷告带领', sound:'调音', ppt:'PPT', broadcast:'转播'}[rowDef.key] || rowDef.label;
       var labelHtml = opt.adaptive
         ? '<span class="cec-label-long">' + esc(rowDef.label) + '</span><span class="cec-label-short">' + esc(shortLabel) + '</span>'
         : esc(rowDef.label);
@@ -2784,7 +2784,7 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
   function serviceRowsForType(type) {
     if (type === '主日下午') {
       return [
-        { key: 'leader',         label: '主领 / 带领', kind: 'badges' },
+        { key: 'leader',         label: '司会', kind: 'badges' },
         { key: 'worship',        label: '敬拜带领',    kind: 'badges' },
         { key: 'prayerLeader',   label: '祷告会带领',  kind: 'badges' },
         { key: 'praisePrayer',   label: '颂赞祷告',    kind: 'badges' },
@@ -2803,7 +2803,7 @@ html.dark .cec-btn-collapse:hover{background:rgba(255,255,255,.15);color:#ffffff
 
     if (type === '主日晚上') {
       return [
-        { key: 'leader',    label: '主领 / 带领', kind: 'badges' },
+        { key: 'leader',    label: '司会', kind: 'badges' },
         { key: 'worship',   label: '敬拜带领',    kind: 'badges' },
         { key: 'piano',     label: '司琴',        kind: 'badges' },
         { key: 'drums',     label: '鼓',          kind: 'badges' },
